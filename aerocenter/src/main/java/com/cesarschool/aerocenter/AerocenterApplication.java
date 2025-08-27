@@ -8,6 +8,7 @@ public class AerocenterApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(AerocenterApplication.class, args);
+		System.out.println("\nHello, AeroCenter!\n");
 	}
 
 }
