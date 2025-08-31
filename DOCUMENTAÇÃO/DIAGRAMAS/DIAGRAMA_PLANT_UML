@@ -1,0 +1,127 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+' --- Descrições dos Bounded Contexts --- '
+
+rectangle "Contexto de Agendamento" as AgendamentoContext {
+  
+  note as N1
+    **Propósito:**
+    O Coração do sistema. Lida com a lógica central
+    de reservas, garantindo a integridade dos horários
+    e a disponibilidade. É onde as regras mais
+    críticas de negócio residem.
+  end note
+
+  class Agendamento {
+    + id: UUID
+    + dataHora: LocalDateTime
+    + status: StatusAgendamento
+    --
+    + concluir()
+  }
+
+  enum StatusAgendamento {
+    Pendente
+    Confirmado
+    Cancelado
+    Concluido
+  }
+}
+
+rectangle "Contexto de Profissionais e Serviços" as ServicoContext {
+  
+  note as N2
+    **Propósito:**
+    Um subdomínio de suporte que gerencia os
+    recursos disponíveis para agendamento.
+    Fornece as informações de "quem" (Profissionais)
+    e "o quê" (Serviços) que podem ser agendados. (ex: "Corte de Cabelo", "Barba")
+  end note
+
+  class Servico {
+    + id: UUID
+    + nome: String
+    + duracao: int (minutos)
+    + preco: BigDecimal
+  }
+
+  class Profissional {
+    + id: UUID
+    + nome: String
+  }
+}
+
+rectangle "Contexto de Vendas e Estoque" as SalesAndInventoryContext {
+  
+  note as N3
+    **Propósito:**
+    Lida com a parte financeira e de inventário.
+    É responsável por registrar transações, dar baixa
+    em produtos do estoque e processar pagamentos.
+  end note
+
+  class Venda {
+    + id: UUID
+    + dataVenda: LocalDateTime
+    + valorTotal: BigDecimal
+    + itens: List<ItemVenda>
+  }
+
+  class ItemVenda {
+    + descricao: String
+    + preco: BigDecimal
+    + quantidade: int
+  }
+  
+  class Pagamento {
+    + id: UUID
+    + metodo: String
+  }
+  
+  class Produto {
+    + id: UUID
+    + nome: String
+    + estoque: int
+  }
+  
+  Venda "1" --> "1..*" ItemVenda : Contém
+  Venda "1" --> "1" Pagamento : Possui
+}
+
+rectangle "Contexto de Marketing e Fidelização" as MarketingContext {
+  
+  note as N4
+    **Propósito:**
+    Focado na retenção e no relacionamento com o cliente.
+    Consome dados de agendamentos e vendas para
+    gerenciar o CRM, programas de fidelidade e
+    análises de desempenho.
+  end note
+
+  class Cliente {
+    + id: UUID
+    + nome: String
+    + historico: List<AgendamentoConcluido>
+    + pontosFidelidade: int
+  }
+  
+  class ProgramaDeFidelidade {
+    + regraPontuacao: int
+    + recompensas: List<Recompensa>
+  }
+}
+
+' Relacionamentos entre Contextos'
+AgendamentoContext .right.> ServicoContext: Usa (via API)
+SalesAndInventoryContext .left.> AgendamentoContext: Usa (via Evento de Domínio)
+SalesAndInventoryContext .left.> ServicoContext: Usa (via API)
+
+' Relacionamentos para o contexto de marketing'
+MarketingContext .up.> AgendamentoContext: Usa (via Evento de Domínio)
+MarketingContext .up.> SalesAndInventoryContext: Usa (via Evento de Domínio)
+
+N1 -[hidden]right-> N2
+N2 -[hidden]right-> N3
+N3 -[hidden]right-> N4
+@enduml
