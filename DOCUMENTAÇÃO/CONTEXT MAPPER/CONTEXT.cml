@@ -1,0 +1,230 @@
+/*
+ * Domínio da Barbearia/AeroCenter modelado em CML (Context Mapper)
+ * Fonte: BDD (TESTES BDD.txt) e Diagrama PlantUML (DIAGRAMA_PLANT_UML)
+ * Linguagem: Português (nomes, descrições e comentários)
+ */
+
+Domain Barbearia {
+  domainVisionStatement = "Gerenciar com excelência o agendamento de serviços, profissionais, vendas/estoque e marketing/fidelização de clientes de uma barbearia."
+
+  Subdomain AgendamentoDeServicos {
+    type = CORE_DOMAIN
+    domainVisionStatement = "Coração do sistema: regras críticas para reservar horários com integridade de disponibilidade e status do agendamento."
+  }
+
+  Subdomain ProfissionaisEServicos {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Catálogo de serviços e cadastro de profissionais, incluindo jornada/agenda base para disponibilidade."
+  }
+
+  Subdomain VendasEEstoque {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Registro de vendas (serviços e produtos), pagamentos e baixa no estoque."
+  }
+
+  Subdomain MarketingEFidelizacao {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "CRM, programa de fidelidade e relacionamento; consome eventos de agendamento e vendas."
+  }
+}
+
+/* --------------------------- Bounded Contexts ---------------------------- */
+
+BoundedContext ContextoAgendamento implements AgendamentoDeServicos {
+  domainVisionStatement = "Gerenciar o ciclo de vida dos agendamentos (criação, confirmação, cancelamento, conclusão) respeitando disponibilidade e regras." 
+
+  Module agenda {
+    Aggregate Agendamentos {
+      /* Ciclo de vida do Agendamento (para geração de diagrama de estados) */
+      enum StatusAgendamento {
+        aggregateLifecycle
+        PENDENTE, CONFIRMADO, CANCELADO, CONCLUIDO
+      }
+
+      ValueObject PoliticaCancelamento {
+        int antecedenciaHoras
+      }
+
+      Entity Agendamento {
+        aggregateRoot
+
+  String id
+  Date dataHora
+  - StatusAgendamento status
+        /* Referências por ID aos contextos upstream */
+  String profissionalId
+  String servicoId
+        /* Regras como atributos simples; poderiam ser parametrizadas */
+  - PoliticaCancelamento politicaCancelamento
+      }
+
+      /* Evento publicado quando um agendamento é concluído */
+      DomainEvent AgendamentoConcluido {
+  String agendamentoId
+  String clienteId
+  String servicoId
+  Date dataHoraConclusao
+        BigDecimal valorDoServico
+      }
+    }
+  }
+}
+
+BoundedContext ContextoServicosProfissionais implements ProfissionaisEServicos {
+  domainVisionStatement = "Cadastrar serviços, preços e duração; gerenciar profissionais e suas jornadas para suportar disponibilidade de agendamentos."
+
+  Module catalogoESquadra {
+    Aggregate Servicos {
+      Entity Servico {
+        aggregateRoot
+
+        UUID id
+        String nome
+        int duracaoMinutos
+        BigDecimal preco
+      }
+    }
+
+    Aggregate Profissionais {
+      ValueObject JornadaTrabalho {
+        /* Simplificado: intervalos e faixa horária */
+        String diasDaSemana // ex: "TER-SAB"
+        String horaInicio  // ex: "10:00"
+        String horaFim     // ex: "19:00"
+        String pausaInicio // ex: "13:00"
+        String pausaFim    // ex: "14:00"
+      }
+
+      Entity Profissional {
+        aggregateRoot
+
+  String id
+        String nome
+  - JornadaTrabalho jornada
+        /* Serviços habilitados (mesmo BC) */
+        - List<Servico> servicosHabilitados
+      }
+    }
+  }
+}
+
+BoundedContext ContextoVendasEstoque implements VendasEEstoque {
+  domainVisionStatement = "Registrar vendas de serviços e produtos, processar pagamentos e manter o saldo de estoque."
+
+  Module comercial {
+    Aggregate Vendas {
+      Entity ItemVenda {
+        String descricao
+        BigDecimal preco
+        int quantidade
+      }
+
+      Entity Pagamento {
+  String id
+        String metodo // ex: "DINHEIRO", "CARTAO", "PIX"
+      }
+
+      Entity Venda {
+        aggregateRoot
+
+  String id
+  Date dataVenda
+        BigDecimal valorTotal
+        - List<ItemVenda> itens
+        - Pagamento pagamento
+      }
+    }
+
+    Aggregate Estoque {
+      Entity Produto {
+        aggregateRoot
+
+  String id
+        String nome
+        int estoque
+        BigDecimal preco
+      }
+    }
+  }
+}
+
+BoundedContext ContextoMarketingFidelizacao implements MarketingEFidelizacao {
+  domainVisionStatement = "Fidelização e CRM: pontuação por agendamentos concluídos, recompensas/vouchers e histórico do cliente."
+
+  Module relacionamento {
+    Aggregate Fidelidade {
+      ValueObject Recompensa {
+        String nome
+        int custoPontos
+      }
+
+      ValueObject Voucher {
+        BigDecimal valorDesconto
+        boolean valido
+      }
+
+      Entity ProgramaDeFidelidade {
+        aggregateRoot
+
+        int regraPontuacaoPorAgendamento // ex: 10 pontos por agendamento concluído
+        - List<Recompensa> recompensas
+      }
+    }
+
+    Aggregate Clientes {
+      ValueObject AgendamentoConcluidoResumo {
+        String servico
+        Date quando
+        BigDecimal valor
+      }
+
+      Entity Cliente {
+        aggregateRoot
+
+        String id
+        String nome
+        int pontosFidelidade
+        - List<AgendamentoConcluidoResumo> historico
+      }
+    }
+  }
+}
+
+/* ----------------------------- Context Map ------------------------------ */
+
+ContextMap MapaDeContextoBarbearia {
+  type = SYSTEM_LANDSCAPE
+  state = AS_IS
+
+  contains ContextoAgendamento, ContextoServicosProfissionais, ContextoVendasEstoque, ContextoMarketingFidelizacao
+
+  /* Relacionamentos (inspirados no diagrama PlantUML) */
+
+  // Agendamento consome API de Serviços/Profissionais (Serviços é Upstream)
+  ContextoAgendamento [D] <- [U,OHS,PL] ContextoServicosProfissionais {
+    implementationTechnology = "RESTful HTTP"
+  }
+
+  // Vendas/Estoque reage a eventos de Agendamento (Agendamento é Upstream)
+  ContextoVendasEstoque [D,ACL] <- [U,PL] ContextoAgendamento {
+    implementationTechnology = "Eventos de Domínio"
+    exposedAggregates = Agendamentos
+  }
+
+  // Vendas/Estoque também consome API de Serviços (Serviços é Upstream)
+  ContextoVendasEstoque [D] <- [U,OHS,PL] ContextoServicosProfissionais {
+    implementationTechnology = "RESTful HTTP"
+  }
+
+  // Marketing consome eventos de Agendamento
+  ContextoMarketingFidelizacao [D] <- [U,PL] ContextoAgendamento {
+    implementationTechnology = "Eventos de Domínio"
+    exposedAggregates = Agendamentos
+  }
+
+  // Marketing consome eventos de Vendas
+  ContextoMarketingFidelizacao [D] <- [U,PL] ContextoVendasEstoque {
+    implementationTechnology = "Eventos de Domínio"
+    exposedAggregates = Vendas
+  }
+}
