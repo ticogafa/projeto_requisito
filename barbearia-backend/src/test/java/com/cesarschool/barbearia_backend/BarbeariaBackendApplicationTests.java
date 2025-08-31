@@ -1,12 +1,10 @@
-package com.cesarschool.aerocenter;
+package com.cesarschool.barbearia_backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles("test")
-class AerocenterApplicationTests {
+class BarbeariaBackendApplicationTests {
 
 	@Test
 	void contextLoads() {
