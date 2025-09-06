@@ -1,4 +1,4 @@
-package com.barbearia.agendamento.domain.model;
+package com.barbearia.agendamento.enums;
 
 public enum StatusAgendamento {
     PENDENTE,

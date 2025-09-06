@@ -1,4 +1,4 @@
-package com.barbearia.marketing.application.event.listener;
+package com.barbearia.marketing.event;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,10 +7,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barbearia.marketing.application.dto.VendaDTO;
-import com.barbearia.marketing.domain.model.Cliente;
-import com.barbearia.marketing.domain.repository.ClienteRepository;
-import com.barbearia.marketing.domain.service.FidelidadeService; 
+import com.barbearia.marketing.model.Cliente;
+import com.barbearia.marketing.repository.ClienteRepository;
+import com.barbearia.marketing.service.FidelidadeService;
+import com.barbearia.vendas.model.Venda;
+
+
 
 @Component
 public class VendaEventListener {
@@ -20,8 +22,7 @@ public class VendaEventListener {
     private final FidelidadeService fidelidadeService;
     private final ClienteRepository clienteRepository;
 
-    @Autowired 
-    public VendaEventListener(FidelidadeService fidelidadeService, ClienteRepository clienteRepository) {
+public VendaEventListener(FidelidadeService fidelidadeService, ClienteRepository clienteRepository) {
         this.fidelidadeService = fidelidadeService;
         this.clienteRepository = clienteRepository;
     }
@@ -29,16 +30,16 @@ public class VendaEventListener {
    
     @EventListener
     @Transactional 
-    public void handleVendaRealizadaEvent(VendaDTO venda) {
-        log.info("Recebido evento de venda para o cliente {}", venda.clienteId());
+    public void handleVendaRealizadaEvent(Venda venda) {
+        log.info("Recebido evento de venda para o cliente {}", venda.getClienteId());
 
         
         int pontosGanhos = fidelidadeService.calcularPontosParaVenda(venda);
 
         if (pontosGanhos > 0) {
             
-            Cliente cliente = clienteRepository.findById(venda.clienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + venda.clienteId()));
+            Cliente cliente = clienteRepository.findById(venda.getClienteId())
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + venda.getClienteId()));
 
             
             cliente.adicionarPontos(pontosGanhos);
@@ -48,7 +49,7 @@ public class VendaEventListener {
 
             log.info("{} pontos adicionados ao cliente {}. Saldo atual: {}", pontosGanhos, cliente.getId(), cliente.getPontos());
         } else {
-            log.info("Nenhum ponto a ser adicionado para a venda {}", venda.vendaId());
+            log.info("Nenhum ponto a ser adicionado para a venda {}", venda.getVendaId());
         }
     }
 }
