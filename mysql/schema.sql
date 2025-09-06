@@ -50,7 +50,6 @@ CREATE TABLE cliente (
     email VARCHAR(127) NOT NULL UNIQUE,
     telefone VARCHAR(13) NOT NULL,
     pontosFidelidade INT DEFAULT 0, -- opcional
-    ativo BOOLEAN DEFAULT TRUE, -- opcional
 );
 
 -- ========================== AGENDAMENTO ============================
@@ -82,8 +81,6 @@ CREATE TABLE produto (
     nome VARCHAR(255) NOT NULL,
     preco DECIMAL(15, 2) NOT NULL,
     estoque INT NOT NULL DEFAULT 0,
-    estoqueMinimo INT DEFAULT 0, -- opcional
-    ativo BOOLEAN DEFAULT TRUE, -- opcional
 );
 
 -- ======================= VENDAS ====================================
