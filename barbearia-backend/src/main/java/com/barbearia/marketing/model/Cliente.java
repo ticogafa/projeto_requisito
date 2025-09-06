@@ -1,6 +1,9 @@
 package com.barbearia.marketing.model;
 import java.util.UUID;
 
+import com.barbearia.common.model.Email;
+import com.barbearia.common.model.Telefone;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,13 +22,18 @@ public class Cliente {
     private UUID id;
 
     private String nome;
-    private String email;
-    private int pontos;
+    private Email email;
+    private Telefone telefone;
+    private int pontos; // opcional
 
-    public Cliente(String nome, String email) {
+    public Cliente(String nome, Email email, Telefone telefone, int pontos) {
         this.nome = nome;
         this.email = email;
-        this.pontos = 0; 
+        this.telefone=telefone;
+        this.pontos = pontos;
+    }
+    public Cliente(String nome, Email email, Telefone telefone) {
+        this(nome, email, telefone, 0);
     }
 
     public void adicionarPontos(int pontosGanhos) {

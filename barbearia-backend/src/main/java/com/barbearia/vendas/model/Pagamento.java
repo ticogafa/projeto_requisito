@@ -2,7 +2,7 @@ package com.barbearia.vendas.model;
 
 import java.util.UUID;
 
-import com.barbearia.vendas.enums.MeioPagamento;
+import com.barbearia.common.enums.MeioPagamento;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

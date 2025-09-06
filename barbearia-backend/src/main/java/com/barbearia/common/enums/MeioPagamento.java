@@ -1,4 +1,4 @@
-package com.barbearia.vendas.enums;
+package com.barbearia.common.enums;
 
 public enum MeioPagamento {
     DEBITO,

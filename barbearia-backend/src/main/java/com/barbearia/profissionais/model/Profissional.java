@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import com.barbearia.common.model.Email;
+import com.barbearia.common.model.Telefone;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -20,5 +23,7 @@ public class Profissional {
 
     @Column(nullable = false)
     private String nome;
+    private Email email;
+    private Telefone telefone;
 
 }

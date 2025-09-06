@@ -25,6 +25,8 @@ public class Servico {
     @Column(nullable = false)
     private BigDecimal preco;
 
-    private int duracao;
+    @Column(nullable = false)
+    private int duracaoMinutos;
 
 }
+
