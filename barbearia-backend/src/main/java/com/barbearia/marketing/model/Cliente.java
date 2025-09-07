@@ -1,9 +1,11 @@
 package com.barbearia.marketing.model;
 import java.util.UUID;
 
+import com.barbearia.common.model.Cpf;
 import com.barbearia.common.model.Email;
 import com.barbearia.common.model.Telefone;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,15 +17,26 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "clientes")
+@Table(name = "cliente")
 public class Cliente {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(nullable = false)
     private String nome;
+
+    @Column(nullable = false)
     private Email email;
+
+    @Column(nullable = false)
+    private Cpf cpf;
+
+    @Column(nullable = false)
     private Telefone telefone;
+
+    @Column(nullable = true)
     private int pontos; // opcional
 
     public Cliente(String nome, Email email, Telefone telefone, int pontos) {

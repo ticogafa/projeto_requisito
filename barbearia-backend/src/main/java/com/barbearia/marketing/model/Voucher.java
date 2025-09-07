@@ -6,10 +6,42 @@ import java.util.UUID;
 
 import com.barbearia.common.enums.StatusVoucher;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Entity
+@Data
+@AllArgsConstructor
+@Table(name = "voucher")
 public class Voucher {
-    UUID id; // PK - also the code
-    Cliente cliente; // FK Cliente(id), NOT NULL
-    BigDecimal valorDesconto; // NOT NULL
-    StatusVoucher status; // DEFAULT GERADO
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    UUID id; // também é o valor usado pra resgatar
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    Cliente cliente;
+
+    @Column(nullable = false)
+    BigDecimal valorDesconto;
+    
+    @Column(nullable = false)
+    StatusVoucher status = StatusVoucher.GERADO; //opcional
+    
+    @Column(nullable = true)
     LocalDateTime expiraEm; // opcional (se não tiver, não expira)
-  }
+
+    public Voucher(Cliente cliente, BigDecimal valorDesconto){
+      this.cliente=cliente;
+      this.valorDesconto=valorDesconto;
+    }
+}
