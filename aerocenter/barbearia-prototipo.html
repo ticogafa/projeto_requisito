@@ -1,0 +1,805 @@
+<!--
+Protótipo de alta fidelidade para aplicativo de agendamento de barbearia
+Design inspirado na imagem fornecida
+Autor: GitHub Copilot
+-->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barbearia - Agendamento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #1a1a2e;
+      --bg-card: #23234a;
+      --text-light: #fff;
+      --text-muted: #cccccc;
+      --accent-blue: #007bff;
+      --accent-red: #dc3545;
+      --accent-green: #28a745;
+      --border-radius: 18px;
+      --input-bg: #22223a;
+      --input-border: #333355;
+      --shadow: 0 4px 24px rgba(0,0,0,0.18);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 32px 24px;
+      margin: 24px;
+      transition: box-shadow 0.3s;
+    }
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .logo-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--accent-blue) 60%, var(--accent-red) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .logo-icon::before {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 12px;
+      background: var(--bg-dark);
+      border-radius: 6px;
+      position: absolute;
+      top: 34px;
+      left: 10px;
+    }
+    .logo-text {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text-light);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-label {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--border-radius);
+      color: var(--text-light);
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .form-input:focus {
+      border-color: var(--accent-blue);
+    }
+    .btn {
+      width: 100%;
+      padding: 14px 0;
+      background: var(--accent-blue);
+      color: var(--text-light);
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.12);
+    }
+    .btn:active {
+      background: #0056b3;
+    }
+    .btn-secondary {
+      background: var(--bg-dark);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      margin-top: 0;
+    }
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+    .form-footer a {
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .form-footer a:hover {
+      color: #0056b3;
+    }
+    .welcome {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--accent-blue);
+    }
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px 0;
+      background: var(--input-bg);
+      color: var(--text-light);
+      border-radius: var(--border-radius);
+      text-align: center;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .tab.active {
+      background: var(--accent-blue);
+      color: var(--text-light);
+    }
+    .services-list {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+    .service {
+      background: var(--input-bg);
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      border: 2px solid transparent;
+    }
+    .service.selected {
+      background: var(--accent-blue);
+      color: var(--text-light);
+      border-color: var(--accent-blue);
+      box-shadow: 0 2px 8px rgba(0,123,255,0.12);
+    }
+    .service-icon {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+    .service-label {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .options-list {
+      margin-bottom: 18px;
+    }
+    .option {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .option.selected {
+      background: var(--accent-blue);
+      color: var(--text-light);
+    }
+    .option-radio {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--accent-blue);
+      margin-right: 12px;
+      background: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .option.selected .option-radio {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+    }
+    .calendar {
+      margin-bottom: 18px;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .calendar-days {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .calendar-day {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--input-bg);
+      color: var(--text-light);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .calendar-day.selected {
+      background: var(--accent-blue);
+      color: var(--text-light);
+    }
+    .calendar-day.today {
+      border: 2px solid var(--accent-blue);
+    }
+    .times-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+      justify-content: center;
+    }
+    .time-slot {
+      padding: 10px 18px;
+      background: var(--input-bg);
+      color: var(--text-light);
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+    }
+    .time-slot.selected {
+      background: var(--accent-blue);
+      color: var(--text-light);
+      border-color: var(--accent-blue);
+    }
+    .time-slot.booked {
+      background: var(--accent-red);
+      color: var(--text-light);
+      cursor: not-allowed;
+      border-color: var(--accent-red);
+      opacity: 0.7;
+    }
+    .dashboard {
+      margin-bottom: 18px;
+    }
+    .dashboard-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+    }
+    .dashboard-list {
+      background: var(--input-bg);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .dashboard-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #333355;
+    }
+    .dashboard-item:last-child {
+      border-bottom: none;
+    }
+    .status {
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 8px;
+      margin-left: 8px;
+      background: var(--accent-blue);
+      color: var(--text-light);
+      transition: background 0.2s;
+    }
+    .status.pendente { background: var(--accent-red); }
+    .status.confirmado { background: var(--accent-blue); }
+    .status.concluido { background: var(--accent-green); }
+    .status.cancelado { background: #555; }
+    .points {
+      font-size: 1rem;
+      color: var(--accent-green);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .voucher {
+      background: var(--accent-blue);
+      color: var(--text-light);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+    .sales {
+      margin-bottom: 18px;
+    }
+    .sales-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+    }
+    .sales-list {
+      background: var(--input-bg);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .sales-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #333355;
+    }
+    .sales-item:last-child {
+      border-bottom: none;
+    }
+    .stock {
+      font-size: 0.95rem;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+    }
+    @media (max-width: 600px) {
+      .container {
+        max-width: 100vw;
+        padding: 18px 6px;
+      }
+      .logo-icon { width: 60px; height: 60px; }
+      .logo-text { font-size: 1.3rem; }
+    }
+    /* Animações */
+    .fade {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    .fade.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="app"></div>
+  <script>
+    // =====================
+    // MODELO DE DADOS
+    // =====================
+    // Entidades principais
+    const mockProfissionais = [
+      { id: 1, nome: 'Carlos Silva', servicos: [1,2,3], agenda: {} },
+      { id: 2, nome: 'João Barros', servicos: [1,2], agenda: {} },
+      { id: 3, nome: 'Lucas Souza', servicos: [2,3], agenda: {} },
+    ];
+    const mockServicos = [
+      { id: 1, nome: 'Corte de Cabelo', duracao: 30, preco: 35, icon: '✂️' },
+      { id: 2, nome: 'Barba', duracao: 20, preco: 25, icon: '🪒' },
+      { id: 3, nome: 'Hair Style', duracao: 40, preco: 50, icon: '💈' },
+    ];
+    const mockProdutos = [
+      { id: 1, nome: 'Shampoo', preco: 20, estoque: 12 },
+      { id: 2, nome: 'Pomada', preco: 30, estoque: 8 },
+      { id: 3, nome: 'Óleo para Barba', preco: 25, estoque: 5 },
+    ];
+    // Mock agenda dos profissionais
+    function gerarAgendaMock() {
+      const agenda = {};
+      for (let d = 0; d < 7; d++) {
+        agenda[d] = [];
+        for (let h = 9; h <= 20; h++) {
+          agenda[d].push({
+            hora: `${h.toString().padStart(2,'0')}:00`,
+            status: Math.random() < 0.15 ? 'booked' : 'available',
+            agendamento: null
+          });
+        }
+      }
+      return agenda;
+    }
+    mockProfissionais.forEach(p => p.agenda = gerarAgendaMock());
+    // Mock clientes
+      const mockClientes = [
+        { id: 1, nome: 'Steve', email: 'steve@email.com', senha: '123', pontos: 120, historico: [], vouchers: [] },
+        { id: 2, nome: 'Maria', email: 'maria@email.com', senha: 'abc', pontos: 80, historico: [], vouchers: [] },
+        { id: 3, nome: 'Teste', email: 'teste@teste.com', senha: 'teste', pontos: 0, historico: [], vouchers: [] },
+      ];
+    // =====================
+    // ESTADO GLOBAL
+    // =====================
+    let state = {
+      tela: 'login', // login, cadastro, agendamento, dashboard, fidelidade, vendas
+      usuario: null, // cliente ou profissional logado
+      agendamento: {
+        servico: null,
+        profissional: null,
+        data: null,
+        hora: null,
+      },
+      vendas: [],
+      fidelidade: {
+        pontos: 0,
+        vouchers: [],
+      },
+    };
+    // =====================
+    // COMPONENTES DE UI
+    // =====================
+    const app = document.getElementById('app');
+    function render() {
+      app.innerHTML = '';
+      switch(state.tela) {
+        case 'login': renderLogin(); break;
+        case 'cadastro': renderCadastro(); break;
+        case 'agendamento': renderAgendamento(); break;
+        case 'dashboard': renderDashboard(); break;
+        case 'fidelidade': renderFidelidade(); break;
+        case 'vendas': renderVendas(); break;
+      }
+      setTimeout(() => {
+        document.querySelectorAll('.fade').forEach(e => e.classList.add('show'));
+      }, 50);
+    }
+    // ========== LOGIN ==========
+    function renderLogin() {
+      app.innerHTML = `
+        <div class="logo fade">
+          <div class="logo-icon"></div>
+          <div class="logo-text">BARBERSHOP</div>
+        </div>
+        <form class="fade" id="loginForm">
+          <div class="form-group">
+            <label class="form-label">E-Mail</label>
+            <input type="email" class="form-input" name="email" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input type="password" class="form-input" name="senha" required autocomplete="current-password">
+          </div>
+          <button class="btn" type="submit">LOG IN</button>
+          <div class="form-footer">
+            <a href="#" id="forgot">Esqueceu a senha?</a>
+            <a href="#" id="signup">Novo usuário? SIGN UP</a>
+          </div>
+        </form>
+      `;
+      document.getElementById('loginForm').onsubmit = function(e) {
+        e.preventDefault();
+        const email = this.email.value.trim();
+        const senha = this.senha.value.trim();
+        const user = mockClientes.find(u => u.email === email && u.senha === senha);
+        if (user) {
+          state.usuario = user;
+          state.tela = 'agendamento';
+          render();
+        } else {
+          alert('Usuário ou senha inválidos.');
+        }
+      };
+      document.getElementById('signup').onclick = function(e) {
+        e.preventDefault();
+        state.tela = 'cadastro';
+        render();
+      };
+      document.getElementById('forgot').onclick = function(e) {
+        e.preventDefault();
+        alert('Funcionalidade de recuperação de senha não implementada.');
+      };
+    }
+    // ========== CADASTRO ==========
+    function renderCadastro() {
+      app.innerHTML = `
+        <div class="logo fade">
+          <div class="logo-icon"></div>
+          <div class="logo-text">BARBERSHOP</div>
+        </div>
+        <form class="fade" id="cadastroForm">
+          <div class="form-group">
+            <label class="form-label">Nome</label>
+            <input type="text" class="form-input" name="nome" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-Mail</label>
+            <input type="email" class="form-input" name="email" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input type="password" class="form-input" name="senha" required>
+          </div>
+          <button class="btn" type="submit">CADASTRAR</button>
+          <div class="form-footer">
+            <a href="#" id="backLogin">Já tem conta? LOGIN</a>
+          </div>
+        </form>
+      `;
+      document.getElementById('cadastroForm').onsubmit = function(e) {
+        e.preventDefault();
+        const nome = this.nome.value.trim();
+        const email = this.email.value.trim();
+        const senha = this.senha.value.trim();
+        if (mockClientes.find(u => u.email === email)) {
+          alert('E-mail já cadastrado.');
+          return;
+        }
+        const novo = { id: mockClientes.length+1, nome, email, senha, pontos: 0, historico: [], vouchers: [] };
+        mockClientes.push(novo);
+        state.usuario = novo;
+        state.tela = 'agendamento';
+        render();
+      };
+      document.getElementById('backLogin').onclick = function(e) {
+        e.preventDefault();
+        state.tela = 'login';
+        render();
+      };
+    }
+    // ========== AGENDAMENTO ==========
+    function renderAgendamento() {
+      const user = state.usuario;
+      app.innerHTML = `
+        <div class="fade">
+          <div class="welcome">Bem-vindo, ${user.nome}!</div>
+          <div style="margin-bottom:12px;color:var(--text-muted);font-size:0.95rem;">Selecione o serviço, profissional e horário desejado.</div>
+          <div class="tabs">
+            <div class="tab active">Serviços</div>
+            <div class="tab" id="tabDashboard">Painel</div>
+            <div class="tab" id="tabFidelidade">Fidelidade</div>
+            <div class="tab" id="tabVendas">Vendas</div>
+          </div>
+          <div class="services-list">
+            ${mockServicos.map(s => `
+              <div class="service${state.agendamento.servico===s.id?' selected':''}" data-id="${s.id}">
+                <div class="service-icon">${s.icon}</div>
+                <div class="service-label">${s.nome}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Profissional</label>
+            <select class="form-input" id="profSelect">
+              <option value="">Selecione</option>
+              ${mockProfissionais.filter(p => !state.agendamento.servico || p.servicos.includes(state.agendamento.servico)).map(p => `
+                <option value="${p.id}"${state.agendamento.profissional===p.id?' selected':''}>${p.nome}</option>
+              `).join('')}
+            </select>
+          </div>
+          <div class="calendar">
+            <div class="calendar-header">
+              <span style="font-weight:600;">Selecione o dia</span>
+              <span id="calendarMonth">${getMonthName()}</span>
+            </div>
+            <div class="calendar-days">
+              ${renderCalendarDays()}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Horário disponível</label>
+            <div class="times-list">
+              ${renderTimeSlots()}
+            </div>
+          </div>
+          <button class="btn" id="btnAgendar">CONTINUAR</button>
+          <div class="form-footer">
+            <a href="#" id="logout">Sair</a>
+          </div>
+        </div>
+      `;
+      // Interações
+      document.querySelectorAll('.service').forEach(el => {
+        el.onclick = () => {
+          state.agendamento.servico = parseInt(el.dataset.id);
+          state.agendamento.profissional = null;
+          state.agendamento.data = null;
+          state.agendamento.hora = null;
+          render();
+        };
+      });
+      document.getElementById('profSelect').onchange = function() {
+        state.agendamento.profissional = parseInt(this.value)||null;
+        state.agendamento.data = null;
+        state.agendamento.hora = null;
+        render();
+      };
+      document.querySelectorAll('.calendar-day').forEach(el => {
+        el.onclick = () => {
+          state.agendamento.data = parseInt(el.dataset.day);
+          state.agendamento.hora = null;
+          render();
+        };
+      });
+      document.querySelectorAll('.time-slot').forEach(el => {
+        if (!el.classList.contains('booked')) {
+          el.onclick = () => {
+            state.agendamento.hora = el.dataset.hora;
+            render();
+          };
+        }
+      });
+      document.getElementById('btnAgendar').onclick = function() {
+        if (!state.agendamento.servico || !state.agendamento.profissional || state.agendamento.data==null || !state.agendamento.hora) {
+          alert('Selecione serviço, profissional, dia e horário.');
+          return;
+        }
+        // Simula agendamento
+        const prof = mockProfissionais.find(p => p.id === state.agendamento.profissional);
+        const slot = prof.agenda[state.agendamento.data].find(s => s.hora === state.agendamento.hora);
+        if (slot.status === 'booked') {
+          alert('Horário já reservado.');
+          return;
+        }
+        slot.status = 'booked';
+        slot.agendamento = {
+          cliente: user.id,
+          servico: state.agendamento.servico,
+          status: 'pendente',
+          data: state.agendamento.data,
+          hora: state.agendamento.hora,
+        };
+        user.historico.push(slot.agendamento);
+        user.pontos += 10;
+        alert('Agendamento realizado! Você ganhou 10 pontos de fidelidade.');
+        state.agendamento = { servico:null, profissional:null, data:null, hora:null };
+        render();
+      };
+      document.getElementById('logout').onclick = function(e) {
+        e.preventDefault();
+        state.usuario = null;
+        state.tela = 'login';
+        render();
+      };
+      document.getElementById('tabDashboard').onclick = function() {
+        state.tela = 'dashboard';
+        render();
+      };
+      document.getElementById('tabFidelidade').onclick = function() {
+        state.tela = 'fidelidade';
+        render();
+      };
+      document.getElementById('tabVendas').onclick = function() {
+        state.tela = 'vendas';
+        render();
+      };
+    }
+    // ========== CALENDÁRIO ==========
+    function getMonthName() {
+      const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      const hoje = new Date();
+      return meses[hoje.getMonth()];
+    }
+    function renderCalendarDays() {
+      const hoje = new Date();
+      const diaAtual = hoje.getDate();
+      let dias = '';
+      for (let i = 0; i < 7; i++) {
+        const dia = diaAtual + i;
+        dias += `<div class="calendar-day${state.agendamento.data===i?' selected':''}${i===0?' today':''}" data-day="${i}">${dia}</div>`;
+      }
+      return dias;
+    }
+    function renderTimeSlots() {
+      if (!state.agendamento.profissional || state.agendamento.data==null) return '<span style="color:var(--text-muted);">Selecione profissional e dia.</span>';
+      const prof = mockProfissionais.find(p => p.id === state.agendamento.profissional);
+      return prof.agenda[state.agendamento.data].map(slot => `
+        <div class="time-slot${slot.status==='booked'?' booked':''}${state.agendamento.hora===slot.hora?' selected':''}" data-hora="${slot.hora}">${slot.hora}</div>
+      `).join('');
+    }
+    // ========== DASHBOARD PROFISSIONAL ==========
+    function renderDashboard() {
+      const prof = mockProfissionais[0]; // Simula login do profissional 1
+      app.innerHTML = `
+        <div class="fade">
+          <div class="dashboard-title">Agenda de ${prof.nome}</div>
+          <div class="dashboard-list">
+            ${Object.keys(prof.agenda).map(dia => {
+              const hoje = new Date();
+              const diaLabel = `${hoje.getDate()+parseInt(dia)}/${hoje.getMonth()+1}`;
+              return `<div style="margin-bottom:8px;font-weight:600;">${diaLabel}</div>
+                ${prof.agenda[dia].filter(s => s.status==='booked').map(slot => {
+                  const ag = slot.agendamento;
+                  const serv = mockServicos.find(s => s.id===ag.servico);
+                  const cliente = mockClientes.find(c => c.id===ag.cliente);
+                  return `<div class="dashboard-item">
+                    <span>${slot.hora} - ${serv.nome} (${cliente.nome})</span>
+                    <span class="status ${ag.status}">${ag.status.charAt(0).toUpperCase()+ag.status.slice(1)}</span>
+                  </div>`;
+                }).join('')}
+              `;
+            }).join('')}
+          </div>
+          <button class="btn" id="backAgendamento">Voltar</button>
+        </div>
+      `;
+      document.getElementById('backAgendamento').onclick = function() {
+        state.tela = 'agendamento';
+        render();
+      };
+    }
+    // ========== FIDELIDADE ==========
+    function renderFidelidade() {
+      const user = state.usuario;
+      app.innerHTML = `
+        <div class="fade">
+          <div class="dashboard-title">Fidelidade</div>
+          <div class="points">Pontos acumulados: ${user.pontos}</div>
+          <div class="voucher">${user.pontos>=100?'Voucher disponível: 10% OFF':'Junte 100 pontos para ganhar um voucher!'}</div>
+          <button class="btn" id="backAgendamento">Voltar</button>
+        </div>
+      `;
+      document.getElementById('backAgendamento').onclick = function() {
+        state.tela = 'agendamento';
+        render();
+      };
+    }
+    // ========== VENDAS ==========
+    function renderVendas() {
+      app.innerHTML = `
+        <div class="fade">
+          <div class="sales-title">Vendas de Produtos</div>
+          <div class="sales-list">
+            ${mockProdutos.map(prod => `
+              <div class="sales-item">
+                <span>${prod.nome} <span class="stock">(Estoque: ${prod.estoque})</span></span>
+                <span>R$ ${prod.preco}</span>
+                <button class="btn btn-secondary" data-id="${prod.id}"${prod.estoque<=0?' disabled':''}>Vender</button>
+              </div>
+            `).join('')}
+          </div>
+          <button class="btn" id="backAgendamento">Voltar</button>
+        </div>
+      `;
+      document.querySelectorAll('.btn.btn-secondary').forEach(btn => {
+        btn.onclick = function() {
+          const id = parseInt(this.dataset.id);
+          const prod = mockProdutos.find(p => p.id===id);
+          if (prod.estoque>0) {
+            prod.estoque--;
+            alert(`Venda realizada: ${prod.nome}. Estoque restante: ${prod.estoque}`);
+            render();
+          }
+        };
+      });
+      document.getElementById('backAgendamento').onclick = function() {
+        state.tela = 'agendamento';
+        render();
+      };
+    }
+    // Inicialização
+    render();
+  </script>
+</html>
