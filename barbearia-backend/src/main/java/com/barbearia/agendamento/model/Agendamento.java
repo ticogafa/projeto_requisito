@@ -28,17 +28,18 @@ public class Agendamento {
     @Column(nullable = false)
     private com.barbearia.common.enums.StatusAgendamento status;
 
-    @ManyToMany
-    @JoinColumn(name = "cliente_id")
-    Cliente cliente;
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", nullable = false)
+    private Cliente cliente;
     
-    @ManyToMany
-    @JoinColumn(name = "profissional_id")
-    Profissional profissional;
+    @ManyToOne
+    @JoinColumn(name = "profissional_id", nullable = false)
+    private Profissional profissional;
 
-    @Column(nullable = false)
-    ServicoOferecido servico;
+    @ManyToOne
+    @JoinColumn(name = "servico_id", nullable = false)
+    private ServicoOferecido servico;
 
     @Column(nullable = true)
-    String observacoes; // opcional
+    private String observacoes; // opcional
 }

@@ -9,6 +9,10 @@ import java.util.UUID;
 import com.barbearia.marketing.model.Cliente;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -18,27 +22,32 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.barbearia.marketing.model.Voucher;
 
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "venda")
 public class Venda {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     
     @ManyToOne
-    @JoinColumn(name = "cliente", nullable = false)
+    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
     @Column(nullable = false)
-    LocalDateTime dataVenda = LocalDateTime.now();
+    private LocalDateTime dataVenda = LocalDateTime.now();
 
     @Column(nullable = false)
     private BigDecimal valorTotal;
 
-    @OneToMany(mappedBy = "item_venda")
+    @OneToMany(mappedBy = "venda")
     private List<ItemVenda> itens = new ArrayList<>(); // >= 1
 
-    @Column(nullable = true)
+    @ManyToOne
+    @JoinColumn(name = "voucher_id", nullable = true)
     private Voucher voucher; // opcional
 
     @Column(nullable = true)
