@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpServerErrorException.NotImplemented;
 
 import com.barbearia.agendamento.model.Agendamento;
 import com.barbearia.agendamento.repository.AgendamentoRepository;
@@ -50,7 +49,12 @@ public class AgendamentoService {
         this.verificarConflitoHorario(agendamento);
         this.verificarConflitoProfissional(agendamento.getProfissional());
         this.verificarAlteracaoStatus(agendamento);
-        // regras de negócio....
+        
+        // Gera um token de confirmação para novos agendamentos
+        if (agendamento.getId() == null) {
+            agendamento.setTokenConfirmacao(UUID.randomUUID().toString());
+        }
+        
         return repository.save(agendamento);
     }
 
