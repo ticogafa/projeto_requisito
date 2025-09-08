@@ -17,6 +17,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import jakarta.persistence.Entity;
+
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.barbearia.marketing.model.Cliente;
+import com.barbearia.marketing.model.Voucher;
 import com.barbearia.marketing.repository.ClienteRepository;
 
 import jakarta.transaction.Transactional;
@@ -16,11 +17,22 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class ClienteService {
+
+    // -- • A cada 100 pontos → R$ 10,00 de desconto
+    // -- • Quando o cliente troca pontos, gera um voucher
+
+    // ainda não decidi aonde colocar essa regra?
+    // -- • Quando o voucher é utilizado, ele é vinculado à venda (campo voucherId)
+
     private final ClienteRepository repository;
 
     public Optional<Cliente> findById(UUID id){
         // regras de negócio....
         return repository.findById(id);
+    }
+
+    private Voucher resgatarVoucher(Cliente cliente){
+        throw new UnsupportedOperationException("Method not implemented");
     }
 
     public List<Cliente> findAll(){
