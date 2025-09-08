@@ -16,10 +16,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "voucher")
 public class Voucher {
 
@@ -27,10 +32,12 @@ public class Voucher {
     @GeneratedValue(strategy = GenerationType.AUTO)
     UUID id; // também é o valor usado pra resgatar
 
+    @NonNull
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     Cliente cliente;
 
+    @NonNull
     @Column(nullable = false)
     BigDecimal valorDesconto;
     
@@ -40,8 +47,4 @@ public class Voucher {
     @Column(nullable = true)
     LocalDateTime expiraEm; // opcional (se não tiver, não expira)
 
-    public Voucher(Cliente cliente, BigDecimal valorDesconto){
-      this.cliente=cliente;
-      this.valorDesconto=valorDesconto;
-    }
 }

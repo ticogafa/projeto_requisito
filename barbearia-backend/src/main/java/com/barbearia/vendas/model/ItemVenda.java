@@ -7,7 +7,11 @@ import com.barbearia.common.enums.TipoVenda;
 import com.barbearia.profissionais.model.ServicoOferecido;
 
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,14 +22,19 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 
+@Entity
 @Data
 @Table(name = "item_venda")
-@Entity
+@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class ItemVenda {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id; // PK
 
+    @NonNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "venda_id", nullable = false)
     private Venda venda;
@@ -38,20 +47,24 @@ public class ItemVenda {
     @JoinColumn(name = "servico_id", nullable = true)
     private ServicoOferecido servico; // opcional (só vai estar presente se for tipo servico)
 
+    @NonNull
     @Column(nullable = false)
     private String descricao;
 
     @Column(nullable = false)
     private int quantidade = 1;
 
+    @NonNull
     @Column(nullable = false)
     private BigDecimal precoUnitario;
 
+    @NonNull
     @Column(nullable = false)
     private BigDecimal precoTotal;
 
+    @NonNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TipoVenda tipo;
+    private TipoVenda tipo; // sera que o tipo é necessário msm aq?
 }
 

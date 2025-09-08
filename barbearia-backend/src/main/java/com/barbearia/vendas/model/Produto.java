@@ -10,10 +10,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "produto")
 public class Produto {
 
@@ -21,6 +24,7 @@ public class Produto {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @NonNull
     @Column(nullable = false)
     private String nome;
 

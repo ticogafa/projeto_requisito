@@ -14,10 +14,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "horario_trabalho")
 public class HorarioTrabalho {
 
@@ -25,16 +30,20 @@ public class HorarioTrabalho {
     @GeneratedValue(strategy = GenerationType.AUTO)
     UUID id;
 
+    @NonNull
     @ManyToOne
     @JoinColumn(name="profissional_id")
     private Profissional profissional;
     
+    @NonNull
     @Column(nullable = false)
     private DiaSemana diaSemana;
     
+    @NonNull
     @Column(nullable = false)
     private LocalTime horaInicio;
     
+    @NonNull
     @Column(nullable = false)
     private LocalTime horaFim;
     
@@ -44,16 +53,5 @@ public class HorarioTrabalho {
     @Column(nullable = true)
     private LocalTime fimPausa; // opcional
 
-    public HorarioTrabalho(
-        Profissional profissional,
-        DiaSemana diaSemana,
-        LocalTime horaInicio,
-        LocalTime horaFim
-    ) {
-        this.profissional = profissional;
-        this.diaSemana = diaSemana;
-        this.horaInicio = horaInicio;
-        this.horaFim = horaFim;
-    }
 }
 

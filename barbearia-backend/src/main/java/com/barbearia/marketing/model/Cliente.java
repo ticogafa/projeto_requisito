@@ -11,12 +11,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
+@RequiredArgsConstructor
+@AllArgsConstructor
 @Table(name = "cliente")
 public class Cliente {
 
@@ -24,30 +29,24 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @NonNull
     @Column(nullable = false)
     private String nome;
 
+    @NonNull
     @Column(nullable = false)
     private Email email;
 
+    @NonNull
     @Column(nullable = false)
     private Cpf cpf;
 
+    @NonNull
     @Column(nullable = false)
     private Telefone telefone;
 
     @Column(nullable = true)
-    private int pontos; // opcional
-
-    public Cliente(String nome, Email email, Telefone telefone, int pontos) {
-        this.nome = nome;
-        this.email = email;
-        this.telefone=telefone;
-        this.pontos = pontos;
-    }
-    public Cliente(String nome, Email email, Telefone telefone) {
-        this(nome, email, telefone, 0);
-    }
+    private int pontos = 0;
 
     public void adicionarPontos(int pontosGanhos) {
         if (pontosGanhos < 0) {

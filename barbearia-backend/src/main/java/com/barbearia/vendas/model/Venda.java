@@ -20,6 +20,8 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
 import com.barbearia.marketing.model.Voucher;
 
 @Entity
@@ -33,13 +35,16 @@ public class Venda {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     
+    @NonNull
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
+    @NonNull
     @Column(nullable = false)
     private LocalDateTime dataVenda = LocalDateTime.now();
 
+    @NonNull
     @Column(nullable = false)
     private BigDecimal valorTotal;
 
