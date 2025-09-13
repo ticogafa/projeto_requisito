@@ -1,14 +1,23 @@
 package com.barbearia.vendas.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.barbearia.common.enums.TipoVenda;
+import com.barbearia.marketing.model.Cliente;
+import com.barbearia.marketing.repository.ClienteRepository;
+import com.barbearia.vendas.controller.PdvController.VendaRequest;
 import com.barbearia.vendas.model.ItemVenda;
 import com.barbearia.vendas.model.Produto;
 import com.barbearia.vendas.model.Venda;
+import com.barbearia.vendas.repository.ProdutoRepository;
 import com.barbearia.vendas.repository.VendaRepository;
 
 import jakarta.transaction.Transactional;
@@ -19,39 +28,112 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class VendaService {
     private final VendaRepository repository;
+    private final ProdutoRepository produtoRepository;
+    private final ClienteRepository clienteRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Optional<Venda> findById(UUID id){
-        // regras de negócio....
         return repository.findById(id);
     }
 
     public List<Venda> findAll(){
-        // regras de negócio....
         return repository.findAll();
     }
 
     public Venda save(Venda venda){
-
-        // -- REGRAS DE NEGÓCIO - VENDA:
-        // -- • A Venda de um Produto deve dar baixa no Estoque
-        // -- • Um Pagamento deve ser registrado para cada Serviço e Produto vendidos
-
-        // regras de negócio....
         this.verificarPagamento(venda);
         this.atualizarEstoque(venda.getItens());
-        return repository.save(venda);
+        Venda saved = repository.save(venda);
+        // publica evento para fidelidade se tiver cliente
+        if (saved.getCliente() != null) {
+            eventPublisher.publishEvent(saved);
+        }
+        return saved;
+    }
+
+    public Venda registrarVendaPDV(VendaRequest request) {
+        if (request.getItens() == null || request.getItens().isEmpty()) {
+            throw new IllegalArgumentException("Venda deve conter ao menos um item");
+        }
+
+        Venda venda = new Venda();
+        venda.setDataVenda(LocalDateTime.now());
+        venda.setObservacoes(request.getObservacoes());
+
+        if (request.getClienteId() != null) {
+            Cliente cliente = clienteRepository.findById(request.getClienteId())
+                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+            venda.setCliente(cliente);
+        }
+
+        List<ItemVenda> itens = new ArrayList<>();
+        BigDecimal total = BigDecimal.ZERO;
+
+        request.getItens().forEach(ir -> {
+            ItemVenda item = new ItemVenda();
+            item.setVenda(venda);
+            item.setDescricao(ir.getDescricao());
+            item.setQuantidade(ir.getQuantidade());
+            item.setPrecoUnitario(ir.getPrecoUnitario());
+            item.setPrecoTotal(ir.getPrecoUnitario().multiply(BigDecimal.valueOf(ir.getQuantidade())));
+            item.setTipo(TipoVenda.valueOf(ir.getTipo()));
+
+            if (item.getTipo() == TipoVenda.PRODUTO) {
+                if (ir.getProdutoId() == null) {
+                    throw new IllegalArgumentException("produtoId é obrigatório para item de tipo PRODUTO");
+                }
+                Produto p = produtoRepository.findById(ir.getProdutoId())
+                    .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado"));
+                if (p.getEstoque() < item.getQuantidade()) {
+                    throw new IllegalStateException("Estoque insuficiente para o produto: " + p.getNome());
+                }
+                // reserva baixa
+                p.setEstoque(p.getEstoque() - item.getQuantidade());
+                produtoRepository.save(p);
+                item.setProduto(p);
+            }
+            // Serviço: aqui apenas registra item, sem estoque
+
+            itens.add(item);
+        
+        });
+
+        for (ItemVenda i : itens) {
+            total = total.add(i.getPrecoTotal());
+        }
+        venda.setValorTotal(total);
+        venda.setItens(itens);
+
+        Venda saved = repository.save(venda);
+        if (saved.getCliente() != null) {
+            eventPublisher.publishEvent(saved);
+        }
+        return saved;
     }
 
     private void verificarPagamento(Venda venda) {
-        throw new UnsupportedOperationException("Unimplemented method 'verificarPagamento'");
+        // Placeholder: validação mínima. Em produção, checar pagamentos associados.
+        if (venda.getItens() == null || venda.getItens().isEmpty()) {
+            throw new IllegalArgumentException("Venda deve conter itens");
+        }
     }
 
     private void atualizarEstoque(List<ItemVenda> itens) {
-        throw new UnsupportedOperationException("Unimplemented method 'atualizarEstoque'");
+        // Atualiza estoque de itens de produto
+        for (ItemVenda item : itens) {
+            if (item.getProduto() != null && item.getQuantidade() > 0) {
+                Produto p = produtoRepository.findById(item.getProduto().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado"));
+                if (p.getEstoque() < item.getQuantidade()) {
+                    throw new IllegalStateException("Estoque insuficiente para o produto: " + p.getNome());
+                }
+                p.setEstoque(p.getEstoque() - item.getQuantidade());
+                produtoRepository.save(p);
+            }
+        }
     }
 
     public void delete(Venda venda){
-        // regras de negócio....
         repository.delete(venda);
     }
 }

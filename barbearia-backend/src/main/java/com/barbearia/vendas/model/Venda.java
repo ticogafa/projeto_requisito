@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 import com.barbearia.marketing.model.Cliente;
+import com.barbearia.marketing.model.Voucher;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,8 +24,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-import com.barbearia.marketing.model.Voucher;
-
 @Entity
 @Data
 @AllArgsConstructor
@@ -35,10 +35,9 @@ public class Venda {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     
-    @NonNull
-    @ManyToOne
-    @JoinColumn(name = "cliente_id", nullable = false)
-    private Cliente cliente;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "cliente_id", nullable = true)
+    private Cliente cliente; // opcional
 
     @NonNull
     @Column(nullable = false)
@@ -48,7 +47,7 @@ public class Venda {
     @Column(nullable = false)
     private BigDecimal valorTotal;
 
-    @OneToMany(mappedBy = "venda")
+    @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemVenda> itens = new ArrayList<>(); // >= 1
 
     @ManyToOne

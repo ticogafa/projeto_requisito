@@ -1,5 +1,6 @@
 package com.barbearia.vendas.model;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -30,4 +31,11 @@ public class Produto {
 
     @Column(nullable = false)
     private int estoque = 0;
+
+    @NonNull
+    @Column(nullable = false)
+    private BigDecimal preco;
+
+    @Column(nullable = false)
+    private int estoqueMinimo = 0;
 }
