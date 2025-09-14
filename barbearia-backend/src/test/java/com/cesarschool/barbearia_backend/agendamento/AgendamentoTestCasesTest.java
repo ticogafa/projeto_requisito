@@ -8,8 +8,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +25,11 @@ import com.cesarschool.barbearia_backend.profissionais.model.Profissional;
 import com.cesarschool.barbearia_backend.profissionais.model.ServicoOferecido;
 
 
-@SpringBootTest
+@WebMvcTest(AgendamentoController.class)
 @ActiveProfiles("test")
 class AgendamentoTestCasesTest extends BaseControllerTest{
+
+
 
   @Autowired
   private AgendamentoController controller;
@@ -39,32 +42,40 @@ class AgendamentoTestCasesTest extends BaseControllerTest{
   private Profissional profissionalTest;
   private ServicoOferecido servicoTest;
 
-  @Override
   public void cleanup() {
     // Clean up any test data if needed
   }
 
-  @Override
+  @BeforeEach
   public void setUp() {
-    // Set up test data
-    clienteTest = new Cliente();
-    clienteTest.setId(UUID.randomUUID());
-    
-    profissionalTest = new Profissional();
-    profissionalTest.setId(UUID.randomUUID());
-    profissionalTest.setNome("João Barbeiro");
-    
-    servicoTest = new ServicoOferecido();
-    servicoTest.setId(UUID.randomUUID());
-    
-    agendamentoTest = new Agendamento();
-    agendamentoTest.setId(UUID.randomUUID());
-    agendamentoTest.setCliente(clienteTest);
-    agendamentoTest.setProfissional(profissionalTest);
-    agendamentoTest.setServico(servicoTest);
-    agendamentoTest.setDataHora(LocalDateTime.now().plusDays(1));
-    agendamentoTest.setStatus(StatusAgendamento.PENDENTE);
-    agendamentoTest.setObservacoes("Teste");
+    try {
+      // Create Cliente with all required fields
+      clienteTest = new Cliente();
+      clienteTest.setId(UUID.randomUUID());
+      
+      // Create Profissional with all required fields  
+      profissionalTest = new Profissional();
+      profissionalTest.setId(UUID.randomUUID());
+      profissionalTest.setNome("João Barbeiro");
+      
+      // Create ServicoOferecido with all required fields
+      servicoTest = new ServicoOferecido();
+      servicoTest.setId(UUID.randomUUID());
+      
+      // Create Agendamento with all required fields
+      agendamentoTest = new Agendamento();
+      agendamentoTest.setId(UUID.randomUUID());
+      agendamentoTest.setCliente(clienteTest);
+      agendamentoTest.setProfissional(profissionalTest);
+      agendamentoTest.setServico(servicoTest);
+      agendamentoTest.setDataHora(LocalDateTime.now().plusDays(1));
+      agendamentoTest.setStatus(StatusAgendamento.PENDENTE);
+      agendamentoTest.setObservacoes("Teste");
+    } catch (Exception e) {
+      // If entity creation fails, the test setup has an issue
+      System.err.println("Error creating test entities: " + e.getMessage());
+      throw new RuntimeException("Test setup failed", e);
+    }
   }
 
   @Test
@@ -188,7 +199,9 @@ class AgendamentoTestCasesTest extends BaseControllerTest{
     agendamentoParaCancelar.setStatus(StatusAgendamento.PENDENTE);
 
     when(agendamentoService.findById(agendamentoId)).thenReturn(agendamentoParaCancelar);
-    when(agendamentoService.save(any(Agendamento.class))).thenThrow(new IllegalArgumentException("Não é permitido cancelar agendamentos com menos de 2 horas de antecedência."));
+    when(agendamentoService.save(any(Agendamento.class))).thenThrow(
+      new IllegalArgumentException("Não é permitido cancelar agendamentos com menos de 2 horas de antecedência.")
+    );
 
     // When: Tentar cancelar o agendamento
     // Then: O cancelamento deve ser rejeitado
