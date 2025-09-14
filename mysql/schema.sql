@@ -130,3 +130,5 @@ CREATE TABLE pagamento (
 );
 
 
+
+-- INSERÇÂO
