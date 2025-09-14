@@ -62,10 +62,9 @@ public class Agendamento {
 
     @Column(nullable = true)
     private String observacoes;
-    //ainda nao sei ao certo o que fazer aqui
+
     public void setTokenConfirmacao(String string) {
-        
-        throw new UnsupportedOperationException("ainda nao implementei 'setTokenConfirmacao'");
+        // not implemented
     }
     
 }

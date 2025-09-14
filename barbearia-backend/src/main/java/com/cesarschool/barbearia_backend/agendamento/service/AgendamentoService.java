@@ -71,15 +71,15 @@ public class AgendamentoService {
 
 
     public void verificarAlteracaoStatus(Agendamento agendamento) {
-        if(!agendamento.getStatus().equals(StatusAgendamento.CANCELADO)){
-            return;
-        }
+        var status = agendamento.getStatus();
         var horasAteAgendamento = Duration.between(
             LocalDateTime.now(),
             agendamento.getDataHora()
         ).toHours();
-        if(horasAteAgendamento <= 2)
+        if(status.equals(StatusAgendamento.CANCELADO) && horasAteAgendamento <= 2)
             throw new IllegalArgumentException("Não é permitido cancelar agendamentos com menos de 2 horas de antecedência.");
+        else if(status.equals(StatusAgendamento.CONFIRMADO) && horasAteAgendamento < 0)
+            throw new IllegalArgumentException("Não é possível confirmar um agendamento que já passou.");
     }
 
     public Agendamento save(Agendamento agendamento) throws IllegalArgumentException{
