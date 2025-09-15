@@ -62,10 +62,6 @@ public class Agendamento {
 
     @Column(nullable = true)
     private String observacoes;
-
-    public void setTokenConfirmacao(String string) {
-        // not implemented
-    }
     
 }
     

@@ -2,7 +2,7 @@ package com.cesarschool.barbearia_backend.agendamento;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -88,7 +88,7 @@ class AgendamentoTestCasesTest extends BaseControllerTest{
     novoAgendamento.setDataHora(LocalDateTime.now().plusDays(1));
     novoAgendamento.setStatus(StatusAgendamento.PENDENTE);
 
-    when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoTest);
+    Mockito.when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoTest);
 
     // When: Tentar criar um agendamento nesse horário
     ResponseEntity<Agendamento> response = controller.criarAgendamento(novoAgendamento);
@@ -111,7 +111,7 @@ class AgendamentoTestCasesTest extends BaseControllerTest{
     agendamentoConflito.setDataHora(LocalDateTime.now().plusDays(1));
     agendamentoConflito.setStatus(StatusAgendamento.PENDENTE);
 
-    when(agendamentoService.save(any(Agendamento.class))).thenThrow(new IllegalArgumentException("Já existe um agendamento com João Barbeiro no horário especificado."));
+    Mockito.when(agendamentoService.save(any(Agendamento.class))).thenThrow(new IllegalArgumentException("Já existe um agendamento com João Barbeiro no horário especificado."));
 
     // When: Tentar criar um agendamento nesse mesmo horário
     // Then: O sistema deve impedir a criação do agendamento
@@ -131,7 +131,7 @@ class AgendamentoTestCasesTest extends BaseControllerTest{
     agendamentoDentroJornada.setDataHora(LocalDateTime.now().plusDays(1).withHour(10).withMinute(0));
     agendamentoDentroJornada.setStatus(StatusAgendamento.PENDENTE);
 
-    when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoTest);
+    Mockito.when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoTest);
 
     // When: Tentar criar um agendamento dentro desse horário
     ResponseEntity<Agendamento> response = controller.criarAgendamento(agendamentoDentroJornada);
@@ -152,7 +152,7 @@ class AgendamentoTestCasesTest extends BaseControllerTest{
     agendamentoForaJornada.setDataHora(LocalDateTime.now().plusDays(1).withHour(2).withMinute(0)); // Horário fora da jornada
     agendamentoForaJornada.setStatus(StatusAgendamento.PENDENTE);
 
-    when(agendamentoService.save(any(Agendamento.class))).thenThrow(new IllegalArgumentException("João Barbeiro não está disponível no horário solicitado."));
+    Mockito.when(agendamentoService.save(any(Agendamento.class))).thenThrow(new IllegalArgumentException("João Barbeiro não está disponível no horário solicitado."));
 
     // When: Tentar criar um agendamento fora desse horário
     // Then: O sistema deve impedir a criação do agendamento
@@ -173,8 +173,8 @@ class AgendamentoTestCasesTest extends BaseControllerTest{
     agendamentoParaCancelar.setDataHora(LocalDateTime.now().plusHours(5)); // Mais de 2 horas
     agendamentoParaCancelar.setStatus(StatusAgendamento.PENDENTE);
 
-    when(agendamentoService.findById(agendamentoId)).thenReturn(agendamentoParaCancelar);
-    when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoParaCancelar);
+    Mockito.when(agendamentoService.findById(agendamentoId)).thenReturn(agendamentoParaCancelar);
+    Mockito.when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoParaCancelar);
 
     // When: Tentar cancelar o agendamento
     ResponseEntity<Agendamento> response = controller.cancelarAgendamento(agendamentoId);
@@ -198,8 +198,8 @@ class AgendamentoTestCasesTest extends BaseControllerTest{
     agendamentoParaCancelar.setDataHora(LocalDateTime.now().plusHours(1)); // Menos de 2 horas
     agendamentoParaCancelar.setStatus(StatusAgendamento.PENDENTE);
 
-    when(agendamentoService.findById(agendamentoId)).thenReturn(agendamentoParaCancelar);
-    when(agendamentoService.save(any(Agendamento.class))).thenThrow(
+    Mockito.when(agendamentoService.findById(agendamentoId)).thenReturn(agendamentoParaCancelar);
+    Mockito.when(agendamentoService.save(any(Agendamento.class))).thenThrow(
       new IllegalArgumentException("Não é permitido cancelar agendamentos com menos de 2 horas de antecedência.")
     );
 
@@ -227,7 +227,7 @@ class AgendamentoTestCasesTest extends BaseControllerTest{
     agendamentoComProfissional.setDataHora(LocalDateTime.now().plusDays(1));
     agendamentoComProfissional.setStatus(StatusAgendamento.PENDENTE);
 
-    when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoComProfissional);
+    Mockito.when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoComProfissional);
 
     // When: Criar um agendamento sem especificar profissional
     ResponseEntity<Agendamento> response = controller.criarAgendamento(agendamentoSemProfissional);
@@ -249,7 +249,7 @@ class AgendamentoTestCasesTest extends BaseControllerTest{
     agendamentoSemProfissional.setStatus(StatusAgendamento.PENDENTE);
     // Não definindo profissional intencionalmente
 
-    when(agendamentoService.save(any(Agendamento.class))).thenThrow(new IllegalArgumentException("Nenhum profissional disponível no horário solicitado."));
+    Mockito.when(agendamentoService.save(any(Agendamento.class))).thenThrow(new IllegalArgumentException("Nenhum profissional disponível no horário solicitado."));
 
     // When: Criar um agendamento sem especificar profissional
     // Then: O sistema deve rejeitar a criação do agendamento

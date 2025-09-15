@@ -64,7 +64,9 @@ public class AgendamentoService {
                 }
             }, () -> {
                 throw new IllegalArgumentException(
-                    String.format("O profissional %s não possui horário de trabalho cadastrado para o dia selecionado.", profissional.getNome())
+                    String.format(
+                        "O profissional %s não possui horário de trabalho cadastrado para o dia selecionado.", profissional.getNome()
+                    )
                 );
             });
     }
@@ -91,11 +93,6 @@ public class AgendamentoService {
         this.verificarConflitoHorario(agendamento);
         this.verificarConflitoProfissional(agendamento.getProfissional(), agendamento.getDataHora());
         this.verificarAlteracaoStatus(agendamento);
-        
-        // Gera um token de confirmação para novos agendamentos
-        if (agendamento.getId() == null) {
-            agendamento.setTokenConfirmacao(UUID.randomUUID().toString());
-        }
         
         return repository.save(agendamento);
     }
