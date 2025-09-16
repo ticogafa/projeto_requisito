@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from '@contexts/AuthContext';
 import LoginForm from '@components/LoginForm';
 import Dashboard from '@components/Dashboard';
 import ProtectedRoute from '@components/ProtectedRoute';
+import '@styles/globals.css';
 import './App.css';
 
 const AppRoutes: React.FC = () => {
