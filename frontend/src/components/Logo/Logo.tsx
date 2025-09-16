@@ -1,5 +1,4 @@
 import React from 'react';
-import './Logo.css';
 
 interface LogoProps {
   size?: 'small' | 'medium' | 'large';

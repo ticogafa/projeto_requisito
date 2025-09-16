@@ -1,5 +1,4 @@
 import React from 'react';
-import './Navigation.css';
 
 interface Tab {
   id: string;
