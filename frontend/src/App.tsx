@@ -22,7 +22,7 @@ const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
-        } 
+        }
       />
       <Route 
         path="/" 

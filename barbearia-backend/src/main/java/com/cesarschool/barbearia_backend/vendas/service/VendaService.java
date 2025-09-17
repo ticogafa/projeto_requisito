@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class VendaService {
     private final ClienteRepository clienteRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    public Optional<Venda> findById(UUID id){
+    public Optional<Venda> findById(Integer id){
         return repository.findById(id);
     }
 

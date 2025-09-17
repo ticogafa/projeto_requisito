@@ -2,7 +2,7 @@ package com.cesarschool.barbearia_backend.marketing.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class VoucherService {
     private final VoucherRepository repository;
 
-    public Optional<Voucher> findById(UUID id){
+    public Optional<Voucher> findById(Integer id){
         // regras de negócio....
         return repository.findById(id);
     }

@@ -12,7 +12,7 @@ public class Telefone {
     
     public Telefone(String value) {
         if (value.length() != 10) {
-            throw new IllegalArgumentException("Número de telefone inválido");
+            throw new IllegalArgumentException("Número de telefone deve ter 10 dígitos");
         }
         this.value = value;
     }

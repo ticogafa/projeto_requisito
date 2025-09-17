@@ -47,7 +47,6 @@ export const getFirebaseErrorMessage = (error: unknown): string => {
     'auth/too-many-requests': 'Muitas tentativas. Tente novamente mais tarde',
   };
   
-  // Check if the error message contains any known Firebase error codes
   for (const [code, translation] of Object.entries(errorMap)) {
     if (message.includes(code)) {
       return translation;

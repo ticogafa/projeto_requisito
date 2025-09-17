@@ -2,7 +2,7 @@ package com.cesarschool.barbearia_backend.vendas.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class ProdutoService {
         return repository.findProdutosComEstoqueBaixo();
     }
 
-    public Optional<Produto> findById(UUID id){
+    public Optional<Produto> findById(Integer id){
         // regras de negócio....
         return repository.findById(id);
     }
@@ -49,7 +49,7 @@ public class ProdutoService {
         return repository.save(produto);
     }
 
-    public Produto baixaEstoque(UUID produtoId, int quantidade) {
+    public Produto baixaEstoque(Integer produtoId, int quantidade) {
         if (quantidade <= 0) {
             throw new IllegalArgumentException("Quantidade para baixa deve ser positiva");
         }

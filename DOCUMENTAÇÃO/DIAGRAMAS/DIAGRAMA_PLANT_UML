@@ -14,7 +14,7 @@ rectangle "Contexto de Agendamento" as AgendamentoContext {
   end note
 
   class Agendamento {
-    + id: UUID
+    + id: Integer
     + dataHora: LocalDateTime
     + status: StatusAgendamento
     --
@@ -40,14 +40,14 @@ rectangle "Contexto de Profissionais e Serviços" as ServicoContext {
   end note
 
   class Servico {
-    + id: UUID
+    + id: Integer
     + nome: String
     + duracao: int (minutos)
     + preco: BigDecimal
   }
 
   class Profissional {
-    + id: UUID
+    + id: Integer
     + nome: String
   }
 }
@@ -62,7 +62,7 @@ rectangle "Contexto de Vendas e Estoque" as SalesAndInventoryContext {
   end note
 
   class Venda {
-    + id: UUID
+    + id: Integer
     + dataVenda: LocalDateTime
     + valorTotal: BigDecimal
     + itens: List<ItemVenda>
@@ -75,12 +75,12 @@ rectangle "Contexto de Vendas e Estoque" as SalesAndInventoryContext {
   }
   
   class Pagamento {
-    + id: UUID
+    + id: Integer
     + metodo: String
   }
   
   class Produto {
-    + id: UUID
+    + id: Integer
     + nome: String
     + estoque: int
   }
@@ -100,7 +100,7 @@ rectangle "Contexto de Marketing e Fidelização" as MarketingContext {
   end note
 
   class Cliente {
-    + id: UUID
+    + id: Integer
     + nome: String
     + historico: List<AgendamentoConcluido>
     + pontosFidelidade: int

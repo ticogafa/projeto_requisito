@@ -1,7 +1,7 @@
 package com.cesarschool.barbearia_backend.vendas.model;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+
 
 import com.cesarschool.barbearia_backend.common.enums.TipoVenda;
 import com.cesarschool.barbearia_backend.profissionais.model.ServicoOferecido;
@@ -32,7 +32,7 @@ public class ItemVenda {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id; // PK
+    private Integer id; // PK
 
     @NonNull
     @ManyToOne(optional = false)

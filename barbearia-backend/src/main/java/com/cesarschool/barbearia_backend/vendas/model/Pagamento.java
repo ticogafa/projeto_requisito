@@ -1,6 +1,6 @@
 package com.cesarschool.barbearia_backend.vendas.model;
 
-import java.util.UUID;
+
 
 import com.cesarschool.barbearia_backend.common.enums.MeioPagamento;
 
@@ -29,7 +29,7 @@ public class Pagamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Integer id;
 
     @NonNull
     @Enumerated(EnumType.STRING)

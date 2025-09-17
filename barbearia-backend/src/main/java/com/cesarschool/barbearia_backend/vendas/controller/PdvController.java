@@ -2,7 +2,7 @@ package com.cesarschool.barbearia_backend.vendas.controller;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
+
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,8 +31,8 @@ public class PdvController {
 
     @Data
     public static class ItemRequest {
-        private UUID produtoId; // opcional se for serviço
-        private UUID servicoId; // opcional se for produto
+        private Integer produtoId; // opcional se for serviço
+        private Integer servicoId; // opcional se for produto
         private String descricao;
         private int quantidade;
         private BigDecimal precoUnitario;
@@ -41,7 +41,7 @@ public class PdvController {
 
     @Data
     public static class VendaRequest {
-        private UUID clienteId; // opcional
+        private Integer clienteId; // opcional
         private List<ItemRequest> itens;
         private String observacoes; // opcional
     }

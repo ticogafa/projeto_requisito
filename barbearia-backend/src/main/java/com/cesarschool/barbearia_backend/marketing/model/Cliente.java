@@ -1,5 +1,5 @@
 package com.cesarschool.barbearia_backend.marketing.model;
-import java.util.UUID;
+
 
 import com.cesarschool.barbearia_backend.common.model.Cpf;
 import com.cesarschool.barbearia_backend.common.model.Email;
@@ -27,22 +27,22 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Integer id;
 
     @NonNull
     @Column(nullable = false)
     private String nome;
 
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Email email;
 
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Cpf cpf;
 
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Telefone telefone;
 
     @Column(nullable = true)
@@ -63,6 +63,16 @@ public class Cliente {
             throw new IllegalStateException("Cliente não possui pontos suficientes.");
         }
         this.pontos -= pontosGastos;
+    }
+
+    public String getEmail(){
+        return this.email.getValue();
+    }
+    public String getCpf(){
+        return this.cpf.getValue();
+    }
+    public String getTelefone(){
+        return this.telefone.getValue();
     }
 
 }

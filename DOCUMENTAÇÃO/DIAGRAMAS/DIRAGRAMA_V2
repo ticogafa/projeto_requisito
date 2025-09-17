@@ -6,10 +6,10 @@ skinparam linetype ortho
 ' ======================= CONTEXTO DE AGENDAMENTO =======================
 package "Contexto de Agendamento" {
   class Agendamento {
-    + UUID id // PK, DEFAULT UUID()
-    + UUID clienteId // FK Cliente(id), NOT NULL
-    + UUID profissionalId // FK Profissional(id), NOT NULL
-    + UUID servicoId // FK Servico(id), NOT NULL
+    + Integer id // PK, DEFAULT Integer()
+    + Integer clienteId // FK Cliente(id), NOT NULL
+    + Integer profissionalId // FK Profissional(id), NOT NULL
+    + Integer servicoId // FK Servico(id), NOT NULL
     + LocalDateTime dataHora // NOT NULL
     + StatusAgendamento status = PENDENTE // DEFAULT
     + String observacoes // opcional
@@ -34,22 +34,22 @@ package "Contexto de Agendamento" {
 ' ================= CONTEXTO DE PROFISSIONAIS E SERVIÇOS =================
 package "Contexto de Profissionais e Serviços" {
   class Servico {
-    + UUID id // PK
+    + Integer id // PK
     + String nome // NOT NULL
     + BigDecimal preco // NOT NULL
     + int duracaoMinutos // NOT NULL
   }
 
   class Profissional {
-    + UUID id // PK
+    + Integer id // PK
     + String nome // NOT NULL
     + String email // UNIQUE, NOT NULL
     + String telefone // NOT NULL
   }
 
   class HorarioTrabalho {
-    + UUID id // PK
-    + UUID profissionalId // FK Profissional(id), NOT NULL
+    + Integer id // PK
+    + Integer profissionalId // FK Profissional(id), NOT NULL
     + DiaSemana diaSemana // NOT NULL
     + LocalTime horaInicio // NOT NULL
     + LocalTime horaFim // NOT NULL
@@ -77,7 +77,7 @@ package "Contexto de Profissionais e Serviços" {
 ' ==================== CONTEXTO DE MARKETING E FIDELIZAÇÃO ====================
 package "Contexto de Marketing e Fidelização" {
   class Cliente {
-    + UUID id // PK
+    + Integer id // PK
     + String nome // NOT NULL
     + String email // UNIQUE, NOT NULL
     + String telefone // NOT NULL
@@ -85,8 +85,8 @@ package "Contexto de Marketing e Fidelização" {
   }
 
   class Voucher {
-    + UUID id // PK
-    + UUID clienteId // FK Cliente(id), NOT NULL
+    + Integer id // PK
+    + Integer clienteId // FK Cliente(id), NOT NULL
     + String codigo // UNIQUE, NOT NULL
     + BigDecimal valorDesconto // NOT NULL
     + StatusVoucher status = GERADO
@@ -112,25 +112,25 @@ package "Contexto de Marketing e Fidelização" {
 ' ==================== CONTEXTO DE VENDAS E ESTOQUE ====================
 package "Contexto de Vendas e Estoque" {
   class Produto {
-    + UUID id // PK
+    + Integer id // PK
     + String nome // NOT NULL
     + BigDecimal preco // NOT NULL
     + int estoque = 0 // NOT NULL, DEFAULT
   }
 
   class Venda {
-    + UUID id // PK
-    + UUID clienteId // FK Cliente(id), opcional
+    + Integer id // PK
+    + Integer clienteId // FK Cliente(id), opcional
     + LocalDateTime dataVenda = NOW()
-    + UUID voucherId // FK Voucher(id), opcional
+    + Integer voucherId // FK Voucher(id), opcional
     + BigDecimal valorTotal // NOT NULL
     + String observacoes // opcional
   }
 
   class ItemVenda {
-    + UUID id // PK
-    + UUID vendaId // FK Venda(id), NOT NULL
-    + UUID produtoId // FK Produto(id), opcional
+    + Integer id // PK
+    + Integer vendaId // FK Venda(id), NOT NULL
+    + Integer produtoId // FK Produto(id), opcional
     + String descricao // NOT NULL
     + int quantidade = 1 // NOT NULL
     + BigDecimal precoUnitario // NOT NULL
@@ -144,8 +144,8 @@ package "Contexto de Vendas e Estoque" {
   }
 
   class Pagamento {
-    + UUID id // PK
-    + UUID vendaId // FK Venda(id), NOT NULL
+    + Integer id // PK
+    + Integer vendaId // FK Venda(id), NOT NULL
     + BigDecimal valor // NOT NULL
     + MetodoPagamento metodo // NOT NULL
     + StatusPagamento status = PENDENTE

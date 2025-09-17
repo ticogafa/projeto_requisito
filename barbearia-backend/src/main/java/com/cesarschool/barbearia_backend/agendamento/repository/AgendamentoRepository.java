@@ -1,6 +1,6 @@
 package com.cesarschool.barbearia_backend.agendamento.repository;
 
-import java.util.UUID;
+
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,14 +12,14 @@ import java.util.List;
 import java.time.LocalDateTime;
 
 @Repository
-public interface AgendamentoRepository extends JpaRepository<Agendamento, UUID>{
+public interface AgendamentoRepository extends JpaRepository<Agendamento, Integer>{
 
     @Query(
-        "SELECT a FROM agendamento a WHERE a.data_hora = :data_hora AND a.profissional.id = :profissional_id"
+        "SELECT a FROM Agendamento a WHERE a.dataHora = :dataHora AND a.profissional.id = :profissionalId"
     )
     List<Agendamento> findByDataHoraAndProfissional(
-        @Param("data_hora") LocalDateTime dataHora,
-        @Param("profissional_id") UUID profissionalId
+        @Param("dataHora") LocalDateTime dataHora,
+        @Param("profissionalId") Integer profissionalId
     );
 
 }

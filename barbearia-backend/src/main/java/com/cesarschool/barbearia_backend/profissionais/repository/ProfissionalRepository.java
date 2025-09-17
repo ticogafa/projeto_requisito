@@ -1,7 +1,7 @@
 package com.cesarschool.barbearia_backend.profissionais.repository;
 
 import java.util.Optional;
-import java.util.UUID;
+
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,12 +11,11 @@ import com.cesarschool.barbearia_backend.common.enums.DiaSemana;
 import com.cesarschool.barbearia_backend.profissionais.model.HorarioTrabalho;
 import com.cesarschool.barbearia_backend.profissionais.model.Profissional;
 
-public interface ProfissionalRepository extends JpaRepository<Profissional, UUID>{
-
+public interface ProfissionalRepository extends JpaRepository<Profissional, Integer>{
     @Query(
-        "SELECT h FROM horario_trabalho h WHERE h.profissional_id = :profissional_id AND h.dia_semana = :dia_semana"
+        "SELECT h FROM HorarioTrabalho h WHERE h.profissional.id = :profissionalId AND h.diaSemana = :diaSemana"
     )
     Optional<HorarioTrabalho> findHorarioTrabalhoByProfissionalAndDiaSemana(
-        @Param ("profissional_id") UUID profissionalId,
-        @Param ("dia_semana") DiaSemana diaSemana);
-}
+        @Param("profissionalId") Integer profissionalId,
+        @Param("diaSemana") DiaSemana diaSemana);
+    }

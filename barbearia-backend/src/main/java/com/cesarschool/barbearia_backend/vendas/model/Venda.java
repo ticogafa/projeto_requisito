@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
 
 import com.cesarschool.barbearia_backend.marketing.model.Cliente;
 import com.cesarschool.barbearia_backend.marketing.model.Voucher;
@@ -32,8 +32,8 @@ import lombok.NonNull;
 public class Venda {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
     
     @ManyToOne(optional = true)
     @JoinColumn(name = "cliente_id", nullable = true)

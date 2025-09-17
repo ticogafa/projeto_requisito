@@ -1,7 +1,7 @@
 package com.cesarschool.barbearia_backend.agendamento.model;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+
 
 import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
 import com.cesarschool.barbearia_backend.marketing.model.Cliente;
@@ -33,8 +33,8 @@ import lombok.RequiredArgsConstructor;
 public class Agendamento {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
 
     @NonNull
     @Column(nullable = false)

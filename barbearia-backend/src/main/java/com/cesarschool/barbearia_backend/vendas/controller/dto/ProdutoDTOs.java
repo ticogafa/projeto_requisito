@@ -1,7 +1,7 @@
 package com.cesarschool.barbearia_backend.vendas.controller.dto;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+
 
 import lombok.Data;
 
@@ -17,7 +17,7 @@ public class ProdutoDTOs {
 
     @Data
     public static class BaixaEstoqueRequest {
-        private UUID produtoId;
+        private Integer produtoId;
         private int quantidade;
     }
 }

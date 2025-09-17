@@ -8,7 +8,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+
 
 @Entity
 @Data
@@ -19,8 +19,8 @@ import java.util.UUID;
 public class ServicoOferecido {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
 
     @NonNull
     @Column(nullable = false)
@@ -29,6 +29,10 @@ public class ServicoOferecido {
     @NonNull
     @Column(nullable = false)
     private BigDecimal preco;
+
+    @NonNull
+    @Column(nullable = false, length = 255)
+    private String descricao;
 
     @Column(nullable = false)
     private int duracaoMinutos;

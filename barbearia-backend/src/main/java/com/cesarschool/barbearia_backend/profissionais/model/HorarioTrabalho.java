@@ -1,7 +1,7 @@
 package com.cesarschool.barbearia_backend.profissionais.model;
 
 import java.time.LocalTime;
-import java.util.UUID;
+
 import com.cesarschool.barbearia_backend.common.enums.DiaSemana;
 
 import jakarta.persistence.Column;
@@ -28,7 +28,7 @@ public class HorarioTrabalho {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    UUID id;
+    Integer id;
 
     @NonNull
     @ManyToOne

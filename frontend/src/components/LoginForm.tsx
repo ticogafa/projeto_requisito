@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useState, type FC, type FormEvent } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
 import Logo from '@/components/Logo/Logo';
+import { getFirebaseErrorMessage } from '@/utils';
 
-const LoginForm: React.FC = () => {
+const LoginForm: FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,7 +13,7 @@ const LoginForm: React.FC = () => {
 
   const { login, signup } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
@@ -37,30 +38,9 @@ const LoginForm: React.FC = () => {
     } catch (error: unknown) {
       console.error('Erro de autenticação:', error);
       
-      // Handle specific Firebase auth errors
-      const firebaseError = error as { code?: string };
-      switch (firebaseError.code) {
-        case 'auth/user-not-found':
-          setError('Usuário não encontrado');
-          break;
-        case 'auth/wrong-password':
-          setError('Senha incorreta');
-          break;
-        case 'auth/email-already-in-use':
-          setError('Este email já está sendo usado');
-          break;
-        case 'auth/weak-password':
-          setError('A senha é muito fraca');
-          break;
-        case 'auth/invalid-email':
-          setError('Email inválido');
-          break;
-        case 'auth/too-many-requests':
-          setError('Muitas tentativas. Tente novamente mais tarde');
-          break;
-        default:
-          setError(isLogin ? 'Erro ao fazer login' : 'Erro ao criar conta');
-      }
+      setError(
+        getFirebaseErrorMessage((error as { code?: string }).code)
+      );
     } finally {
       setLoading(false);
     }

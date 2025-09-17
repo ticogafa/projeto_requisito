@@ -78,7 +78,7 @@ BoundedContext ContextoServicosProfissionais implements ProfissionaisEServicos {
       Entity Servico {
         aggregateRoot
 
-        UUID id
+        Integer id
         String nome
         int duracaoMinutos
         BigDecimal preco

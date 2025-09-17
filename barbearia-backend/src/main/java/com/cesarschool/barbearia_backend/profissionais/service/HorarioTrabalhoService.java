@@ -2,7 +2,7 @@ package com.cesarschool.barbearia_backend.profissionais.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class HorarioTrabalhoService {
     private final HorarioTrabalhoRepository repository;
 
-    public Optional<HorarioTrabalho> findById(UUID id){
+    public Optional<HorarioTrabalho> findById(Integer id){
         // regras de negócio....
         return repository.findById(id);
     }
@@ -29,7 +29,7 @@ public class HorarioTrabalhoService {
     }
 
     public HorarioTrabalho save(HorarioTrabalho horarioTrabalho){
-        // regras de negócio....
+        
         return repository.save(horarioTrabalho);
     }
 

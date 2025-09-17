@@ -7,7 +7,7 @@
 -- Usar a base de dados aerocenter
 USE aerocenter;
 
--- Habilitar inserção de UUIDs explícitos
+-- Habilitar inserção de Integers explícitos
 SET @@session.sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 -- ===================== VARIÁVEIS PARA PKs ===================
@@ -78,44 +78,44 @@ INSERT IGNORE INTO profissional (id, nome, email, telefone) VALUES
 
 -- Carlos Silva - Segunda a Sábado
 INSERT IGNORE INTO horario_trabalho (id, profissional_id, dia_semana, hora_inicio, hora_fim, inicio_pausa, fim_pausa) VALUES
-(UUID(), @prof_carlos, 'SEGUNDA', '08:00:00', '18:00:00', '12:00:00', '13:00:00'),
-(UUID(), @prof_carlos, 'TERCA', '08:00:00', '18:00:00', '12:00:00', '13:00:00'),
-(UUID(), @prof_carlos, 'QUARTA', '08:00:00', '18:00:00', '12:00:00', '13:00:00'),
-(UUID(), @prof_carlos, 'QUINTA', '08:00:00', '18:00:00', '12:00:00', '13:00:00'),
-(UUID(), @prof_carlos, 'SEXTA', '08:00:00', '18:00:00', '12:00:00', '13:00:00'),
-(UUID(), @prof_carlos, 'SABADO', '08:00:00', '16:00:00', '12:00:00', '13:00:00');
+(Integer(), @prof_carlos, 'SEGUNDA', '08:00:00', '18:00:00', '12:00:00', '13:00:00'),
+(Integer(), @prof_carlos, 'TERCA', '08:00:00', '18:00:00', '12:00:00', '13:00:00'),
+(Integer(), @prof_carlos, 'QUARTA', '08:00:00', '18:00:00', '12:00:00', '13:00:00'),
+(Integer(), @prof_carlos, 'QUINTA', '08:00:00', '18:00:00', '12:00:00', '13:00:00'),
+(Integer(), @prof_carlos, 'SEXTA', '08:00:00', '18:00:00', '12:00:00', '13:00:00'),
+(Integer(), @prof_carlos, 'SABADO', '08:00:00', '16:00:00', '12:00:00', '13:00:00');
 
 -- João Mendes - Terça a Sábado
 INSERT IGNORE INTO horario_trabalho (id, profissional_id, dia_semana, hora_inicio, hora_fim, inicio_pausa, fim_pausa) VALUES
-(UUID(), @prof_joao, 'TERCA', '09:00:00', '19:00:00', '12:30:00', '13:30:00'),
-(UUID(), @prof_joao, 'QUARTA', '09:00:00', '19:00:00', '12:30:00', '13:30:00'),
-(UUID(), @prof_joao, 'QUINTA', '09:00:00', '19:00:00', '12:30:00', '13:30:00'),
-(UUID(), @prof_joao, 'SEXTA', '09:00:00', '19:00:00', '12:30:00', '13:30:00'),
-(UUID(), @prof_joao, 'SABADO', '09:00:00', '17:00:00', '12:30:00', '13:30:00');
+(Integer(), @prof_joao, 'TERCA', '09:00:00', '19:00:00', '12:30:00', '13:30:00'),
+(Integer(), @prof_joao, 'QUARTA', '09:00:00', '19:00:00', '12:30:00', '13:30:00'),
+(Integer(), @prof_joao, 'QUINTA', '09:00:00', '19:00:00', '12:30:00', '13:30:00'),
+(Integer(), @prof_joao, 'SEXTA', '09:00:00', '19:00:00', '12:30:00', '13:30:00'),
+(Integer(), @prof_joao, 'SABADO', '09:00:00', '17:00:00', '12:30:00', '13:30:00');
 
 -- Lucas Santos - Segunda a Sexta
 INSERT IGNORE INTO horario_trabalho (id, profissional_id, dia_semana, hora_inicio, hora_fim, inicio_pausa, fim_pausa) VALUES
-(UUID(), @prof_lucas, 'SEGUNDA', '10:00:00', '20:00:00', '13:00:00', '14:00:00'),
-(UUID(), @prof_lucas, 'TERCA', '10:00:00', '20:00:00', '13:00:00', '14:00:00'),
-(UUID(), @prof_lucas, 'QUARTA', '10:00:00', '20:00:00', '13:00:00', '14:00:00'),
-(UUID(), @prof_lucas, 'QUINTA', '10:00:00', '20:00:00', '13:00:00', '14:00:00'),
-(UUID(), @prof_lucas, 'SEXTA', '10:00:00', '20:00:00', '13:00:00', '14:00:00');
+(Integer(), @prof_lucas, 'SEGUNDA', '10:00:00', '20:00:00', '13:00:00', '14:00:00'),
+(Integer(), @prof_lucas, 'TERCA', '10:00:00', '20:00:00', '13:00:00', '14:00:00'),
+(Integer(), @prof_lucas, 'QUARTA', '10:00:00', '20:00:00', '13:00:00', '14:00:00'),
+(Integer(), @prof_lucas, 'QUINTA', '10:00:00', '20:00:00', '13:00:00', '14:00:00'),
+(Integer(), @prof_lucas, 'SEXTA', '10:00:00', '20:00:00', '13:00:00', '14:00:00');
 
 -- Roberto Costa - Quarta a Domingo
 INSERT IGNORE INTO horario_trabalho (id, profissional_id, dia_semana, hora_inicio, hora_fim, inicio_pausa, fim_pausa) VALUES
-(UUID(), @prof_roberto, 'QUARTA', '08:30:00', '17:30:00', '12:00:00', '13:00:00'),
-(UUID(), @prof_roberto, 'QUINTA', '08:30:00', '17:30:00', '12:00:00', '13:00:00'),
-(UUID(), @prof_roberto, 'SEXTA', '08:30:00', '17:30:00', '12:00:00', '13:00:00'),
-(UUID(), @prof_roberto, 'SABADO', '08:30:00', '16:30:00', '12:00:00', '13:00:00'),
-(UUID(), @prof_roberto, 'DOMINGO', '09:00:00', '15:00:00', NULL, NULL);
+(Integer(), @prof_roberto, 'QUARTA', '08:30:00', '17:30:00', '12:00:00', '13:00:00'),
+(Integer(), @prof_roberto, 'QUINTA', '08:30:00', '17:30:00', '12:00:00', '13:00:00'),
+(Integer(), @prof_roberto, 'SEXTA', '08:30:00', '17:30:00', '12:00:00', '13:00:00'),
+(Integer(), @prof_roberto, 'SABADO', '08:30:00', '16:30:00', '12:00:00', '13:00:00'),
+(Integer(), @prof_roberto, 'DOMINGO', '09:00:00', '15:00:00', NULL, NULL);
 
 -- André Oliveira - Sexta a Terça (fim de semana)
 INSERT IGNORE INTO horario_trabalho (id, profissional_id, dia_semana, hora_inicio, hora_fim, inicio_pausa, fim_pausa) VALUES
-(UUID(), @prof_andre, 'SEXTA', '14:00:00', '22:00:00', '18:00:00', '19:00:00'),
-(UUID(), @prof_andre, 'SABADO', '10:00:00', '20:00:00', '14:00:00', '15:00:00'),
-(UUID(), @prof_andre, 'DOMINGO', '10:00:00', '18:00:00', '13:00:00', '14:00:00'),
-(UUID(), @prof_andre, 'SEGUNDA', '14:00:00', '22:00:00', '18:00:00', '19:00:00'),
-(UUID(), @prof_andre, 'TERCA', '14:00:00', '22:00:00', '18:00:00', '19:00:00');
+(Integer(), @prof_andre, 'SEXTA', '14:00:00', '22:00:00', '18:00:00', '19:00:00'),
+(Integer(), @prof_andre, 'SABADO', '10:00:00', '20:00:00', '14:00:00', '15:00:00'),
+(Integer(), @prof_andre, 'DOMINGO', '10:00:00', '18:00:00', '13:00:00', '14:00:00'),
+(Integer(), @prof_andre, 'SEGUNDA', '14:00:00', '22:00:00', '18:00:00', '19:00:00'),
+(Integer(), @prof_andre, 'TERCA', '14:00:00', '22:00:00', '18:00:00', '19:00:00');
 
 -- ===================== CLIENTES ===================
 
@@ -135,60 +135,60 @@ INSERT IGNORE INTO cliente (id, nome, email, telefone, pontos_fidelidade) VALUES
 
 -- Vouchers para clientes com mais de 100 pontos
 INSERT IGNORE INTO voucher (id, cliente_id, codigo, valor_desconto, status, expira_em) VALUES
-(UUID(), @cliente_maria, 'FIDELIDADE10-001', 10.00, 'GERADO', '2025-12-31 23:59:59'),
-(UUID(), @cliente_ana, 'FIDELIDADE20-002', 20.00, 'GERADO', '2025-12-31 23:59:59'),
-(UUID(), @cliente_carla, 'FIDELIDADE30-003', 30.00, 'UTILIZADO', '2025-12-31 23:59:59'),
-(UUID(), @cliente_fernanda, 'FIDELIDADE10-004', 10.00, 'GERADO', '2025-12-31 23:59:59'),
-(UUID(), @cliente_juliana, 'FIDELIDADE20-005', 20.00, 'GERADO', '2025-12-31 23:59:59'),
-(UUID(), @cliente_marcos, 'FIDELIDADE10-006', 10.00, 'GERADO', '2025-12-31 23:59:59');
+(Integer(), @cliente_maria, 'FIDELIDADE10-001', 10.00, 'GERADO', '2025-12-31 23:59:59'),
+(Integer(), @cliente_ana, 'FIDELIDADE20-002', 20.00, 'GERADO', '2025-12-31 23:59:59'),
+(Integer(), @cliente_carla, 'FIDELIDADE30-003', 30.00, 'UTILIZADO', '2025-12-31 23:59:59'),
+(Integer(), @cliente_fernanda, 'FIDELIDADE10-004', 10.00, 'GERADO', '2025-12-31 23:59:59'),
+(Integer(), @cliente_juliana, 'FIDELIDADE20-005', 20.00, 'GERADO', '2025-12-31 23:59:59'),
+(Integer(), @cliente_marcos, 'FIDELIDADE10-006', 10.00, 'GERADO', '2025-12-31 23:59:59');
 
 -- ===================== AGENDAMENTOS ===================
 
 -- Agendamentos para os próximos dias (alguns confirmados, outros pendentes)
 INSERT IGNORE INTO agendamento (id, cliente_id, profissional_id, servico_id, data_hora, status, observacoes) VALUES
 -- Agendamentos para hoje
-(UUID(), @cliente_maria, @prof_carlos, @servico_corte_masc, '2025-09-14 09:00:00', 'CONFIRMADO', 'Cliente preferencial'),
-(UUID(), @cliente_jose, @prof_carlos, @servico_corte_barba, '2025-09-14 10:00:00', 'CONFIRMADO', NULL),
-(UUID(), @cliente_ana, @prof_joao, @servico_barba, '2025-09-14 14:00:00', 'PENDENTE', 'Primeira vez na barbearia'),
+(Integer(), @cliente_maria, @prof_carlos, @servico_corte_masc, '2025-09-14 09:00:00', 'CONFIRMADO', 'Cliente preferencial'),
+(Integer(), @cliente_jose, @prof_carlos, @servico_corte_barba, '2025-09-14 10:00:00', 'CONFIRMADO', NULL),
+(Integer(), @cliente_ana, @prof_joao, @servico_barba, '2025-09-14 14:00:00', 'PENDENTE', 'Primeira vez na barbearia'),
 
 -- Agendamentos para amanhã
-(UUID(), @cliente_pedro, @prof_lucas, @servico_corte_degrade, '2025-09-15 11:00:00', 'CONFIRMADO', NULL),
-(UUID(), @cliente_carla, @prof_lucas, @servico_limpeza_pele, '2025-09-15 15:00:00', 'CONFIRMADO', 'Limpeza completa'),
-(UUID(), @cliente_paulo, @prof_roberto, @servico_corte_infantil, '2025-09-15 16:00:00', 'PENDENTE', 'Criança de 8 anos'),
+(Integer(), @cliente_pedro, @prof_lucas, @servico_corte_degrade, '2025-09-15 11:00:00', 'CONFIRMADO', NULL),
+(Integer(), @cliente_carla, @prof_lucas, @servico_limpeza_pele, '2025-09-15 15:00:00', 'CONFIRMADO', 'Limpeza completa'),
+(Integer(), @cliente_paulo, @prof_roberto, @servico_corte_infantil, '2025-09-15 16:00:00', 'PENDENTE', 'Criança de 8 anos'),
 
 -- Agendamentos para o fim de semana
-(UUID(), @cliente_fernanda, @prof_andre, @servico_corte_barba, '2025-09-20 15:00:00', 'CONFIRMADO', NULL),
-(UUID(), @cliente_ricardo, @prof_andre, @servico_corte_masc, '2025-09-21 11:00:00', 'CONFIRMADO', NULL),
+(Integer(), @cliente_fernanda, @prof_andre, @servico_corte_barba, '2025-09-20 15:00:00', 'CONFIRMADO', NULL),
+(Integer(), @cliente_ricardo, @prof_andre, @servico_corte_masc, '2025-09-21 11:00:00', 'CONFIRMADO', NULL),
 
 -- Agendamentos históricos (concluídos)
-(UUID(), @cliente_juliana, @prof_carlos, @servico_corte_barba, '2025-09-10 14:00:00', 'CONCLUIDO', NULL),
-(UUID(), @cliente_marcos, @prof_joao, @servico_corte_masc, '2025-09-11 16:00:00', 'CONCLUIDO', 'Cliente satisfeito');
+(Integer(), @cliente_juliana, @prof_carlos, @servico_corte_barba, '2025-09-10 14:00:00', 'CONCLUIDO', NULL),
+(Integer(), @cliente_marcos, @prof_joao, @servico_corte_masc, '2025-09-11 16:00:00', 'CONCLUIDO', 'Cliente satisfeito');
 
 -- ===================== PRODUTOS ===================
 
 INSERT IGNORE INTO produto (id, nome, preco, estoque) VALUES
-(UUID(), 'Shampoo Anticaspa', 25.90, 45),
-(UUID(), 'Condicionador Hidratante', 22.50, 38),
-(UUID(), 'Pomada Modeladora', 35.00, 22),
-(UUID(), 'Gel Fixador Forte', 18.90, 55),
-(UUID(), 'Cera Para Cabelo', 42.00, 15),
-(UUID(), 'Óleo Para Barba', 65.00, 28),
-(UUID(), 'Balm Para Barba', 38.50, 32),
-(UUID(), 'Loção Pós-Barba', 29.90, 41),
-(UUID(), 'Spray Texturizador', 31.00, 8),
-(UUID(), 'Água de Colônia', 45.00, 20),
-(UUID(), 'Máscara Capilar', 55.00, 12),
-(UUID(), 'Pente Profissional', 15.00, 25);
+(Integer(), 'Shampoo Anticaspa', 25.90, 45),
+(Integer(), 'Condicionador Hidratante', 22.50, 38),
+(Integer(), 'Pomada Modeladora', 35.00, 22),
+(Integer(), 'Gel Fixador Forte', 18.90, 55),
+(Integer(), 'Cera Para Cabelo', 42.00, 15),
+(Integer(), 'Óleo Para Barba', 65.00, 28),
+(Integer(), 'Balm Para Barba', 38.50, 32),
+(Integer(), 'Loção Pós-Barba', 29.90, 41),
+(Integer(), 'Spray Texturizador', 31.00, 8),
+(Integer(), 'Água de Colônia', 45.00, 20),
+(Integer(), 'Máscara Capilar', 55.00, 12),
+(Integer(), 'Pente Profissional', 15.00, 25);
 
 -- ===================== VENDAS ===================
 
 -- Definir variáveis para IDs de vendas
-SET @venda1 = UUID();
-SET @venda2 = UUID();
-SET @venda3 = UUID();
-SET @venda4 = UUID();
-SET @venda5 = UUID();
-SET @venda6 = UUID();
+SET @venda1 = Integer();
+SET @venda2 = Integer();
+SET @venda3 = Integer();
+SET @venda4 = Integer();
+SET @venda5 = Integer();
+SET @venda6 = Integer();
 
 -- Vendas históricas com produtos e serviços
 INSERT IGNORE INTO venda (id, cliente_id, data_venda, voucher_id, valor_total, observacoes) VALUES
@@ -201,52 +201,52 @@ INSERT IGNORE INTO venda (id, cliente_id, data_venda, voucher_id, valor_total, o
 
 -- ===================== ITENS DE VENDA ===================
 
--- Como não podemos usar referências de produtos específicos (UUIDs dinâmicos),
+-- Como não podemos usar referências de produtos específicos (Integers dinâmicos),
 -- vamos simplificar e usar apenas descrições para os itens de venda
 
 -- Itens da primeira venda
 INSERT IGNORE INTO item_venda (id, venda_id, produto_id, descricao, quantidade, preco_unitario, preco_total, tipo) VALUES
-(UUID(), @venda1, NULL, 'Shampoo Anticaspa', 1, 25.90, 25.90, 'PRODUTO'),
-(UUID(), @venda1, NULL, 'Óleo Para Barba', 1, 65.00, 65.00, 'PRODUTO');
+(Integer(), @venda1, NULL, 'Shampoo Anticaspa', 1, 25.90, 25.90, 'PRODUTO'),
+(Integer(), @venda1, NULL, 'Óleo Para Barba', 1, 65.00, 65.00, 'PRODUTO');
 
 -- Itens da segunda venda
 INSERT IGNORE INTO item_venda (id, venda_id, produto_id, descricao, quantidade, preco_unitario, preco_total, tipo) VALUES
-(UUID(), @venda2, NULL, 'Pomada Modeladora', 2, 35.00, 70.00, 'PRODUTO'),
-(UUID(), @venda2, NULL, 'Água de Colônia', 1, 45.00, 45.00, 'PRODUTO'),
-(UUID(), @venda2, NULL, 'Pente Profissional', 1, 15.00, 15.00, 'PRODUTO');
+(Integer(), @venda2, NULL, 'Pomada Modeladora', 2, 35.00, 70.00, 'PRODUTO'),
+(Integer(), @venda2, NULL, 'Água de Colônia', 1, 45.00, 45.00, 'PRODUTO'),
+(Integer(), @venda2, NULL, 'Pente Profissional', 1, 15.00, 15.00, 'PRODUTO');
 
 -- Itens da terceira venda (com desconto)
 INSERT IGNORE INTO item_venda (id, venda_id, produto_id, descricao, quantidade, preco_unitario, preco_total, tipo) VALUES
-(UUID(), @venda3, NULL, 'Cera Para Cabelo', 1, 42.00, 42.00, 'PRODUTO'),
-(UUID(), @venda3, NULL, 'Balm Para Barba', 1, 38.50, 38.50, 'PRODUTO'),
-(UUID(), @venda3, NULL, 'Condicionador Hidratante', 1, 22.50, 22.50, 'PRODUTO');
+(Integer(), @venda3, NULL, 'Cera Para Cabelo', 1, 42.00, 42.00, 'PRODUTO'),
+(Integer(), @venda3, NULL, 'Balm Para Barba', 1, 38.50, 38.50, 'PRODUTO'),
+(Integer(), @venda3, NULL, 'Condicionador Hidratante', 1, 22.50, 22.50, 'PRODUTO');
 
 -- Itens da quarta venda (cliente sem cadastro)
 INSERT IGNORE INTO item_venda (id, venda_id, produto_id, descricao, quantidade, preco_unitario, preco_total, tipo) VALUES
-(UUID(), @venda4, NULL, 'Gel Fixador Forte', 2, 18.90, 37.80, 'PRODUTO'),
-(UUID(), @venda4, NULL, 'Loção Pós-Barba', 1, 29.90, 29.90, 'PRODUTO');
+(Integer(), @venda4, NULL, 'Gel Fixador Forte', 2, 18.90, 37.80, 'PRODUTO'),
+(Integer(), @venda4, NULL, 'Loção Pós-Barba', 1, 29.90, 29.90, 'PRODUTO');
 
 -- Itens da quinta venda (muitos produtos)
 INSERT IGNORE INTO item_venda (id, venda_id, produto_id, descricao, quantidade, preco_unitario, preco_total, tipo) VALUES
-(UUID(), @venda5, NULL, 'Óleo Para Barba', 1, 65.00, 65.00, 'PRODUTO'),
-(UUID(), @venda5, NULL, 'Máscara Capilar', 1, 55.00, 55.00, 'PRODUTO'),
-(UUID(), @venda5, NULL, 'Pomada Modeladora', 1, 35.00, 35.00, 'PRODUTO'),
-(UUID(), @venda5, NULL, 'Spray Texturizador', 1, 31.00, 31.00, 'PRODUTO');
+(Integer(), @venda5, NULL, 'Óleo Para Barba', 1, 65.00, 65.00, 'PRODUTO'),
+(Integer(), @venda5, NULL, 'Máscara Capilar', 1, 55.00, 55.00, 'PRODUTO'),
+(Integer(), @venda5, NULL, 'Pomada Modeladora', 1, 35.00, 35.00, 'PRODUTO'),
+(Integer(), @venda5, NULL, 'Spray Texturizador', 1, 31.00, 31.00, 'PRODUTO');
 
 -- Itens da sexta venda (só serviços)
 INSERT IGNORE INTO item_venda (id, venda_id, produto_id, descricao, quantidade, preco_unitario, preco_total, tipo) VALUES
-(UUID(), @venda6, @servico_corte_masc, 'Corte de Cabelo Masculino', 1, 35.00, 35.00, 'SERVICO');
+(Integer(), @venda6, @servico_corte_masc, 'Corte de Cabelo Masculino', 1, 35.00, 35.00, 'SERVICO');
 
 -- ===================== PAGAMENTOS ===================
 
 -- Pagamentos das vendas
 INSERT IGNORE INTO pagamento (id, venda_id, valor, metodo, status, data_processamento) VALUES
-(UUID(), @venda1, 90.90, 'PIX', 'CONFIRMADO', '2025-09-10 14:45:30'),
-(UUID(), @venda2, 125.50, 'CREDITO', 'CONFIRMADO', '2025-09-11 17:31:15'),
-(UUID(), @venda3, 95.00, 'DEBITO', 'CONFIRMADO', '2025-09-12 10:16:00'),
-(UUID(), @venda4, 67.00, 'DINHEIRO', 'CONFIRMADO', '2025-09-13 15:20:30'),
-(UUID(), @venda5, 183.90, 'PIX', 'CONFIRMADO', '2025-09-13 18:46:10'),
-(UUID(), @venda6, 35.00, 'DINHEIRO', 'CONFIRMADO', '2025-09-14 09:31:00');
+(Integer(), @venda1, 90.90, 'PIX', 'CONFIRMADO', '2025-09-10 14:45:30'),
+(Integer(), @venda2, 125.50, 'CREDITO', 'CONFIRMADO', '2025-09-11 17:31:15'),
+(Integer(), @venda3, 95.00, 'DEBITO', 'CONFIRMADO', '2025-09-12 10:16:00'),
+(Integer(), @venda4, 67.00, 'DINHEIRO', 'CONFIRMADO', '2025-09-13 15:20:30'),
+(Integer(), @venda5, 183.90, 'PIX', 'CONFIRMADO', '2025-09-13 18:46:10'),
+(Integer(), @venda6, 35.00, 'DINHEIRO', 'CONFIRMADO', '2025-09-14 09:31:00');
 
 -- =========================================================================
 -- CONSULTAS DE VERIFICAÇÃO

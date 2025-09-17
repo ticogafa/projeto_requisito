@@ -218,7 +218,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="app">
-      <Header 
+      <Header
         userName={currentUser?.displayName || currentUser?.email || 'Usuário'} 
         onLogout={logout}
       />

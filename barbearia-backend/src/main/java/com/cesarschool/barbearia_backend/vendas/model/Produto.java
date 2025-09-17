@@ -1,7 +1,7 @@
 package com.cesarschool.barbearia_backend.vendas.model;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +23,7 @@ public class Produto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Integer id;
 
     @NonNull
     @Column(nullable = false)

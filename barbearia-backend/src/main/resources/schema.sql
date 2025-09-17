@@ -2,7 +2,7 @@
 
 -- • Um Serviço deve ter uma Duração e um Preço
 CREATE TABLE servico (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
     nome VARCHAR(255) NOT NULL,
     preco DECIMAL(15, 2) NOT NULL,
     duracaoMinutos INT NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE servico (
 -- • Um Profissional pode ser associado a múltiplos Serviços
 -- • A Configuração de Horário deve respeitar o horário de funcionamento da barbearia
 CREATE TABLE profissional (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(127) NOT NULL UNIQUE,
     telefone VARCHAR(13) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE profissional (
 -- }
 
 CREATE TABLE horarioTrabalho (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
     profissionalId VARCHAR(36) NOT NULL,
     diaSemana ENUM(
         "SEGUNDA", "TERCA", "QUARTA", "QUINTA", "SABADO", "DOMINGO"
@@ -37,7 +37,7 @@ CREATE TABLE horarioTrabalho (
 
 -- • A cada R$ 1,00 gasto no agendamento → 1 ponto de fidelidade
 CREATE TABLE cliente (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(127) NOT NULL UNIQUE,
     telefone VARCHAR(13) NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE cliente (
 -- • Quando o voucher é utilizado, ele é vinculado à venda (campo voucherId)
 -- • Mantém controle de expiração e auditoria
 CREATE TABLE voucher (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
     clienteId VARCHAR(36) NOT NULL,
     codigo VARCHAR(50) NOT NULL UNIQUE,
     valorDesconto DECIMAL(15,2) NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE voucher (
 -- • Quando um Agendamento é criado, ele tem o Status de Pendente e só muda para Confirmado após a validação
 -- • Um Agendamento só pode ser cancelado até 2 horas antes do horário
 CREATE TABLE agendamento (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
     clienteId VARCHAR(36) NOT NULL,
     profissionalId VARCHAR(36) NOT NULL,
     servicoId VARCHAR(36) NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE agendamento (
 -- REGRAS DE NEGÓCIO - PRODUTO:
 -- • Não pode ser feita venda de um produto sem estoque
 CREATE TABLE produto (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
     nome VARCHAR(255) NOT NULL,
     preco DECIMAL(15, 2) NOT NULL,
     estoque INT NOT NULL DEFAULT 0,
@@ -94,7 +94,7 @@ CREATE TABLE produto (
 -- • A Venda de um Produto deve dar baixa no Estoque
 -- • Um Pagamento deve ser registrado para cada Serviço e Produto vendidos
 CREATE TABLE venda (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
     clienteId VARCHAR(36), -- opcional
     dataVenda DATETIME DEFAULT NOW(),
     voucherId VARCHAR(36), -- opcional
@@ -105,7 +105,7 @@ CREATE TABLE venda (
 );
 
 CREATE TABLE itemVenda (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
     vendaId VARCHAR(36) NOT NULL,
     produtoId  VARCHAR(36) NOT NULL,
     descricao VARCHAR(500) NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE itemVenda (
 -- REGRAS DE NEGÓCIO - PAGAMENTO:
 -- • Um Pagamento deve ser registrado para cada venda
 CREATE TABLE pagamento (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
     vendaId VARCHAR(36) NOT NULL,
     valor DECIMAL(15, 2) NOT NULL,
     metodo ENUM('DINHEIRO', 'CREDITO', 'DEBITO', 'PIX') NOT NULL,

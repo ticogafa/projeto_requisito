@@ -1,13 +1,15 @@
 package com.cesarschool.barbearia_backend.marketing.service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
 
 import org.springframework.stereotype.Service;
 
+import com.cesarschool.barbearia_backend.marketing.dto.ClienteDTOs.AtualizarClienteRequest;
+import com.cesarschool.barbearia_backend.marketing.dto.ClienteDTOs.ClienteResponse;
+import com.cesarschool.barbearia_backend.marketing.dto.ClienteDTOs.CriarClienteRequest;
+import com.cesarschool.barbearia_backend.marketing.mapper.ClienteMapper;
 import com.cesarschool.barbearia_backend.marketing.model.Cliente;
-import com.cesarschool.barbearia_backend.marketing.model.Voucher;
 import com.cesarschool.barbearia_backend.marketing.repository.ClienteRepository;
 
 import jakarta.transaction.Transactional;
@@ -18,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClienteService {
 
+    private static final String CLIENTE_NAO_ENCONTRADO = "Cliente não encontrado";
+
     // -- • A cada 100 pontos → R$ 10,00 de desconto
     // -- • Quando o cliente troca pontos, gera um voucher
 
@@ -26,27 +30,58 @@ public class ClienteService {
 
     private final ClienteRepository repository;
 
-    public Optional<Cliente> findById(UUID id){
-        // regras de negócio....
-        return repository.findById(id);
+    public ClienteResponse criarCliente(CriarClienteRequest request) {
+        Cliente cliente = ClienteMapper.toEntity(request);
+        Cliente clienteSalvo = repository.save(cliente);
+        return ClienteMapper.toResponse(clienteSalvo);
     }
 
-    private Voucher resgatarVoucher(Cliente cliente){
-        throw new UnsupportedOperationException("Method not implemented");
+    public ClienteResponse buscarPorId(Integer id) {
+        Cliente cliente = repository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
+        return ClienteMapper.toResponse(cliente);
     }
 
-    public List<Cliente> findAll(){
-        // regras de negócio....
-        return repository.findAll();
+    public ClienteResponse atualizarCliente( AtualizarClienteRequest request) {
+        Cliente cliente = repository.findById(request.getId())
+            .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
+        
+        ClienteMapper.updateEntityFromDto(request, cliente);
+        Cliente clienteAtualizado = repository.save(cliente);
+        return ClienteMapper.toResponse(clienteAtualizado);
     }
 
-    public Cliente save(Cliente cliente){
-        // regras de negócio....
-        return repository.save(cliente);
+    public List<ClienteResponse> listarClientes() {
+        return repository.findAll().
+        stream()
+        .map(ClienteMapper::toResponse)
+        .toList();
     }
 
-    public void delete(Cliente cliente){
-        // regras de negócio....
+
+    public ClienteResponse adicionarPontos(Integer id, int pontos) {
+        Cliente cliente = repository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
+        
+        cliente.adicionarPontos(pontos);
+        Cliente clienteAtualizado = repository.save(cliente);
+        
+        return ClienteMapper.toResponse(clienteAtualizado);
+    }
+
+    public ClienteResponse usarPontos(Integer id, int pontos) {
+        Cliente cliente = repository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
+        
+        cliente.usarPontos(pontos);
+        Cliente clienteAtualizado = repository.save(cliente);
+        
+        return ClienteMapper.toResponse(clienteAtualizado);
+    }
+
+    public void deletarCliente(Integer id) {
+        Cliente cliente = repository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
         repository.delete(cliente);
     }
 }

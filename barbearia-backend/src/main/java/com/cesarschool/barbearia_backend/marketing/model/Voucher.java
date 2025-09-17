@@ -2,7 +2,7 @@ package com.cesarschool.barbearia_backend.marketing.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
+
 
 import com.cesarschool.barbearia_backend.common.enums.StatusVoucher;
 
@@ -30,7 +30,7 @@ public class Voucher {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    UUID id; // também é o valor usado pra resgatar
+    Integer id; // também é o valor usado pra resgatar
 
     @NonNull
     @ManyToOne

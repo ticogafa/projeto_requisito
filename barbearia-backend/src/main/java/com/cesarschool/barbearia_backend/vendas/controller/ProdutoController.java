@@ -1,7 +1,7 @@
 package com.cesarschool.barbearia_backend.vendas.controller;
 
 import java.util.List;
-import java.util.UUID;
+
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +40,7 @@ public class ProdutoController {
     }
 
     @PostMapping("/{id}/baixa")
-    public ResponseEntity<Produto> baixaManual(@PathVariable("id") UUID id, @RequestParam("quantidade") int quantidade) {
+    public ResponseEntity<Produto> baixaManual(@PathVariable("id") Integer id, @RequestParam("quantidade") int quantidade) {
         Produto atualizado = produtoService.baixaEstoque(id, quantidade);
         return ResponseEntity.ok(atualizado);
     }

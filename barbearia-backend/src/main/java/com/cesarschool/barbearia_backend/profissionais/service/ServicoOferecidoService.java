@@ -2,7 +2,7 @@ package com.cesarschool.barbearia_backend.profissionais.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class ServicoOferecidoService {
     private final ServicoOferecidoRepository repository;
 
-    public Optional<ServicoOferecido> findById(UUID id){
+    public Optional<ServicoOferecido> findById(Integer id){
         // regras de negócio....
         return repository.findById(id);
     }
