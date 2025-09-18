@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,12 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
-@Table(name = "horario_trabalho")
+@Table(
+    name = "horario_trabalho",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"profissional_id", "diaSemana"})
+    }
+)
 public class HorarioTrabalho {
 
     @Id

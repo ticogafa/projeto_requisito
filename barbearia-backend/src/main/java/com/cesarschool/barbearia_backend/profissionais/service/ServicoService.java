@@ -58,8 +58,8 @@ public class ServicoService {
         return ServicoMapper.toResponse(servico);
     }
 
-    public ServicoResponse atualizarServico(AtualizarServicoRequest request) {
-        ServicoOferecido servico = findById(request.getId())
+    public ServicoResponse atualizarServico(Integer id, AtualizarServicoRequest request) {
+        ServicoOferecido servico = findById(id)
             .orElseThrow(() -> new IllegalArgumentException(SERVICO_NAO_ENCONTRADO));
         
         ServicoMapper.updateEntityFromDto(request, servico);

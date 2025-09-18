@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.cesarschool.barbearia_backend.common.enums.DiaSemana;
 import com.cesarschool.barbearia_backend.profissionais.dto.HorarioTrabalhoDTOs.AtualizarHorarioTrabalhoRequest;
 import com.cesarschool.barbearia_backend.profissionais.dto.HorarioTrabalhoDTOs.CriarHorarioTrabalhoRequest;
 import com.cesarschool.barbearia_backend.profissionais.dto.HorarioTrabalhoDTOs.HorarioTrabalhoResponse;
@@ -64,8 +65,8 @@ public class ProfissionalService {
         return ProfissionalMapper.toResponse(profissional);
     }
 
-    public ProfissionalResponse atualizarProfissional(AtualizarProfissionalRequest request) {
-        Profissional profissional = findById(request.getId())
+    public ProfissionalResponse atualizarProfissional(Integer id, AtualizarProfissionalRequest request) {
+        Profissional profissional = findById(id)
             .orElseThrow(() -> new IllegalArgumentException(PROFISSIONAL_NAO_ENCONTRADO));
         
         ProfissionalMapper.updateEntityFromDto(request, profissional);
@@ -81,7 +82,7 @@ public class ProfissionalService {
             .stream()
             .map(ProfissionalMapper::toResponse)
             .toList();
-    }
+        }
 
     public void deletarProfissional(Integer id) {
         Profissional profissional = findById(id)
@@ -97,6 +98,15 @@ public class ProfissionalService {
         // Verificar se o profissional existe
         Profissional profissional = findById(profissionalId)
             .orElseThrow(() -> new IllegalArgumentException(PROFISSIONAL_NAO_ENCONTRADO));
+        
+
+        horarioRepository.findByProfissionalId(profissionalId)
+            .stream()
+            .filter(horario -> horario.getDiaSemana().equals(request.getDiaSemana()))
+            .findFirst().ifPresent(horario->{
+                throw new IllegalArgumentException("Já existe um horário cadastrado para este dia da semana para " + profissional.getNome());
+            });
+
         
         // Converter DTO para entidade
         HorarioTrabalho horario = horarioMapper.toEntity(request);

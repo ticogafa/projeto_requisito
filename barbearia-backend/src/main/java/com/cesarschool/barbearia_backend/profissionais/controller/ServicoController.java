@@ -21,32 +21,33 @@ public class ServicoController {
 
     private final ServicoService servicoService;
 
-    @PostMapping("/criar")
+    @PostMapping
     public ResponseEntity<ServicoResponse> criarServico(@Valid @RequestBody CriarServicoRequest request) {
         ServicoResponse servico = servicoService.criarServico(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(servico);
     }
 
-    @GetMapping("/buscar/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ServicoResponse> buscarServicoPorId(@PathVariable Integer id) {
         ServicoResponse servico = servicoService.buscarPorId(id);
         return ResponseEntity.ok(servico);
     }
 
-    @GetMapping("/listar")
+    @GetMapping
     public ResponseEntity<List<ServicoResponse>> listarServicos() {
         List<ServicoResponse> response = servicoService.listarServicos();
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/atualizar")
+    @PutMapping("/{id}")
     public ResponseEntity<ServicoResponse> atualizarServico(
+            @PathVariable Integer id,
             @Valid @RequestBody AtualizarServicoRequest request) {
-        ServicoResponse servico = servicoService.atualizarServico(request);
+        ServicoResponse servico = servicoService.atualizarServico(id, request);
         return ResponseEntity.ok(servico);
     }
 
-    @DeleteMapping("/deletar/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarServico(@PathVariable Integer id) {
         servicoService.deletarServico(id);
         return ResponseEntity.noContent().build();

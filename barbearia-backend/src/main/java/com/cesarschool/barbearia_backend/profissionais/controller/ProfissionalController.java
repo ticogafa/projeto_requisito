@@ -20,32 +20,33 @@ public class ProfissionalController {
 
     private final ProfissionalService profissionalService;
 
-    @PostMapping("/criar")
+    @PostMapping
     public ResponseEntity<ProfissionalResponse> criarProfissional(@Valid @RequestBody CriarProfissionalRequest request) {
         ProfissionalResponse profissional = profissionalService.criarProfissional(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(profissional);
     }
 
-    @GetMapping("/buscar/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ProfissionalResponse> buscarProfissionalPorId(@PathVariable Integer id) {
         ProfissionalResponse profissional = profissionalService.buscarPorId(id);
         return ResponseEntity.ok(profissional);
     }
 
-    @GetMapping("/listar")
+    @GetMapping
     public ResponseEntity<List<ProfissionalResponse>> listarProfissionais() {
         List<ProfissionalResponse> response = profissionalService.listarProfissionais();
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/atualizar")
+    @PutMapping("/{id}")
     public ResponseEntity<ProfissionalResponse> atualizarProfissional(
+            @PathVariable Integer id,
             @Valid @RequestBody AtualizarProfissionalRequest request) {
-        ProfissionalResponse profissional = profissionalService.atualizarProfissional(request);
+        ProfissionalResponse profissional = profissionalService.atualizarProfissional(id, request);
         return ResponseEntity.ok(profissional);
     }
 
-    @DeleteMapping("/deletar/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarProfissional(@PathVariable Integer id) {
         profissionalService.deletarProfissional(id);
         return ResponseEntity.noContent().build();

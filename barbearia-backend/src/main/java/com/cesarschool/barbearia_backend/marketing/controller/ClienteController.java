@@ -21,32 +21,33 @@ public class ClienteController {
 
     private final ClienteService clienteService;
 
-    @PostMapping("/criar")
+    @PostMapping
     public ResponseEntity<ClienteResponse> criarCliente(@Valid @RequestBody CriarClienteRequest request) {
         ClienteResponse cliente = clienteService.criarCliente(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(cliente);
     }
 
-    @GetMapping("/buscar/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ClienteResponse> buscarClientePorId(@PathVariable Integer id) {
         ClienteResponse cliente = clienteService.buscarPorId(id);
         return ResponseEntity.ok(cliente);
     }
 
-    @GetMapping("/listar")
+    @GetMapping
     public ResponseEntity<List<ClienteResponse>> listarClientes() {
         List<ClienteResponse> response = clienteService.listarClientes();
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/atualizar")
+    @PutMapping("/{id}")
     public ResponseEntity<ClienteResponse> atualizarCliente(
+            @PathVariable Integer id,
             @Valid @RequestBody AtualizarClienteRequest request) {
-        ClienteResponse cliente = clienteService.atualizarCliente(request);
+        ClienteResponse cliente = clienteService.atualizarCliente(id, request);
         return ResponseEntity.ok(cliente);
     }
 
-    @DeleteMapping("/deletar/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarCliente(@PathVariable Integer id) {
         clienteService.deletarCliente(id);
         return ResponseEntity.noContent().build();

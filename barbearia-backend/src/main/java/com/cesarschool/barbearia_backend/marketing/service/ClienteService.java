@@ -42,8 +42,8 @@ public class ClienteService {
         return ClienteMapper.toResponse(cliente);
     }
 
-    public ClienteResponse atualizarCliente( AtualizarClienteRequest request) {
-        Cliente cliente = repository.findById(request.getId())
+    public ClienteResponse atualizarCliente(Integer id, AtualizarClienteRequest request) {
+        Cliente cliente = repository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
         
         ClienteMapper.updateEntityFromDto(request, cliente);
