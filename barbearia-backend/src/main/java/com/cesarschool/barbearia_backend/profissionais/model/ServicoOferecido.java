@@ -23,7 +23,7 @@ public class ServicoOferecido {
     private Integer id;
 
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 100)
     private String nome;
 
     @NonNull
