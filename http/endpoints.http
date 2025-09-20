@@ -41,6 +41,8 @@ PUT {{baseUrl}}/servicos/1
 Content-Type: application/json
 
 {
+  "id": 1,
+  "descricao": "Corte de cabelo masculino premium",
   "nome": "Corte Masculino Premium",
   "preco": 35.00,
   "duracaoMinutos": 45
@@ -93,10 +95,10 @@ POST {{baseUrl}}/profissionais/1/horarios
 Content-Type: application/json
 
 {
-  "diaSemana": "QUINTA",
+  "diaSemana": "SEGUNDA",
   "horaInicio": "08:00",
-  "horaFim": "18:00",
   "inicioPausa": "12:00",
+  "horaFim": "18:00",
   "fimPausa": "13:00"
 }
 
@@ -165,21 +167,114 @@ POST {{baseUrl}}/agendamentos/criar-agendamento
 Content-Type: application/json
 
 {
-  "dataHora": "2025-09-18T14:30:00",
-  "clienteId": "252",
+  "dataHora": "2025-09-22T14:30:00",
+  "clienteId": "1",
   "profissionalId": "1",
-  "servicoId": "102",
+  "servicoId": "1",
   "observacoes": "Cliente prefere corte social"
 }
 
-### Buscar Agendamento por ID
+### Criar segundo Agendamento
+POST {{baseUrl}}/agendamentos/criar-agendamento
+Content-Type: application/json
+
+{
+  "dataHora": "2025-09-22T15:00:00",
+  "clienteId": "2",
+  "profissionalId": "2",
+  "servicoId": "2",
+  "observacoes": "Cliente regular"
+}
+
+### Criar terceiro Agendamento
+POST {{baseUrl}}/agendamentos/criar-agendamento
+Content-Type: application/json
+
+{
+  "dataHora": "2025-09-22T16:30:00",
+  "clienteId": "1",
+  "profissionalId": "1",
+  "servicoId": "2",
+  "observacoes": "Agendamento adicional"
+}
+
+### Buscar Agendamento por ID (ID = 1)
 GET {{baseUrl}}/agendamentos/1
 
-### Confirmar Agendamento
+### Buscar Agendamento por ID (ID = 2)
+GET {{baseUrl}}/agendamentos/2
+
+### Buscar Agendamento por ID (ID = 3)
+GET {{baseUrl}}/agendamentos/3
+
+### Confirmar Agendamento (ID = 1)
 PATCH {{baseUrl}}/agendamentos/confirmar-agendamento/1
 
-### Cancelar Agendamento
-PATCH {{baseUrl}}/agendamentos/cancelar-agendamento/550e8400-e29b-41d4-a716-446655440010
+### Confirmar Agendamento (ID = 2)
+PATCH {{baseUrl}}/agendamentos/confirmar-agendamento/2
+
+### Cancelar Agendamento (ID = 3)
+PATCH {{baseUrl}}/agendamentos/cancelar-agendamento/3
+
+### ============================================================
+### HORÁRIOS DISPONÍVEIS - Novos Endpoints
+### ============================================================
+
+### Listar horários disponíveis para Serviço 1 em 22/09/2025
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-25&servicoOferecidoId=1
+
+### Listar horários disponíveis para Serviço 2 em 22/09/2025
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-22&servicoOferecidoId=1
+
+### Listar horários disponíveis para Serviço 1 em 23/09/2025
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-23&servicoOferecidoId=1
+
+### Listar horários disponíveis para Serviço 2 em 23/09/2025
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-23&servicoOferecidoId=2
+
+### ============================================================
+### PROFISSIONAIS DISPONÍVEIS - Novos Endpoints
+### ============================================================
+
+### Listar profissionais disponíveis para Serviço 1 às 14:30 em 22/09/2025
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-22&horario=14:30&servicoOferecidoId=1
+
+### Listar profissionais disponíveis para Serviço 2 às 15:00 em 22/09/2025
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-22&horario=15:00&servicoOferecidoId=2
+
+### Listar profissionais disponíveis para Serviço 1 às 09:00 em 22/09/2025
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-22&horario=09:00&servicoOferecidoId=1
+
+### Listar profissionais disponíveis para Serviço 2 às 10:30 em 22/09/2025
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-22&horario=10:30&servicoOferecidoId=2
+
+### Listar profissionais disponíveis para Serviço 1 às 16:00 em 23/09/2025
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-23&horario=16:00&servicoOferecidoId=1
+
+### Listar profissionais disponíveis para Serviço 2 às 17:30 em 23/09/2025
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-23&horario=17:30&servicoOferecidoId=2
+
+### ============================================================
+### FLUXO COMPLETO DE AGENDAMENTO EM DUAS ETAPAS
+### ============================================================
+
+### PASSO 1: Verificar horários disponíveis para corte de cabelo
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-22&servicoOferecidoId=1
+
+### PASSO 2: Verificar profissionais disponíveis às 14:00
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-24&horario=14:00&servicoOferecidoId=1
+
+### PASSO 3: Criar agendamento com profissional escolhido
+POST {{baseUrl}}/agendamentos/criar-agendamento
+Content-Type: application/json
+
+{
+  "dataHora": "2025-09-22T14:00:00",
+  "clienteId": "1",
+  "profissionalId": "1",
+  "servicoId": "1",
+  "observacoes": "Agendamento via fluxo completo"
+}
 
 ### ============================================================
 ### PRODUTOS
@@ -200,7 +295,7 @@ Content-Type: application/json
 GET {{baseUrl}}/produtos/estoque-baixo
 
 ### Baixa Manual de Estoque
-POST {{baseUrl}}/produtos/550e8400-e29b-41d4-a716-446655440020/baixa?quantidade=5
+POST {{baseUrl}}/produtos/1
 
 ### ============================================================
 ### PDV (Ponto de Venda)
@@ -211,10 +306,10 @@ POST {{baseUrl}}/pdv/vendas
 Content-Type: application/json
 
 {
-  "clienteId": "550e8400-e29b-41d4-a716-446655440001",
+  "clienteId": "1",
   "itens": [
     {
-      "produtoId": "550e8400-e29b-41d4-a716-446655440020",
+      "produtoId": "1",
       "descricao": "Shampoo Profissional",
       "quantidade": 1,
       "precoUnitario": 45.90,
@@ -268,28 +363,102 @@ Content-Type: application/json
 }
 
 ### ============================================================
-### TESTES DE VALIDAÇÃO E ERROS
+### TESTES DE VALIDAÇÃO E CONFLITOS
 ### ============================================================
 
-### Teste - Criar Agendamento com dados inválidos
+### Teste - Tentar criar agendamento no mesmo horário/profissional (deve falhar)
 POST {{baseUrl}}/agendamentos/criar-agendamento
 Content-Type: application/json
 
 {
-  "dataHora": "2025-09-18T14:30:00"
-  // clienteId, profissionalId, servicoId são obrigatórios
+  "dataHora": "2025-09-22T14:30:00",
+  "clienteId": "2",
+  "profissionalId": "1",
+  "servicoId": "1",
+  "observacoes": "Teste de conflito de horário"
 }
 
-### Teste - Criar Cliente com email inválido
-POST {{baseUrl}}/clientes
+### Teste - Criar agendamento fora do horário de trabalho (deve falhar)
+POST {{baseUrl}}/agendamentos/criar-agendamento
 Content-Type: application/json
 
 {
-  "nome": "Teste",
-  "email": "email-invalido",
-  "cpf": "123.456.789-01",
-  "telefone": "(11) 99999-9999"
+  "dataHora": "2025-09-22T07:00:00",
+  "clienteId": "1",
+  "profissionalId": "1",
+  "servicoId": "1",
+  "observacoes": "Teste antes do horário de funcionamento"
 }
 
-### Teste - Buscar entidade inexistente
-GET {{baseUrl}}/clientes/999
+### Teste - Criar agendamento no horário de pausa (deve falhar)
+POST {{baseUrl}}/agendamentos/criar-agendamento
+Content-Type: application/json
+
+{
+  "dataHora": "2025-09-22T12:30:00",
+  "clienteId": "1",
+  "profissionalId": "1",
+  "servicoId": "1",
+  "observacoes": "Teste no horário de pausa"
+}
+
+### Teste - Buscar horários para data sem disponibilidade
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-12-25&servicoOferecidoId=1
+
+### Teste - Buscar profissionais para horário indisponível
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-22&horario=19:00&servicoOferecidoId=1
+
+### Teste - Buscar horários para serviço inexistente (deve falhar)
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-22&servicoOferecidoId=999
+
+### Teste - Buscar profissionais para serviço inexistente (deve falhar)
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-22&horario=14:00&servicoOferecidoId=999
+
+### ============================================================
+### TESTES DE CENÁRIOS COMPLEXOS
+### ============================================================
+
+### Cenário 1: Múltiplos agendamentos no mesmo dia
+POST {{baseUrl}}/agendamentos/criar-agendamento
+Content-Type: application/json
+
+{
+  "dataHora": "2025-09-25T09:00:00",
+  "clienteId": "1",
+  "profissionalId": "1",
+  "servicoId": "1",
+  "observacoes": "Primeiro agendamento do dia"
+}
+
+### Cenário 2: Agendamento seguido (30 min depois)
+POST {{baseUrl}}/agendamentos/criar-agendamento
+Content-Type: application/json
+
+{
+  "dataHora": "2025-09-25T09:30:00",
+  "clienteId": "2",
+  "profissionalId": "1",
+  "servicoId": "2",
+  "observacoes": "Segundo agendamento seguido"
+}
+
+### Cenário 3: Agendamento com outro profissional no mesmo horário
+POST {{baseUrl}}/agendamentos/criar-agendamento
+Content-Type: application/json
+
+{
+  "dataHora": "2025-09-25T09:00:00",
+  "clienteId": "3",
+  "profissionalId": "2",
+  "servicoId": "1",
+  "observacoes": "Mesmo horário, profissional diferente"
+}
+
+### Verificar horários disponíveis após os agendamentos
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-25&servicoOferecidoId=1
+
+### Verificar profissionais disponíveis às 09:00 após agendamentos
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-25&horario=09:00&servicoOferecidoId=1
+
+### Verificar profissionais disponíveis às 10:00 (horário livre)
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-25&horario=10:00&servicoOferecidoId=1

@@ -1,5 +1,6 @@
 package com.cesarschool.barbearia_backend.profissionais.dto;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -62,6 +63,13 @@ public final class HorarioTrabalhoDTOs {
     @Data
     public static class ListarHorariosTrabalhoResponse {
         private List<HorarioTrabalhoResponse> horarios;
-        private int totalElements;
+        private int total;
+    }
+
+    @Data
+    public static class HorariosDisponiveisResponse {
+        private List<String> horarios;
+        private LocalDate data;
+        
     }
 }

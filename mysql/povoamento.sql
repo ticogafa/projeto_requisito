@@ -309,3 +309,7 @@ ORDER BY pontosFidelidade DESC;
 -- =========================================================================
 -- FIM DO SCRIPT DE POVOAMENTO
 -- =========================================================================
+
+
+select * from agendamento a
+where DATE('2025-09-22') = DATE(a.data_hora)

@@ -22,4 +22,10 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
         @Param("profissionalId") Integer profissionalId
     );
 
+    @Query(
+        "SELECT a FROM Agendamento a WHERE DATE(a.dataHora) = DATE(:dataHora)"
+    )
+    List<Agendamento> findByData(
+        @Param("dataHora") LocalDateTime dataHora
+    );
 }

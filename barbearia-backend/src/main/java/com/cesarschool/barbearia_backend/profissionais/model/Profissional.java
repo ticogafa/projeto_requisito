@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-
+import java.util.List;
 
 import com.cesarschool.barbearia_backend.common.model.Cpf;
 import com.cesarschool.barbearia_backend.common.model.Email;
@@ -40,6 +40,7 @@ public class Profissional {
     @NonNull
     @Column(nullable = false, unique = true)
     private Telefone telefone;
+
 
     public String getEmail(){
         return this.email.getValue();

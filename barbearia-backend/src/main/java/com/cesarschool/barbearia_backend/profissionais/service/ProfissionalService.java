@@ -1,10 +1,12 @@
 package com.cesarschool.barbearia_backend.profissionais.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.cesarschool.barbearia_backend.common.constants.ErrorMessages;
+import com.cesarschool.barbearia_backend.common.enums.DiaSemana;
 import com.cesarschool.barbearia_backend.common.exceptions.DuplicateException;
 import com.cesarschool.barbearia_backend.common.exceptions.NotFoundException;
 import com.cesarschool.barbearia_backend.profissionais.dto.HorarioTrabalhoDTOs.AtualizarHorarioTrabalhoRequest;
@@ -17,6 +19,7 @@ import com.cesarschool.barbearia_backend.profissionais.dto.ProfissionalDTOs.Prof
 import com.cesarschool.barbearia_backend.profissionais.mapper.HorarioTrabalhoMapper;
 import com.cesarschool.barbearia_backend.profissionais.model.HorarioTrabalho;
 import com.cesarschool.barbearia_backend.profissionais.model.Profissional;
+import com.cesarschool.barbearia_backend.profissionais.model.ProfissionalServico;
 import com.cesarschool.barbearia_backend.profissionais.repository.HorarioTrabalhoRepository;
 import com.cesarschool.barbearia_backend.profissionais.repository.ProfissionalRepository;
 import com.cesarschool.barbearia_backend.profissionais.mapper.ProfissionalMapper;
@@ -33,6 +36,31 @@ public class ProfissionalService {
     private final HorarioTrabalhoRepository horarioRepository;
 
 
+
+    /**
+     * Busca o horário de trabalho de um profissional para um determinado dia da semana.
+     *
+     * @param profissionalId o identificador do profissional.
+     * @param diaSemana o dia da semana para o qual se deseja buscar o horário de trabalho.
+     * @return uma resposta contendo o horário de trabalho do profissional para o dia especificado.
+     * @throws IllegalArgumentException se o profissional não possuir horário de trabalho cadastrado para o dia informado.
+     */
+    public HorarioTrabalhoResponse buscarHorarioDoDia(Integer profissionalId, DiaSemana diaSemana) {
+        HorarioTrabalho horarioTrabalho = repository.findHorarioTrabalhoByProfissionalAndDiaSemana(profissionalId, diaSemana).orElseThrow(
+            () -> new IllegalArgumentException(
+                String.format(
+                    "O profissional %s não possui horário de trabalho cadastrado para %s.",
+                    buscarEntidadePorId(profissionalId).getNome(), diaSemana.getNome()
+                )
+            )
+        );
+        return HorarioTrabalhoMapper.toResponse(horarioTrabalho);
+    }
+
+    public List<ProfissionalServico> buscarProfissionaisPorServico(Integer servicoId){
+        return repository.buscarProfissionaisPorServico(servicoId);
+    }
+
     // CREATE
     public ProfissionalResponse criarProfissional(CriarProfissionalRequest request) {
         Profissional profissional = ProfissionalMapper.toEntity(request);
@@ -41,7 +69,7 @@ public class ProfissionalService {
     }
 
     // READ
-    private Profissional buscarEntidadePorId(Integer id) {
+    public Profissional buscarEntidadePorId(Integer id) {
         return repository.findById(id).orElseThrow(
             () -> new NotFoundException(ErrorMessages.ENTIDADE_NAO_ENCONTRADA.format("Profissional"))
         );
@@ -115,7 +143,7 @@ public class ProfissionalService {
         
         ListarHorariosTrabalhoResponse response = new ListarHorariosTrabalhoResponse();
         response.setHorarios(horariosResponse);
-        response.setTotalElements(horarios.size());
+        response.setTotal(horarios.size());
         
         return response;
     }

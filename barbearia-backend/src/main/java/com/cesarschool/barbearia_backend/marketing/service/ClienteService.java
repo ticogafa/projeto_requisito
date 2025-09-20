@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.cesarschool.barbearia_backend.common.exceptions.NotFoundException;
 import com.cesarschool.barbearia_backend.marketing.dto.ClienteDTOs.AtualizarClienteRequest;
 import com.cesarschool.barbearia_backend.marketing.dto.ClienteDTOs.ClienteResponse;
 import com.cesarschool.barbearia_backend.marketing.dto.ClienteDTOs.CriarClienteRequest;
@@ -46,22 +47,25 @@ public class ClienteService {
         if(repository.findByTelefone(request.getTelefone()).isPresent()) {
             throw new IllegalArgumentException("Telefone já cadastrado");
         }
-
         Cliente cliente = ClienteMapper.toEntity(request);
         Cliente clienteSalvo = repository.save(cliente);
         return ClienteMapper.toResponse(clienteSalvo);
     }
 
+    public Cliente buscarEntidadePorId(Integer id) {
+        return repository.findById(id)
+            .orElseThrow(() -> new NotFoundException(CLIENTE_NAO_ENCONTRADO));
+    }
+
     public ClienteResponse buscarPorId(Integer id) {
-        Cliente cliente = repository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
+        Cliente cliente = buscarEntidadePorId(id);
         return ClienteMapper.toResponse(cliente);
     }
 
+
     public ClienteResponse atualizarCliente(Integer id, AtualizarClienteRequest request) {
-        Cliente cliente = repository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
-        
+        Cliente cliente = buscarEntidadePorId(id);
+
         ClienteMapper.updateEntityFromDto(request, cliente);
         Cliente clienteAtualizado = repository.save(cliente);
         return ClienteMapper.toResponse(clienteAtualizado);
@@ -76,9 +80,8 @@ public class ClienteService {
 
 
     public ClienteResponse adicionarPontos(Integer id, int pontos) {
-        Cliente cliente = repository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
-        
+        Cliente cliente = buscarEntidadePorId(id);
+
         cliente.adicionarPontos(pontos);
         Cliente clienteAtualizado = repository.save(cliente);
         
@@ -86,9 +89,8 @@ public class ClienteService {
     }
 
     public ClienteResponse usarPontos(Integer id, int pontos) {
-        Cliente cliente = repository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
-        
+        Cliente cliente = buscarEntidadePorId(id);
+
         cliente.usarPontos(pontos);
         Cliente clienteAtualizado = repository.save(cliente);
         
@@ -96,8 +98,7 @@ public class ClienteService {
     }
 
     public void deletarCliente(Integer id) {
-        Cliente cliente = repository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(CLIENTE_NAO_ENCONTRADO));
+        Cliente cliente = buscarEntidadePorId(id);
         repository.delete(cliente);
     }
 }

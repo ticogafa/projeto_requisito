@@ -1,0 +1,3 @@
+* como definir os horários fixos da barberia como por exemplo
+horário de inicio, hornado de fim de modo que o horário de todos os profissionais precisem respeitar esse horário fixo,
+* pq os ids nao tao pegando na atualização das entidades

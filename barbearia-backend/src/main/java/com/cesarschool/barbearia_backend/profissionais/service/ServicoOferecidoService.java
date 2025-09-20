@@ -55,9 +55,13 @@ public class ServicoOferecidoService {
     }
 
     public ServicoResponse buscarPorId(Integer id) {
-        ServicoOferecido servico = findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(SERVICO_NAO_ENCONTRADO));
+        ServicoOferecido servico = buscarEntidadePorId(id);
         return ServicoMapper.toResponse(servico);
+    }
+
+    public ServicoOferecido buscarEntidadePorId(Integer id) {
+        return  findById(id)
+            .orElseThrow(() -> new IllegalArgumentException(SERVICO_NAO_ENCONTRADO));
     }
 
     public ServicoResponse atualizarServico(Integer id, AtualizarServicoRequest request) {
