@@ -2,19 +2,19 @@
 
 -- • Um Serviço deve ter uma Duração e um Preço
 CREATE TABLE servico (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
+    id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255) NOT NULL,
     preco DECIMAL(15, 2) NOT NULL,
-    duracaoMinutos INT NOT NULL,
+    duracaoMinutos INT NOT NULL
 );
 
 -- • Um Profissional pode ser associado a múltiplos Serviços
 -- • A Configuração de Horário deve respeitar o horário de funcionamento da barbearia
 CREATE TABLE profissional (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (Integer()),
+    id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(127) NOT NULL UNIQUE,
-    telefone VARCHAR(13) NOT NULL,
+    telefone VARCHAR(13) NOT NULL
 );
 
 -- // Pseudo-código

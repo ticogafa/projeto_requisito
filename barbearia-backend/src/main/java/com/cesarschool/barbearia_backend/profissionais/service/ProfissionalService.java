@@ -1,11 +1,12 @@
 package com.cesarschool.barbearia_backend.profissionais.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.cesarschool.barbearia_backend.common.enums.DiaSemana;
+import com.cesarschool.barbearia_backend.common.constants.ErrorMessages;
+import com.cesarschool.barbearia_backend.common.exceptions.DuplicateException;
+import com.cesarschool.barbearia_backend.common.exceptions.NotFoundException;
 import com.cesarschool.barbearia_backend.profissionais.dto.HorarioTrabalhoDTOs.AtualizarHorarioTrabalhoRequest;
 import com.cesarschool.barbearia_backend.profissionais.dto.HorarioTrabalhoDTOs.CriarHorarioTrabalhoRequest;
 import com.cesarschool.barbearia_backend.profissionais.dto.HorarioTrabalhoDTOs.HorarioTrabalhoResponse;
@@ -28,54 +29,40 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProfissionalService {
 
-    private static final String PROFISSIONAL_NAO_ENCONTRADO = "Profissional não encontrado";
-    private static final String HORARIO_NAO_ENCONTRADO = "Horário de trabalho não encontrado";
-    
     private final ProfissionalRepository repository;
     private final HorarioTrabalhoRepository horarioRepository;
-    private final HorarioTrabalhoMapper horarioMapper;
 
-    public Optional<Profissional> findById(Integer id){
-        return repository.findById(id);
-    }
 
-    public List<Profissional> findAll(){
-        return repository.findAll();
-    }
-
-    public Profissional save(Profissional profissional){
-        return repository.save(profissional);
-    }
-
-    public void delete(Profissional profissional){
-        repository.delete(profissional);
-    }
-
+    // CREATE
     public ProfissionalResponse criarProfissional(CriarProfissionalRequest request) {
         Profissional profissional = ProfissionalMapper.toEntity(request);
-        
-        Profissional profissionalSalvo = save(profissional);
-        
+        Profissional profissionalSalvo = repository.save(profissional);
         return ProfissionalMapper.toResponse(profissionalSalvo);
     }
 
+    // READ
+    private Profissional buscarEntidadePorId(Integer id) {
+        return repository.findById(id).orElseThrow(
+            () -> new NotFoundException(ErrorMessages.ENTIDADE_NAO_ENCONTRADA.format("Profissional"))
+        );
+    }
+
+    // READ
     public ProfissionalResponse buscarPorId(Integer id) {
-        Profissional profissional = findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(PROFISSIONAL_NAO_ENCONTRADO));
+        Profissional profissional = buscarEntidadePorId(id);
         return ProfissionalMapper.toResponse(profissional);
     }
 
+    // UPDATE
     public ProfissionalResponse atualizarProfissional(Integer id, AtualizarProfissionalRequest request) {
-        Profissional profissional = findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(PROFISSIONAL_NAO_ENCONTRADO));
-        
+        Profissional profissional = buscarEntidadePorId(id);
+
         ProfissionalMapper.updateEntityFromDto(request, profissional);
-        
-        Profissional profissionalAtualizado = save(profissional);
-        
+        Profissional profissionalAtualizado = repository.save(profissional);
         return ProfissionalMapper.toResponse(profissionalAtualizado);
     }
 
+    // LIST
     public List<ProfissionalResponse> listarProfissionais() {
         return repository
             .findAll()
@@ -84,52 +71,46 @@ public class ProfissionalService {
             .toList();
         }
 
+    // DELETE
     public void deletarProfissional(Integer id) {
-        Profissional profissional = findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(PROFISSIONAL_NAO_ENCONTRADO));
-        delete(profissional);
+        Profissional profissional = buscarEntidadePorId(id);
+        repository.delete(profissional);
     }
 
-    // ===============================
-    // Métodos para Horários de Trabalho
-    // ===============================
+    // ------------------ MÉTODOS PARA HORÁRIOS DE TRABALHO ------------------
 
+    // CREATE
+    /**
+     * Regras de negócio para criar um horário de trabalho:
+     * 1. O profissional deve existir.
+     * 2. Não pode haver horários duplicados para o mesmo dia da semana para o mesmo profissional.
+     */
     public HorarioTrabalhoResponse criarHorarioTrabalho(Integer profissionalId, CriarHorarioTrabalhoRequest request) {
-        // Verificar se o profissional existe
-        Profissional profissional = findById(profissionalId)
-            .orElseThrow(() -> new IllegalArgumentException(PROFISSIONAL_NAO_ENCONTRADO));
+        Profissional profissional = buscarEntidadePorId(profissionalId);
         
-
-        horarioRepository.findByProfissionalId(profissionalId)
+        horarioRepository.buscarHorariosPorProfissionalId(profissionalId)
             .stream()
             .filter(horario -> horario.getDiaSemana().equals(request.getDiaSemana()))
             .findFirst().ifPresent(horario->{
-                throw new IllegalArgumentException("Já existe um horário cadastrado para este dia da semana para " + profissional.getNome());
+                throw new DuplicateException(ErrorMessages.DIA_SEMANA_JA_CADASTRADO.format(request.getDiaSemana().getNome(), profissional.getNome()));
             });
 
-        
-        // Converter DTO para entidade
-        HorarioTrabalho horario = horarioMapper.toEntity(request);
+        HorarioTrabalho horario = HorarioTrabalhoMapper.toEntity(request);
         horario.setProfissional(profissional);
         
-        // Salvar horário
         HorarioTrabalho horarioSalvo = horarioRepository.save(horario);
-        
-        // Converter para DTO de resposta
-        return horarioMapper.toResponse(horarioSalvo);
+
+        return HorarioTrabalhoMapper.toResponse(horarioSalvo);
     }
 
+    // READ
     public ListarHorariosTrabalhoResponse listarHorariosPorProfissional(Integer profissionalId) {
-        // Verificar se o profissional existe
-        findById(profissionalId)
-            .orElseThrow(() -> new IllegalArgumentException(PROFISSIONAL_NAO_ENCONTRADO));
-        
-        // Buscar horários do profissional
-        List<HorarioTrabalho> horarios = horarioRepository.findByProfissionalId(profissionalId);
+        buscarEntidadePorId(profissionalId);
+        List<HorarioTrabalho> horarios = horarioRepository.buscarHorariosPorProfissionalId(profissionalId);
         
         List<HorarioTrabalhoResponse> horariosResponse = horarios
             .stream()
-            .map(horarioMapper::toResponse)
+            .map(HorarioTrabalhoMapper::toResponse)
             .toList();
         
         ListarHorariosTrabalhoResponse response = new ListarHorariosTrabalhoResponse();
@@ -139,43 +120,49 @@ public class ProfissionalService {
         return response;
     }
 
+    // UPDATE
+    /**
+     * Regras de negócio para atualizar um horário de trabalho:
+     * 1. O profissional deve existir.
+     * 2. O horário de trabalho deve existir.
+     * 3. O horário de trabalho deve pertencer ao profissional informado.
+     * 4. O campo 'diaSemana' não pode ser alterado.
+     * 5. Os demais campos do horário podem ser atualizados.
+     */
     public HorarioTrabalhoResponse atualizarHorarioTrabalho(Integer profissionalId, Integer horarioId, AtualizarHorarioTrabalhoRequest request) {
-        // Verificar se o profissional existe
-        findById(profissionalId)
-            .orElseThrow(() -> new IllegalArgumentException(PROFISSIONAL_NAO_ENCONTRADO));
+        buscarEntidadePorId(profissionalId);
         
-        // Buscar horário específico
         HorarioTrabalho horario = horarioRepository.findById(horarioId)
-            .orElseThrow(() -> new IllegalArgumentException(HORARIO_NAO_ENCONTRADO));
+            .orElseThrow(() -> new NotFoundException(ErrorMessages.ENTIDADE_NAO_ENCONTRADA.format("Horário de trabalho")));
         
-        // Verificar se o horário pertence ao profissional
         if (!horario.getProfissional().getId().equals(profissionalId)) {
-            throw new IllegalArgumentException("Horário não pertence ao profissional informado");
+            throw new IllegalArgumentException(ErrorMessages.HORARIO_NAO_PERTENCE_A_PROFISSIONAL.format());
+        }
+
+        if(horario.getDiaSemana() != request.getDiaSemana()) {
+            throw new IllegalArgumentException(ErrorMessages.CAMPO_NAO_PODE_SER_ALTERADO.format("Dia da semana"));
         }
         
-        // Atualizar campos usando mapper
-        horarioMapper.updateEntityFromDto(request, horario);
-        
-        // Salvar alterações
+        HorarioTrabalhoMapper.updateEntityFromDto(request, horario);
         HorarioTrabalho horarioAtualizado = horarioRepository.save(horario);
-        
-        return horarioMapper.toResponse(horarioAtualizado);
+        return HorarioTrabalhoMapper.toResponse(horarioAtualizado);
     }
 
+    // DELETE
+    /**
+     * Regras de negócio para deletar um horário de trabalho:
+     * 1. O profissional deve existir.
+     * 2. O horário de trabalho deve existir.
+     * 3. O horário de trabalho deve pertencer ao profissional informado.
+     */
     public void deletarHorarioTrabalho(Integer profissionalId, Integer horarioId) {
-        // Verificar se o profissional existe
-        findById(profissionalId)
-            .orElseThrow(() -> new IllegalArgumentException(PROFISSIONAL_NAO_ENCONTRADO));
-        
-        // Buscar horário específico
+        buscarPorId(profissionalId);
         HorarioTrabalho horario = horarioRepository.findById(horarioId)
-            .orElseThrow(() -> new IllegalArgumentException(HORARIO_NAO_ENCONTRADO));
+            .orElseThrow(() -> new NotFoundException(ErrorMessages.HORARIO_NAO_ENCONTRADO.format()));
         
-        // Verificar se o horário pertence ao profissional
         if (!horario.getProfissional().getId().equals(profissionalId)) {
-            throw new IllegalArgumentException("Horário não pertence ao profissional informado");
+            throw new IllegalArgumentException(ErrorMessages.HORARIO_NAO_PERTENCE_A_PROFISSIONAL.format());
         }
-        
         horarioRepository.delete(horario);
     }
 }

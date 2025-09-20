@@ -17,6 +17,7 @@ public final class ServicoDTOs {
 
     @Data
     public static class CriarServicoRequest {
+
         @NotBlank(message = "Nome é obrigatório")
         @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
         private String nome;

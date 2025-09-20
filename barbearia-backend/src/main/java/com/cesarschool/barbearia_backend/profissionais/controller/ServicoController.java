@@ -1,14 +1,12 @@
 package com.cesarschool.barbearia_backend.profissionais.controller;
 
 import com.cesarschool.barbearia_backend.profissionais.dto.ServicoDTOs.*;
-import com.cesarschool.barbearia_backend.profissionais.service.ServicoService;
+import com.cesarschool.barbearia_backend.profissionais.service.ServicoOferecidoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ServicoController {
 
-    private final ServicoService servicoService;
+    private final ServicoOferecidoService servicoService;
 
     @PostMapping
     public ResponseEntity<ServicoResponse> criarServico(@Valid @RequestBody CriarServicoRequest request) {
-        ServicoResponse servico = servicoService.criarServico(request);
+        ServicoResponse servico = servicoService.cadastrarServico(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(servico);
     }
 

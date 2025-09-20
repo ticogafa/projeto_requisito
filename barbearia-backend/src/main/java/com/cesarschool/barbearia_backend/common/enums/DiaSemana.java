@@ -1,13 +1,23 @@
 package com.cesarschool.barbearia_backend.common.enums;
 
 public enum DiaSemana {
-    SEGUNDA,
-    TERCA,
-    QUARTA,
-    QUINTA,
-    SEXTA,
-    SABADO,
-    DOMINGO;
+    SEGUNDA("Segunda-feira"),
+    TERCA("Terça-feira"),
+    QUARTA("Quarta-feira"),
+    QUINTA("Quinta-feira"),
+    SEXTA("Sexta-feira"),
+    SABADO("Sábado"),
+    DOMINGO("Domingo");
+
+    private final String nomeCompleto;
+
+    DiaSemana(String nomeCompleto) {
+        this.nomeCompleto = nomeCompleto;
+    }
+
+    public String getNome() {
+        return nomeCompleto;
+    }
 
     public static DiaSemana fromLocalDateTime(java.time.LocalDateTime dateTime) {
         switch (dateTime.getDayOfWeek()) {

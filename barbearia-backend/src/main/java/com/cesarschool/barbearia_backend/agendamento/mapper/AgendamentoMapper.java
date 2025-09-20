@@ -46,7 +46,6 @@ public class AgendamentoMapper {
         response.setProfissionalId(profissional.getId());
         response.setProfissionalNome(profissional.getNome());
         response.setProfissionalEmail(profissional.getEmail());
-        
         // Dados do serviço
         ServicoOferecido servico = agendamento.getServico();
         response.setServicoId(servico.getId());

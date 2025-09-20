@@ -2,6 +2,7 @@ package com.cesarschool.barbearia_backend.agendamento.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -53,13 +54,17 @@ public class AgendamentoService {
 
     if (existeConflito) {
         String nomeProfissional = agendamento.getProfissional().getNome();
-        String horario = dataHora.toString();
         throw new IllegalArgumentException(
-            String.format("Já existe um agendamento com %s no horário %s.", nomeProfissional, horario)
+            String.format("Já existe um agendamento com %s no para %s.", nomeProfissional, dataHora.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
         );
     }
     }
 
+    /**
+     * Regras de negócio para verificar se o profissional está disponível no horário solicitado
+     * -- • Um Agendamento não pode ser criado em um horário fora da jornada de trabalho do profissional
+     * -- • Se um Agendamento não especificar o profissional, o sistema deve atribuir o primeiro com horário livre
+     */
     public void verificarConflitoProfissional(Profissional profissional, LocalDateTime horarioAgendamento) {
         var diaSemana = DiaSemana.fromLocalDateTime(horarioAgendamento);
         profissionalRepository.findHorarioTrabalhoByProfissionalAndDiaSemana(profissional.getId(), diaSemana)
@@ -67,7 +72,8 @@ public class AgendamentoService {
                 var inicioPausa = value.getFimPausa();
                 var fimPausa = value.getInicioPausa();
                 var horario = horarioAgendamento.toLocalTime();
-                if (horario.isAfter(inicioPausa) && horario.isBefore(fimPausa)) {
+                var profissionalTemPausa = inicioPausa != null && fimPausa != null;
+                if (profissionalTemPausa && (horario.isAfter(inicioPausa) && horario.isBefore(fimPausa))) {
                     throw new IllegalArgumentException(
                         String.format("%s não está disponível no horário solicitado.", profissional.getNome())
                     );
@@ -75,11 +81,11 @@ public class AgendamentoService {
             }, () -> {
                 throw new IllegalArgumentException(
                     String.format(
-                        "O profissional %s não possui horário de trabalho cadastrado para o dia selecionado.", profissional.getNome()
+                        "O profissional %s não possui horário de trabalho cadastrado para %s.", profissional.getNome(), diaSemana.getNome()
                     )
                 );
             });
-    }
+        }
 
 
     public void verificarAlteracaoStatus(Agendamento agendamento) {
@@ -90,20 +96,18 @@ public class AgendamentoService {
         ).toHours();
         if(status.equals(StatusAgendamento.CANCELADO) && horasAteAgendamento <= 2)
             throw new IllegalArgumentException("Não é permitido cancelar agendamentos com menos de 2 horas de antecedência.");
-        else if(status.equals(StatusAgendamento.CONFIRMADO) && horasAteAgendamento < 0)
+        else if(status.equals(StatusAgendamento.CONFIRMADO) && horasAteAgendamento < 0) {
+            agendamento.setStatus(StatusAgendamento.CANCELADO);
+            repository.save(agendamento);
             throw new IllegalArgumentException("Não é possível confirmar um agendamento que já passou.");
+        }
     }
 
-    public Agendamento save(Agendamento agendamento) throws IllegalArgumentException{
-        // -- • Um Agendamento só pode ser criado se o Horário Disponível estiver livre
-        // -- • Um Agendamento não pode ser criado em um horário fora da jornada de trabalho do profissional
-        // -- • Um Agendamento só pode ser cancelado até 2 horas antes do horário
-        // -- • Se um Agendamento não especificar o profissional, o sistema deve atribuir o primeiro com horário livre
-
-        this.verificarConflitoHorario(agendamento);
-        this.verificarConflitoProfissional(agendamento.getProfissional(), agendamento.getDataHora());
-        this.verificarAlteracaoStatus(agendamento);
-        
+    /**
+     * Simple save method without validations
+     * Validations should be applied in the business methods that need them
+     */
+    public Agendamento save(Agendamento agendamento) {
         return repository.save(agendamento);
     }
 
@@ -113,7 +117,7 @@ public class AgendamentoService {
 
     // Métodos que trabalham com DTOs
     public AgendamentoResponse criarAgendamento(CriarAgendamentoRequest request) {
-        // Buscar entidades pelos IDs
+        // Buscar entidades relacionadas
         Cliente cliente = clienteRepository.findById(request.getClienteId())
             .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
         
@@ -126,7 +130,12 @@ public class AgendamentoService {
         // Converter DTO para entidade
         Agendamento agendamento = mapper.toEntity(request, cliente, profissional, servico);
         
-        // Salvar o agendamento (com validações)
+        // Apply full validation for new agendamentos
+        this.verificarConflitoHorario(agendamento);
+        this.verificarConflitoProfissional(agendamento.getProfissional(), agendamento.getDataHora());
+        this.verificarAlteracaoStatus(agendamento);
+        
+        // Salvar o agendamento
         Agendamento agendamentoSalvo = save(agendamento);
         
         // Converter para DTO de resposta
@@ -142,6 +151,9 @@ public class AgendamentoService {
         Agendamento agendamento = findById(id);
         agendamento.setStatus(StatusAgendamento.CONFIRMADO);
         
+        // Only validate status change rules for confirmation
+        this.verificarAlteracaoStatus(agendamento);
+        
         Agendamento agendamentoSalvo = save(agendamento);
         return mapper.toResponse(agendamentoSalvo);
     }
@@ -149,6 +161,9 @@ public class AgendamentoService {
     public AgendamentoResponse cancelarAgendamento(Integer id) {
         Agendamento agendamento = findById(id);
         agendamento.setStatus(StatusAgendamento.CANCELADO);
+        
+        // Only validate status change rules for cancellation
+        this.verificarAlteracaoStatus(agendamento);
         
         Agendamento agendamentoSalvo = save(agendamento);
         return mapper.toResponse(agendamentoSalvo);

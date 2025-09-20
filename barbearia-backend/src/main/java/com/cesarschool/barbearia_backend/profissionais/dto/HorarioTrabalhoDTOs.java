@@ -25,6 +25,7 @@ public final class HorarioTrabalhoDTOs {
         @NotNull(message = "Hora de fim é obrigatória")
         private LocalTime horaFim;
 
+        
         private LocalTime inicioPausa; // opcional
 
         private LocalTime fimPausa; // opcional

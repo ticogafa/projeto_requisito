@@ -4,15 +4,15 @@ package com.cesarschool.barbearia_backend.common.controller;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.cesarschool.barbearia_backend.common.exceptions.DuplicateException;
-import com.cesarschool.barbearia_backend.common.exceptions.ValueNotFoundException;
+import com.cesarschool.barbearia_backend.common.exceptions.NotFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConflictExceptions(RuntimeException ex) {
         return this.buildResponse(
             HttpStatus.CONFLICT,
-            "resource_conflict",
+            ex.getClass().getSimpleName(),
             ex.getMessage()
         );
     }
@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
         EntityNotFoundException.class,
-        ValueNotFoundException.class
+        NotFoundException.class
     })
     public ResponseEntity<ErrorResponse> handleNotFoundExceptions(RuntimeException ex) {
         return this.buildResponse(
@@ -80,7 +80,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(org.springframework.dao.DataIntegrityViolationException ex) {
         return this.buildResponse(
             HttpStatus.CONFLICT,

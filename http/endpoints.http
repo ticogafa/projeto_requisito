@@ -1,12 +1,14 @@
-### Sistema Barbear# Barbearia API - Fluxo Completo de Testes
-# Este arquivo segue uma ordem lógica para testar todas as funcionalidades
-# Comece pelas dependências antes de criar agendamentos
+# Barbearia API - Endpoints Completos
+# Este arquivo contém todos os endpoints organizados por funcionalidade
 
 ### Variables
 @baseUrl = http://localhost:8080/api
 
+### ============================================================
+### SERVIÇOS
+### ============================================================
 
-### 1.1 - Criar Serviços (necessários para agendamentos)
+### Criar Serviço
 POST {{baseUrl}}/servicos
 Content-Type: application/json
 
@@ -17,7 +19,7 @@ Content-Type: application/json
   "duracaoMinutos": 30
 }
 
-### 1.2 - Criar outro Serviço
+### Criar outro Serviço
 POST {{baseUrl}}/servicos
 Content-Type: application/json
 
@@ -28,479 +30,11 @@ Content-Type: application/json
   "duracaoMinutos": 20
 }
 
-
-### 1.3 - Listar Serviços (para verificar IDs criados)
-GET {{baseUrl}}/servicos
-
-### ============================================================
-### PASSO 2: CRIAR PROFISSIONAIS
-### ============================================================
-
-### 2.1 - Criar Profissional 1
-POST {{baseUrl}}/profissionais
-Content-Type: application/json
-
-{
-  "nome": "Carlos Silva",
-  "email": "carlos.silva@barbearia.com",
-  "cpf": "53604042801",
-  "telefone": "0000000000"
-}
-
-### 2.2 - Criar Profissional 2
-POST {{baseUrl}}/profissionais
-Content-Type: application/json
-
-{
-  "nome": "João Santos",
-  "email": "joao.santos@barbearia.com",
-  "cpf": "02973067405",
-  "telefone": "0000000000"
-}
-
-### 2.3 - Listar Profissionais (para verificar IDs criados)
-GET {{baseUrl}}/profissionais
-
-### ============================================================
-### PASSO 3: CONFIGURAR HORÁRIOS DOS PROFISSIONAIS
-### ============================================================
-### IMPORTANTE: Os horários de trabalho precisam ser criados separadamente
-
-### 3.1 - Criar Horário de Trabalho - Carlos (Segunda a Sexta) - SEGUNDA
-POST {{baseUrl}}/profissionais/1/horarios
-Content-Type: application/json
-
-{
-  "diaSemana": "QUARTA",
-  "horaInicio": "08:00",
-  "horaFim": "18:00",
-  "inicioPausa": "12:00",
-  "fimPausa": "13:00"
-}
-
-### 3.2 - Criar Horário de Trabalho - Carlos - TERÇA
-POST {{baseUrl}}/profissionais/1/horarios
-Content-Type: application/json
-
-{
-  "diaSemana": "TERCA",
-  "horaInicio": "08:00",
-  "horaFim": "18:00",
-  "inicioPausa": "12:00",
-  "fimPausa": "13:00"
-}
-
-### 3.3 - Criar Horário de Trabalho - Carlos - QUARTA
-POST {{baseUrl}}/profissionais/1/horarios
-Content-Type: application/json
-
-{
-  "diaSemana": "QUARTA",
-  "horaInicio": "08:00",
-  "horaFim": "18:00",
-  "inicioPausa": "12:00",
-  "fimPausa": "13:00"
-}
-
-### 3.4 - Criar Horário de Trabalho - Carlos - QUINTA
-POST {{baseUrl}}/profissionais/1/horarios
-Content-Type: application/json
-
-{
-  "diaSemana": "QUINTA",
-  "horaInicio": "08:00",
-  "horaFim": "18:00",
-  "inicioPausa": "12:00",
-  "fimPausa": "13:00"
-}
-
-### 3.5 - Criar Horário de Trabalho - Carlos - SEXTA
-POST {{baseUrl}}/profissionais/1/horarios
-Content-Type: application/json
-
-{
-  "diaSemana": "SEXTA",
-  "horaInicio": "08:00",
-  "horaFim": "18:00",
-  "inicioPausa": "12:00",
-  "fimPausa": "13:00"
-}
-
-### 3.6 - Listar Horários do Carlos (ID 1)
-GET {{baseUrl}}/profissionais/1/horarios
-
-### 3.7 - Criar Horário de Trabalho - Ana (Barbeira 2) - SEGUNDA
-POST {{baseUrl}}/profissionais/2/horarios
-Content-Type: application/json
-
-{
-  "diaSemana": "SEGUNDA",
-  "horaInicio": "09:00",
-  "horaFim": "17:00",
-  "inicioPausa": "12:30",
-  "fimPausa": "13:30"
-}
-
-### 3.8 - Atualizar Horário de Trabalho (exemplo - alterar horário da segunda de Carlos)
-PUT {{baseUrl}}/profissionais/1/horarios/202
-Content-Type: application/json
-
-{
-  "diaSemana": "SEXTA",
-  "horaInicio": "07:30",
-  "horaFim": "17:30",
-  "inicioPausa": "12:00",
-  "fimPausa": "13:00"
-}
-
-### ============================================================
-### PASSO 4: CRIAR CLIENTES
-### ============================================================
-
-### 4.1 - Criar Cliente 1
-POST {{baseUrl}}/clientes
-Content-Type: application/json
-
-{
-  "nome": "Maria Silva",
-  "email": "maria.silva@email.com",
-  "cpf": "111.222.333-44",
-  "telefone": "(11) 99999-1111"
-}
-
-### 4.2 - Criar Cliente 2
-POST {{baseUrl}}/clientes
-Content-Type: application/json
-
-{
-  "nome": "Pedro Santos",
-  "email": "pedro.santos@email.com",
-  "cpf": "555.666.777-88",
-  "telefone": "(11) 99999-2222"
-}
-
-### 4.3 - Listar Clientes (para verificar IDs criados)
-GET {{baseUrl}}/clientes
-
-### ============================================================
-### PASSO 5: CRIAR AGENDAMENTOS (OBJETIVO PRINCIPAL)
-### ============================================================
-
-### 5.1 - Criar Agendamento 1 (substitua os IDs pelos retornados nos passos anteriores)
-POST {{baseUrl}}/agendamentos
-Content-Type: application/json
-
-{
-  "profissionalId": 1,
-  "clienteId": 1,
-  "servicoId": 1,
-  "dataHora": "2025-09-18T14:30:00",
-  "observacoes": "Cliente prefere corte mais curto"
-}
-
-### 5.2 - Criar Agendamento 2
-POST {{baseUrl}}/agendamentos
-Content-Type: application/json
-
-{
-  "profissionalId": 2,
-  "clienteId": 2,
-  "servicoId": 3,
-  "dataHora": "2025-09-18T15:30:00",
-  "observacoes": "Combo corte e barba"
-}
-
-### 5.3 - Listar Agendamentos
-GET {{baseUrl}}/agendamentos
-
-### 5.4 - Buscar Agendamento por ID (substitua pelo ID retornado)
-GET {{baseUrl}}/agendamentos/1
-
-### 5.5 - Atualizar Agendamento
-PUT {{baseUrl}}/agendamentos/1
-Content-Type: application/json
-
-{
-  "profissionalId": 1,
-  "clienteId": 1,
-  "servicoId": 2,
-  "dataHora": "2025-09-18T16:00:00",
-  "observacoes": "Horário alterado - apenas barba"
-}
-
-### ============================================================
-### GERENCIAMENTO COMPLETO DE ENTIDADES
-### ============================================================
-
-### === CLIENTES ===
-
-### Buscar Cliente por ID
-GET {{baseUrl}}/clientes/1
-
-### Atualizar Cliente
-PUT {{baseUrl}}/clientes/1
-Content-Type: application/json
-
-{
-  "nome": "Maria Silva Santos",
-  "email": "maria.santos@email.com",
-  "cpf": "111.222.333-44",
-  "telefone": "(11) 99999-1111"
-}
-
-### Adicionar Pontos de Fidelidade
-POST {{baseUrl}}/clientes/1/pontos/50
-
-### Usar Pontos de Fidelidade
-POST {{baseUrl}}/clientes/1/usarPontos/25
-
-### Deletar Cliente
-# DELETE {{baseUrl}}/clientes/2
-
-### === PROFISSIONAIS ===
-
-### Buscar Profissional por ID
-GET {{baseUrl}}/profissionais/1
-
-### Atualizar Profissional
-PUT {{baseUrl}}/profissionais/1
-Content-Type: application/json
-
-{
-  "nome": "Carlos Silva Junior",
-  "email": "carlos.junior@barbearia.com",
-  "cpf": "123.456.789-01",
-  "telefone": "(11) 91234-5678"
-}
-
-### Deletar Profissional
-# DELETE {{baseUrl}}/profissionais/2
-
-### === SERVIÇOS ===
-
-### Buscar Serviço por ID
-GET {{baseUrl}}/servicos/1
-
-### Atualizar Serviço
-PUT {{baseUrl}}/servicos/1
-Content-Type: application/json
-
-{
-  "nome": "Corte Masculino Premium",
-  "preco": 30.00,
-  "duracaoMinutos": 35
-}
-
-### Deletar Serviço
-# DELETE {{baseUrl}}/servicos/3
-
-### === AGENDAMENTOS ===
-
-### Buscar Agendamentos por Cliente
-GET {{baseUrl}}/agendamentos/cliente/1
-
-### Buscar Agendamentos por Profissional
-GET {{baseUrl}}/agendamentos/profissional/1
-
-### Buscar Agendamentos por Data
-GET {{baseUrl}}/agendamentos/data/2025-09-18
-
-### Deletar Agendamento
-# DELETE {{baseUrl}}/agendamentos/1
-
-### ============================================================
-### PAGINAÇÃO E FILTROS
-### ============================================================
-
-### Listar com Paginação - Clientes
-GET {{baseUrl}}/clientes?page=0&size=5
-
-### Listar com Paginação - Profissionais
-GET {{baseUrl}}/profissionais?page=0&size=5
-
-### Listar com Paginação - Serviços
-GET {{baseUrl}}/servicos?page=0&size=5
-
-### Listar com Paginação - Agendamentos
-GET {{baseUrl}}/agendamentos?page=0&size=10
-
-### ============================================================
-### TESTES DE VALIDAÇÃO E ERROS
-### ============================================================
-
-### Teste - Criar Agendamento com dados inválidos
-POST {{baseUrl}}/agendamentos
-Content-Type: application/json
-
-{
-  "dataHora": "2025-09-18T14:30:00"
-  // clienteId, profissionalId, servicoId são obrigatórios
-}
-
-### Teste - Criar Cliente com email inválido
-POST {{baseUrl}}/clientes
-Content-Type: application/json
-
-{
-  "nome": "Teste",
-  "email": "email-invalido",
-  "cpf": "123.456.789-01",
-  "telefone": "(11) 99999-9999"
-}
-
-### Teste - Criar Serviço com preço negativo
-POST {{baseUrl}}/servicos
-Content-Type: application/json
-
-{
-  "nome": "Teste",
-  "preco": -10.00,
-  "duracaoMinutos": 30
-}
-
-### Teste - Buscar entidade inexistente
-GET {{baseUrl}}/clientes/999
-
-### ============================================================
-### NOTAS IMPORTANTES
-### ============================================================
-### 1. Execute os endpoints na ordem apresentada
-### 2. Substitua os IDs pelos valores retornados pelas APIs
-### 3. Os endpoints comentados (com #) são para operações destrutivas
-### 4. Certifique-se de que o backend está rodando na porta 8080
-### 5. Horários de trabalho implementados - usar endpoints de profissionais/{id}/horarios
-### 6. Os DTOs utilizados seguem o padrão já implementado no projeto - REST API Endpoints
-### Base URL: http://localhost:8080
-
-### ========================================
-### AGENDAMENTOS API
-### ========================================
-
-### 1. Criar Agendamento (Usando DTOs)
-POST http://localhost:8080/api/agendamentos/criar-agendamento
-Content-Type: application/json
-
-{
-  "dataHora": "2025-09-18T14:30:00",
-  "clienteId": "550e8400-e29b-41d4-a716-446655440001",
-  "profissionalId": "550e8400-e29b-41d4-a716-446655440002",
-  "servicoId": "550e8400-e29b-41d4-a716-446655440003",
-  "observacoes": "Cliente prefere corte social"
-}
-
-### 1.1. Buscar Agendamento por ID
-GET {{http://localhost:8080/api/agendamentos/550e8400-e29b-41d4-a716-446655440010
-}}
-### 2. Confirmar Agendamento
-PATCH http://localhost:8080/api/agendamentos/confirmar-agendamento/550e8400-e29b-41d4-a716-446655440010
-
-### 3. Cancelar Agendamento
-PATCH http://localhost:8080/api/agendamentos/cancelar-agendamento/550e8400-e29b-41d4-a716-446655440010
-
-### ======================
-###    CLIENTE
-### ======================
-
-### Criar Cliente
-POST {{baseUrl}}/clientes
-Content-Type: application/json
-
-{
-  "nome": "João Silva",
-  "email": "joao.silva@email.com",
-  "telefone": "9311886888",
-  "cpf": "53604042801",
-  "nascimento": "1990-05-15"
-}
-
-### Buscar Cliente por ID
-GET {{baseUrl}}/clientes/1
-
-### Listar Clientes
-GET {{baseUrl}}/clientes
-
-### Atualizar Cliente
-PUT {{baseUrl}}/clientes/1
-Content-Type: application/json
-
-{
-  "nome": "João Silva Santos",
-  "email": "joao.santos@email.com",
-  "telefone": "(11) 98765-4321",
-  "cpf": "123.456.789-01",
-  "nascimento": "1990-05-15"
-}
-
-### Deletar Cliente
-DELETE {{baseUrl}}/clientes/1
-
-### Adicionar Pontos ao Cliente
-POST {{baseUrl}}/clientes/1/pontos/adicionar/50
-
-### Usar Pontos do Cliente
-POST {{baseUrl}}/clientes/1/pontos/usar/25
-
-### ======================
-###    PROFISSIONAL
-### ======================
-
-### Criar Profissional
-POST {{baseUrl}}/profissionais
-Content-Type: application/json
-
-{
-  "nome": "Maria Santos",
-  "email": "maria.santos@barbearia.com",
-  "cpf": "123.456.789-02",
-  "telefone": "(11) 91234-5678"
-}
-
-### Buscar Profissional por ID
-GET {{baseUrl}}/profissionais/1
-
-### Listar Profissionais
-GET {{baseUrl}}/profissionais
-
-### Listar Profissionais com Paginação
-GET {{baseUrl}}/profissionais?page=0&size=5
-
-### Atualizar Profissional
-PUT {{baseUrl}}/profissionais/1
-Content-Type: application/json
-
-
-{
-  "nome": "Maria Santos Silva",
-  "email": "maria.silva@barbearia.com",
-  "cpf": "123.456.789-02",
-  "telefone": "(11) 91234-5678"
-}
-
-### Deletar Profissional
-DELETE {{baseUrl}}/profissionais/1
-
-### ======================
-###    SERVIÇO
-### ======================
-
-### Criar Serviço
-POST {{baseUrl}}/servicos
-Content-Type: application/json
-
-{
-  "nome": "Corte Masculino",
-  "preco": 25.00,
-  "duracaoMinutos": 30
-}
-
 ### Buscar Serviço por ID
 GET {{baseUrl}}/servicos/1
 
 ### Listar Serviços
 GET {{baseUrl}}/servicos
-
-### Listar Serviços com Paginação
-GET {{baseUrl}}/servicos?page=0&size=5
 
 ### Atualizar Serviço
 PUT {{baseUrl}}/servicos/1
@@ -515,12 +49,144 @@ Content-Type: application/json
 ### Deletar Serviço
 DELETE {{baseUrl}}/servicos/1
 
-### ======================
-###    PRODUTO
-### ======================
+### ============================================================
+### PROFISSIONAIS
+### ============================================================
 
-### 4. Cadastrar Produto
-POST http://localhost:8080/api/produtos/cadastrar
+### Criar Profissional
+POST {{baseUrl}}/profissionais
+Content-Type: application/json
+
+{
+  "nome": "Carlos Silva",
+  "email": "carlos.silva@barbearia.com",
+  "cpf": "53604042801",
+  "telefone": "0000000000"
+}
+
+### Buscar Profissional por ID
+GET {{baseUrl}}/profissionais/1
+
+### Listar Profissionais
+GET {{baseUrl}}/profissionais
+
+### Atualizar Profissional
+PUT {{baseUrl}}/profissionais/1
+Content-Type: application/json
+
+{
+  "nome": "Carlos Silva Junior",
+  "email": "carlos.junior@barbearia.com",
+  "cpf": "123.456.789-01",
+  "telefone": "(11) 91234-5678"
+}
+
+### Deletar Profissional
+DELETE {{baseUrl}}/profissionais/1
+
+### ============================================================
+### HORÁRIOS DE TRABALHO
+### ============================================================
+
+### Criar Horário de Trabalho
+POST {{baseUrl}}/profissionais/1/horarios
+Content-Type: application/json
+
+{
+  "diaSemana": "QUINTA",
+  "horaInicio": "08:00",
+  "horaFim": "18:00",
+  "inicioPausa": "12:00",
+  "fimPausa": "13:00"
+}
+
+### Listar Horários do Profissional
+GET {{baseUrl}}/profissionais/1/horarios
+
+### Atualizar Horário de Trabalho
+PUT {{baseUrl}}/profissionais/1/horarios/1
+Content-Type: application/json
+
+{
+  "diaSemana": "SEGUNDA",
+  "horaInicio": "07:30",
+  "horaFim": "17:30",
+  "inicioPausa": "12:00",
+  "fimPausa": "13:00"
+}
+
+### ============================================================
+### CLIENTES
+### ============================================================
+
+### Criar Cliente
+POST {{baseUrl}}/clientes
+Content-Type: application/json
+
+{
+  "nome": "Maria Silva",
+  "email": "maria.silva@email.com",
+  "cpf": "53604042801",
+  "telefone": "9311886888"
+}
+
+### Buscar Cliente por ID
+GET {{baseUrl}}/clientes/1
+
+### Listar Clientes
+GET {{baseUrl}}/clientes
+
+### Atualizar Cliente
+PUT {{baseUrl}}/clientes/1
+Content-Type: application/json
+
+{
+  "nome": "Maria Silva Santos",
+  "email": "maria.santos@email.com",
+  "cpf": "111.222.333-44",
+  "telefone": "(11) 99999-1111"
+}
+
+### Deletar Cliente
+DELETE {{baseUrl}}/clientes/1
+
+### Adicionar Pontos de Fidelidade
+POST {{baseUrl}}/clientes/1/pontos/adicionar/50
+
+### Usar Pontos de Fidelidade
+POST {{baseUrl}}/clientes/1/pontos/usar/25
+
+### ============================================================
+### AGENDAMENTOS
+### ============================================================
+
+### Criar Agendamento
+POST {{baseUrl}}/agendamentos/criar-agendamento
+Content-Type: application/json
+
+{
+  "dataHora": "2025-09-18T14:30:00",
+  "clienteId": "252",
+  "profissionalId": "1",
+  "servicoId": "102",
+  "observacoes": "Cliente prefere corte social"
+}
+
+### Buscar Agendamento por ID
+GET {{baseUrl}}/agendamentos/1
+
+### Confirmar Agendamento
+PATCH {{baseUrl}}/agendamentos/confirmar-agendamento/1
+
+### Cancelar Agendamento
+PATCH {{baseUrl}}/agendamentos/cancelar-agendamento/550e8400-e29b-41d4-a716-446655440010
+
+### ============================================================
+### PRODUTOS
+### ============================================================
+
+### Cadastrar Produto
+POST {{baseUrl}}/produtos/cadastrar
 Content-Type: application/json
 
 {
@@ -530,40 +196,18 @@ Content-Type: application/json
   "estoqueMinimo": 10
 }
 
-### 5. Cadastrar Produto (Cera para Cabelo)
-POST http://localhost:8080/api/produtos/cadastrar
-Content-Type: application/json
+### Listar Produtos com Estoque Baixo
+GET {{baseUrl}}/produtos/estoque-baixo
 
-{
-  "nome": "Cera para Cabelo",
-  "preco": 32.50,
-  "estoque": 25,
-  "estoqueMinimo": 5
-}
+### Baixa Manual de Estoque
+POST {{baseUrl}}/produtos/550e8400-e29b-41d4-a716-446655440020/baixa?quantidade=5
 
-### 6. Cadastrar Produto (Pomada Modeladora)
-POST http://localhost:8080/api/produtos/cadastrar
-Content-Type: application/json
+### ============================================================
+### PDV (Ponto de Venda)
+### ============================================================
 
-{
-  "nome": "Pomada Modeladora",
-  "preco": 28.00,
-  "estoque": 8,
-  "estoqueMinimo": 15
-}
-
-### 7. Listar Produtos com Estoque Baixo
-GET http://localhost:8080/api/produtos/estoque-baixo
-
-### 8. Baixa Manual de Estoque
-POST http://localhost:8080/api/produtos/550e8400-e29b-41d4-a716-446655440020/baixa?quantidade=5
-
-### ========================================
-### PDV (Ponto de Venda) API
-### ========================================
-
-### 9. Registrar Venda - Produtos
-POST http://localhost:8080/api/pdv/vendas
+### Registrar Venda - Produtos
+POST {{baseUrl}}/pdv/vendas
 Content-Type: application/json
 
 {
@@ -575,20 +219,13 @@ Content-Type: application/json
       "quantidade": 1,
       "precoUnitario": 45.90,
       "tipo": "PRODUTO"
-    },
-    {
-      "produtoId": "550e8400-e29b-41d4-a716-446655440021",
-      "descricao": "Cera para Cabelo",
-      "quantidade": 1,
-      "precoUnitario": 32.50,
-      "tipo": "PRODUTO"
     }
   ],
-  "observacoes": "Venda balcão - Cliente levou produtos para casa"
+  "observacoes": "Venda balcão"
 }
 
-### 10. Registrar Venda - Serviços
-POST http://localhost:8080/api/pdv/vendas
+### Registrar Venda - Serviços
+POST {{baseUrl}}/pdv/vendas
 Content-Type: application/json
 
 {
@@ -600,20 +237,13 @@ Content-Type: application/json
       "quantidade": 1,
       "precoUnitario": 25.00,
       "tipo": "SERVICO"
-    },
-    {
-      "servicoId": "550e8400-e29b-41d4-a716-446655440004",
-      "descricao": "Barba",
-      "quantidade": 1,
-      "precoUnitario": 15.00,
-      "tipo": "SERVICO"
     }
   ],
   "observacoes": "Serviços executados pelo Carlos"
 }
 
-### 11. Registrar Venda Mista - Produtos + Serviços
-POST http://localhost:8080/api/pdv/vendas
+### Registrar Venda Mista - Produtos + Serviços
+POST {{baseUrl}}/pdv/vendas
 Content-Type: application/json
 
 {
@@ -637,106 +267,29 @@ Content-Type: application/json
   "observacoes": "Corte + produto finalização"
 }
 
-### 12. Registrar Venda sem Cliente (Balcão)
-POST http://localhost:8080/api/pdv/vendas
-Content-Type: application/json
+### ============================================================
+### TESTES DE VALIDAÇÃO E ERROS
+### ============================================================
 
-{
-  "itens": [
-    {
-      "produtoId": "550e8400-e29b-41d4-a716-446655440020",
-      "descricao": "Shampoo Profissional",
-      "quantidade": 2,
-      "precoUnitario": 45.90,
-      "tipo": "PRODUTO"
-    }
-  ],
-  "observacoes": "Venda avulsa - Cliente não cadastrado"
-}
-
-### ========================================
-### TESTES DE VALIDAÇÃO
-### ========================================
-
-### 13. Teste - Agendamento com dados inválidos
-POST http://localhost:8080/api/agendamentos/criar-agendamento
+### Teste - Criar Agendamento com dados inválidos
+POST {{baseUrl}}/agendamentos/criar-agendamento
 Content-Type: application/json
 
 {
   "dataHora": "2025-09-18T14:30:00"
-  // Dados obrigatórios ausentes: clienteId, profissionalId, servicoId
+  // clienteId, profissionalId, servicoId são obrigatórios
 }
 
-### 14. Teste - Produto com preço inválido
-POST http://localhost:8080/api/produtos/cadastrar
+### Teste - Criar Cliente com email inválido
+POST {{baseUrl}}/clientes
 Content-Type: application/json
 
 {
-  "nome": "Produto Teste",
-  "preco": -10.00,
-  "estoque": 10,
-  "estoqueMinimo": 5
+  "nome": "Teste",
+  "email": "email-invalido",
+  "cpf": "123.456.789-01",
+  "telefone": "(11) 99999-9999"
 }
 
-### 15. Teste - Baixa de estoque com quantidade maior que disponível
-POST http://localhost:8080/api/produtos/550e8400-e29b-41d4-a716-446655440020/baixa?quantidade=1000
-
-### ========================================
-### VARIÁVEIS DE AMBIENTE (OPCIONAL)
-### ========================================
-### Para usar variáveis, descomente as linhas abaixo e ajuste conforme necessário:
-
-# @agendamentoId = 550e8400-e29b-41d4-a716-446655440010
-# @produtoId = 550e8400-e29b-41d4-a716-446655440020
-# @clienteId = 550e8400-e29b-41d4-a716-446655440001
-
-### ========================================
-### NOTAS IMPORTANTES
-### ========================================
-### 1. Certifique-se de que a aplicação Spring Boot está rodando na porta 8080
-### 2. Os Integers utilizados são exemplos - substitua pelos IDs reais do seu banco
-### 3. Para testar em ambiente de desenvolvimento, pode ser necessário ajustar CORS
-### 4. Alguns endpoints podem retornar 404 se os relacionamentos não existirem no banco
-### 5. Status válidos para agendamento: PENDENTE, CONFIRMADO, CANCELADO, CONCLUIDO
-### 6. Tipos válidos para items de venda: PRODUTO, SERVICO
-
-### ========================================
-### ESTRUTURA DE RESPOSTA ESPERADA
-### ========================================
-### Agendamento criado com sucesso (usando DTOs):
-### {
-###   "id": "Integer-gerado",
-###   "dataHora": "2025-09-18T14:30:00",
-###   "status": "PENDENTE",
-###   "observacoes": "Cliente prefere corte social",
-###   "clienteId": "550e8400-e29b-41d4-a716-446655440001",
-###   "clienteNome": "João Silva",
-###   "clienteEmail": "joao.silva@email.com",
-###   "clienteTelefone": "1199999999",
-###   "profissionalId": "550e8400-e29b-41d4-a716-446655440002",
-###   "profissionalNome": "Carlos Barbeiro",
-###   "profissionalEmail": "carlos@barbearia.com",
-###   "servicoId": "550e8400-e29b-41d4-a716-446655440003",
-###   "servicoNome": "Corte de Cabelo",
-###   "servicoPreco": 25.00,
-###   "servicoDuracaoMinutos": 30
-### }
-
-### Produto criado com sucesso:
-### {
-###   "id": "Integer-gerado",
-###   "nome": "Shampoo Profissional",
-###   "preco": 45.90,
-###   "estoque": 50,
-###   "estoqueMinimo": 10
-### }
-
-### Venda registrada com sucesso:
-### {
-###   "id": "Integer-gerado",
-###   "dataHora": "2025-09-17T...",
-###   "cliente": {...},
-###   "itens": [...],
-###   "valorTotal": 78.40,
-###   "observacoes": "..."
-### }
+### Teste - Buscar entidade inexistente
+GET {{baseUrl}}/clientes/999

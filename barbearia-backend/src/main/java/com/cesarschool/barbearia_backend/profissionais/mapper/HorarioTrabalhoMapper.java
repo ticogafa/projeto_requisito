@@ -10,7 +10,10 @@ import com.cesarschool.barbearia_backend.profissionais.model.HorarioTrabalho;
 @Component
 public class HorarioTrabalhoMapper {
 
-    public HorarioTrabalho toEntity(CriarHorarioTrabalhoRequest request) {
+    private HorarioTrabalhoMapper() {
+    }
+
+    public static HorarioTrabalho toEntity(CriarHorarioTrabalhoRequest request) {
         if (request == null) {
             return null;
         }
@@ -24,7 +27,7 @@ public class HorarioTrabalhoMapper {
         return entity;
     }
 
-    public HorarioTrabalhoResponse toResponse(HorarioTrabalho horarioTrabalho) {
+    public static HorarioTrabalhoResponse toResponse(HorarioTrabalho horarioTrabalho) {
         if (horarioTrabalho == null) {
             return null;
         }
@@ -38,7 +41,7 @@ public class HorarioTrabalhoMapper {
         return response;
     }
 
-    public void updateEntityFromDto(AtualizarHorarioTrabalhoRequest dto, HorarioTrabalho entity) {
+    public static void updateEntityFromDto(AtualizarHorarioTrabalhoRequest dto, HorarioTrabalho entity) {
         if (dto == null || entity == null) {
             return;
         }

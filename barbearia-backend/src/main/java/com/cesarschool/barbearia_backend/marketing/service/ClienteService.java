@@ -30,7 +30,23 @@ public class ClienteService {
 
     private final ClienteRepository repository;
 
+    /**
+     * Regras de negócio para criação de cliente:
+     * - O CPF deve ser único.
+     * - O email deve ser único.
+     * - O telefone deve ser único.
+     */
     public ClienteResponse criarCliente(CriarClienteRequest request) {
+        if(repository.findByCpf(request.getCpf()).isPresent()) {
+            throw new IllegalArgumentException("CPF já cadastrado");
+        }
+        if(repository.findByEmail(request.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email já cadastrado");
+        }
+        if(repository.findByTelefone(request.getTelefone()).isPresent()) {
+            throw new IllegalArgumentException("Telefone já cadastrado");
+        }
+
         Cliente cliente = ClienteMapper.toEntity(request);
         Cliente clienteSalvo = repository.save(cliente);
         return ClienteMapper.toResponse(clienteSalvo);
