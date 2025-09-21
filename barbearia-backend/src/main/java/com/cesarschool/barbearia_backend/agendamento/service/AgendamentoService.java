@@ -300,11 +300,19 @@ public List<String> listarHorariosDisponiveis(String data, Integer servicoId) {
     
     // Definir horário de funcionamento geral da barbearia (definir melhor dps)
     LocalTime inicioFuncionamento = LocalTime.of(8, 0);  // 08:00
-    LocalTime fimFuncionamento = LocalTime.of(18, 0);    // 18:00
+    LocalTime fimFuncionamento = LocalTime.of(18, 00);    // 18:00
     
     List<String> horariosDisponiveis = new ArrayList<>();
-    LocalTime horarioAtual = inicioFuncionamento;
     
+    LocalTime horarioAtual = null;
+
+    if(dataConsulta.equals(LocalDate.now())){
+        horarioAtual = LocalTime.now();
+        // como arredondar para o próximo slot de tempo?
+    } else{
+        horarioAtual = inicioFuncionamento;
+    }
+
     // Gerar slots de 30 em 30 minutos
     boolean antesDoFechamento = horarioAtual.plusMinutes(servico.getDuracaoMinutos()).isBefore(fimFuncionamento) || 
            horarioAtual.plusMinutes(servico.getDuracaoMinutos()).equals(fimFuncionamento);

@@ -77,6 +77,7 @@ PUT {{baseUrl}}/profissionais/1
 Content-Type: application/json
 
 {
+  "id": 1,
   "nome": "Carlos Silva Junior",
   "email": "carlos.junior@barbearia.com",
   "cpf": "123.456.789-01",
@@ -95,7 +96,7 @@ POST {{baseUrl}}/profissionais/1/horarios
 Content-Type: application/json
 
 {
-  "diaSemana": "SEGUNDA",
+  "diaSemana": "SABADO",
   "horaInicio": "08:00",
   "inicioPausa": "12:00",
   "horaFim": "18:00",
@@ -127,8 +128,17 @@ Content-Type: application/json
 
 {
   "nome": "Maria Silva",
-  "email": "maria.silva@email.com",
+  "email": "maria.silva2@email.com",
   "cpf": "53604042801",
+  "telefone": "9211886888"
+}
+
+POST {{baseUrl}}/clientes
+Content-Type: application/json
+{
+  "nome": "Maria Silva",
+  "email": "maria.silva@email.com",
+  "cpf": "12345678900",
   "telefone": "9311886888"
 }
 
@@ -221,10 +231,10 @@ PATCH {{baseUrl}}/agendamentos/cancelar-agendamento/3
 ### ============================================================
 
 ### Listar horários disponíveis para Serviço 1 em 22/09/2025
-GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-25&servicoOferecidoId=1
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-20&servicoOferecidoId=1
 
 ### Listar horários disponíveis para Serviço 2 em 22/09/2025
-GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-22&servicoOferecidoId=1
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-20&servicoOferecidoId=1
 
 ### Listar horários disponíveis para Serviço 1 em 23/09/2025
 GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-23&servicoOferecidoId=1
