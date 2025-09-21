@@ -1,6 +1,7 @@
 package com.cesarschool.barbearia_backend.bdd;
 
 import com.cesarschool.barbearia_backend.agendamento.dto.AgendamentoDTOs.CriarAgendamentoRequest;
+import com.cesarschool.barbearia_backend.common.enums.DiaSemana;
 import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
 import com.cesarschool.barbearia_backend.helper.TestEntityFactory;
 import com.cesarschool.barbearia_backend.marketing.model.Cliente;
@@ -59,373 +60,216 @@ public class AgendamentoStepDefinitions extends CucumberSpringContext {
 
     // ========================= GIVENS COMUNS =========================
 
-    @Given("que existe um Cliente válido")
-    public void queExisteUmClienteValido() {
-        if (cliente == null) {
-            int n = Unique.next();
-            cliente = factory.saveCliente(
-                "Cliente " + n,
-                Unique.email(n),
-                Unique.cpf(n),
-                Unique.phone10(n)
-            );
-            System.out.println("CLIENTE: " + cliente.toString());
-        }
-    }
+@Given("que escolho um horário futuro livre para o profissional")
+public void que_escolho_um_horário_futuro_livre_para_o_profissional() {
+    horarioEscolhido = factory.proximaData(DayOfWeek.MONDAY, 14, 0);
+}
 
-    @Given("que existe um Profissional chamado {string} com jornada de trabalho configurada")
-    public void queExisteUmProfissionalComJornadaDeTrabalho(String nome) {
-        if (profissional == null) {
-            int n = Unique.next();
-            profissional = factory.saveProfissionalComJornada(
-                nome,
-                Unique.email("prof", n),
-                Unique.cpf(n),
-                Unique.phone10(n),
+@Given("que informo cliente, profissional, serviço e data\\/hora")
+public void que_informo_cliente_profissional_serviço_e_data_hora() {
+        profissional = factory.saveProfissionalComJornada(
+                "João Barbeiro",
+                "joao@email.com",
+                "53604042801",
+                "1234567890",
                 LocalTime.of(9, 0),
-                LocalTime.of(18, 0)
-            );
-        }
-    }
+                LocalTime.of(18, 0),
+                DiaSemana.SEGUNDA,
+                DiaSemana.TERCA,
+                DiaSemana.QUARTA,
+                DiaSemana.QUINTA,
+                DiaSemana.SEXTA);
 
-    @Given("que existe um Serviço oferecido válido")
-    public void queExisteUmServicoOferecidoValido() {
-        if (servico == null) {
-            int n = Unique.peek(); // não avança se já usamos no passo anterior
-            if (n == 0) n = Unique.next();
-            servico = factory.saveServico(
-                "Corte de Cabelo " + n, // nome único (se houver restrição)
-                new BigDecimal("25.00"),
-                30,
-                "Corte tradicional"
-            );
-        }
-    }
+        cliente = factory.saveCliente(
+                "Miguel Batista",
+                "miguel@email.com",
+                "02973067405",
+                "0123456789");
 
-    // ========================= CRIAÇÃO EM HORÁRIOS =========================
+        servico = factory.saveServico("Corte de Cabelo", new BigDecimal("30.00"), 30, "Corte legal");
 
-    @Given("que escolho um horário futuro às {int}:{int} dentro da jornada do profissional")
-    public void horarioDentroDaJornada(Integer hora, Integer minuto) {
-        horarioEscolhido = factory.proximaData(DayOfWeek.MONDAY, hora, minuto);
-    }
+        factory.saveProfissionalServico(profissional, servico);
+}
 
-    @Given("que escolho um horário futuro às {int}:{int} fora da jornada do profissional")
-    public void horarioForaDaJornada(Integer hora, Integer minuto) {
-        horarioEscolhido = factory.proximaData(DayOfWeek.MONDAY, hora, minuto);
-    }
-
-    @Given("que informo cliente, profissional, serviço e data\\/hora")
-    public void informarTudo() {
-        // Ensure all required entities exist
-        if (cliente == null) {
-            queExisteUmClienteValido();
-        }
-        if (profissional == null) {
-            queExisteUmProfissionalComJornadaDeTrabalho("João Barbeiro");
-        }
-        if (servico == null) {
-            queExisteUmServicoOferecidoValido();
-        }
-        if (horarioEscolhido == null) {
-            horarioEscolhido = factory.proximaData(DayOfWeek.MONDAY, 10, 0);
-        }
-        payload = new CriarAgendamentoRequest(
-            horarioEscolhido,
-            cliente.getId(),
-            profissional.getId(),
-            servico.getId(),
-            "Observações do teste BDD"
-        );
-    }
-
-    @When("solicito a criação do novo agendamento")
-    public void criarNovoAgendamento() throws Exception {
-        resultado = mockMvc.perform(
-            post(CREATE_PATH)
+@When("solicito a criação do agendamento")
+public void solicito_a_criação_do_agendamento() throws Exception{
+    resultado = mockMvc.perform(post(CREATE_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload))
-        );
-    }
-
-    @Then("retorna o corpo do agendamento criado")
-    public void retornaCorpoCriado() throws Exception {
-        resultado.andExpect(status().isOk())
-                 .andExpect(jsonPath("$.id").isNumber())
-                 .andExpect(jsonPath("$.clienteId").value(cliente.getId()))
-                 .andExpect(jsonPath("$.servicoId").value(servico.getId()));
-    }
-
-    // ========================= CONFLITO DE HORÁRIO =========================
-
-    @Given("que já existe um agendamento para {string} no mesmo horário")
-    public void existeConflitoMesmoHorario(String nomeProfissional) {
-        if (horarioEscolhido == null) {
-            horarioEscolhido = factory.proximaData(DayOfWeek.MONDAY, 10, 0);
-        }
-        if (profissional == null || !nomeProfissional.equals(profissional.getNome())) {
-            int n = Unique.next();
-            profissional = factory.saveProfissionalComJornada(
-                nomeProfissional,
-                Unique.email("prof", n),
-                Unique.cpf(n),
-                Unique.phone10(n),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0)
             );
-        }
-        if (cliente == null) {
-            int n = Unique.next();
-            cliente = factory.saveCliente("Cliente " + n, Unique.email(n), Unique.cpf(n), Unique.phone10(n));
-        }
-        if (servico == null) {
-            int n = Unique.next();
-            servico = factory.saveServico("Corte " + n, new BigDecimal("30.00"), 30, "Desc");
-        }
+}
 
-        factory.saveAgendamento(
-            cliente,
-            profissional,
-            servico,
-            horarioEscolhido,
-            StatusAgendamento.CONFIRMADO,
-            "seed conflito"
-        );
-    }
+@Then("o sistema responde sucesso \\(HTTP 2xx)")
+public void o_sistema_responde_sucesso_http_2xx() throws Exception{
+    resultado.andExpect(
+        status().is2xxSuccessful()
+    );
+}
+@Then("retorna o agendamento criado com um ID preenchido")
+public void retorna_o_agendamento_criado_com_um_id_preenchido() throws Exception{
+    resultado.andExpect(
+        jsonPath("$.id").isNumber()
+    );
+}
 
-    @Given("que tento criar outro agendamento nesse horário com os mesmos Givens essenciais")
-    public void tentarCriarComConflito() {
-        // Ensure we have all required data from the previous conflict setup
-        if (cliente == null || profissional == null || servico == null || horarioEscolhido == null) {
-            throw new IllegalStateException("Entities must be set up before attempting to create conflicting appointment");
-        }
-        payload = new CriarAgendamentoRequest(
-            horarioEscolhido,
-            cliente.getId(),
-            profissional.getId(),
-            servico.getId(),
-            "tentando conflitar"
-        );
-    }
 
-    // ========================= CANCELAMENTO =========================
+@Given("que já existe um agendamento para {string} no mesmo horário")
+public void que_já_existe_um_agendamento_para_no_mesmo_horário(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Given("que tento criar outro agendamento nesse horário com os mesmos Givens essenciais")
+public void que_tento_criar_outro_agendamento_nesse_horário_com_os_mesmos_givens_essenciais() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@When("solicito a criação do novo agendamento")
+public void solicito_a_criação_do_novo_agendamento() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("o sistema rejeita a operação")
+public void o_sistema_rejeita_a_operação() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("exibe a mensagem: {string}")
+public void exibe_a_mensagem(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
 
-    @Given("que existe um agendamento marcado para ocorrer em mais de {int} horas")
-    public void agendamentoMaiorQueHoras(Integer horas) {
-        seedBasicoSeNecessario();
-        var dataHora = LocalDateTime.now(clock).plusHours(horas);
-        var ag = factory.saveAgendamento(
-            cliente, profissional, servico, dataHora, StatusAgendamento.PENDENTE, "seed >2h"
-        );
-        agendamentoId = ag.getId();
-    }
+// ----------------------- other test case
 
-    @Given("que existe um agendamento marcado para ocorrer em menos de {int} horas")
-    public void agendamentoMenorQueHoras(Integer horas) {
-        seedBasicoSeNecessario();
-        var dataHora = LocalDateTime.now(clock).plusHours(horas);
-        var ag = factory.saveAgendamento(
-            cliente, profissional, servico, dataHora, StatusAgendamento.PENDENTE, "seed <2h"
-        );
-        agendamentoId = ag.getId();
-    }
+@Given("que escolho um horário futuro às {int}:{int} dentro da jornada do profissional")
+public void que_escolho_um_horário_futuro_às_dentro_da_jornada_do_profissional(Integer int1, Integer int2) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("retorna o corpo do agendamento criado")
+public void retorna_o_corpo_do_agendamento_criado() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
 
-    @Given("que o status atual do agendamento é {string}")
-    public void statusAtual(String status) {
-        // Mantido PENDENTE na semente; ajuste aqui se precisar mudar o status na base.
-    }
 
-    @When("solicito o cancelamento deste agendamento")
-    public void cancelarAgendamento() throws Exception {
-        resultado = mockMvc.perform(
-            patch(CANCEL_PATH, agendamentoId)
-                .contentType(MediaType.APPLICATION_JSON)
-        );
-    }
+// ----------------------- other test case
 
-    @Then("o status do agendamento passa a ser {string}")
-    public void statusAposCancelamento(String esperado) throws Exception {
-        resultado.andExpect(status().isOk())
-                 .andExpect(jsonPath("$.status").value(esperado));
-    }
+@Given("que escolho um horário futuro às {int}:{int} fora da jornada do profissional")
+public void que_escolho_um_horário_futuro_às_fora_da_jornada_do_profissional(Integer int1, Integer int2) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("o sistema rejeita a operação")
+public void o_sistema_rejeita_a_operação_() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("exibe a mensagem: {string}")
+public void exibe_a_mensagem_(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
 
-    // ========================= ATRIBUIÇÃO AUTOMÁTICA =========================
 
-    @Given("que não informei um profissional explicitamente")
-    public void semProfissionalExplicito() {
-        // nada a fazer; refletiremos no payload
-    }
 
-    @Given("que há pelo menos um profissional disponível no horário solicitado")
-    public void haProfissionalDisponivel() {
-        if (profissional == null) {
-            int n = Unique.next();
-            profissional = factory.saveProfissionalComJornada(
-                "Prof " + n,
-                Unique.email("prof", n),
-                Unique.cpf(n),
-                Unique.phone10(n),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0)
-            );
-        }
-    }
 
-    @Given("que informo cliente, serviço e data\\/hora")
-    public void informarSemProfissional() {
-        // Ensure required entities exist (except profissional for auto-assignment)
-        if (cliente == null) {
-            queExisteUmClienteValido();
-        }
-        if (servico == null) {
-            queExisteUmServicoOferecidoValido();
-        }
-        if (horarioEscolhido == null) {
-            horarioEscolhido = factory.proximaData(DayOfWeek.MONDAY, 10, 0);
-        }
-        payload = new CriarAgendamentoRequest(
-            horarioEscolhido,
-            cliente.getId(),
-            null, // auto-atribuição
-            servico.getId(),
-            "sem profissional para auto-atribuição"
-        );
-    }
+@Given("que existe um agendamento marcado para ocorrer em mais de {int} horas")
+public void que_existe_um_agendamento_marcado_para_ocorrer_em_mais_de_horas(Integer int1) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Given("que o status atual do agendamento é {string}")
+public void que_o_status_atual_do_agendamento_é(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@When("solicito o cancelamento deste agendamento")
+public void solicito_o_cancelamento_deste_agendamento() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("o status do agendamento passa a ser {string}")
+public void o_status_do_agendamento_passa_a_ser(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
 
-    @Then("o agendamento retornado possui um profissional atribuído automaticamente")
-    public void validacaoAutoAtribuicao() throws Exception {
-        resultado.andExpect(status().isOk())
-                 .andExpect(jsonPath("$.profissionalId").isNumber())
-                 .andExpect(jsonPath("$.profissionalNome").isString());
-    }
 
-    @Given("que nenhum profissional está disponível no horário solicitado")
-    public void nenhumProfissionalDisponivel() {
-        if (horarioEscolhido == null) {
-            horarioEscolhido = factory.proximaData(DayOfWeek.MONDAY, 10, 0);
-        }
-        if (cliente == null) {
-            int n = Unique.next();
-            cliente = factory.saveCliente("Cliente " + n, Unique.email(n), Unique.cpf(n), Unique.phone10(n));
-        }
-        if (servico == null) {
-            int n = Unique.next();
-            servico = factory.saveServico("Corte " + n, new BigDecimal("30.00"), 30, "Desc");
-        }
-        // ocupa o horário com um profissional qualquer para simular indisponibilidade
-        int n = Unique.next();
-        var pOcupado = factory.saveProfissionalComJornada(
-            "Prof Ocupado " + n,
-            Unique.email("ocupado", n),
-            Unique.cpf(n),
-            Unique.phone10(n),
-            LocalTime.of(9, 0),
-            LocalTime.of(18, 0)
-        );
-        factory.saveAgendamento(
-            cliente, pOcupado, servico, horarioEscolhido, StatusAgendamento.CONFIRMADO, "ocupar horário"
-        );
-    }
 
-    // ========================= REUTILIZÁVEIS =========================
+@Given("que existe um agendamento marcado para ocorrer em menos de {int} horas")
+public void que_existe_um_agendamento_marcado_para_ocorrer_em_menos_de_horas(Integer int1) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Given("que o status atual do agendamento é {string}")
+public void que_o_status_atual_do_agendamento_é(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@When("solicito o cancelamento deste agendamento")
+public void solicito_o_cancelamento_deste_agendamento() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("o sistema rejeita a operação")
+public void o_sistema_rejeita_a_operação() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("exibe a mensagem: {string}")
+public void exibe_a_mensagem(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
 
-    @Given("que escolho um horário futuro livre para o profissional")
-    public void horarioLivreDefault() {
-        horarioEscolhido = factory.proximaData(DayOfWeek.MONDAY, 10, 0);
-    }
 
-    @When("solicito a criação do agendamento")
-    public void criarAgendamento() throws Exception {
-        resultado = mockMvc.perform(
-            post(CREATE_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(payload))
-        );
-    }
 
-    @Then("o sistema responde sucesso \\(HTTP 2xx)")
-    public void sucesso2xx() throws Exception {
-        resultado.andExpect(status().isOk());
-    }
+@Given("que não informei um profissional explicitamente")
+public void que_não_informei_um_profissional_explicitamente() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Given("que há pelo menos um profissional disponível no horário solicitado")
+public void que_há_pelo_menos_um_profissional_disponível_no_horário_solicitado() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Given("que informo cliente, serviço e data\\/hora")
+public void que_informo_cliente_serviço_e_data_hora() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("o agendamento retornado possui um profissional atribuído automaticamente")
+public void o_agendamento_retornado_possui_um_profissional_atribuído_automaticamente() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
 
-    @Then("retorna o agendamento criado com um ID preenchido")
-    public void retornaComIdPreenchido() throws Exception {
-        resultado.andExpect(status().isOk())
-                 .andExpect(jsonPath("$.id").isNumber())
-                 .andExpect(jsonPath("$.status").value("PENDENTE"));
-    }
 
-    @Then("o sistema rejeita a operação")
-    public void rejeicao4xx() throws Exception {
-        resultado.andExpect(status().is4xxClientError());
-    }
-
-    @Then("exibe a mensagem: {string}")
-    public void validaMensagem(String mensagemEsperada) throws Exception {
-        resultado.andExpect(jsonPath("$.message").value(containsString(mensagemEsperada)));
-    }
-
-    // ========================= HELPERS =========================
-
-    private void seedBasicoSeNecessario() {
-        if (cliente == null) {
-            int n = Unique.next();
-            cliente = factory.saveCliente("Cliente " + n, Unique.email(n), Unique.cpf(n), Unique.phone10(n));
-        }
-        if (profissional == null) {
-            int n = Unique.next();
-            profissional = factory.saveProfissionalComJornada(
-                "João Barbeiro " + n,
-                Unique.email("prof", n),
-                Unique.cpf(n),
-                Unique.phone10(n),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0)
-            );
-        }
-        if (servico == null) {
-            int n = Unique.next();
-            servico = factory.saveServico("Corte " + n, new BigDecimal("30.00"), 30, "Desc");
-        }
-    }
-
-    /** Geração determinística e única de CPFs, e-mails e telefones (10 dígitos). */
-    static final class Unique {
-        private static final AtomicInteger SEQ = new AtomicInteger(0);
-
-        static int next() { return SEQ.incrementAndGet(); }
-        static int peek() { return SEQ.get(); }
-
-        static String email(int n) { return email("user", n); }
-
-        static String email(String prefix, int n) {
-            // domínio reservado para testes
-            return String.format("%s%03d@bdd.test", prefix, n);
-        }
-
-        static String phone10(int n) {
-            // 10 dígitos: DDD 81 (Recife) + 8 dígitos determinísticos
-            // garante zero-padding para totalizar 10 dígitos
-            int body = (n * 739_391) % 100_000_000; // espalhamento simples
-            return String.format("81%08d", body);
-        }
-
-        static String cpf(int n) {
-            // base de 9 dígitos (zero-padded) derivada do contador
-            String base = String.format("%09d", n);
-            int[] d = new int[11];
-            for (int i = 0; i < 9; i++) d[i] = base.charAt(i) - '0';
-            d[9]  = cpfDigit(d, 9);
-            d[10] = cpfDigit(d, 10);
-            StringBuilder sb = new StringBuilder(11);
-            for (int i = 0; i < 11; i++) sb.append(d[i]);
-            return sb.toString();
-        }
-
-        private static int cpfDigit(int[] d, int pos) {
-            int sum = 0, weight = pos + 1;
-            for (int i = 0; i < pos; i++) sum += d[i] * (weight - i);
-            int mod = (sum * 10) % 11;
-            return (mod == 10) ? 0 : mod;
-        }
-    }
+@Given("que não informei um profissional explicitamente")
+public void que_não_informei_um_profissional_explicitamente() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Given("que nenhum profissional está disponível no horário solicitado")
+public void que_nenhum_profissional_está_disponível_no_horário_solicitado() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Given("que informo cliente, serviço e data\\/hora")
+public void que_informo_cliente_serviço_e_data_hora() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("o sistema rejeita a operação")
+public void o_sistema_rejeita_a_operação() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("exibe a mensagem: {string}")
+public void exibe_a_mensagem(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
 }
