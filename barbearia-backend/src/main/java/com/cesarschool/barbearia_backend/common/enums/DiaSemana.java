@@ -1,5 +1,7 @@
 package com.cesarschool.barbearia_backend.common.enums;
 
+import java.time.DayOfWeek;
+
 public enum DiaSemana {
     SEGUNDA("Segunda-feira"),
     TERCA("Terça-feira"),
@@ -29,6 +31,18 @@ public enum DiaSemana {
             case SATURDAY: return SABADO;
             case SUNDAY: return DOMINGO;
             default: throw new IllegalArgumentException("Invalid day of week");
+        }
+    }
+    public DayOfWeek tDayOfWeek() {
+        switch (this) {
+            case SEGUNDA: return DayOfWeek.MONDAY;
+            case TERCA: return DayOfWeek.TUESDAY;
+            case QUARTA: return DayOfWeek.WEDNESDAY;
+            case QUINTA: return DayOfWeek.THURSDAY;
+            case SEXTA: return DayOfWeek.FRIDAY;
+            case SABADO: return DayOfWeek.SATURDAY;
+            case DOMINGO: return DayOfWeek.SUNDAY;
+            default: throw new IllegalArgumentException("Invalid DiaSemana");
         }
     }
 }

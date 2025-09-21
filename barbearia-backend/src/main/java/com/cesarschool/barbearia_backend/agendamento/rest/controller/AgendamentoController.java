@@ -79,14 +79,14 @@ public class AgendamentoController {
      * Endpoint para o primeiro passo do fluxo de agendamento em duas etapas.
      *
      * @param data Data desejada para o agendamento (formato: yyyy-MM-dd)
-     * @param servicoOferecidoId ID do serviço oferecido
+     * @param servicoId ID do serviço oferecido
      * @return ResponseEntity com lista de horários disponíveis em formato String (HH:mm)
      */
     @GetMapping("/horarios-disponiveis")
     public ResponseEntity<List<String>> listarHorariosDisponiveis(
             @RequestParam String data,
-            @RequestParam Integer servicoOferecidoId) {
-        var horarios = agendamentoService.listarHorariosDisponiveis(data, servicoOferecidoId);
+            @RequestParam Integer servicoId) {
+        var horarios = agendamentoService.listarHorariosDisponiveis(data, servicoId);
         return ResponseEntity.ok(horarios);
     }
 
@@ -96,15 +96,15 @@ public class AgendamentoController {
      *
      * @param data Data do agendamento (formato: yyyy-MM-dd)
      * @param horario Horário desejado (formato: HH:mm)
-     * @param servicoOferecidoId ID do serviço oferecido
+     * @param servicoId ID do serviço oferecido
      * @return ResponseEntity com lista de profissionais disponíveis e seus dados
      */
     @GetMapping("/profissionais-disponiveis")
     public ResponseEntity<List<ProfissionalResponse>> listarProfissionaisDisponiveis(
             @RequestParam String data,
             @RequestParam String horario,
-            @RequestParam Integer servicoOferecidoId) {
-        var profissionais = agendamentoService.listarProfissionaisDisponiveis(data, horario, servicoOferecidoId);
+            @RequestParam Integer servicoId) {
+        var profissionais = agendamentoService.listarProfissionaisDisponiveis(data, horario, servicoId);
         return ResponseEntity.ok(profissionais);
     }
 }

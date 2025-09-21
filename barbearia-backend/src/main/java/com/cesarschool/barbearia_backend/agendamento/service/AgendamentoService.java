@@ -1,5 +1,6 @@
 package com.cesarschool.barbearia_backend.agendamento.service;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import com.cesarschool.barbearia_backend.agendamento.model.Agendamento;
 import com.cesarschool.barbearia_backend.agendamento.repository.AgendamentoRepository;
 import com.cesarschool.barbearia_backend.common.enums.DiaSemana;
 import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
+import com.cesarschool.barbearia_backend.common.exceptions.DuplicateException;
 import com.cesarschool.barbearia_backend.common.exceptions.NotFoundException;
 import com.cesarschool.barbearia_backend.marketing.model.Cliente;
 import com.cesarschool.barbearia_backend.marketing.service.ClienteService;
@@ -35,6 +37,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class AgendamentoService {
+    
+    private final Clock clock;
     private final AgendamentoRepository repository;
     private final ProfissionalService profissionalService;
     private final ClienteService clienteService;
@@ -85,13 +89,10 @@ public class AgendamentoService {
      * @throws IllegalArgumentException se houver conflito de horário
      */
     public void verificarConflitoHorario(Agendamento agendamento) {
-        if (temConflitoDeHorario(agendamento)) {
-            String nomeProfissional = agendamento.getProfissional().getNome();
-            throw new IllegalArgumentException(
-                String.format("Já existe um agendamento com %s para %s.", nomeProfissional, 
-                    agendamento.getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-            );
-        }
+        verificarConflitoHorario(
+            agendamento.getDataHora(), 
+            agendamento.getProfissional().getId()
+        );
     }
 
     /**
@@ -161,7 +162,7 @@ public class AgendamentoService {
     public void verificarConflitoHorario(LocalDateTime dataHora, Integer profissionalId) {
         if (temConflitoDeHorario(dataHora, profissionalId)) {
             Profissional profissional = profissionalService.buscarEntidadePorId(profissionalId);
-            throw new IllegalArgumentException(
+            throw new DuplicateException(
                 String.format("Já existe um agendamento com %s para %s.", profissional.getNome(), 
                     dataHora.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
             );
@@ -178,7 +179,7 @@ public class AgendamentoService {
     public void verificarAlteracaoStatus(Agendamento agendamento) {
         var status = agendamento.getStatus();
         var horasAteAgendamento = Duration.between(
-            LocalDateTime.now(),
+            LocalDateTime.now(clock),
             agendamento.getDataHora()
         ).toHours();
 
@@ -306,8 +307,8 @@ public List<String> listarHorariosDisponiveis(String data, Integer servicoId) {
     
     LocalTime horarioAtual = null;
 
-    if(dataConsulta.equals(LocalDate.now())){
-        horarioAtual = LocalTime.now();
+    if(dataConsulta.equals(LocalDate.now(clock))){
+        horarioAtual = LocalTime.now(clock);
         // como arredondar para o próximo slot de tempo?
     } else{
         horarioAtual = inicioFuncionamento;

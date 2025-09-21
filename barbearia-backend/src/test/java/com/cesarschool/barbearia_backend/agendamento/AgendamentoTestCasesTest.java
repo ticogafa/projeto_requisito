@@ -1,203 +1,228 @@
 package com.cesarschool.barbearia_backend.agendamento;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import com.cesarschool.barbearia_backend.agendamento.dto.AgendamentoDTOs.CriarAgendamentoRequest;
+import com.cesarschool.barbearia_backend.common.enums.DiaSemana;
+import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
+import com.cesarschool.barbearia_backend.helper.FixedClockTestConfig;
+import com.cesarschool.barbearia_backend.helper.TestEntityFactory;
+import com.cesarschool.barbearia_backend.marketing.model.Cliente;
+import com.cesarschool.barbearia_backend.profissionais.model.Profissional;
+import com.cesarschool.barbearia_backend.profissionais.model.ServicoOferecido;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.hamcrest.Matchers;
+
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Arrays;
+import java.time.*;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-import com.cesarschool.barbearia_backend.agendamento.dto.AgendamentoDTOs.AgendamentoResponse;
-import com.cesarschool.barbearia_backend.agendamento.dto.AgendamentoDTOs.CriarAgendamentoRequest;
-import com.cesarschool.barbearia_backend.agendamento.rest.controller.AgendamentoController;
-import com.cesarschool.barbearia_backend.agendamento.service.AgendamentoService;
-import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
-import com.cesarschool.barbearia_backend.profissionais.dto.ProfissionalDTOs.ProfissionalResponse;
-
-@WebMvcTest(AgendamentoController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
+@ContextConfiguration(classes = { FixedClockTestConfig.class })
+@Transactional
 class AgendamentoTestCasesTest {
 
     @Autowired
-    private AgendamentoController controller;
+    MockMvc mvc;
+    @Autowired
+    ObjectMapper om;
+    @Autowired
+    TestEntityFactory factory;
 
-    @MockBean
-    private AgendamentoService agendamentoService;
+    @Autowired
+    private Clock clock;
+    
+    private Profissional prof;
+    private Cliente cliente;
+    private ServicoOferecido servico;
 
-    private CriarAgendamentoRequest agendamentoRequest;
-    private AgendamentoResponse agendamentoResponse;
+    private final String BASE_URL = "/api/agendamentos/";
 
     @BeforeEach
-    void setUp() {
-        // Create request DTO
-        agendamentoRequest = new CriarAgendamentoRequest();
-        agendamentoRequest.setClienteId(1);
-        agendamentoRequest.setProfissionalId(1);
-        agendamentoRequest.setServicoId(1);
-        agendamentoRequest.setDataHora(LocalDateTime.now().plusDays(1));
-        agendamentoRequest.setObservacoes("Teste de agendamento");
+    void setupTest() {
+        prof = factory.saveProfissionalComJornada(
+                "João Barbeiro",
+                "joao@email.com",
+                "53604042801",
+                "1234567890",
+                LocalTime.of(9, 0),
+                LocalTime.of(18, 0),
+                DiaSemana.SEGUNDA,
+                DiaSemana.TERCA,
+                DiaSemana.QUARTA,
+                DiaSemana.QUINTA,
+                DiaSemana.SEXTA);
 
-        // Create response DTO
-        agendamentoResponse = new AgendamentoResponse();
-        agendamentoResponse.setId(1);
-        agendamentoResponse.setDataHora(agendamentoRequest.getDataHora());
-        agendamentoResponse.setStatus(StatusAgendamento.CONFIRMADO);
-        agendamentoResponse.setObservacoes(agendamentoRequest.getObservacoes());
-        agendamentoResponse.setClienteId(1);
-        agendamentoResponse.setClienteNome("Miguel Batista");
-        agendamentoResponse.setClienteEmail("miguel@example.com");
-        agendamentoResponse.setClienteTelefone("11999999999");
-        agendamentoResponse.setProfissionalId(1);
-        agendamentoResponse.setProfissionalNome("João Barbeiro");
-        agendamentoResponse.setProfissionalEmail("joao@example.com");
-        agendamentoResponse.setServicoId(1);
-        agendamentoResponse.setServicoNome("Corte de Cabelo");
-        agendamentoResponse.setServicoPreco(new BigDecimal("30.00"));
-        agendamentoResponse.setServicoDuracaoMinutos(30);
+        cliente = factory.saveCliente(
+                "Miguel Batista",
+                "miguel@email.com",
+                "02973067405",
+                "0123456789");
+
+        servico = factory.saveServico("Corte de Cabelo", new BigDecimal("30.00"), 30, "Corte legal");
+
+        factory.saveProfissionalServico(prof, servico);
+    }
+
+    private String asJson(Object o) throws Exception {
+        return om.writeValueAsString(o);
     }
 
     @Test
-    void testCriarAgendamento_Success() {
-        // Given
-        when(agendamentoService.criarAgendamento(any(CriarAgendamentoRequest.class)))
-            .thenReturn(agendamentoResponse);
+    void criarAgendamento_sucesso_quandoHorarioLivreEDentroDaJornada() throws Exception {
+        var dataHora = factory.proximaData(DiaSemana.SEGUNDA.tDayOfWeek(), 10, 0);
 
-        // When
-        ResponseEntity<AgendamentoResponse> response = controller.criarAgendamento(agendamentoRequest);
+        var payload = new CriarAgendamentoRequest(
+                dataHora,
+                cliente.getId(),
+                prof.getId(),
+                servico.getId(),
+                "Teste de agendamento");
 
-        // Then
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(agendamentoResponse.getId(), response.getBody().getId());
-        assertEquals(StatusAgendamento.CONFIRMADO, response.getBody().getStatus());
-        
-        verify(agendamentoService, times(1)).criarAgendamento(any(CriarAgendamentoRequest.class));
+        var result = mvc.perform(post(BASE_URL + "criar-agendamento")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJson(payload)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.status").value("PENDENTE"))
+                .andExpect(jsonPath("$.profissionalNome").value("João Barbeiro"))
+                .andReturn();
+
+        System.out.println("Response: " + result.getResponse().getContentAsString());
     }
 
     @Test
-    void testBuscarAgendamento_Success() {
-        // Given
-        Integer agendamentoId = 1;
-        when(agendamentoService.buscarPorId(agendamentoId))
-            .thenReturn(agendamentoResponse);
+    void criarAgendamento_falha_quandoConflitoDeHorario() throws Exception {
+        var slot = factory.proximaData(DayOfWeek.MONDAY, 10, 0);
 
-        // When
-        ResponseEntity<AgendamentoResponse> response = controller.buscarAgendamento(agendamentoId);
+        // ocupa o slot previamente
+        factory.saveAgendamento(
+                cliente,
+                prof,
+                servico,
+                slot,
+                StatusAgendamento.PENDENTE,
+                "Observações"    
+                );
 
-        // Then
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(agendamentoId, response.getBody().getId());
-        
-        verify(agendamentoService, times(1)).buscarPorId(agendamentoId);
+        var payload = new CriarAgendamentoRequest(
+                slot,
+                cliente.getId(),
+                prof.getId(),
+                servico.getId(),
+                "conflict");
+
+        var result = mvc.perform(post(BASE_URL + "criar-agendamento")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJson(payload)))
+                .andExpect(status().isConflict())
+                .andExpect(
+                        jsonPath("$.message")
+                                .value(Matchers.containsStringIgnoringCase("já existe um agendamento")));
+        System.out.println("RESULT!: " + result);
     }
 
     @Test
-    void testConfirmarAgendamento_Success() {
-        // Given
-        Integer agendamentoId = 1;
-        agendamentoResponse.setStatus(StatusAgendamento.CONFIRMADO);
-        when(agendamentoService.confirmarAgendamento(agendamentoId))
-            .thenReturn(agendamentoResponse);
+    void criarAgendamento_falha_foraDaJornada() throws Exception {
+        var fora = factory.proximaData(DayOfWeek.MONDAY, 2, 0); // 02:00
 
-        // When
-        ResponseEntity<AgendamentoResponse> response = controller.confirmarAgendamento(agendamentoId);
+        var payload = new CriarAgendamentoRequest(
+                fora,
+                cliente.getId(),
+                prof.getId(),
+                servico.getId(),
+                "Observações do agendamento");
 
-        // Then
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(StatusAgendamento.CONFIRMADO, response.getBody().getStatus());
-        
-        verify(agendamentoService, times(1)).confirmarAgendamento(agendamentoId);
+        mvc.perform(post(BASE_URL + "criar-agendamento")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJson(payload)))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message").value(Matchers.containsString("não está disponível")));
     }
 
     @Test
-    void testCancelarAgendamento_Success() {
-        // Given
-        Integer agendamentoId = 1;
-        agendamentoResponse.setStatus(StatusAgendamento.CANCELADO);
-        when(agendamentoService.cancelarAgendamento(agendamentoId))
-            .thenReturn(agendamentoResponse);
-
-        // When
-        ResponseEntity<AgendamentoResponse> response = controller.cancelarAgendamento(agendamentoId);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(StatusAgendamento.CANCELADO, response.getBody().getStatus());
+    void cancelarAgendamento_sucesso_quandoFaltamMaisDeDuasHoras() throws Exception {
+        var horario = LocalDate.now(clock).atTime(14, 0);
         
-        verify(agendamentoService, times(1)).cancelarAgendamento(agendamentoId);
+        var ag = factory.saveAgendamento(
+            cliente, 
+            prof, 
+            servico, 
+            horario,
+            StatusAgendamento.PENDENTE,
+            "observações"
+            );
+
+        var result = mvc.perform(patch(BASE_URL + "cancelar-agendamento/" + ag.getId()))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.status").value("CANCELADO"));
+    
+        System.out.println("THE RESULT: " + result);
+        }
+
+    @Test
+    void cancelarAgendamento_falha_quandoFaltamMenosDeDuasHoras() throws Exception {
+        var horario = LocalDate.now(clock).atTime(10, 30); // agora (09:00) + 1h30 => < 2h
+        var ag = factory.saveAgendamento(
+                cliente,
+                prof,
+                servico, 
+                horario,
+                StatusAgendamento.PENDENTE,
+                "observações"
+                );
+
+        mvc.perform(patch(BASE_URL + "cancelar-agendamento/" + ag.getId()))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message").value(Matchers.containsStringIgnoringCase("Não é permitido cancelar")));
     }
 
     @Test
-    void testListarHorariosDisponiveis_Success() {
-        // Given
-        String data = "2025-09-22";
-        Integer servicoId = 1;
-        List<String> horariosDisponiveis = Arrays.asList("09:00", "10:00", "11:00", "14:00", "15:00");
-        
-        when(agendamentoService.listarHorariosDisponiveis(data, servicoId))
-            .thenReturn(horariosDisponiveis);
-
-        // When
-        ResponseEntity<List<String>> response = controller.listarHorariosDisponiveis(data, servicoId);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(5, response.getBody().size());
-        assertTrue(response.getBody().contains("09:00"));
-        assertTrue(response.getBody().contains("15:00"));
-        
-        verify(agendamentoService, times(1)).listarHorariosDisponiveis(data, servicoId);
+    void listarHorariosDisponiveis_sucesso() throws Exception {
+        var data = factory
+            .proximaData(DayOfWeek.MONDAY, 0, 0)
+            .toLocalDate()
+            .toString();
+                    
+        mvc.perform(get(BASE_URL + "horarios-disponiveis")
+                .param("data", data)
+                .param("servicoId", servico.getId().toString()))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.length()").value(Matchers.greaterThan(0)));
     }
 
     @Test
-    void testListarProfissionaisDisponiveis_Success() {
-        // Given
-        String data = "2025-09-22";
-        String horario = "10:00";
-        Integer servicoId = 1;
-        
-        ProfissionalResponse profissional = new ProfissionalResponse();
-        profissional.setId(1);
-        profissional.setNome("João Barbeiro");
-        profissional.setEmail("joao@example.com");
-        profissional.setCpf("12345678901");
-        profissional.setTelefone("11999999999");
-        
-        List<ProfissionalResponse> profissionaisDisponiveis = Arrays.asList(profissional);
-        
-        when(agendamentoService.listarProfissionaisDisponiveis(data, horario, servicoId))
-            .thenReturn(profissionaisDisponiveis);
+    void listarProfissionaisDisponiveis_sucesso() throws Exception {
+        // assume que endpoint checa os que já têm o serviço associado (se houver tal
+        // vínculo no seu modelo)
 
-        // When
-        ResponseEntity<List<ProfissionalResponse>> response = controller.listarProfissionaisDisponiveis(data, horario, servicoId);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().size());
-        assertEquals("João Barbeiro", response.getBody().get(0).getNome());
+        var data = factory
+            .proximaData(DayOfWeek.MONDAY, 0, 0)
+            .toLocalDate()
+            .toString();
         
-        verify(agendamentoService, times(1)).listarProfissionaisDisponiveis(data, horario, servicoId);
+        mvc.perform(get(BASE_URL + "profissionais-disponiveis")
+                .param("data", data)
+                .param("horario", "10:00")
+                .param("servicoId", servico.getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value("João Barbeiro"));
     }
+
 }

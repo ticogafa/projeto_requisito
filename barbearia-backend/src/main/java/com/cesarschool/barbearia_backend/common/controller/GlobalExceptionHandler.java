@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.cesarschool.barbearia_backend.common.exceptions.DuplicateException;
 import com.cesarschool.barbearia_backend.common.exceptions.NotFoundException;
@@ -35,6 +36,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateException.class)
     public ResponseEntity<ErrorResponse> handleConflictExceptions(RuntimeException ex) {
+        return this.buildResponse(
+            HttpStatus.CONFLICT,
+            ex.getClass().getSimpleName(),
+            ex.getMessage()
+        );
+    }
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoStaticResourceExceptions(RuntimeException ex) {
         return this.buildResponse(
             HttpStatus.CONFLICT,
             ex.getClass().getSimpleName(),

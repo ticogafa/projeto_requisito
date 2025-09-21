@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 public class AgendamentoDTOs {
@@ -14,6 +15,7 @@ public class AgendamentoDTOs {
     }
 
     @Data
+    @AllArgsConstructor
     public static class CriarAgendamentoRequest {
         private LocalDateTime dataHora;
         private Integer clienteId;
