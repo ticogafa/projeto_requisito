@@ -9,27 +9,107 @@ export interface User {
   createdAt: Date;
 }
 
-// Service types
-export interface Service {
-  id: string;
-  name: string;
-  duration: number; // in minutes
-  price: number;
-  icon: string;
-  description?: string;
+// Service types (based on ServicoOferecido and ServicoDTOs)
+export interface Servico {
+  id: number;
+  nome: string;
+  preco: number;
+  duracaoMinutos: number;
+  descricao: string;
 }
 
-// Professional types
-export interface Professional {
-  id: string;
-  name: string;
-  services: string[]; // service IDs
-  avatar?: string;
-  rating?: number;
-  schedule: Schedule;
+export interface ServicoResponse {
+  id: number;
+  nome: string;
+  preco: number;
+  duracaoMinutos: number;
+  descricao: string;
 }
 
-// Schedule types
+export interface CriarServicoRequest {
+  nome: string;
+  preco: number;
+  duracaoMinutos: number;
+  descricao: string;
+}
+
+// Professional types (based on Profissional and ProfissionalDTOs)
+export interface Profissional {
+  id: number;
+  nome: string;
+  email: string;
+  cpf: string;
+  telefone: string;
+}
+
+export interface ProfissionalResponse {
+  id: number;
+  nome: string;
+  email: string;
+  cpf: string;
+  telefone: string;
+}
+
+export interface CriarProfissionalRequest {
+  nome: string;
+  email: string;
+  cpf: string;
+  telefone: string;
+}
+
+// Client types (based on Cliente model)
+export interface Cliente {
+  id: number;
+  nome: string;
+  email: string;
+  cpf: string;
+  telefone: string;
+  pontos: number;
+}
+
+// Appointment types (based on Agendamento and AgendamentoDTOs)
+export interface Agendamento {
+  id: number;
+  dataHora: string; // ISO date string
+  status: StatusAgendamento;
+  observacoes?: string;
+  cliente: Cliente;
+  profissional: Profissional;
+  servico: Servico;
+}
+
+export interface AgendamentoResponse {
+  id: number;
+  dataHora: string; // ISO date string
+  status: StatusAgendamento;
+  observacoes?: string;
+  // Client data
+  clienteId: number;
+  clienteNome: string;
+  clienteEmail: string;
+  clienteTelefone: string;
+  // Professional data
+  profissionalId: number;
+  profissionalNome: string;
+  profissionalEmail: string;
+  // Service data
+  servicoId: number;
+  servicoNome: string;
+  servicoPreco: number;
+  servicoDuracaoMinutos: number;
+}
+
+export interface CriarAgendamentoRequest {
+  dataHora: string; // ISO date string
+  clienteId: number;
+  profissionalId: number;
+  servicoId: number;
+  observacoes?: string;
+}
+
+export type StatusAgendamento = 'AGENDADO' | 'CONFIRMADO' | 'CANCELADO' | 'CONCLUIDO';
+
+// Schedule types for legacy compatibility
 export interface Schedule {
   [dayOfWeek: string]: TimeSlot[];
 }
@@ -40,7 +120,16 @@ export interface TimeSlot {
   appointmentId?: string;
 }
 
-// Appointment types
+// Legacy types for backward compatibility with existing components
+export interface Professional {
+  id: string;
+  name: string;
+  services: string[]; // service IDs
+  avatar?: string;
+  rating?: number;
+  schedule: Schedule;
+}
+
 export interface Appointment {
   id: string;
   clientId: string;
@@ -56,13 +145,13 @@ export interface Appointment {
 
 // Product types
 export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-  description?: string;
-  image?: string;
-  category: string;
+  id: number;
+  nome: string;
+  preco: number;
+  estoque: number;
+  estoqueMinimo: number;
+  descricao?: string;
+  categoria?: string;
 }
 
 // Loyalty types

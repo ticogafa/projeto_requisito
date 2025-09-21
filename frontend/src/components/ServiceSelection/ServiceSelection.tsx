@@ -1,7 +1,7 @@
 import React from 'react';
 
 export interface Service {
-  id: string;
+  id: number; // Changed from string to number to match backend
   name: string;
   duration: number;
   price?: number;
@@ -9,8 +9,8 @@ export interface Service {
 
 interface ServiceSelectionProps {
   services: Service[];
-  selectedService?: string;
-  onSelect: (serviceId: string) => void;
+  selectedService?: number; // Changed from string to number
+  onSelect: (serviceId: number) => void; // Changed from string to number
 }
 
 export const ServiceSelection: React.FC<ServiceSelectionProps> = ({

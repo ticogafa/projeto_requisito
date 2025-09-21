@@ -9,14 +9,8 @@ import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
 import type { Service } from '@/components/ServiceSelection/ServiceSelection';
 import type { Professional } from '@/components/ProfessionalSelection/ProfessionalSelection';
 import type { Booking } from '@/components/BookingList/BookingList';
-
-// Mock data - in real app this would come from API
-const SERVICES: Service[] = [
-  { id: '1', name: 'Corte', duration: 30, price: 25 },
-  { id: '2', name: 'Barba', duration: 20, price: 15 },
-  { id: '3', name: 'Combo (Corte + Barba)', duration: 50, price: 35 },
-  { id: '4', name: 'Sessão Completa', duration: 60, price: 45 },
-];
+import type { ServicoResponse } from '@/types';
+import apiClient from '@/services/api';
 
 const PROFESSIONALS: Professional[] = [
   { id: '1', name: 'Ana', role: 'Especialista em degradê' },
@@ -25,7 +19,7 @@ const PROFESSIONALS: Professional[] = [
 ];
 
 interface BookingFormData {
-  service: string;
+  service: number; // Changed from string to number
   professional: string;
   date: string;
   time: string;
@@ -37,9 +31,11 @@ interface BookingFormData {
 const Dashboard: React.FC = () => {
   const { currentUser, logout } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [servicesLoading, setServicesLoading] = useState(true);
+  const [services, setServices] = useState<Service[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [formData, setFormData] = useState<BookingFormData>({
-    service: SERVICES[0].id,
+    service: 0, // Changed from empty string to 0
     professional: PROFESSIONALS[0].id,
     date: new Date().toISOString().split('T')[0],
     time: '',
@@ -47,6 +43,42 @@ const Dashboard: React.FC = () => {
     clientPhone: '',
     notes: '',
   });
+
+  // Load services from API
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setServicesLoading(true);
+        const response = await apiClient.getServices();
+        if (response.success && response.data) {
+          // Map backend Servico to frontend Service format
+          const mappedServices: Service[] = response.data.map(servico => ({
+            id: servico.id,
+            name: servico.nome,
+            duration: servico.duracaoMinutos,
+            price: servico.preco
+          }));
+          
+          setServices(mappedServices);
+          // Set default service after loading
+          if (mappedServices.length > 0) {
+            setFormData(prev => ({ ...prev, service: mappedServices[0].id }));
+          }
+        } else {
+          console.error('Failed to fetch services:', response.error);
+          // Fallback to mock data or show error
+          setServices([]);
+        }
+      } catch (error) {
+        console.error('Error fetching services:', error);
+        setServices([]);
+      } finally {
+        setServicesLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   // Load bookings from localStorage on mount
   useEffect(() => {
@@ -65,10 +97,10 @@ const Dashboard: React.FC = () => {
     localStorage.setItem('barbeariaBookings', JSON.stringify(bookings));
   }, [bookings]);
 
-  const selectedService = SERVICES.find(s => s.id === formData.service);
+  const selectedService = services.find(s => s.id === formData.service);
   const selectedProfessional = PROFESSIONALS.find(p => p.id === formData.professional);
 
-  const handleServiceSelect = (serviceId: string) => {
+  const handleServiceSelect = (serviceId: number) => {
     setFormData(prev => ({ ...prev, service: serviceId, time: '' }));
   };
 
@@ -228,11 +260,15 @@ const Dashboard: React.FC = () => {
         <section className="card" aria-label="Formulário de agendamento">
           <div className="section">
             <h2>Escolha um serviço</h2>
-            <ServiceSelection
-              services={SERVICES}
-              selectedService={formData.service}
-              onSelect={handleServiceSelect}
-            />
+            {servicesLoading ? (
+              <LoadingSpinner />
+            ) : (
+              <ServiceSelection
+                services={services}
+                selectedService={formData.service}
+                onSelect={handleServiceSelect}
+              />
+            )}
           </div>
 
           <div className="section">

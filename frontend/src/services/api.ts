@@ -1,14 +1,18 @@
 import type { 
   User, 
-  Service, 
-  Professional, 
-  Appointment, 
+  ServicoResponse, 
+  CriarServicoRequest,
+  ProfissionalResponse, 
+  CriarProfissionalRequest,
+  AgendamentoResponse, 
+  CriarAgendamentoRequest,
   Product, 
   LoyaltyProgram,
   ApiResponse
-} from '../types';
+} from '@/types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081/api';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
 class ApiClient {
   private baseURL: string;
@@ -69,68 +73,115 @@ class ApiClient {
     });
   }
 
-  // Services
-  async getServices(): Promise<ApiResponse<Service[]>> {
-    return this.request<Service[]>('/services');
+  // Services - updated to match backend endpoints
+  async getServices(): Promise<ApiResponse<ServicoResponse[]>> {
+    return this.request<ServicoResponse[]>('/servicos');
   }
 
-  async getService(id: string): Promise<ApiResponse<Service>> {
-    return this.request<Service>(`/services/${id}`);
+  async getService(id: number): Promise<ApiResponse<ServicoResponse>> {
+    return this.request<ServicoResponse>(`/servicos/${id}`);
   }
 
-  // Professionals
-  async getProfessionals(): Promise<ApiResponse<Professional[]>> {
-    return this.request<Professional[]>('/professionals');
+  async createService(service: CriarServicoRequest): Promise<ApiResponse<ServicoResponse>> {
+    return this.request<ServicoResponse>('/servicos', {
+      method: 'POST',
+      body: JSON.stringify(service),
+    });
   }
 
-  async getProfessional(id: string): Promise<ApiResponse<Professional>> {
-    return this.request<Professional>(`/professionals/${id}`);
+  async updateService(id: number, service: Partial<CriarServicoRequest>): Promise<ApiResponse<ServicoResponse>> {
+    return this.request<ServicoResponse>(`/servicos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ id, ...service }),
+    });
   }
 
-  async getProfessionalAvailability(
-    professionalId: string, 
-    date: string
-  ): Promise<ApiResponse<string[]>> {
-    return this.request<string[]>(`/professionals/${professionalId}/availability?date=${date}`);
+  async deleteService(id: number): Promise<ApiResponse<void>> {
+    return this.request<void>(`/servicos/${id}`, {
+      method: 'DELETE',
+    });
   }
 
-  // Appointments
-  async createAppointment(appointment: Partial<Appointment>): Promise<ApiResponse<Appointment>> {
-    return this.request<Appointment>('/appointments', {
+  // Professionals - updated to match backend endpoints
+  async getProfessionals(): Promise<ApiResponse<ProfissionalResponse[]>> {
+    return this.request<ProfissionalResponse[]>('/profissionais');
+  }
+
+  async getProfessional(id: number): Promise<ApiResponse<ProfissionalResponse>> {
+    return this.request<ProfissionalResponse>(`/profissionais/${id}`);
+  }
+
+  async createProfessional(professional: CriarProfissionalRequest): Promise<ApiResponse<ProfissionalResponse>> {
+    return this.request<ProfissionalResponse>('/profissionais', {
+      method: 'POST',
+      body: JSON.stringify(professional),
+    });
+  }
+
+  // Appointments - updated to match backend endpoints
+  async createAppointment(appointment: CriarAgendamentoRequest): Promise<ApiResponse<AgendamentoResponse>> {
+    return this.request<AgendamentoResponse>('/agendamentos/criar-agendamento', {
       method: 'POST',
       body: JSON.stringify(appointment),
     });
   }
 
-  async getUserAppointments(userId: string): Promise<ApiResponse<Appointment[]>> {
-    return this.request<Appointment[]>(`/appointments/user/${userId}`);
+  async getAppointment(id: number): Promise<ApiResponse<AgendamentoResponse>> {
+    return this.request<AgendamentoResponse>(`/agendamentos/${id}`);
   }
 
-  async updateAppointment(
-    id: string, 
-    updates: Partial<Appointment>
-  ): Promise<ApiResponse<Appointment>> {
-    return this.request<Appointment>(`/appointments/${id}`, {
+  async confirmAppointment(id: number): Promise<ApiResponse<AgendamentoResponse>> {
+    return this.request<AgendamentoResponse>(`/agendamentos/confirmar-agendamento/${id}`, {
       method: 'PATCH',
-      body: JSON.stringify(updates),
     });
   }
 
-  async cancelAppointment(id: string): Promise<ApiResponse<void>> {
-    return this.request<void>(`/appointments/${id}`, {
-      method: 'DELETE',
+  async cancelAppointment(id: number): Promise<ApiResponse<AgendamentoResponse>> {
+    return this.request<AgendamentoResponse>(`/agendamentos/cancelar-agendamento/${id}`, {
+      method: 'PATCH',
     });
+  }
+
+  // Scheduling availability endpoints
+  async getAvailableTimeSlots(
+    data: string, 
+    servicoOferecidoId: number
+  ): Promise<ApiResponse<string[]>> {
+    return this.request<string[]>(`/agendamentos/horarios-disponiveis?data=${data}&servicoOferecidoId=${servicoOferecidoId}`);
+  }
+
+  async getAvailableProfessionals(
+    data: string, 
+    horario: string, 
+    servicoOferecidoId: number
+  ): Promise<ApiResponse<ProfissionalResponse[]>> {
+    return this.request<ProfissionalResponse[]>(`/agendamentos/profissionais-disponiveis?data=${data}&horario=${horario}&servicoOferecidoId=${servicoOferecidoId}`);
   }
 
   // Products
   async getProducts(): Promise<ApiResponse<Product[]>> {
-    return this.request<Product[]>('/products');
+    return this.request<Product[]>('/produtos');
   }
 
-  async updateProductStock(id: string, quantity: number): Promise<ApiResponse<Product>> {
-    return this.request<Product>(`/products/${id}/stock`, {
-      method: 'PATCH',
-      body: JSON.stringify({ quantity }),
+  async getProductsLowStock(): Promise<ApiResponse<Product[]>> {
+    return this.request<Product[]>('/produtos/estoque-baixo');
+  }
+
+  async createProduct(product: {
+    nome: string;
+    preco: number;
+    estoque: number;
+    estoqueMinimo: number;
+  }): Promise<ApiResponse<Product>> {
+    return this.request<Product>('/produtos/cadastrar', {
+      method: 'POST',
+      body: JSON.stringify(product),
+    });
+  }
+
+  async updateProductStock(id: number, quantidade: number): Promise<ApiResponse<Product>> {
+    return this.request<Product>(`/produtos/${id}/baixa?quantidade=${quantidade}`, {
+      method: 'POST',
     });
   }
 

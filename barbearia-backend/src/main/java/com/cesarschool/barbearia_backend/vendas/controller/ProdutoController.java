@@ -34,6 +34,11 @@ public class ProdutoController {
         return ResponseEntity.ok(salvo);
     }
 
+    @GetMapping
+    public ResponseEntity<List<Produto>> listarTodos() {
+        return ResponseEntity.ok(produtoService.findAll());
+    }
+
     @GetMapping("/estoque-baixo")
     public ResponseEntity<List<Produto>> listarComEstoqueBaixo() {
         return ResponseEntity.ok(produtoService.listarComEstoqueBaixo());
