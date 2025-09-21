@@ -1,260 +1,203 @@
-// package com.cesarschool.barbearia_backend.agendamento;
+package com.cesarschool.barbearia_backend.agendamento;
 
-// import static org.junit.jupiter.api.Assertions.*;
-// import static org.mockito.ArgumentMatchers.*;
-// import org.mockito.Mockito;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-// import java.time.LocalDateTime;
-// 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Arrays;
 
-// import org.junit.jupiter.api.Test;
-// import org.junit.jupiter.api.BeforeEach;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-// import org.springframework.boot.test.mock.mockito.MockBean;
-// import org.springframework.test.context.ActiveProfiles;
-// import org.springframework.http.ResponseEntity;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
-// import com.cesarschool.barbearia_backend.BaseControllerTest;
-// import com.cesarschool.barbearia_backend.agendamento.model.Agendamento;
-// import com.cesarschool.barbearia_backend.agendamento.rest.controller.AgendamentoController;
-// import com.cesarschool.barbearia_backend.agendamento.service.AgendamentoService;
-// import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
-// import com.cesarschool.barbearia_backend.marketing.model.Cliente;
-// import com.cesarschool.barbearia_backend.profissionais.model.Profissional;
-// import com.cesarschool.barbearia_backend.profissionais.model.ServicoOferecido;
+import com.cesarschool.barbearia_backend.agendamento.dto.AgendamentoDTOs.AgendamentoResponse;
+import com.cesarschool.barbearia_backend.agendamento.dto.AgendamentoDTOs.CriarAgendamentoRequest;
+import com.cesarschool.barbearia_backend.agendamento.rest.controller.AgendamentoController;
+import com.cesarschool.barbearia_backend.agendamento.service.AgendamentoService;
+import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
+import com.cesarschool.barbearia_backend.profissionais.dto.ProfissionalDTOs.ProfissionalResponse;
 
+@WebMvcTest(AgendamentoController.class)
+@ActiveProfiles("test")
+class AgendamentoTestCasesTest {
 
-// @WebMvcTest(AgendamentoController.class)
-// @ActiveProfiles("test")
-// class AgendamentoTestCasesTest extends BaseControllerTest{
+    @Autowired
+    private AgendamentoController controller;
 
+    @MockBean
+    private AgendamentoService agendamentoService;
 
+    private CriarAgendamentoRequest agendamentoRequest;
+    private AgendamentoResponse agendamentoResponse;
 
-//   @Autowired
-//   private AgendamentoController controller;
+    @BeforeEach
+    void setUp() {
+        // Create request DTO
+        agendamentoRequest = new CriarAgendamentoRequest();
+        agendamentoRequest.setClienteId(1);
+        agendamentoRequest.setProfissionalId(1);
+        agendamentoRequest.setServicoId(1);
+        agendamentoRequest.setDataHora(LocalDateTime.now().plusDays(1));
+        agendamentoRequest.setObservacoes("Teste de agendamento");
 
-//   @MockBean
-//   private AgendamentoService agendamentoService;
+        // Create response DTO
+        agendamentoResponse = new AgendamentoResponse();
+        agendamentoResponse.setId(1);
+        agendamentoResponse.setDataHora(agendamentoRequest.getDataHora());
+        agendamentoResponse.setStatus(StatusAgendamento.CONFIRMADO);
+        agendamentoResponse.setObservacoes(agendamentoRequest.getObservacoes());
+        agendamentoResponse.setClienteId(1);
+        agendamentoResponse.setClienteNome("Miguel Batista");
+        agendamentoResponse.setClienteEmail("miguel@example.com");
+        agendamentoResponse.setClienteTelefone("11999999999");
+        agendamentoResponse.setProfissionalId(1);
+        agendamentoResponse.setProfissionalNome("João Barbeiro");
+        agendamentoResponse.setProfissionalEmail("joao@example.com");
+        agendamentoResponse.setServicoId(1);
+        agendamentoResponse.setServicoNome("Corte de Cabelo");
+        agendamentoResponse.setServicoPreco(new BigDecimal("30.00"));
+        agendamentoResponse.setServicoDuracaoMinutos(30);
+    }
 
-//   private Agendamento agendamentoTest;
-//   private Cliente clienteTest;
-//   private Profissional profissionalTest;
-//   private ServicoOferecido servicoTest;
+    @Test
+    void testCriarAgendamento_Success() {
+        // Given
+        when(agendamentoService.criarAgendamento(any(CriarAgendamentoRequest.class)))
+            .thenReturn(agendamentoResponse);
 
-//   public void cleanup() {
-//     // Clean up any test data if needed
-//   }
+        // When
+        ResponseEntity<AgendamentoResponse> response = controller.criarAgendamento(agendamentoRequest);
 
-//   @BeforeEach
-//   public void setUp() {
-//     try {
-//       // Create Cliente with all required fields
-//       clienteTest = new Cliente();
-//       clienteTest.setId(Integer.randomInteger());
-      
-//       // Create Profissional with all required fields  
-//       profissionalTest = new Profissional();
-//       profissionalTest.setId(Integer.randomInteger());
-//       profissionalTest.setNome("João Barbeiro");
-      
-//       // Create ServicoOferecido with all required fields
-//       servicoTest = new ServicoOferecido();
-//       servicoTest.setId(Integer.randomInteger());
-      
-//       // Create Agendamento with all required fields
-//       agendamentoTest = new Agendamento();
-//       agendamentoTest.setId(Integer.randomInteger());
-//       agendamentoTest.setCliente(clienteTest);
-//       agendamentoTest.setProfissional(profissionalTest);
-//       agendamentoTest.setServico(servicoTest);
-//       agendamentoTest.setDataHora(LocalDateTime.now().plusDays(1));
-//       agendamentoTest.setStatus(StatusAgendamento.PENDENTE);
-//       agendamentoTest.setObservacoes("Teste");
-//     } catch (Exception e) {
-//       // If entity creation fails, the test setup has an issue
-//       System.err.println("Error creating test entities: " + e.getMessage());
-//       throw new RuntimeException("Test setup failed", e);
-//     }
-//   }
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(agendamentoResponse.getId(), response.getBody().getId());
+        assertEquals(StatusAgendamento.CONFIRMADO, response.getBody().getStatus());
+        
+        verify(agendamentoService, times(1)).criarAgendamento(any(CriarAgendamentoRequest.class));
+    }
 
-//   @Test
-//   void testCreateAgendamentoWhenHorarioDisponivelLivre_Positive() {
-//     // Given: Um horário disponível para um profissional
-//     Agendamento novoAgendamento = new Agendamento();
-//     novoAgendamento.setCliente(clienteTest);
-//     novoAgendamento.setProfissional(profissionalTest);
-//     novoAgendamento.setServico(servicoTest);
-//     novoAgendamento.setDataHora(LocalDateTime.now().plusDays(1));
-//     novoAgendamento.setStatus(StatusAgendamento.PENDENTE);
+    @Test
+    void testBuscarAgendamento_Success() {
+        // Given
+        Integer agendamentoId = 1;
+        when(agendamentoService.buscarPorId(agendamentoId))
+            .thenReturn(agendamentoResponse);
 
-//     Mockito.when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoTest);
+        // When
+        ResponseEntity<AgendamentoResponse> response = controller.buscarAgendamento(agendamentoId);
 
-//     // When: Tentar criar um agendamento nesse horário
-//     ResponseEntity<Agendamento> response = controller.criarAgendamento(novoAgendamento);
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(agendamentoId, response.getBody().getId());
+        
+        verify(agendamentoService, times(1)).buscarPorId(agendamentoId);
+    }
 
-//     // Then: O agendamento deve ser criado com sucesso
-//     assertNotNull(response);
-//     assertTrue(response.getStatusCode().is2xxSuccessful());
-//     assertNotNull(response.getBody());
-//     assertEquals(agendamentoTest.getId(), response.getBody().getId());
-//     // Simule a criação e verifique se foi salvo corretamente
-//   }
+    @Test
+    void testConfirmarAgendamento_Success() {
+        // Given
+        Integer agendamentoId = 1;
+        agendamentoResponse.setStatus(StatusAgendamento.CONFIRMADO);
+        when(agendamentoService.confirmarAgendamento(agendamentoId))
+            .thenReturn(agendamentoResponse);
 
-//   @Test
-//   void testCreateAgendamentoWhenHorarioDisponivelLivre_Negative() {
-//     // Given: Um horário já ocupado para um profissional
-//     Agendamento agendamentoConflito = new Agendamento();
-//     agendamentoConflito.setCliente(clienteTest);
-//     agendamentoConflito.setProfissional(profissionalTest);
-//     agendamentoConflito.setServico(servicoTest);
-//     agendamentoConflito.setDataHora(LocalDateTime.now().plusDays(1));
-//     agendamentoConflito.setStatus(StatusAgendamento.PENDENTE);
+        // When
+        ResponseEntity<AgendamentoResponse> response = controller.confirmarAgendamento(agendamentoId);
 
-//     Mockito.when(agendamentoService.save(any(Agendamento.class))).thenThrow(new IllegalArgumentException("Já existe um agendamento com João Barbeiro no horário especificado."));
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(StatusAgendamento.CONFIRMADO, response.getBody().getStatus());
+        
+        verify(agendamentoService, times(1)).confirmarAgendamento(agendamentoId);
+    }
 
-//     // When: Tentar criar um agendamento nesse mesmo horário
-//     // Then: O sistema deve impedir a criação do agendamento
-//     assertThrows(IllegalArgumentException.class, () -> {
-//       controller.criarAgendamento(agendamentoConflito);
-//     });
-//     // Simule conflito e verifique se ocorre exceção ou erro esperado
-//   }
+    @Test
+    void testCancelarAgendamento_Success() {
+        // Given
+        Integer agendamentoId = 1;
+        agendamentoResponse.setStatus(StatusAgendamento.CANCELADO);
+        when(agendamentoService.cancelarAgendamento(agendamentoId))
+            .thenReturn(agendamentoResponse);
 
-//   @Test
-//   void testCreateAgendamentoWhenHorarioForaJornadaTrabalho_Positive() {
-//     // Given: Jornada de trabalho definida para o profissional
-//     Agendamento agendamentoDentroJornada = new Agendamento();
-//     agendamentoDentroJornada.setCliente(clienteTest);
-//     agendamentoDentroJornada.setProfissional(profissionalTest);
-//     agendamentoDentroJornada.setServico(servicoTest);
-//     agendamentoDentroJornada.setDataHora(LocalDateTime.now().plusDays(1).withHour(10).withMinute(0));
-//     agendamentoDentroJornada.setStatus(StatusAgendamento.PENDENTE);
+        // When
+        ResponseEntity<AgendamentoResponse> response = controller.cancelarAgendamento(agendamentoId);
 
-//     Mockito.when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoTest);
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(StatusAgendamento.CANCELADO, response.getBody().getStatus());
+        
+        verify(agendamentoService, times(1)).cancelarAgendamento(agendamentoId);
+    }
 
-//     // When: Tentar criar um agendamento dentro desse horário
-//     ResponseEntity<Agendamento> response = controller.criarAgendamento(agendamentoDentroJornada);
+    @Test
+    void testListarHorariosDisponiveis_Success() {
+        // Given
+        String data = "2025-09-22";
+        Integer servicoId = 1;
+        List<String> horariosDisponiveis = Arrays.asList("09:00", "10:00", "11:00", "14:00", "15:00");
+        
+        when(agendamentoService.listarHorariosDisponiveis(data, servicoId))
+            .thenReturn(horariosDisponiveis);
 
-//     // Then: O agendamento deve ser criado com sucesso
-//     assertNotNull(response);
-//     assertTrue(response.getStatusCode().is2xxSuccessful());
-//     assertNotNull(response.getBody());
-//   }
+        // When
+        ResponseEntity<List<String>> response = controller.listarHorariosDisponiveis(data, servicoId);
 
-//   @Test
-//   void testCreateAgendamentoWhenHorarioForaJornadaTrabalho_Negative() {
-//     // Given: Jornada de trabalho definida para o profissional
-//     Agendamento agendamentoForaJornada = new Agendamento();
-//     agendamentoForaJornada.setCliente(clienteTest);
-//     agendamentoForaJornada.setProfissional(profissionalTest);
-//     agendamentoForaJornada.setServico(servicoTest);
-//     agendamentoForaJornada.setDataHora(LocalDateTime.now().plusDays(1).withHour(2).withMinute(0)); // Horário fora da jornada
-//     agendamentoForaJornada.setStatus(StatusAgendamento.PENDENTE);
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(5, response.getBody().size());
+        assertTrue(response.getBody().contains("09:00"));
+        assertTrue(response.getBody().contains("15:00"));
+        
+        verify(agendamentoService, times(1)).listarHorariosDisponiveis(data, servicoId);
+    }
 
-//     Mockito.when(agendamentoService.save(any(Agendamento.class))).thenThrow(new IllegalArgumentException("João Barbeiro não está disponível no horário solicitado."));
+    @Test
+    void testListarProfissionaisDisponiveis_Success() {
+        // Given
+        String data = "2025-09-22";
+        String horario = "10:00";
+        Integer servicoId = 1;
+        
+        ProfissionalResponse profissional = new ProfissionalResponse();
+        profissional.setId(1);
+        profissional.setNome("João Barbeiro");
+        profissional.setEmail("joao@example.com");
+        profissional.setCpf("12345678901");
+        profissional.setTelefone("11999999999");
+        
+        List<ProfissionalResponse> profissionaisDisponiveis = Arrays.asList(profissional);
+        
+        when(agendamentoService.listarProfissionaisDisponiveis(data, horario, servicoId))
+            .thenReturn(profissionaisDisponiveis);
 
-//     // When: Tentar criar um agendamento fora desse horário
-//     // Then: O sistema deve impedir a criação do agendamento
-//     assertThrows(IllegalArgumentException.class, () -> {
-//       controller.criarAgendamento(agendamentoForaJornada);
-//     });
-//   }
+        // When
+        ResponseEntity<List<ProfissionalResponse>> response = controller.listarProfissionaisDisponiveis(data, horario, servicoId);
 
-//   @Test
-//   void testCancelAgendamentoLessThan2HoursBefore_Positive() {
-//     // Given: Um agendamento marcado para daqui a mais de 2 horas
-//     Integer agendamentoId = Integer.randomInteger();
-//     Agendamento agendamentoParaCancelar = new Agendamento();
-//     agendamentoParaCancelar.setId(agendamentoId);
-//     agendamentoParaCancelar.setCliente(clienteTest);
-//     agendamentoParaCancelar.setProfissional(profissionalTest);
-//     agendamentoParaCancelar.setServico(servicoTest);
-//     agendamentoParaCancelar.setDataHora(LocalDateTime.now().plusHours(5)); // Mais de 2 horas
-//     agendamentoParaCancelar.setStatus(StatusAgendamento.PENDENTE);
-
-//     Mockito.when(agendamentoService.findById(agendamentoId)).thenReturn(agendamentoParaCancelar);
-//     Mockito.when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoParaCancelar);
-
-//     // When: Tentar cancelar o agendamento
-//     ResponseEntity<Agendamento> response = controller.cancelarAgendamento(agendamentoId);
-
-//     // Then: O cancelamento deve ser permitido
-//     assertNotNull(response);
-//     assertTrue(response.getStatusCode().is2xxSuccessful());
-//     assertNotNull(response.getBody());
-//     assertEquals(StatusAgendamento.CANCELADO, agendamentoParaCancelar.getStatus());
-//   }
-
-//   @Test
-//   void testCancelAgendamentoLessThan2HoursBefore_Negative() {
-//     // Given: Um agendamento marcado para daqui a menos de 2 horas
-//     Integer agendamentoId = Integer.randomInteger();
-//     Agendamento agendamentoParaCancelar = new Agendamento();
-//     agendamentoParaCancelar.setId(agendamentoId);
-//     agendamentoParaCancelar.setCliente(clienteTest);
-//     agendamentoParaCancelar.setProfissional(profissionalTest);
-//     agendamentoParaCancelar.setServico(servicoTest);
-//     agendamentoParaCancelar.setDataHora(LocalDateTime.now().plusHours(1)); // Menos de 2 horas
-//     agendamentoParaCancelar.setStatus(StatusAgendamento.PENDENTE);
-
-//     Mockito.when(agendamentoService.findById(agendamentoId)).thenReturn(agendamentoParaCancelar);
-//     Mockito.when(agendamentoService.save(any(Agendamento.class))).thenThrow(
-//       new IllegalArgumentException("Não é permitido cancelar agendamentos com menos de 2 horas de antecedência.")
-//     );
-
-//     // When: Tentar cancelar o agendamento
-//     // Then: O cancelamento deve ser rejeitado
-//     assertThrows(IllegalArgumentException.class, () -> {
-//       controller.cancelarAgendamento(agendamentoId);
-//     });
-//   }
-
-//   @Test
-//   void testAssignFirstAvailableProfessionalWhenNoneSpecified_Positive() {
-//     // Given: Múltiplos profissionais com horários livres
-//     Agendamento agendamentoSemProfissional = new Agendamento();
-//     agendamentoSemProfissional.setCliente(clienteTest);
-//     agendamentoSemProfissional.setServico(servicoTest);
-//     agendamentoSemProfissional.setDataHora(LocalDateTime.now().plusDays(1));
-//     agendamentoSemProfissional.setStatus(StatusAgendamento.PENDENTE);
-//     // Não definindo profissional intencionalmente
-
-//     Agendamento agendamentoComProfissional = new Agendamento();
-//     agendamentoComProfissional.setCliente(clienteTest);
-//     agendamentoComProfissional.setProfissional(profissionalTest); // Sistema atribuiu automaticamente
-//     agendamentoComProfissional.setServico(servicoTest);
-//     agendamentoComProfissional.setDataHora(LocalDateTime.now().plusDays(1));
-//     agendamentoComProfissional.setStatus(StatusAgendamento.PENDENTE);
-
-//     Mockito.when(agendamentoService.save(any(Agendamento.class))).thenReturn(agendamentoComProfissional);
-
-//     // When: Criar um agendamento sem especificar profissional
-//     ResponseEntity<Agendamento> response = controller.criarAgendamento(agendamentoSemProfissional);
-
-//     // Then: O sistema deve atribuir o primeiro profissional disponível
-//     assertNotNull(response);
-//     assertTrue(response.getStatusCode().is2xxSuccessful());
-//     assertNotNull(response.getBody());
-//     assertNotNull(agendamentoComProfissional.getProfissional());
-//   }
-
-//   @Test
-//   void testAssignFirstAvailableProfessionalWhenNoneSpecified_Negative() {
-//     // Given: Nenhum profissional disponível no horário solicitado
-//     Agendamento agendamentoSemProfissional = new Agendamento();
-//     agendamentoSemProfissional.setCliente(clienteTest);
-//     agendamentoSemProfissional.setServico(servicoTest);
-//     agendamentoSemProfissional.setDataHora(LocalDateTime.now().plusDays(1));
-//     agendamentoSemProfissional.setStatus(StatusAgendamento.PENDENTE);
-//     // Não definindo profissional intencionalmente
-
-//     Mockito.when(agendamentoService.save(any(Agendamento.class))).thenThrow(new IllegalArgumentException("Nenhum profissional disponível no horário solicitado."));
-
-//     // When: Criar um agendamento sem especificar profissional
-//     // Then: O sistema deve rejeitar a criação do agendamento
-//     assertThrows(IllegalArgumentException.class, () -> {
-//       controller.criarAgendamento(agendamentoSemProfissional);
-//     });
-//   }
-// }
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        assertEquals("João Barbeiro", response.getBody().get(0).getNome());
+        
+        verify(agendamentoService, times(1)).listarProfissionaisDisponiveis(data, horario, servicoId);
+    }
+}
