@@ -1,4 +1,4 @@
-package com.cesarschool.barbearia_backend.helper;
+package com.cesarschool.barbearia_backend.config;
 
 import java.time.Clock;
 import java.time.Instant;

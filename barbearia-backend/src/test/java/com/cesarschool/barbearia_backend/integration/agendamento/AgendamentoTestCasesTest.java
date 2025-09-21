@@ -1,9 +1,9 @@
-package com.cesarschool.barbearia_backend.agendamento;
+package com.cesarschool.barbearia_backend.integration.agendamento;
 
 import com.cesarschool.barbearia_backend.agendamento.dto.AgendamentoDTOs.CriarAgendamentoRequest;
 import com.cesarschool.barbearia_backend.common.enums.DiaSemana;
 import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
-import com.cesarschool.barbearia_backend.helper.FixedClockTestConfig;
+import com.cesarschool.barbearia_backend.config.FixedClockTestConfig;
 import com.cesarschool.barbearia_backend.helper.TestEntityFactory;
 import com.cesarschool.barbearia_backend.marketing.model.Cliente;
 import com.cesarschool.barbearia_backend.profissionais.model.Profissional;
@@ -83,9 +83,10 @@ class AgendamentoTestCasesTest {
     }
 
     @Test
-    void criarAgendamento_sucesso_quandoHorarioLivreEDentroDaJornada() throws Exception {
+    void devecriarAgendamentoComSucessoQuandoHorarioEstiverLivreEDentroDaJornada() throws Exception {
+        // Given: que escolho um horário futuro livre para o profissional
+        // And: que informo cliente, profissional, serviço e data/hora
         var dataHora = factory.proximaData(DiaSemana.SEGUNDA.tDayOfWeek(), 10, 0);
-
         var payload = new CriarAgendamentoRequest(
                 dataHora,
                 cliente.getId(),
@@ -93,9 +94,13 @@ class AgendamentoTestCasesTest {
                 servico.getId(),
                 "Teste de agendamento");
 
+        // When: solicito a criação do agendamento
         var result = mvc.perform(post(BASE_URL + "criar-agendamento")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(payload)))
+        
+        // Then: o sistema responde sucesso (HTTP 2xx)
+        // And: retorna o agendamento criado com um ID preenchido
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.status").value("PENDENTE"))
@@ -106,10 +111,9 @@ class AgendamentoTestCasesTest {
     }
 
     @Test
-    void criarAgendamento_falha_quandoConflitoDeHorario() throws Exception {
+    void deveFalharCriacaoQuandoJaExisteAgendamentoNoMesmoHorario() throws Exception {
+        // Given: que já existe um agendamento para "João Barbeiro" no mesmo horário
         var slot = factory.proximaData(DayOfWeek.MONDAY, 10, 0);
-
-        // ocupa o slot previamente
         factory.saveAgendamento(
                 cliente,
                 prof,
@@ -119,6 +123,7 @@ class AgendamentoTestCasesTest {
                 "Observações"    
                 );
 
+        // And: que tento criar outro agendamento nesse horário com os mesmos Givens essenciais
         var payload = new CriarAgendamentoRequest(
                 slot,
                 cliente.getId(),
@@ -126,9 +131,13 @@ class AgendamentoTestCasesTest {
                 servico.getId(),
                 "conflict");
 
+        // When: solicito a criação do novo agendamento
         var result = mvc.perform(post(BASE_URL + "criar-agendamento")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(payload)))
+                
+                // Then: o sistema rejeita a operação
+                // And: exibe a mensagem: "Já existe um agendamento com João Barbeiro no horário especificado."
                 .andExpect(status().isConflict())
                 .andExpect(
                         jsonPath("$.message")
@@ -137,9 +146,11 @@ class AgendamentoTestCasesTest {
     }
 
     @Test
-    void criarAgendamento_falha_foraDaJornada() throws Exception {
+    void deveFalharCriacaoQuandoProfissionalIndisponivelForaDaJornada() throws Exception {
+        // Given: que escolho um horário futuro às 02:00 fora da jornada do profissional
         var fora = factory.proximaData(DayOfWeek.MONDAY, 2, 0); // 02:00
 
+        // And: que informo cliente, profissional, serviço e data/hora
         var payload = new CriarAgendamentoRequest(
                 fora,
                 cliente.getId(),
@@ -147,6 +158,9 @@ class AgendamentoTestCasesTest {
                 servico.getId(),
                 "Observações do agendamento");
 
+        // When: solicito a criação do agendamento
+        // Then: o sistema rejeita a operação
+        // And: exibe a mensagem: "João Barbeiro não está disponível no horário solicitado."
         mvc.perform(post(BASE_URL + "criar-agendamento")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(payload)))
@@ -155,9 +169,14 @@ class AgendamentoTestCasesTest {
     }
 
     @Test
-    void cancelarAgendamento_sucesso_quandoFaltamMaisDeDuasHoras() throws Exception {
+    void deveCancelarAgendamentoComSucessoQuandoFaltamMaisDeDuasHoras() throws Exception {
+        // Given: que existe um agendamento marcado para ocorrer em mais de 2 horas
         var horario = LocalDate.now(clock).atTime(14, 0);
+        System.out.println("🕒 Horário atual (Clock): " + LocalDateTime.now(clock));
+        System.out.println("📅 Horário do agendamento: " + horario);
+        System.out.println("⏰ Diferença em horas: " + java.time.Duration.between(LocalDateTime.now(clock), horario).toHours());
         
+        // And: que o status atual do agendamento é "PENDENTE"
         var ag = factory.saveAgendamento(
             cliente, 
             prof, 
@@ -167,6 +186,9 @@ class AgendamentoTestCasesTest {
             "observações"
             );
 
+        // When: solicito o cancelamento deste agendamento
+        // Then: o sistema responde sucesso (HTTP 2xx)
+        // And: o status do agendamento passa a ser "CANCELADO"
         var result = mvc.perform(patch(BASE_URL + "cancelar-agendamento/" + ag.getId()))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -176,8 +198,11 @@ class AgendamentoTestCasesTest {
         }
 
     @Test
-    void cancelarAgendamento_falha_quandoFaltamMenosDeDuasHoras() throws Exception {
+    void deveFalharCancelamentoQuandoFaltamMenosDeDuasHoras() throws Exception {
+        // Given: que existe um agendamento marcado para ocorrer em menos de 2 horas
         var horario = LocalDate.now(clock).atTime(10, 30); // agora (09:00) + 1h30 => < 2h
+        
+        // And: que o status atual do agendamento é "PENDENTE"
         var ag = factory.saveAgendamento(
                 cliente,
                 prof,
@@ -187,18 +212,26 @@ class AgendamentoTestCasesTest {
                 "observações"
                 );
 
+        // When: solicito o cancelamento deste agendamento
+        // Then: o sistema rejeita a operação
+        // And: exibe a mensagem: "Não é permitido cancelar agendamentos com menos de 2 horas de antecedência."
         mvc.perform(patch(BASE_URL + "cancelar-agendamento/" + ag.getId()))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.message").value(Matchers.containsStringIgnoringCase("Não é permitido cancelar")));
     }
 
     @Test
-    void listarHorariosDisponiveis_sucesso() throws Exception {
+    void deveListarHorariosDisponiveisComSucesso() throws Exception {
+        // Given: que há pelo menos um profissional disponível no horário solicitado
+        // And: que informo uma data válida e um serviço existente
         var data = factory
             .proximaData(DayOfWeek.MONDAY, 0, 0)
             .toLocalDate()
             .toString();
                     
+        // When: solicito a listagem de horários disponíveis
+        // Then: o sistema responde sucesso (HTTP 2xx)
+        // And: retorna uma lista de horários disponíveis
         mvc.perform(get(BASE_URL + "horarios-disponiveis")
                 .param("data", data)
                 .param("servicoId", servico.getId().toString()))
@@ -208,15 +241,18 @@ class AgendamentoTestCasesTest {
     }
 
     @Test
-    void listarProfissionaisDisponiveis_sucesso() throws Exception {
-        // assume que endpoint checa os que já têm o serviço associado (se houver tal
-        // vínculo no seu modelo)
-
+    void deveListarProfissionaisDisponiveisComSucesso() throws Exception {
+        // Given: que não informei um profissional explicitamente
+        // And: que há pelo menos um profissional disponível no horário solicitado
+        // And: que informo cliente, serviço e data/hora
         var data = factory
             .proximaData(DayOfWeek.MONDAY, 0, 0)
             .toLocalDate()
             .toString();
         
+        // When: solicito a listagem de profissionais disponíveis
+        // Then: o sistema responde sucesso (HTTP 2xx)
+        // And: retorna pelo menos um profissional disponível
         mvc.perform(get(BASE_URL + "profissionais-disponiveis")
                 .param("data", data)
                 .param("horario", "10:00")
