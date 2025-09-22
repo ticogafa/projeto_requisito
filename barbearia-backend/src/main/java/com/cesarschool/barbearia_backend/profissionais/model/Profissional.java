@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
 import com.cesarschool.barbearia_backend.common.model.Cpf;
 import com.cesarschool.barbearia_backend.common.model.Email;
 import com.cesarschool.barbearia_backend.common.model.Telefone;
