@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import apiClient from '@/services/api';
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
 
 export interface TimeSlot {
   time: string;
@@ -16,23 +18,47 @@ interface CalendarProps {
   bookedSlots?: string[]; // Array of booked times for the selected date
 }
 
-export const Calendar: React.FC<CalendarProps> = ({
+const Calendar: React.FC<CalendarProps> = ({
   selectedDate,
   selectedTime,
   onDateChange,
   onTimeSelect,
   serviceDuration,
+  professionalId,
   bookedSlots = [],
 }) => {
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  
   // Business hours configuration
   const BUSINESS_START = 9 * 60; // 9:00 AM in minutes
   const BUSINESS_END = 19 * 60; // 7:00 PM in minutes  
   const SLOT_DURATION = 30; // 30 minutes per slot
 
+  // Fetch available time slots from API when date or professional changes
+  useEffect(() => {
+    if (!selectedDate || !professionalId) return;
+    
+    setLoading(true);
+    
+    apiClient.getAvailableTimeSlots(
+      selectedDate,
+      parseInt(professionalId),
+      (slots) => {
+        setAvailableSlots(slots);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Failed to fetch available slots:', error);
+        setAvailableSlots([]);
+        setLoading(false);
+      }
+    );
+  }, [selectedDate, professionalId]);
+
   // Generate time slots
   const generateTimeSlots = (): TimeSlot[] => {
     const slots: TimeSlot[] = [];
-    const slotsNeeded = Math.ceil(serviceDuration / SLOT_DURATION);
     const today = new Date();
     const selectedDateObj = new Date(selectedDate);
     const isToday = selectedDateObj.toDateString() === today.toDateString();
@@ -43,7 +69,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       const mins = minutes % 60;
       const timeString = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
       
-      // Check if this slot and required following slots are available
+      // Check if this slot is available
       let available = true;
       
       // Check if it's in the past (for today only)
@@ -51,22 +77,19 @@ export const Calendar: React.FC<CalendarProps> = ({
         available = false;
       }
       
-      // Check if this slot or any required following slots are booked
-      for (let i = 0; i < slotsNeeded; i++) {
-        const checkMinutes = minutes + (i * SLOT_DURATION);
-        const checkHours = Math.floor(checkMinutes / 60);
-        const checkMins = checkMinutes % 60;
-        const checkTimeString = `${checkHours.toString().padStart(2, '0')}:${checkMins.toString().padStart(2, '0')}`;
-        
-        if (bookedSlots.includes(checkTimeString) || checkMinutes >= BUSINESS_END) {
+      // If using API data, check if the slot is in the availableSlots array
+      if (availableSlots.length > 0) {
+        available = availableSlots.includes(timeString);
+      } else {
+        // Fallback to checking against bookedSlots
+        if (bookedSlots.includes(timeString)) {
           available = false;
-          break;
         }
-      }
-      
-      // Don't show slots that would extend beyond business hours
-      if (minutes + (serviceDuration) > BUSINESS_END) {
-        available = false;
+        
+        // Don't show slots that would extend beyond business hours
+        if (minutes + serviceDuration > BUSINESS_END) {
+          available = false;
+        }
       }
       
       slots.push({
@@ -91,6 +114,38 @@ export const Calendar: React.FC<CalendarProps> = ({
   const minDateString = today.toISOString().split('T')[0];
   const maxDateString = maxDate.toISOString().split('T')[0];
 
+  // Render time slots based on conditions
+  const renderTimeSlots = () => {
+    if (loading) {
+      return <LoadingSpinner />;
+    }
+    
+    if (isSunday) {
+      return (
+        <div className="closed">
+          Fechado neste dia. Por favor, escolha uma segunda a sábado.
+        </div>
+      );
+    }
+    
+    return (
+      <div className="slots" aria-label="Available time slots">
+        {timeSlots.map((slot) => (
+          <button
+            key={slot.time}
+            className={`slot ${selectedTime === slot.time ? 'selected' : ''}`}
+            disabled={!slot.available}
+            onClick={() => slot.available && onTimeSelect(slot.time)}
+            aria-pressed={selectedTime === slot.time}
+            title={slot.available ? `Selecionar horário ${slot.time}` : 'Horário indisponível'}
+          >
+            {slot.time}
+          </button>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="calendar">
       <div className="field">
@@ -108,26 +163,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       
       <div className="time-slots">
         <h3>Horários disponíveis</h3>
-        {isSunday ? (
-          <div className="closed">
-            Fechado neste dia. Por favor, escolha uma segunda a sábado.
-          </div>
-        ) : (
-          <div className="slots" aria-label="Available time slots">
-            {timeSlots.map((slot) => (
-              <button
-                key={slot.time}
-                className={`slot ${selectedTime === slot.time ? 'selected' : ''}`}
-                disabled={!slot.available}
-                onClick={() => slot.available && onTimeSelect(slot.time)}
-                aria-pressed={selectedTime === slot.time}
-                title={slot.available ? `Selecionar horário ${slot.time}` : 'Horário indisponível'}
-              >
-                {slot.time}
-              </button>
-            ))}
-          </div>
-        )}
+        {renderTimeSlots()}
       </div>
     </div>
   );

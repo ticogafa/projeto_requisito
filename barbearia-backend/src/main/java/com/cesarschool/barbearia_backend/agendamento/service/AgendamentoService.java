@@ -56,6 +56,14 @@ public class AgendamentoService {
         return mapper.toResponse(agendamento);
     }
 
+    public List<AgendamentoResponse> listarTodos() {
+        return repository
+        .findAll()
+        .stream()
+        .map(mapper::toResponse)
+        .toList();
+    }
+
     /**
      * Regras de negócio para verificar conflito de horário:
      * 1. Não pode haver dois agendamentos para o mesmo profissional no mesmo horário

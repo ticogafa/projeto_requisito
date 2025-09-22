@@ -14,48 +14,42 @@ export const ProductList: React.FC<ProductListProps> = ({ showLowStockOnly = fal
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const response = showLowStockOnly 
-          ? await apiClient.getProductsLowStock()
-          : await apiClient.getProducts();
-        
-        if (response.success && response.data) {
-          setProducts(response.data);
-        } else {
-          setError(response.error || 'Failed to fetch products');
-        }
-      } catch (err) {
-        console.error('Error fetching products:', err);
-        setError('Error connecting to server');
-      } finally {
-        setLoading(false);
-      }
+    setLoading(true);
+    setError(null);
+    
+    const onSuccess = (data: Product[]) => {
+      setProducts(data);
+      setLoading(false);
     };
-
-    fetchProducts();
+    
+    const onError = (errorMsg: string) => {
+      setError(errorMsg || 'Failed to fetch products');
+      setLoading(false);
+    };
+    
+    if (showLowStockOnly) {
+      apiClient.getProductsLowStock(onSuccess, onError);
+    } else {
+      apiClient.getProducts(onSuccess, onError);
+    }
   }, [showLowStockOnly]);
 
-  const handleStockUpdate = async (productId: number, quantidade: number) => {
-    try {
-      const response = await apiClient.updateProductStock(productId, quantidade);
-      if (response.success && response.data) {
+  const handleStockUpdate = (productId: number, quantidade: number) => {
+    apiClient.updateProductStock(
+      productId, 
+      quantidade,
+      (updatedProduct) => {
         // Update the product in local state
         setProducts(prev => 
           prev.map(product => 
-            product.id === productId ? response.data! : product
+            product.id === productId ? updatedProduct : product
           )
         );
-      } else {
-        alert('Failed to update stock: ' + response.error);
+      },
+      (errorMsg) => {
+        alert('Failed to update stock: ' + errorMsg);
       }
-    } catch (error) {
-      console.error('Error updating stock:', error);
-      alert('Error updating stock');
-    }
+    );
   };
 
   if (loading) {

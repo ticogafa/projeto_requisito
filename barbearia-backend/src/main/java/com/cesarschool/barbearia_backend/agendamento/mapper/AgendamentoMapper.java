@@ -6,7 +6,13 @@ import com.cesarschool.barbearia_backend.agendamento.dto.AgendamentoDTOs.Agendam
 import com.cesarschool.barbearia_backend.agendamento.dto.AgendamentoDTOs.CriarAgendamentoRequest;
 import com.cesarschool.barbearia_backend.agendamento.model.Agendamento;
 import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
+import com.cesarschool.barbearia_backend.marketing.dto.ClienteDTOs.ClienteResponse;
+import com.cesarschool.barbearia_backend.marketing.mapper.ClienteMapper;
 import com.cesarschool.barbearia_backend.marketing.model.Cliente;
+import com.cesarschool.barbearia_backend.profissionais.dto.ProfissionalDTOs.ProfissionalResponse;
+import com.cesarschool.barbearia_backend.profissionais.dto.ServicoDTOs.ServicoResponse;
+import com.cesarschool.barbearia_backend.profissionais.mapper.ProfissionalMapper;
+import com.cesarschool.barbearia_backend.profissionais.mapper.ServicoMapper;
 import com.cesarschool.barbearia_backend.profissionais.model.Profissional;
 import com.cesarschool.barbearia_backend.profissionais.model.ServicoOferecido;
 
@@ -35,23 +41,14 @@ public class AgendamentoMapper {
         response.setObservacoes(agendamento.getObservacoes());
         
         // Dados do cliente
-        Cliente cliente = agendamento.getCliente();
-        response.setClienteId(cliente.getId());
-        response.setClienteNome(cliente.getNome());
-        response.setClienteEmail(cliente.getEmail());
-        response.setClienteTelefone(cliente.getTelefone());
+        ClienteResponse cliente = ClienteMapper.toResponse(agendamento.getCliente());
+        response.setCliente(cliente);
         
-        // Dados do profissional
-        Profissional profissional = agendamento.getProfissional();
-        response.setProfissionalId(profissional.getId());
-        response.setProfissionalNome(profissional.getNome());
-        response.setProfissionalEmail(profissional.getEmail());
-        // Dados do serviço
-        ServicoOferecido servico = agendamento.getServico();
-        response.setServicoId(servico.getId());
-        response.setServicoNome(servico.getNome());
-        response.setServicoPreco(servico.getPreco());
-        response.setServicoDuracaoMinutos(servico.getDuracaoMinutos());
+        ProfissionalResponse profissional = ProfissionalMapper.toResponse(agendamento.getProfissional());
+        response.setProfissional(profissional);
+
+        ServicoResponse servico = ServicoMapper.toResponse(agendamento.getServico());
+        response.setServico(servico);
         
         return response;
     }

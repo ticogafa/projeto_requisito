@@ -50,6 +50,12 @@ public class AgendamentoController {
         return ResponseEntity.ok(agendamento);
     }
 
+    @GetMapping
+    public ResponseEntity<List<AgendamentoResponse>> listarTodos() {
+        var agendamentos = agendamentoService.listarTodos();
+        return ResponseEntity.ok(agendamentos);
+    }
+
     /**
      * Confirma um agendamento específico.
      *

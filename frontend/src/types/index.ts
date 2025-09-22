@@ -1,15 +1,11 @@
-// Authentication types
+export type Union<T, K> = T | K;
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  phone?: string;
-  points: number;
-  role: 'client' | 'professional';
-  createdAt: Date;
 }
 
-// Service types (based on ServicoOferecido and ServicoDTOs)
 export interface Servico {
   id: number;
   nome: string;
@@ -18,13 +14,6 @@ export interface Servico {
   descricao: string;
 }
 
-export interface ServicoResponse {
-  id: number;
-  nome: string;
-  preco: number;
-  duracaoMinutos: number;
-  descricao: string;
-}
 
 export interface CriarServicoRequest {
   nome: string;
@@ -33,17 +22,8 @@ export interface CriarServicoRequest {
   descricao: string;
 }
 
-// Professional types (based on Profissional and ProfissionalDTOs)
 export interface Profissional {
-  id: number;
-  nome: string;
-  email: string;
-  cpf: string;
-  telefone: string;
-}
-
-export interface ProfissionalResponse {
-  id: number;
+  id: number | string;
   nome: string;
   email: string;
   cpf: string;
@@ -78,27 +58,6 @@ export interface Agendamento {
   servico: Servico;
 }
 
-export interface AgendamentoResponse {
-  id: number;
-  dataHora: string; // ISO date string
-  status: StatusAgendamento;
-  observacoes?: string;
-  // Client data
-  clienteId: number;
-  clienteNome: string;
-  clienteEmail: string;
-  clienteTelefone: string;
-  // Professional data
-  profissionalId: number;
-  profissionalNome: string;
-  profissionalEmail: string;
-  // Service data
-  servicoId: number;
-  servicoNome: string;
-  servicoPreco: number;
-  servicoDuracaoMinutos: number;
-}
-
 export interface CriarAgendamentoRequest {
   dataHora: string; // ISO date string
   clienteId: number;
@@ -109,10 +68,6 @@ export interface CriarAgendamentoRequest {
 
 export type StatusAgendamento = 'AGENDADO' | 'CONFIRMADO' | 'CANCELADO' | 'CONCLUIDO';
 
-// Schedule types for legacy compatibility
-export interface Schedule {
-  [dayOfWeek: string]: TimeSlot[];
-}
 
 export interface TimeSlot {
   time: string; // "09:00"
@@ -120,31 +75,18 @@ export interface TimeSlot {
   appointmentId?: string;
 }
 
-// Legacy types for backward compatibility with existing components
-export interface Professional {
-  id: string;
-  name: string;
-  services: string[]; // service IDs
-  avatar?: string;
-  rating?: number;
-  schedule: Schedule;
+export interface Profissional {
+  id: number | string;
+  nome: string;
+  email: string;
+  cpf: string;
+  telefone: string;
+  servicos?: []; // service IDs
 }
 
-export interface Appointment {
-  id: string;
-  clientId: string;
-  professionalId: string;
-  serviceId: string;
-  date: string; // ISO date string
-  time: string; // "09:00"
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  notes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 // Product types
-export interface Product {
+export interface Produto {
   id: number;
   nome: string;
   preco: number;
@@ -152,21 +94,6 @@ export interface Product {
   estoqueMinimo: number;
   descricao?: string;
   categoria?: string;
-}
-
-// Loyalty types
-export interface LoyaltyProgram {
-  pointsBalance: number;
-  vouchers: Voucher[];
-  tier: 'bronze' | 'silver' | 'gold';
-}
-
-export interface Voucher {
-  id: string;
-  title: string;
-  discount: number; // percentage
-  expiresAt: Date;
-  isUsed: boolean;
 }
 
 // API Response types
@@ -179,12 +106,3 @@ export interface ApiResponse<T> {
 
 // Common types
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
-
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  hasNext: boolean;
-  hasPrevious: boolean;
-}

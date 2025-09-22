@@ -104,7 +104,7 @@ class AgendamentoTestCasesTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.status").value("PENDENTE"))
-                .andExpect(jsonPath("$.profissionalNome").value("João Barbeiro"))
+                .andExpect(jsonPath("$.profissional.nome").value("João Barbeiro"))
                 .andReturn();
 
         System.out.println("Response: " + result.getResponse().getContentAsString());

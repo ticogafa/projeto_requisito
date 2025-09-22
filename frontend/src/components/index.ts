@@ -1,6 +1,6 @@
 // Main app components  
-export { default as LoginForm } from '@/components/LoginForm';
-export { default as Dashboard } from '@/components/Dashboard';
+export { default as LoginForm } from '@/components/LoginForm/LoginForm';
+export { default as Dashboard } from '@/components/Dashboard/Dashboard';
 export { default as ProtectedRoute } from '@/components/ProtectedRoute';
 
 // Component library
@@ -17,6 +17,5 @@ export { BookingList } from '@/components/BookingList/BookingList';
 
 // Type Exports
 export type { Service } from '@/components/ServiceSelection/ServiceSelection';
-export type { Professional } from '@/components/ProfessionalSelection/ProfessionalSelection';
 export type { TimeSlot } from '@/components/Calendar/Calendar';
 export type { Booking } from '@/components/BookingList/BookingList';

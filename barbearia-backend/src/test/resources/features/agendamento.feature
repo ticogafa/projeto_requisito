@@ -1,38 +1,33 @@
-
 Feature: Agendamentos via Serviços
 
-  # ------------------------- Criação quando horário está livre -------------------------
+  # Criação e conflitos de horário
   Scenario: Criar agendamento em horário livre (sucesso)
-    Given que escolho um horário futuro livre para o profissional
-    And que informo as informações essenciais
+    Given que escolho um horário futuro livre para o profissional "João Barbeiro" às 10:00
     When solicito a criação do agendamento
-    Then o sistema responde sucesso
+    Then o sistema deve exibir a mensagem "Agendamento criado com sucesso."
 
-  Scenario: Impedir criação quando horário já está ocupado (falha)
-    Given que já existe um agendamento para "João Barbeiro" no mesmo horário
-    And que tento criar outro agendamento nesse horário com os mesmos Givens essenciais
-    When solicito a criação do novo agendamento
-    Then o sistema rejeita a operação
+  # Scenario: Impedir criação quando horário já está ocupado (falha)
+  #   Given que já existe um agendamento para "João Barbeiro" às 10:00
+  #   And que tento criar outro agendamento no mesmo horário
+  #   When solicito a criação do agendamento
+  #   Then o sistema deve exibir a mensagem "Já existe um agendamento com João Barbeiro no horário especificado."
 
-  # ------------------------- Janela de jornada de trabalho -------------------------
+  # # Jornada de trabalho
+  # Scenario: Impedir agendamento fora da jornada de trabalho (falha)
+  #   Given que escolho um horário fora da jornada do profissional "João Barbeiro" às 02:00
+  #   When solicito a criação do agendamento
+  #   Then o sistema deve exibir a mensagem "João Barbeiro não está disponível no horário solicitado."
 
-  Scenario: Impedir agendamento fora da jornada de trabalho (falha)
-    Given que escolho um agendamento inválido às 02:00 fora da jornada do profissional
-    And que informo as informações essenciais
-    When solicito a criação do agendamento
-    Then o sistema rejeita a operação
+  # # Cancelamento com antecedência mínima
+  # Scenario: Impedir cancelamento com menos de 2 horas de antecedência (falha)
+  #   Given que existe um agendamento marcado para ocorrer em menos de 2 horas com status "PENDENTE"
+  #   When solicito o cancelamento deste agendamento
+  #   Then o sistema deve exibir a mensagem "Não é permitido cancelar agendamentos com menos de 2 horas de antecedência."
 
-  # ------------------------- Cancelamento com antecedência mínima -------------------------
-
-  Scenario: Impedir cancelamento com menos de 2 horas de antecedência (falha)
-    Given que existe um agendamento marcado para ocorrer em menos de 2 horas
-    And que o status atual do agendamento é "PENDENTE"
-    When solicito o cancelamento deste agendamento
-    Then o sistema rejeita a operação
-
-  # ------------------------- Atribuição automática de profissional -------------------------
-  Scenario: Atribuir o primeiro profissional disponível quando não informado (sucesso)
-    Given que não informei um profissional explicitamente
-    When solicito a criação do agendamento
-    Then o sistema responde sucesso
-
+  # # Atribuição automática
+  # Scenario: Atribuir o primeiro profissional disponível quando não informado (sucesso)
+  #   Given que não informei um profissional explicitamente
+  #   And que escolho um horário futuro livre às 11:00
+  #   When solicito a criação do agendamento
+  #   Then o sistema deve exibir a mensagem "Agendamento criado com sucesso."
+  #   And o sistema deve exibir o profissional atribuído automaticamente

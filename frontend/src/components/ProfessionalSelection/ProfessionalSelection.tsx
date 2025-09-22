@@ -1,11 +1,6 @@
+import type { Professional } from '@/types';
 import React from 'react';
 
-export interface Professional {
-  id: string;
-  name: string;
-  role: string;
-  avatar?: string;
-}
 
 interface ProfessionalSelectionProps {
   professionals: Professional[];
@@ -18,6 +13,10 @@ export const ProfessionalSelection: React.FC<ProfessionalSelectionProps> = ({
   selectedProfessional,
   onSelect,
 }) => {
+  if (professionals.length === 0) {
+    return <div className="no-professionals">Nenhum profissional disponível</div>;
+  }
+  
   return (
     <div className="pro-list" role="radiogroup" aria-label="Professional">
       {professionals.map((pro) => (
@@ -38,10 +37,11 @@ export const ProfessionalSelection: React.FC<ProfessionalSelectionProps> = ({
           </div>
           <div className="meta">
             <span className="name">{pro.name}</span>
-            <span className="role">{pro.role}</span>
           </div>
         </label>
       ))}
     </div>
   );
 };
+
+export default ProfessionalSelection;

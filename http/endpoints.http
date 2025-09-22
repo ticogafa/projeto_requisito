@@ -96,7 +96,7 @@ POST {{baseUrl}}/profissionais/1/horarios
 Content-Type: application/json
 
 {
-  "diaSemana": "SABADO",
+  "diaSemana": "SEGUNDA",
   "horaInicio": "08:00",
   "inicioPausa": "12:00",
   "horaFim": "18:00",
@@ -210,6 +210,9 @@ Content-Type: application/json
 
 ### Buscar Agendamento por ID (ID = 1)
 GET {{baseUrl}}/agendamentos/1
+
+### Listar Todos os Agendamentos
+GET {{baseUrl}}/agendamentos
 
 ### Buscar Agendamento por ID (ID = 2)
 GET {{baseUrl}}/agendamentos/2

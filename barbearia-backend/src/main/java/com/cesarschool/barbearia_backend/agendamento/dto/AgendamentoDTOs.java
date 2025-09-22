@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 
 
 import com.cesarschool.barbearia_backend.common.enums.StatusAgendamento;
+import com.cesarschool.barbearia_backend.marketing.dto.ClienteDTOs.ClienteResponse;
+import com.cesarschool.barbearia_backend.profissionais.dto.ProfissionalDTOs.ProfissionalResponse;
+import com.cesarschool.barbearia_backend.profissionais.dto.ServicoDTOs.ServicoResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,21 +35,9 @@ public class AgendamentoDTOs {
         private String observacoes;
         
         // Dados do cliente
-        private Integer clienteId;
-        private String clienteNome;
-        private String clienteEmail;
-        private String clienteTelefone;
-        
-        // Dados do profissional
-        private Integer profissionalId;
-        private String profissionalNome;
-        private String profissionalEmail;
-        
-        // Dados do serviço
-        private Integer servicoId;
-        private String servicoNome;
-        private java.math.BigDecimal servicoPreco;
-        private Integer servicoDuracaoMinutos;
+        private ClienteResponse cliente;
+        private ProfissionalResponse profissional;
+        private ServicoResponse servico;
     }
 
     @Data
