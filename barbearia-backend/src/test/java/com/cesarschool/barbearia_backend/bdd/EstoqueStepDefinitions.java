@@ -123,9 +123,9 @@ public class EstoqueStepDefinitions extends CucumberSpringContext {
         resposta.andExpect(status().is4xxClientError());
     }
 
-    @Then("exibe a mensagem: {string}")
-    public void exibe_a_mensagem(String mensagem) throws Exception {
-        // Handler global retorna campo 'message'
+    @Then("é exibida a mensagem de erro: {string}")
+    public void mensagem_de_erro_estoque(String mensagem) throws Exception {
+        // Reuso da asserção específica para contexto de estoque/PDV
         resposta.andExpect(jsonPath("$.message").value(mensagem));
     }
 }

@@ -32,29 +32,20 @@
 	</properties>
 	<dependencies>
 		
-		<!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-java -->
+		<!-- Cucumber stack unificada -->
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-java</artifactId>
-			<version>7.28.2</version>
+			<version>7.14.0</version>
 			<scope>test</scope>
 		</dependency>
-		
-		<!-- Cucumber JUnit Integration -->
-		<dependency>
-			<groupId>io.cucumber</groupId>
-			<artifactId>cucumber-junit</artifactId>
-			<version>7.28.2</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<!-- Cucumber Spring Integration -->
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-spring</artifactId>
-			<version>7.28.2</version>
+			<version>7.14.0</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- JUnit Platform Engine já presente abaixo -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

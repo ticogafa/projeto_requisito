@@ -22,5 +22,4 @@ Feature: Gestão de Estoque e PDV
     And que monto uma venda PDV com 5 unidades do produto "Pomada Forte" preço unitário 30.00
     When eu envio a venda para registro
     Then o sistema rejeita a operação
-    And exibe a mensagem: "Estoque insuficiente para o produto: Pomada Forte"
-
+    And é exibida a mensagem de erro: "Estoque insuficiente para o produto: Pomada Forte"
