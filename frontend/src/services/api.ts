@@ -7,7 +7,7 @@ import type { User } from 'firebase/auth';
 export type SuccessCallback<T> = (data: T) => void;
 export type ErrorCallback = (error: string) => void;
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE_URL = 'http://localhost:8080/api';
 
 class ApiClient {
   private readonly axiosInstance: AxiosInstance;
@@ -291,7 +291,7 @@ class ApiClient {
     onError: ErrorCallback
   ): void {
     this.request<string[]>(
-      `/agendamentos/horarios-disponiveis?data=${data}&servicoOferecidoId=${servicoOferecidoId}`,
+      `/agendamentos/horarios-disponiveis?data=${data}&servicoId=${servicoOferecidoId}`,
       {},
       onSuccess,
       onError
@@ -306,7 +306,7 @@ class ApiClient {
     onError: ErrorCallback
   ): void {
     this.request<Profissional[]>(
-      `/agendamentos/profissionais-disponiveis?data=${data}&horario=${horario}&servicoOferecidoId=${servicoOferecidoId}`,
+      `/agendamentos/profissionais-disponiveis?data=${data}&horario=${horario}&servicoId=${servicoOferecidoId}`,
       {},
       onSuccess,
       onError

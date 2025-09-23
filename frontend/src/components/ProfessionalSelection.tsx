@@ -1,6 +1,10 @@
-import type { Professional } from '@/types';
 import React from 'react';
 
+interface Professional {
+  id: string;
+  name: string;
+  avatar?: string;
+}
 
 interface ProfessionalSelectionProps {
   professionals: Professional[];

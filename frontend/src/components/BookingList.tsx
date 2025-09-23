@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export interface Booking {
   id: string;

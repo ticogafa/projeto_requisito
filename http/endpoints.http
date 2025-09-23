@@ -234,23 +234,15 @@ PATCH {{baseUrl}}/agendamentos/cancelar-agendamento/3
 ### ============================================================
 
 ### Listar horários disponíveis para Serviço 1 em 22/09/2025
-GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-20&servicoOferecidoId=1
+GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-27&servicoId=1
 
-### Listar horários disponíveis para Serviço 2 em 22/09/2025
-GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-20&servicoOferecidoId=1
-
-### Listar horários disponíveis para Serviço 1 em 23/09/2025
-GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-23&servicoOferecidoId=1
-
-### Listar horários disponíveis para Serviço 2 em 23/09/2025
-GET {{baseUrl}}/agendamentos/horarios-disponiveis?data=2025-09-23&servicoOferecidoId=2
 
 ### ============================================================
 ### PROFISSIONAIS DISPONÍVEIS - Novos Endpoints
 ### ============================================================
 
 ### Listar profissionais disponíveis para Serviço 1 às 14:30 em 22/09/2025
-GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-22&horario=14:30&servicoOferecidoId=1
+GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-27&horario=14:30&servicoId=1
 
 ### Listar profissionais disponíveis para Serviço 2 às 15:00 em 22/09/2025
 GET {{baseUrl}}/agendamentos/profissionais-disponiveis?data=2025-09-22&horario=15:00&servicoOferecidoId=2

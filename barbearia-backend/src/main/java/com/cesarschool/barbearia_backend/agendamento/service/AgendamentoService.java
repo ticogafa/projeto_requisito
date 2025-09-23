@@ -197,8 +197,9 @@ public class AgendamentoService {
         if (cancelandoComMenosDeDuasHoras) {
             throw new IllegalArgumentException("Não é permitido cancelar agendamentos com menos de 2 horas de antecedência.");
         } else if (confirmacaoDeAgendamentoPassado) {
+            // Não salvar dentro do método de validação para evitar o rollback inesperado
             agendamento.setStatus(StatusAgendamento.CANCELADO);
-            repository.save(agendamento);
+            // Removendo a linha de repository.save para evitar operações de banco durante a validação
             throw new IllegalArgumentException("Não é possível confirmar um agendamento que já passou.");
         }
     }
@@ -227,12 +228,12 @@ public class AgendamentoService {
         // Converter DTO para entidade
         Agendamento agendamento = mapper.toEntity(request, cliente, profissional, servico);
         
-        // Apply full validation for new agendamentos
+        // Realize todas as validações antes de persistir
         this.verificarConflitoHorario(agendamento.getDataHora(), agendamento.getProfissional().getId());
         this.verificarConflitoProfissional(agendamento.getProfissional(), agendamento.getDataHora());
         this.verificarAlteracaoStatus(agendamento);
         
-        // Salvar o agendamento
+        // Se chegou aqui, não houve exceções e podemos salvar
         Agendamento agendamentoSalvo = repository.save(agendamento);
         
         // Converter para DTO de resposta
@@ -252,12 +253,19 @@ public class AgendamentoService {
      */
     public AgendamentoResponse confirmarAgendamento(Integer id) {
         Agendamento agendamento = buscarEntidadePorId(id);
+        
+        // Criar uma cópia para validação sem afetar a entidade original ainda
+        Agendamento agendamentoParaValidar = new Agendamento();
+        agendamentoParaValidar.setDataHora(agendamento.getDataHora());
+        agendamentoParaValidar.setStatus(StatusAgendamento.CONFIRMADO);
+        
+        // Validar antes de atualizar a entidade real
+        this.verificarAlteracaoStatus(agendamentoParaValidar);
+        
+        // Se passou na validação, atualiza a entidade real
         agendamento.setStatus(StatusAgendamento.CONFIRMADO);
-        
-        // Only validate status change rules for confirmation
-        this.verificarAlteracaoStatus(agendamento);
-        
         Agendamento agendamentoSalvo = repository.save(agendamento);
+        
         return mapper.toResponse(agendamentoSalvo);
     }
 
@@ -273,12 +281,19 @@ public class AgendamentoService {
      */
     public AgendamentoResponse cancelarAgendamento(Integer id) {
         Agendamento agendamento = buscarEntidadePorId(id);
+        
+        // Criar uma cópia para validação sem afetar a entidade original ainda
+        Agendamento agendamentoParaValidar = new Agendamento();
+        agendamentoParaValidar.setDataHora(agendamento.getDataHora());
+        agendamentoParaValidar.setStatus(StatusAgendamento.CANCELADO);
+        
+        // Validar antes de atualizar a entidade real
+        this.verificarAlteracaoStatus(agendamentoParaValidar);
+        
+        // Se passou na validação, atualiza a entidade real
         agendamento.setStatus(StatusAgendamento.CANCELADO);
-        
-        // Only validate status change rules for cancellation
-        this.verificarAlteracaoStatus(agendamento);
-        
         Agendamento agendamentoSalvo = repository.save(agendamento);
+        
         return mapper.toResponse(agendamentoSalvo);
     }
 

@@ -1,7 +1,7 @@
 import { useState, type FC, type FormEvent } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
-import Logo from '@/components/Logo/Logo';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import Logo from '@/components/Logo';
 import { getFirebaseErrorMessage } from '@/utils';
 
 const LoginForm: FC = () => {

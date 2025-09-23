@@ -3,6 +3,7 @@ package com.cesarschool.barbearia_backend.agendamento.rest.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/agendamentos")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class AgendamentoController {
 
     private final AgendamentoService agendamentoService;
@@ -91,7 +93,7 @@ public class AgendamentoController {
     @GetMapping("/horarios-disponiveis")
     public ResponseEntity<List<String>> listarHorariosDisponiveis(
             @RequestParam String data,
-            @RequestParam Integer servicoId) {
+            @RequestParam() Integer servicoId) {
         var horarios = agendamentoService.listarHorariosDisponiveis(data, servicoId);
         return ResponseEntity.ok(horarios);
     }

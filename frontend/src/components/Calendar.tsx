@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '@/services/api';
-import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export interface TimeSlot {
   time: string;

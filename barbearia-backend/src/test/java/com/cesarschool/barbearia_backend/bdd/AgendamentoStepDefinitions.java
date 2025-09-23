@@ -100,11 +100,11 @@ public class AgendamentoStepDefinitions extends CucumberSpringContext {
         } else {
             // Se não houve exceção, verificar se o agendamento foi criado com sucesso
             assertNotNull(agendamentoResponse, "O agendamento deveria ter sido criado com sucesso");
-            assertEquals(cliente.getId(), agendamentoResponse.getClienteId(),
+            assertEquals(cliente.getId(), agendamentoResponse.getCliente().getId(),
                 "O ID do cliente no agendamento deveria corresponder");
-            assertEquals(profissional.getId(), agendamentoResponse.getProfissionalId(),
+            assertEquals(profissional.getId(), agendamentoResponse.getProfissional().getId(),
                 "O ID do profissional no agendamento deveria corresponder");
-            assertEquals(servico.getId(), agendamentoResponse.getServicoId(),
+            assertEquals(servico.getId(), agendamentoResponse.getServico().getId(),
                 "O ID do serviço no agendamento deveria corresponder");
         }
     }
