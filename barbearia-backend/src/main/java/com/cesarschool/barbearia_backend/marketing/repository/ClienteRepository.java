@@ -9,8 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.cesarschool.barbearia_backend.marketing.model.Cliente;
-import com.cesarschool.barbearia_backend.profissionais.model.Profissional;
-
 
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Integer> {

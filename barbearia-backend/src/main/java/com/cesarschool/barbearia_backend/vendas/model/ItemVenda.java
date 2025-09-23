@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 import com.cesarschool.barbearia_backend.common.enums.TipoVenda;
 import com.cesarschool.barbearia_backend.profissionais.model.ServicoOferecido;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -37,6 +38,7 @@ public class ItemVenda {
     @NonNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "venda_id", nullable = false)
+    @JsonIgnore // evita recursão infinita na serialização (Venda -> itens -> venda -> ...)
     private Venda venda;
     
     @ManyToOne
