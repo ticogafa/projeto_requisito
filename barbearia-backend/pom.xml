@@ -81,18 +81,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-  <groupId>io.cucumber</groupId>
-  <artifactId>cucumber-java</artifactId>
-  <version>7.14.0</version>
-  <scope>test</scope>
-</dependency>
-<dependency>
-  <groupId>io.cucumber</groupId>
-  <artifactId>cucumber-spring</artifactId>
-  <version>7.14.0</version>
-  <scope>test</scope>
-</dependency>
 <!-- JUnit 5 runner p/ Cucumber -->
 <dependency>
   <groupId>io.cucumber</groupId>
@@ -104,7 +92,6 @@
 <dependency>
   <groupId>org.junit.platform</groupId>
   <artifactId>junit-platform-suite</artifactId>
-  <version>1.10.2</version>
   <scope>test</scope>
 </dependency>
 		<dependency>
@@ -166,6 +153,20 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.2.5</version>
 			</plugin>
+			
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 			
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
