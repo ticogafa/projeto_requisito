@@ -1,7 +1,6 @@
 package com.cesarschool.barbearia_backend.profissionais.service;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import com.cesarschool.barbearia_backend.common.constants.ErrorMessages;

@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '@/services/api';
-import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
-import type { Product } from '@/types';
-import './ProductList.css';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import type { Produto } from '@/types';
+
+interface Product {
+  id: number;
+  nome: string;
+  preco: number;
+  estoque: number;
+  estoqueMinimo: number;
+}
 
 interface ProductListProps {
   showLowStockOnly?: boolean;
@@ -35,21 +42,20 @@ export const ProductList: React.FC<ProductListProps> = ({ showLowStockOnly = fal
   }, [showLowStockOnly]);
 
   const handleStockUpdate = (productId: number, quantidade: number) => {
-    apiClient.updateProductStock(
-      productId, 
-      quantidade,
-      (updatedProduct) => {
-        // Update the product in local state
-        setProducts(prev => 
-          prev.map(product => 
-            product.id === productId ? updatedProduct : product
-          )
-        );
-      },
-      (errorMsg) => {
-        alert('Failed to update stock: ' + errorMsg);
-      }
-    );
+    // apiClient.updateProductStock(
+    //   productId, 
+    //   quantidade,
+    //   (updatedProduct: Produto) => {
+    //     // Update the product in local state
+    //     const updatedProducts = products.map(product => 
+    //       product.id === productId ? updatedProduct : product
+    //     );
+    //     setProducts(updatedProducts);
+    //   },
+    //   (errorMsg) => {
+    //     alert('Failed to update stock: ' + errorMsg);
+    //   }
+    // );
   };
 
   if (loading) {

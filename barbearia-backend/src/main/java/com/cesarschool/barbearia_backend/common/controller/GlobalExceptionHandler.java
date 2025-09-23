@@ -60,6 +60,16 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalState(RuntimeException ex) {
+        // Casos como estoque insuficiente lançam IllegalStateException no domínio
+        return this.buildResponse(
+            HttpStatus.BAD_REQUEST,
+            "invalid_state",
+            ex.getMessage()
+        );
+    }
+
     @ExceptionHandler({
         EntityNotFoundException.class,
         NotFoundException.class

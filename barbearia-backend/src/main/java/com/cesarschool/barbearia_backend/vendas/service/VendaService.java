@@ -101,7 +101,8 @@ public class VendaService {
         for (ItemVenda i : itens) {
             total = total.add(i.getPrecoTotal());
         }
-        venda.setValorTotal(total);
+    // garante total não nulo
+    venda.setValorTotal(total == null ? BigDecimal.ZERO : total);
         venda.setItens(itens);
 
         Venda saved = repository.save(venda);

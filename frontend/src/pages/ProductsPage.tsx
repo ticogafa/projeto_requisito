@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import ProductList from '@/components/ProductList/ProductList';
-import './ProductsPage.css';
+import ProductList from '@/components/ProductList';
 
 const ProductsPage: React.FC = () => {
   const [showLowStockOnly, setShowLowStockOnly] = useState(false);

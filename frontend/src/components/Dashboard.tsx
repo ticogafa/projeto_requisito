@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Header } from '@/components/Header/Header';
-import { ProfessionalSelection } from '@/components/ProfessionalSelection/ProfessionalSelection';
-import { ServiceSelection } from '@/components/ServiceSelection/ServiceSelection';
-import Calendar from '@/components/Calendar/Calendar';
-import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
+import { Header } from '@/components/Header';
+import { ProfessionalSelection } from '@/components/ProfessionalSelection';
+import { ServiceSelection } from '@/components/ServiceSelection';
+import Calendar from '@/components/Calendar';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import apiClient from '@/services/api';
 import type { Agendamento, Profissional, Servico, CriarAgendamentoRequest } from '@/types';
 
@@ -39,11 +39,12 @@ const Dashboard: React.FC = () => {
   const [profissionaisDisponiveis, setProfissionaisDisponiveis] = useState<Profissional[]>([]);
   const [profissionaisDisponiveisLoading, setProfissionaisDisponiveisLoading] = useState(false);
 
-  // Carregar serviços da API
+  // IMPLEMENT SERVICOS
   useEffect(() => {
     setServicosLoading(true);
     
-    const successCallback = (servicos: Servico[]) => {        
+    const successCallback = (servicos: Servico[]) => {       
+      console.log('Serviços carregados:', servicos); 
       setServicos(servicos);
       if (servicos.length > 0) {
         setFormData(prev => ({ ...prev, servicoId: servicos[0].id }));
@@ -60,47 +61,41 @@ const Dashboard: React.FC = () => {
     apiClient.getServices(successCallback, errorCallback);
   }, []);
 
-  // Carregar profissionais da API
+  // IMPLEMENT PROFISSIONAIS
   useEffect(() => {
-    setProfissionaisLoading(true);
-
     const successCallback = (response: Profissional[]) => {
       setProfissionais(response);
-      setProfissionaisLoading(false);
     };
 
     const errorCallback = (error: string) => {
       console.error('Falha ao buscar profissionais:', error);
       setProfissionais([]);
-      setProfissionaisLoading(false);
     };
 
     apiClient.getProfessionals(successCallback, errorCallback);
   }, []);
 
-  // Buscar horários disponíveis quando a data ou serviço mudar
+  // IMPLEMENT BUSCAR HORARIOS CONFORME DATA MUDA
   useEffect(() => {
     if (!formData.data || !formData.servicoId) return;
     
-    setHorarioLoading(true);
     setHorarios([]);
     
     apiClient.getAvailableTimeSlots(
       formData.data,
       formData.servicoId,
       (horarios) => {
+        console.log('Horários disponíveis:', horarios);
         setHorarios(horarios);
-        setHorarioLoading(false);
       },
       (error) => {
         console.error('Falha ao buscar horários disponíveis:', error);
         setHorarios([]);
-        setHorarioLoading(false);
       }
     );
   }, [formData.data, formData.servicoId]);
 
-  // Buscar profissionais disponíveis quando a data, horário ou serviço mudar
+  // IMPLEMENT BUSCAR PROFISSIONAIS DISPONÍVEIS QUANDO A DATA, HORÁRIO OU SERVIÇO MUDAR
   useEffect(() => {
     if (!formData.data || !formData.horario || !formData.servicoId) return;
     
@@ -188,10 +183,8 @@ const Dashboard: React.FC = () => {
       observacoes: formData.observacoes
     };
     
-    // Chamar API para criar o agendamento
+    // IMPLEMENT CRIAR AGENDAMENTO
     const successCallback = (agendamento: Agendamento) => {
-      setAgendamentos(prev => [...prev, agendamento]);
-      
       // Exibir mensagem de sucesso
       setMensagem(`Agendamento criado com sucesso para ${new Date(agendamento.dataHora).toLocaleString('pt-BR')}`);
       
@@ -285,21 +278,31 @@ const Dashboard: React.FC = () => {
 
           <div className="section">
             <h2>3. Escolha um profissional</h2>
-            {profissionaisDisponiveisLoading ? (
-              <LoadingSpinner />
-            ) : profissionaisDisponiveis.length > 0 ? (
-              <ProfessionalSelection
-                professionals={profissionaisDisponiveis}
-                selectedProfessional={formData.profissionalId.toString()}
-                onSelect={handleProfissionalSelect}
-              />
-            ) : (
-              <div className="empty-state">
-                {formData.data && formData.horario 
-                  ? "Nenhum profissional disponível neste horário. Por favor, escolha outro horário." 
-                  : "Selecione uma data e horário para ver os profissionais disponíveis."}
-              </div>
-            )}
+            {(() => {
+              if (profissionaisDisponiveisLoading) {
+                return <LoadingSpinner />;
+              }
+              if (profissionaisDisponiveis.length > 0) {
+                return (
+                  <ProfessionalSelection
+                    professionals={profissionaisDisponiveis.map(p => ({
+                      id: p.id.toString(),
+                      name: p.nome,
+                      specialty: '' // Using empty string as specialty isn't in the Profissional interface
+                    }))}
+                    selectedProfessional={formData.profissionalId.toString()}
+                    onSelect={handleProfissionalSelect}
+                  />
+                );
+              }
+              return (
+                <div className="empty-state">
+                  {formData.data && formData.horario 
+                    ? "Nenhum profissional disponível neste horário. Por favor, escolha outro horário." 
+                    : "Selecione uma data e horário para ver os profissionais disponíveis."}
+                </div>
+              );
+            })()}
           </div>
 
           <div className="section">

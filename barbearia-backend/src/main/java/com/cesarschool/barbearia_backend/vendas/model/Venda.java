@@ -45,7 +45,7 @@ public class Venda {
 
     @NonNull
     @Column(nullable = false)
-    private BigDecimal valorTotal;
+    private BigDecimal valorTotal = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemVenda> itens = new ArrayList<>(); // >= 1

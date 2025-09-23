@@ -65,7 +65,8 @@ class AgendamentoTestCasesTest {
                 DiaSemana.TERCA,
                 DiaSemana.QUARTA,
                 DiaSemana.QUINTA,
-                DiaSemana.SEXTA);
+                DiaSemana.SEXTA
+        );
 
         cliente = factory.saveCliente(
                 "Miguel Batista",
