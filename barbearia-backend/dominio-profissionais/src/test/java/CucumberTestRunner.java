@@ -6,8 +6,8 @@ import io.cucumber.junit.CucumberOptions;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-    features = "dominio-profissionais/src/main/resources/gestaoDeProfissionais.feature",
-    glue = "com.cesarschool.barbearia.dominio.financeiro"
+    features = "src/main/java/com/cesarschool/barbearia/dominio/profissionais/resources/gestaoDeProfissionais.feature",
+    glue = "com.cesarschool.barbearia.dominio.profissionais"
 )
 public class CucumberTestRunner {
 

@@ -6,7 +6,7 @@ import io.cucumber.junit.CucumberOptions;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-    features = "src/test/resources/com/cesarschool/barbearia/dominio/financeiro",
+    features = "src/main/java/com/cesarschool/barbearia/dominio/financeiro/src/resources/fidelidade.feature",
     glue = "com.cesarschool.barbearia.dominio.financeiro"
 )
 public class CucumberTestRunner {

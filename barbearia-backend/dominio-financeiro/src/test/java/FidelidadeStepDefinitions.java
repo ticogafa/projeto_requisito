@@ -18,7 +18,7 @@ public class FidelidadeStepDefinitions {
     @Dado("um cliente com {int} pontos de fidelidade")
     public void um_cliente_com_pontos_de_fidelidade(Integer pontosIniciais) {
         // Aqui você criaria um mock do cliente e sua pontuação
-        this.pontuacaoCliente = new Pontuacao(/*clienteId*/, pontosIniciais);
+        this.pontuacaoCliente = new Pontuacao(/*clienteId*/ pontosIniciais);
     }
 
     @Quando("ele realiza um serviço que vale {int} pontos")
