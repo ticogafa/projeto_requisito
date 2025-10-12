@@ -721,25 +721,18 @@ Autor: GitHub Copilot
     }
     // ========== DASHBOARD PROFISSIONAL ==========
     function renderDashboard() {
-      const prof = mockProfissionais[0]; // Simula login do profissional 1
       app.innerHTML = `
         <div class="fade">
-          <div class="dashboard-title">Agenda de ${prof.nome}</div>
+          <div class="dashboard-title">Painel de Desempenho</div>
           <div class="dashboard-list">
-            ${Object.keys(prof.agenda).map(dia => {
-              const hoje = new Date();
-              const diaLabel = `${hoje.getDate()+parseInt(dia)}/${hoje.getMonth()+1}`;
-              return `<div style="margin-bottom:8px;font-weight:600;">${diaLabel}</div>
-                ${prof.agenda[dia].filter(s => s.status==='booked').map(slot => {
-                  const ag = slot.agendamento;
-                  const serv = mockServicos.find(s => s.id===ag.servico);
-                  const cliente = mockClientes.find(c => c.id===ag.cliente);
-                  return `<div class="dashboard-item">
-                    <span>${slot.hora} - ${serv.nome} (${cliente.nome})</span>
-                    <span class="status ${ag.status}">${ag.status.charAt(0).toUpperCase()+ag.status.slice(1)}</span>
-                  </div>`;
-                }).join('')}
-              `;
+            <div style="margin-bottom:8px;font-weight:600;">Tempo médio de serviço</div>
+            ${mockProfissionais.map(prof => {
+              // Valores fictícios para o protótipo
+              const tempoMedio = 25 + Math.floor(Math.random() * 15);
+              return `<div class="dashboard-item">
+                <span>${prof.nome}</span>
+                <span style="color: var(--text-muted);">${tempoMedio} min</span>
+              </div>`;
             }).join('')}
           </div>
           <button class="btn" id="backAgendamento">Voltar</button>
