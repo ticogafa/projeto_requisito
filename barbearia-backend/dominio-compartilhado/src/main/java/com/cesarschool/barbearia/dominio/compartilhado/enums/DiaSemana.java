@@ -1,4 +1,4 @@
-package com.cesarschool.barbearia.dominio.compartilhado;
+package com.cesarschool.barbearia.dominio.compartilhado.enums;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;

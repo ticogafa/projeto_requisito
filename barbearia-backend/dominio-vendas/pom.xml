@@ -19,10 +19,25 @@
     <description>Domínio de vendas e produtos - regras de negócio puras</description>
 
     <dependencies>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
         <!-- Dependências internas -->
         <dependency>
             <groupId>com.cesarschool.barbearia</groupId>
             <artifactId>barbearia-dominio-compartilhado</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cesarschool.barbearia</groupId>
+            <artifactId>barbearia-dominio-marketing</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cesarschool.barbearia</groupId>
+            <artifactId>barbearia-dominio-profissionais</artifactId>
         </dependency>
 
         <!-- Apache Commons Lang -->

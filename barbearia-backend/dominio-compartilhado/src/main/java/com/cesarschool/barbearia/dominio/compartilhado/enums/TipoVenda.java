@@ -1,4 +1,4 @@
-package com.cesarschool.barbearia.dominio.compartilhado;
+package com.cesarschool.barbearia.dominio.compartilhado.enums;
 
 /**
  * Enum representando os tipos de venda.

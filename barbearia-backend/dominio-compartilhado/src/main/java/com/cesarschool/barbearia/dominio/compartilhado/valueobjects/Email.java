@@ -1,4 +1,4 @@
-package com.cesarschool.barbearia.dominio.compartilhado;
+package com.cesarschool.barbearia.dominio.compartilhado.valueobjects;
 
 import java.util.Objects;
 import java.util.regex.Pattern;

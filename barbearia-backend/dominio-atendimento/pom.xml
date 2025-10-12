@@ -19,6 +19,12 @@
     <description>Domínio de atendimentos - regras de negócio puras</description>
 
     <dependencies>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
         <!-- Dependências internas -->
         <dependency>
             <groupId>com.cesarschool.barbearia</groupId>

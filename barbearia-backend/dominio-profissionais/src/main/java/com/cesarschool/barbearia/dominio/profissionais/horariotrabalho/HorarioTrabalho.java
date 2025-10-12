@@ -1,10 +1,10 @@
 package com.cesarschool.barbearia.dominio.profissionais.horariotrabalho;
 
-import java.time.LocalTime;
-import java.util.Objects;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.*;
 
-import com.cesarschool.barbearia.dominio.compartilhado.DiaSemana;
-import static com.cesarschool.barbearia.dominio.compartilhado.Validacoes.validarObjetoObrigatorio;
+import java.time.LocalTime;
+
+import com.cesarschool.barbearia.dominio.compartilhado.enums.DiaSemana;
 import com.cesarschool.barbearia.dominio.profissionais.profissional.ProfissionalId;
 
 /**

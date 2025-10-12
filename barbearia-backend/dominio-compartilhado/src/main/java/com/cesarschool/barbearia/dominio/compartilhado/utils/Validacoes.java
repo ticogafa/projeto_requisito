@@ -1,7 +1,9 @@
-package com.cesarschool.barbearia.dominio.compartilhado;
+package com.cesarschool.barbearia.dominio.compartilhado.utils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.apache.commons.lang3.Validate;
 
@@ -20,6 +22,28 @@ public final class Validacoes {
      */
     public static void validarStringObrigatoria(String valor, String nomeCampo) {
         Validate.notBlank(valor, "%s não pode ser nulo ou vazio", nomeCampo);
+    }
+    /**
+     * Valida que uma string não é nula e não está em branco.
+     */
+    public static void validarTamanhoMinimoString(String valor, int size, String nomeCampo) {
+        Validacoes.validarStringObrigatoria(valor, nomeCampo);
+        if (valor.length() < size){
+            throw new IllegalArgumentException(
+                String.format("%s deve ter pelo menos %d caracteres. Valor informado: \"%s\"", nomeCampo, size, valor)
+            );
+        }
+    }
+    /**
+     * Valida que uma string não é nula e não está em branco.
+     */
+    public static void validarTamanhoMaximoString(String valor, int size, String nomeCampo) {
+        Validate.notBlank(valor, "%s não pode ser nulo ou vazio", nomeCampo);
+        if (valor.length() > size){
+            throw new IllegalArgumentException(
+                String.format("%s deve ter no máximo %d caracteres. Valor informado: \"%s\"", nomeCampo, size, valor)
+            );
+        }
     }
     
     /**
@@ -85,6 +109,25 @@ public final class Validacoes {
         Validate.notNull(data, "%s não pode ser nulo", nomeCampo);
         Validate.isTrue(!data.isBefore(LocalDateTime.now()), 
             "%s não pode ser no passado. Data informada: %s", nomeCampo, data);
+    }
+    /**
+     * Valida que uma data não é passada.
+     */
+    public static void validarInicioAntesFim(LocalDateTime inicio, LocalDateTime fim) {
+        Validate.isTrue(inicio.isBefore(fim), "A data de início deve ser anterior à data de fim");
+    }
+    /**
+     * Valida que uma data não é passada.
+     */
+    public static void validarInicioAntesFim(LocalDate inicio, LocalDate fim) {
+        Validate.isTrue(inicio.isBefore(fim), "A data de início deve ser anterior à data de fim");
+    }
+
+    /**
+     * Valida que uma data não é passada.
+     */
+    public static void validarInicioAntesFim(LocalTime inicio, LocalTime fim) {
+        Validate.isTrue(inicio.isBefore(fim), "A hora de início deve ser anterior à hora de fim");
     }
 }
 

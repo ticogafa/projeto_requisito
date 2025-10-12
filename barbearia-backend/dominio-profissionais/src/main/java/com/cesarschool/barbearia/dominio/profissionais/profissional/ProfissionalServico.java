@@ -2,9 +2,8 @@ package com.cesarschool.barbearia.dominio.profissionais.profissional;
 
 import java.util.List;
 
-import static org.apache.commons.lang3.Validate.notNull;
-
-import com.cesarschool.barbearia.dominio.compartilhado.Cpf;
+import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 
 /**
  * Serviço de domínio contendo as regras de negócio de Profissional.
@@ -14,7 +13,7 @@ public class ProfissionalServico {
     private final ProfissionalRepositorio repositorio;
 
     public ProfissionalServico(ProfissionalRepositorio repositorio) {
-        notNull(repositorio, "O repositório não pode ser nulo");
+        Validacoes.validarObjetoObrigatorio(repositorio, "O repositório");
         this.repositorio = repositorio;
     }
 
@@ -23,7 +22,7 @@ public class ProfissionalServico {
      * Verifica se já existe profissional com mesmo CPF.
      */
     public Profissional registrarNovo(Profissional profissional) {
-        notNull(profissional, "O profissional não pode ser nulo");
+        Validacoes.validarObjetoObrigatorio(profissional, "O profissional");
         
         // Regra de negócio: não pode haver profissionais duplicados por CPF
         if (repositorio.existePorCpf(profissional.getCpf())) {
@@ -39,8 +38,8 @@ public class ProfissionalServico {
      * Busca um profissional por ID.
      */
     public Profissional buscarPorId(ProfissionalId id) {
-        notNull(id, "O ID não pode ser nulo");
-        return repositorio.buscarPorId(id)
+        Validacoes.validarObjetoObrigatorio(id, "O ID");
+        return repositorio.buscarPorId(id.getValor())
                 .orElseThrow(() -> new IllegalArgumentException(
                     "Profissional não encontrado com ID: " + id
                 ));
@@ -50,7 +49,7 @@ public class ProfissionalServico {
      * Busca um profissional por CPF.
      */
     public Profissional buscarPorCpf(Cpf cpf) {
-        notNull(cpf, "O CPF não pode ser nulo");
+        Validacoes.validarObjetoObrigatorio(cpf, "O CPF");
         return repositorio.buscarPorCpf(cpf)
                 .orElseThrow(() -> new IllegalArgumentException(
                     "Profissional não encontrado com CPF: " + cpf
@@ -68,8 +67,8 @@ public class ProfissionalServico {
      * Atualiza os dados de um profissional existente.
      */
     public Profissional atualizar(Profissional profissional) {
-        notNull(profissional, "O profissional não pode ser nulo");
-        notNull(profissional.getId(), "O ID do profissional não pode ser nulo");
+        Validacoes.validarObjetoObrigatorio(profissional, "O profissional");
+        Validacoes.validarObjetoObrigatorio(profissional.getId(), "O ID do profissional");
         
         // Verifica se existe
         buscarPorId(profissional.getId());
@@ -83,6 +82,6 @@ public class ProfissionalServico {
     public void remover(ProfissionalId id) {
         // Verifica se existe antes de remover
         buscarPorId(id);
-        repositorio.remover(id);
+        repositorio.remover(id.getValor());
     }
 }

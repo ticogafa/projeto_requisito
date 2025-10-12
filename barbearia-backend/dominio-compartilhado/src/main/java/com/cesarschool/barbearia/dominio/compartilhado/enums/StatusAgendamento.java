@@ -1,4 +1,4 @@
-package com.cesarschool.barbearia.dominio.compartilhado;
+package com.cesarschool.barbearia.dominio.compartilhado.enums;
 
 /**
  * Enum representando os status possíveis de um agendamento.
@@ -7,8 +7,7 @@ public enum StatusAgendamento {
     PENDENTE("Pendente"),
     CONFIRMADO("Confirmado"),
     CANCELADO("Cancelado"),
-    CONCLUIDO("Concluído"),
-    EM_ATENDIMENTO("Em Atendimento");
+    CONCLUIDO("Concluído");
 
     private final String descricao;
 
@@ -21,10 +20,10 @@ public enum StatusAgendamento {
     }
 
     public boolean podeSerCancelado() {
-        return this == PENDENTE || this == CONFIRMADO;
+        return this.equals(PENDENTE) || this.equals(CONFIRMADO);
     }
 
-    public boolean podeIniciarAtendimento() {
-        return this == CONFIRMADO;
+    public boolean podeConfirmar() {
+        return this.equals(StatusAgendamento.PENDENTE);
     }
 }

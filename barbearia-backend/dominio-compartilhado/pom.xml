@@ -19,6 +19,12 @@
     <description>Value Objects e componentes compartilhados entre todos os domínios</description>
 
     <dependencies>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
         <!-- Utilitários -->
         <dependency>
             <groupId>org.apache.commons</groupId>

@@ -1,6 +1,4 @@
-package com.cesarschool.barbearia.dominio.compartilhado;
-
-import java.util.Objects;
+package com.cesarschool.barbearia.dominio.compartilhado.valueobjects;
 
 /**
  * Value Object representando um Telefone válido.
@@ -28,9 +26,7 @@ public final class Telefone {
         this.value = digitos;
     }
 
-    public String getValue() {
-        return value;
-    }
+    public String getValue() { return value; }
 
     /**
      * Retorna o telefone formatado.
@@ -57,23 +53,5 @@ public final class Telefone {
 
     public boolean isFixo() {
         return value.length() == 10;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Telefone)) return false;
-        Telefone telefone = (Telefone) o;
-        return value.equals(telefone.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    @Override
-    public String toString() {
-        return getFormatado();
     }
 }

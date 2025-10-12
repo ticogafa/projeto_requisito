@@ -19,6 +19,12 @@
     <description>Entidades e lógica de negócio de profissionais e serviços</description>
 
     <dependencies>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
         <!-- Dependência do Compartilhado -->
         <dependency>
             <groupId>com.cesarschool.barbearia</groupId>

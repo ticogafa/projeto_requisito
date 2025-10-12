@@ -1,8 +1,9 @@
-package com.cesarschool.barbearia.dominio.compartilhado;
+package com.cesarschool.barbearia.dominio.compartilhado.valueobjects;
 
 import java.util.Objects;
 
-import static com.cesarschool.barbearia.dominio.compartilhado.Validacoes.validarObjetoObrigatorio;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarInteiroPositivo;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio;
 
 /**
  * Classe base abstrata para Value Objects de ID.
@@ -14,6 +15,7 @@ public abstract class ValueObjectId<T> {
     
     protected ValueObjectId(T valor) {
         validarObjetoObrigatorio(valor, "Valor do ID");
+        if(valor instanceof Integer integer) validarInteiroPositivo(integer, "ID");
         this.valor = valor;
     }
     

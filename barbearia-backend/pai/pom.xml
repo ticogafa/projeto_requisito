@@ -34,6 +34,7 @@
         <commons-lang3.version>3.19.0</commons-lang3.version>
         <commons-validator.version>1.10.0</commons-validator.version>
         <modelmapper.version>3.2.0</modelmapper.version>
+        <lombok.version>1.18.30</lombok.version>
         <cucumber.version>7.28.2</cucumber.version>
         <junit-jupiter.version>5.10.1</junit-jupiter.version>
         <assertj.version>3.25.1</assertj.version>
@@ -118,6 +119,13 @@
                 <version>${modelmapper.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
             <!-- ========================================
                  CUCUMBER (BDD Testing)
                  ======================================== -->
@@ -159,6 +167,13 @@
                         <source>${java.version}</source>
                         <target>${java.version}</target>
                         <encoding>${project.build.sourceEncoding}</encoding>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
 

@@ -1,6 +1,6 @@
 package com.cesarschool.barbearia.dominio.profissionais.servico;
 
-import com.cesarschool.barbearia.dominio.compartilhado.ValueObjectId;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.ValueObjectId;
 
 /**
  * Value Object representando o identificador único de um Serviço Oferecido.

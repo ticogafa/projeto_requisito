@@ -1,12 +1,10 @@
 package com.cesarschool.barbearia.dominio.profissionais.profissional;
 
-import java.util.Objects;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.*;
 
-import com.cesarschool.barbearia.dominio.compartilhado.Cpf;
-import com.cesarschool.barbearia.dominio.compartilhado.Email;
-import com.cesarschool.barbearia.dominio.compartilhado.Telefone;
-import static com.cesarschool.barbearia.dominio.compartilhado.Validacoes.validarObjetoObrigatorio;
-import static com.cesarschool.barbearia.dominio.compartilhado.Validacoes.validarStringObrigatoria;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
 
 /**
  * Entidade de domínio representando um Profissional da barbearia.
@@ -34,19 +32,12 @@ public final class Profissional {
     }
 
     // Getters e Setters com validações
-    public ProfissionalId getId() {
-        return id;
-    }
-
+    
     public void setId(ProfissionalId id) {
         validarObjetoObrigatorio(id, "Id");
         this.id = id;
     }
-
-    public String getNome() {
-        return nome;
-    }
-
+    
     public void setNome(String nome) {
         validarStringObrigatoria(nome, "Nome");
         if (nome.length() < 3 || nome.length() > 100) {
@@ -54,60 +45,34 @@ public final class Profissional {
         }
         this.nome = nome;
     }
-
-    public Email getEmail() {
-        return email;
-    }
-
+    
+    
     public void setEmail(Email email) {
         validarObjetoObrigatorio(email, "Email");
         this.email = email;
     }
-
-    public Cpf getCpf() {
-        return cpf;
-    }
-
+    
+    
     public void setCpf(Cpf cpf) {
         validarObjetoObrigatorio(cpf, "Cpf");
         this.cpf = cpf;
     }
-
-    public Telefone getTelefone() {
-        return telefone;
-    }
-
+    
     public void setTelefone(Telefone telefone) {
         validarObjetoObrigatorio(telefone, "Telefone");
         this.telefone = telefone;
     }
-
+    
     // Métodos de negócio
     public void atualizarContato(Email novoEmail, Telefone novoTelefone) {
         setEmail(novoEmail);
         setTelefone(novoTelefone);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Profissional)) return false;
-        Profissional that = (Profissional) o;
-        return Objects.equals(id, that.id) && Objects.equals(cpf, that.cpf);
-    }
+    public ProfissionalId getId() { return id; }
+    public String getNome() { return nome; }
+    public Email getEmail() { return email; }
+    public Cpf getCpf() { return cpf; }
+    public Telefone getTelefone() { return telefone; }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, cpf);
-    }
-
-    @Override
-    public String toString() {
-        return "Profissional{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", cpf=" + cpf +
-                ", email=" + email +
-                '}';
-    }
 }

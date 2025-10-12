@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import com.cesarschool.barbearia.dominio.compartilhado.StatusAgendamento;
+import com.cesarschool.barbearia.dominio.compartilhado.enums.StatusAgendamento;
+import com.cesarschool.barbearia.dominio.marketing.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.profissionais.profissional.ProfissionalId;
 
 /**
@@ -16,7 +17,7 @@ public interface AgendamentoRepositorio {
     
     Optional<Agendamento> buscarPorId(AgendamentoId id);
     
-    List<Agendamento> buscarPorCliente(Integer clienteId);
+    List<Agendamento> buscarPorCliente(ClienteId clienteId);
     
     List<Agendamento> buscarPorProfissional(ProfissionalId profissionalId);
     

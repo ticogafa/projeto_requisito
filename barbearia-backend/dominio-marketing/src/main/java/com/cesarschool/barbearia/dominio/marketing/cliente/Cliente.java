@@ -1,9 +1,9 @@
 package com.cesarschool.barbearia.dominio.marketing.cliente;
 
-import com.cesarschool.barbearia.dominio.compartilhado.Cpf;
-import com.cesarschool.barbearia.dominio.compartilhado.Email;
-import com.cesarschool.barbearia.dominio.compartilhado.Telefone;
-import com.cesarschool.barbearia.dominio.compartilhado.Validacoes;
+import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
 
 
 public final class Cliente {
@@ -33,8 +33,8 @@ public final class Cliente {
         this(nome, email, cpf, telefone);
         Validacoes.validarObjetoObrigatorio(id, "ID");
         Validacoes.validarInteiroNaoNegativo(pontos, "Pontos");
-        this.id = id;
-        this.pontos = pontos;
+        this.setId(id);
+        this.setPontos(pontos);
     }
 
     public void adicionarPontos(int pontosGanhos) {
@@ -55,11 +55,6 @@ public final class Cliente {
         return this.pontos >= pontosNecessarios;
     }
 
-    public void setId(ClienteId id) {
-        Validacoes.validarObjetoObrigatorio(id, "ID");
-        this.id = id;
-    }
-
     public void setNome(String nome) {
         Validacoes.validarStringObrigatoria(nome, "Nome");
         if (nome.length() < 3) {
@@ -78,6 +73,10 @@ public final class Cliente {
         this.cpf = cpf;
     }
 
+    public void setId(ClienteId id) {
+        this.id = id;
+    }
+  
     public void setTelefone(Telefone telefone) {
         Validacoes.validarObjetoObrigatorio(telefone, "Telefone");
         this.telefone = telefone;
@@ -88,11 +87,10 @@ public final class Cliente {
         this.pontos = pontos;
     }
 
-    public ClienteId getId() { return id; }
     public String getNome() { return nome; }
     public Email getEmail() { return email; }
     public Cpf getCpf() { return cpf; }
     public Telefone getTelefone() { return telefone; }
     public int getPontos() { return pontos; }
-
+    public ClienteId getId() { return id; }
 }

@@ -1,12 +1,9 @@
 package com.cesarschool.barbearia.dominio.profissionais.servico;
 
-import java.math.BigDecimal;
-import java.util.Objects;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.*;
 
-import static com.cesarschool.barbearia.dominio.compartilhado.Validacoes.validarInteiroPositivo;
-import static com.cesarschool.barbearia.dominio.compartilhado.Validacoes.validarObjetoObrigatorio;
-import static com.cesarschool.barbearia.dominio.compartilhado.Validacoes.validarStringObrigatoria;
-import static com.cesarschool.barbearia.dominio.compartilhado.Validacoes.validarValorPositivo;
+import java.math.BigDecimal;
+
 import com.cesarschool.barbearia.dominio.profissionais.profissional.ProfissionalId;
 
 /**
@@ -48,28 +45,19 @@ public final class ServicoOferecido {
     }
 
     // Getters e Setters com validações
-    public ServicoOferecidoId getId() {
-        return id;
-    }
-
+    
     public void setId(ServicoOferecidoId id) {
         validarObjetoObrigatorio(id, "ID");
         this.id = id;
     }
-
-    public ProfissionalId getProfissionalId() {
-        return profissionalId;
-    }
-
+    
+    
     public void setProfissionalId(ProfissionalId profissionalId) {
         validarObjetoObrigatorio(profissionalId, "ID do profissional");
         this.profissionalId = profissionalId;
     }
-
-    public String getNome() {
-        return nome;
-    }
-
+    
+    
     public void setNome(String nome) {
         validarStringObrigatoria(nome, "Nome");
         if (nome.length() < 3 || nome.length() > 100) {
@@ -77,20 +65,14 @@ public final class ServicoOferecido {
         }
         this.nome = nome;
     }
-
-    public BigDecimal getPreco() {
-        return preco;
-    }
-
+    
+    
     public void setPreco(BigDecimal preco) {
         validarValorPositivo(preco, "Preço");
         this.preco = preco;
     }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
+    
+    
     public void setDescricao(String descricao) {
         validarStringObrigatoria(descricao, "Descrição");
         if (descricao.length() > 255) {
@@ -98,11 +80,8 @@ public final class ServicoOferecido {
         }
         this.descricao = descricao;
     }
-
-    public Integer getDuracaoMinutos() {
-        return duracaoMinutos;
-    }
-
+    
+    
     public void setDuracaoMinutos(Integer duracaoMinutos) {
         validarObjetoObrigatorio(duracaoMinutos, "Duração");
         validarInteiroPositivo(duracaoMinutos, "Duração");
@@ -111,37 +90,21 @@ public final class ServicoOferecido {
         }
         this.duracaoMinutos = duracaoMinutos;
     }
-
+    
     // Métodos de negócio
     public void atualizarPreco(BigDecimal novoPreco) {
         setPreco(novoPreco);
     }
-
+    
     public void atualizarDuracao(Integer novaDuracao) {
         setDuracaoMinutos(novaDuracao);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ServicoOferecido)) return false;
-        ServicoOferecido that = (ServicoOferecido) o;
-        return Objects.equals(id, that.id);
-    }
+    public ServicoOferecidoId getId() { return id; }
+    public ProfissionalId getProfissionalId() { return profissionalId; }
+    public String getNome() { return nome; }
+    public BigDecimal getPreco() { return preco; }
+    public String getDescricao() { return descricao; }
+    public Integer getDuracaoMinutos() { return duracaoMinutos; }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "ServicoOferecido{" +
-                "id=" + id +
-                ", profissionalId=" + profissionalId +
-                ", nome='" + nome + '\'' +
-                ", duracaoMinutos=" + duracaoMinutos +
-                ", preco=" + preco +
-                '}';
-    }
 }
