@@ -22,6 +22,7 @@
         <module>pai</module>
         <module>dominio-compartilhado</module>
         <module>dominio-profissionais</module>
+        <module>dominio-finaceiro</module>
         <module>dominio-agendamento</module>
         <module>dominio-vendas</module>
         <module>dominio-marketing</module>
@@ -29,6 +30,7 @@
         <module>aplicacao</module>
         <module>infraestrutura</module>
         <module>apresentacao-backend</module>
+        <module>dominio-financeiro</module>
     </modules>
 
 </project>

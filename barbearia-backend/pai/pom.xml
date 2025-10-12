@@ -16,6 +16,9 @@
     <artifactId>barbearia-pai</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <modules>
+        <module>dominio-financeiro</module>
+    </modules>
 
     <name>Barbearia Backend - Configurações PAI</name>
     <description>Configurações compartilhadas entre todos os módulos</description>

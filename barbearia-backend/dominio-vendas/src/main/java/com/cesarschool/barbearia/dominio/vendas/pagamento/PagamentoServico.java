@@ -13,13 +13,27 @@ public class PagamentoServico {
         this.repositorio = repositorio;
     }
 
+    /**
+     * Registra um novo pagamento.
+     * Regras de negócio:
+     * - ID é obrigatório
+     * - Meio de pagamento é obrigatório
+     */
+    public Pagamento registrar(Pagamento pagamento) {
+        Validacoes.validarObjetoObrigatorio(pagamento, "O pagamento");
+        Validacoes.validarObjetoObrigatorio(pagamento.getId(), "ID do pagamento");
+        Validacoes.validarObjetoObrigatorio(pagamento.getMeioPagamento(), "Meio de pagamento");
+        
+        return repositorio.salvar(pagamento);
+    }
+
     public Pagamento salvar(Pagamento pagamento) {
         return repositorio.salvar(pagamento);
     }
 
-    public Pagamento buscarPorId(Integer id) {
+    public Pagamento buscarPorId(PagamentoId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do pagamento");
-        return repositorio.buscarPorId(id)
+        return repositorio.buscarPorId(id.getValor())
                 .orElseThrow(() -> new IllegalArgumentException(
                     "Pagamento não encontrado com ID: " + id
         ));
@@ -32,15 +46,20 @@ public class PagamentoServico {
     /**
      * Atualiza um pagamento existente.
      */
-    public Pagamento atualizar(Integer id, Pagamento pagamento) {
+    public Pagamento atualizar(PagamentoId id, Pagamento pagamento) {
+        Validacoes.validarObjetoObrigatorio(id, "ID do pagamento");
+        Validacoes.validarObjetoObrigatorio(pagamento, "O pagamento");
+        Validacoes.validarObjetoObrigatorio(pagamento.getMeioPagamento(), "Meio de pagamento");
+        
         // Verifica se o pagamento existe
         buscarPorId(id);
+        
         return repositorio.salvar(pagamento);
     }
 
-    public void remover(Integer id) {
+    public void remover(PagamentoId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do pagamento");
         buscarPorId(id); // Verifica se existe
-        repositorio.remover(id);
+        repositorio.remover(id.getValor());
     }
 }
