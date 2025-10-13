@@ -355,7 +355,7 @@ mkdir -p barbearia-backend/dominio-compartilhado/src/main/java/com/cesarschool/b
 **Arquivo: `/barbearia-backend/dominio-compartilhado/src/main/java/com/cesarschool/barbearia/dominio/compartilhado/Email.java`**
 
 ```java
-package com.cesarschool.barbearia.dominio.compartilhado;
+package com.cesarschool.base;
 
 import static org.apache.commons.lang3.Validate.*;
 
@@ -421,7 +421,7 @@ public final class Email {
 **Arquivo: `/barbearia-backend/dominio-compartilhado/src/main/java/com/cesarschool/barbearia/dominio/compartilhado/Cpf.java`**
 
 ```java
-package com.cesarschool.barbearia.dominio.compartilhado;
+package com.cesarschool.base;
 
 import static org.apache.commons.lang3.Validate.*;
 
@@ -510,7 +510,7 @@ public final class Cpf {
 **Arquivo: `/barbearia-backend/dominio-compartilhado/src/main/java/com/cesarschool/barbearia/dominio/compartilhado/Telefone.java`**
 
 ```java
-package com.cesarschool.barbearia.dominio.compartilhado;
+package com.cesarschool.base;
 
 import static org.apache.commons.lang3.Validate.*;
 
@@ -599,7 +599,7 @@ public final class Telefone {
 **Arquivo: `/barbearia-backend/dominio-compartilhado/src/main/java/com/cesarschool/barbearia/dominio/compartilhado/DiaSemana.java`**
 
 ```java
-package com.cesarschool.barbearia.dominio.compartilhado;
+package com.cesarschool.base;
 
 /**
  * Enumeração representando os dias da semana.
@@ -745,9 +745,9 @@ package com.cesarschool.barbearia.dominio.profissionais.profissional;
 
 import static org.apache.commons.lang3.Validate.*;
 
-import com.cesarschool.barbearia.dominio.compartilhado.Cpf;
-import com.cesarschool.barbearia.dominio.compartilhado.Email;
-import com.cesarschool.barbearia.dominio.compartilhado.Telefone;
+import com.cesarschool.base.Cpf;
+import com.cesarschool.base.Email;
+import com.cesarschool.base.Telefone;
 
 /**
  * Entidade de domínio representando um Profissional da barbearia.
@@ -899,8 +899,8 @@ package com.cesarschool.barbearia.dominio.profissionais.profissional;
 
 import java.util.Optional;
 
-import com.cesarschool.barbearia.dominio.compartilhado.Cpf;
-import com.cesarschool.barbearia.dominio.compartilhado.Email;
+import com.cesarschool.base.Cpf;
+import com.cesarschool.base.Email;
 
 /**
  * Interface de repositório para Profissional.
@@ -958,8 +958,8 @@ package com.cesarschool.barbearia.dominio.profissionais.profissional;
 
 import static org.apache.commons.lang3.Validate.*;
 
-import com.cesarschool.barbearia.dominio.compartilhado.Cpf;
-import com.cesarschool.barbearia.dominio.compartilhado.Email;
+import com.cesarschool.base.Cpf;
+import com.cesarschool.base.Email;
 
 /**
  * Serviço de Domínio para operações de negócio relacionadas a Profissional.
@@ -1149,7 +1149,7 @@ import static org.apache.commons.lang3.Validate.*;
 
 import java.time.LocalTime;
 
-import com.cesarschool.barbearia.dominio.compartilhado.DiaSemana;
+import com.cesarschool.base.DiaSemana;
 import com.cesarschool.barbearia.dominio.profissionais.profissional.ProfissionalId;
 
 /**
@@ -1379,7 +1379,7 @@ package com.cesarschool.barbearia.dominio.profissionais.horariotrabalho;
 import java.util.List;
 import java.util.Optional;
 
-import com.cesarschool.barbearia.dominio.compartilhado.DiaSemana;
+import com.cesarschool.base.DiaSemana;
 import com.cesarschool.barbearia.dominio.profissionais.profissional.ProfissionalId;
 
 /**

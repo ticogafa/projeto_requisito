@@ -20,7 +20,7 @@
 
     <modules>
         <module>pai</module>
-        <module>dominio-compartilhado</module>
+        <module>dominio-principal</module>
         <module>dominio-profissionais</module>
         <module>dominio-finaceiro</module>
         <module>dominio-agendamento</module>
