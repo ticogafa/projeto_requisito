@@ -16,9 +16,6 @@
     <artifactId>barbearia-pai</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <modules>
-        <module>dominio-financeiro</module>
-    </modules>
 
     <name>Barbearia Backend - Configurações PAI</name>
     <description>Configurações compartilhadas entre todos os módulos</description>
@@ -59,48 +56,6 @@
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.cesarschool.barbearia</groupId>
-                <artifactId>barbearia-dominio-profissionais</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.cesarschool.barbearia</groupId>
-                <artifactId>barbearia-dominio-agendamento</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.cesarschool.barbearia</groupId>
-                <artifactId>barbearia-dominio-vendas</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.cesarschool.barbearia</groupId>
-                <artifactId>barbearia-dominio-marketing</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.cesarschool.barbearia</groupId>
-                <artifactId>barbearia-dominio-atendimento</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.cesarschool.barbearia</groupId>
-                <artifactId>barbearia-aplicacao</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.cesarschool.barbearia</groupId>
-                <artifactId>barbearia-infraestrutura</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-
             <!-- ========================================
                  BIBLIOTECAS EXTERNAS
                  ======================================== -->
@@ -114,6 +69,21 @@
                 <groupId>commons-validator</groupId>
                 <artifactId>commons-validator</artifactId>
                 <version>${commons-validator.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-java -->
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-java</artifactId>
+                <version>7.30.0</version>
+            </dependency>
+
+<!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-java -->
+<!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-junit -->
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-junit</artifactId>
+                <version>7.30.0</version>
             </dependency>
 
             <dependency>
