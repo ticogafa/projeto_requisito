@@ -7,10 +7,13 @@ import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
+import lombok.Builder;
+
 /**
  * Entidade de domínio representando um Agendamento.
  * Adaptado do código original - sem anotações JPA.
  */
+@Builder
 public final class Agendamento {
     private AgendamentoId id;
     private LocalDateTime dataHora;

@@ -5,7 +5,9 @@ import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
 
+import lombok.Builder;
 
+@Builder
 public final class Cliente {
     private ClienteId id;
     private String nome;
@@ -29,6 +31,12 @@ public final class Cliente {
         this.pontos = 0;
     }
     
+    public Cliente(ClienteId id, String nome, Email email, Cpf cpf, Telefone telefone) {
+        this(nome, email, cpf, telefone);
+        Validacoes.validarObjetoObrigatorio(id, "ID");
+        this.setId(id);
+        this.pontos = 0;
+    }
     public Cliente(ClienteId id, String nome, Email email, Cpf cpf, Telefone telefone, int pontos) {
         this(nome, email, cpf, telefone);
         Validacoes.validarObjetoObrigatorio(id, "ID");
