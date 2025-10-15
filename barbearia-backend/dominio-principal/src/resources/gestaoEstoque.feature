@@ -16,7 +16,7 @@ Feature: Gestão de Estoque e PDV
   Scenario: Impedir cadastro de produto com nome duplicado (NEGATIVO)
     Given que já existe um produto chamado "Gel Fixador"
     When eu tento cadastrar um novo produto com o nome "Gel Fixador"
-    Then o sistema rejeita a operação
+    Then o sistema rejeita a operação de cadastro com nome duplicado
 
   # Cenários de Atualização de Estoque
   Scenario: Atualizar estoque com quantidade válida (POSITIVO)
@@ -27,19 +27,19 @@ Feature: Gestão de Estoque e PDV
   Scenario: Impedir atualização de estoque com valor negativo (NEGATIVO)
     Given que existe um produto "Cera Capilar" com estoque 10
     When eu tento reduzir o estoque em -5 unidades diretamente
-    Then o sistema rejeita a operação
+    Then o sistema rejeita a operação de atualização com valor negativo
 
   # Cenários de Venda PDV
   Scenario: Registrar venda PDV com produto reduzindo estoque (sucesso)
     Given que existe um produto "Gel Fixador" com estoque 50
     When eu envio a venda de 2 produtos "Gel Fixador" para registro
-    Then o sistema responde sucesso
+    Then o sistema responde sucesso e registra a venda
     And o estoque atual do produto "Gel Fixador" passa a ser 48
 
   Scenario: Impedir venda PDV com estoque insuficiente (falha)
     Given que existe um produto "Pomada Forte" com estoque 2
     When envio uma venda PDV com 5 unidades do produto "Pomada Forte"
-    Then o sistema rejeita a operação
+    Then o sistema rejeita a operação de venda com estoque insuficiente
 
   # Cenários de Status de Produto
   Scenario: Desativar produto por indisponibilidade com sucesso (POSITIVO)
@@ -50,7 +50,7 @@ Feature: Gestão de Estoque e PDV
   Scenario: Impedir venda de produto inativo (NEGATIVO)
     Given que o produto "Óleo Capilar" está inativo por "descontinuado pelo fornecedor"
     When o operador tenta registrar uma venda do produto "Óleo Capilar"
-    Then o sistema rejeita a operação
+    Then o sistema rejeita a operação de venda de produto inativo
 
   # Cenários de Alerta de Estoque
   Scenario: Gerar alerta quando estoque atinge nível mínimo (POSITIVO)
@@ -61,7 +61,7 @@ Feature: Gestão de Estoque e PDV
   Scenario: Impedir definição de estoque mínimo inválido (NEGATIVO)
     Given que existe um produto "Máscara Hidratante"
     When eu tento configurar o estoque mínimo para um valor negativo
-    Then o sistema rejeita a operação
+    Then o sistema rejeita a operação de definição de estoque mínimo inválido
 
   # Cenários de Relatório
   Scenario: Gerar relatório de produtos com estoque baixo (POSITIVO)
