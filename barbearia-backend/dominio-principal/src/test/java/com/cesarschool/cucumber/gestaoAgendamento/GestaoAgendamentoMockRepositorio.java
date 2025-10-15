@@ -21,16 +21,16 @@ import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 public class GestaoAgendamentoMockRepositorio implements AgendamentoRepositorio {
     
-    private Map<AgendamentoId, Agendamento> agendamentos = new HashMap<>();
-    public  Map<ProfissionalId, Profissional> profissionais = new HashMap<>();
-    private Map<ServicoOferecidoId, ServicoOferecido> servicos = new HashMap<>();
-    private Map<ClienteId, Cliente> clientes = new HashMap<>();
-    private Map<ProfissionalId, LocalTime> jornadas = new HashMap<>();
-    private Map<ServicoOferecidoId, List<ProfissionalId>> servicoProfissionais = new HashMap<>();
-    private Map<ServicoOferecidoId, Boolean> servicosAtivos = new HashMap<>();
-    private Map<ServicoOferecidoId, Integer> duracaoServicos = new HashMap<>();
-    private Map<ServicoOferecidoId, Integer> intervalosLimpeza = new HashMap<>();
-    private Map<ServicoOferecidoId, ServicoOferecidoId> addOns = new HashMap<>();
+    private final Map<AgendamentoId, Agendamento> agendamentos = new HashMap<>();
+    public  final Map<ProfissionalId, Profissional> profissionais = new HashMap<>();
+    private final Map<ServicoOferecidoId, ServicoOferecido> servicos = new HashMap<>();
+    private final Map<ClienteId, Cliente> clientes = new HashMap<>();
+    private final Map<ProfissionalId, LocalTime> jornadas = new HashMap<>();
+    private final Map<ServicoOferecidoId, List<ProfissionalId>> servicoProfissionais = new HashMap<>();
+    private final Map<ServicoOferecidoId, Boolean> servicosAtivos = new HashMap<>();
+    private final Map<ServicoOferecidoId, Integer> duracaoServicos = new HashMap<>();
+    private final Map<ServicoOferecidoId, Integer> intervalosLimpeza = new HashMap<>();
+    private final Map<ServicoOferecidoId, ServicoOferecidoId> addOns = new HashMap<>();
     private int proximoId = 1;
     
     // Métodos de setup para testes
