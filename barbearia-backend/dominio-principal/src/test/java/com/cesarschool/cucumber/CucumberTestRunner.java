@@ -6,6 +6,6 @@ import io.cucumber.junit.CucumberOptions;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-    features = "src/resources/agendamento.feature")
+    features = "src/resources/ControleCaixa.feature")
 public class CucumberTestRunner {
 }

@@ -1,35 +1,15 @@
 package com.cesarschool.barbearia.dominio.principal.cliente.caixa;
 
-import java.io.Serializable;
-import java.util.Objects;
 import java.util.UUID;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.ValueObjectId;
 
-public class LancamentoId implements Serializable {//implementa Serializable para facilitar que essa classe funcione em diversos frameworks eh so um detalhe mesmo.
-
-    private String value;
+public class LancamentoId extends ValueObjectId<String> {
 
     public LancamentoId() {
-        this.value = UUID.randomUUID().toString();
+        super(UUID.randomUUID().toString()); //faz um identificador único automático
     }
 
     public LancamentoId(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LancamentoId that = (LancamentoId) o;
-        return Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
+        super(value);
     }
 }

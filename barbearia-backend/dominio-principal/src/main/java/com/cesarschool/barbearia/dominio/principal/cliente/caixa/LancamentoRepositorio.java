@@ -1,5 +1,6 @@
 package com.cesarschool.barbearia.dominio.principal.cliente.caixa;
 
+import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +11,6 @@ public interface LancamentoRepositorio {
     Optional<Lancamento> buscarPorId(LancamentoId id);
 
     List<Lancamento> buscarTodos();
-    
-    // Outros métodos de busca podem ser adicionados aqui conforme a necessidade.
-    // Ex: List<Lancamento> buscarPorStatus(String status);
+
+    List<Lancamento> buscarPendentesPorCliente(ClienteId clienteId);
 }

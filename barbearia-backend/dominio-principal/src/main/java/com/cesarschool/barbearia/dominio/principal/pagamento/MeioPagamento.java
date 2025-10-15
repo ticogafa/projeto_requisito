@@ -1,5 +1,5 @@
 package com.cesarschool.barbearia.dominio.principal.pagamento;
-
+//QUEM FOI QUE CRIOU ESSA CLASSE AQUI? ME DIZ EH RAFA
 /**
  * Enum representando os meios de pagamento aceitos.
  */
