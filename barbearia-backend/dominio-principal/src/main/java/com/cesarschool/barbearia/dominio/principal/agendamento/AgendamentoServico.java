@@ -41,7 +41,7 @@ public class AgendamentoServico {
     public Agendamento buscarPorId(AgendamentoId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do agendamento");
         return repositorio.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new IllegalArgumentException(//por algum motivo nao esta dando erro aqui
                     "Agendamento não encontrado com ID: " + id
         ));
     }

@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 
+
 /**
  * Serviço de domínio para ServicoOferecido.
  * Gerencia os serviços oferecidos pelos profissionais.
