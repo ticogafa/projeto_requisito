@@ -1,13 +1,12 @@
 package com.cesarschool.barbearia.dominio.principal.servico;
 
-
 import java.math.BigDecimal;
 
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarInteiroPositivo;
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio;
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarStringObrigatoria;
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarValorPositivo;
-import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.ValueObjectId;
 
 
 
@@ -47,6 +46,12 @@ public final class ServicoOferecido {
             Integer duracaoMinutos) {
         this(profissionalId, nome, preco, descricao, duracaoMinutos);
         setId(id);
+    }
+
+    public final class ProfissionalId extends ValueObjectId<Integer> {
+        public ProfissionalId(Integer valor) {
+            super(valor);
+        }
     }
 
     // Getters e Setters com validações

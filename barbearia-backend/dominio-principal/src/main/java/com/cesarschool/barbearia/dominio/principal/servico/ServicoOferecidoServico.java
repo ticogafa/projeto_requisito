@@ -2,6 +2,7 @@ package com.cesarschool.barbearia.dominio.principal.servico;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
@@ -130,4 +131,41 @@ public class ServicoOferecidoServico {
         buscarPorId(id); // Verifica se existe
         repositorio.remover(id);
     }
+
+    public final class Validacoes {
+
+        private Validacoes() {}
+
+        public static void validarObjetoObrigatorio(Object objeto, String nomeCampo) {
+            if (Objects.isNull(objeto)) {
+                throw new IllegalArgumentException(nomeCampo + " é obrigatório.");
+            }
+        }
+
+        public static void validarStringObrigatoria(String texto, String nomeCampo) {
+            validarObjetoObrigatorio(texto, nomeCampo);
+            if (texto.trim().isEmpty()) {
+                throw new IllegalArgumentException(nomeCampo + " é obrigatório.");
+            }
+        }
+
+        public static void validarValorPositivo(BigDecimal valor, String nomeCampo) {
+            validarObjetoObrigatorio(valor, nomeCampo);
+            if (valor.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException(nomeCampo + " deve ser um valor positivo.");
+            }
+        }
+        
+        public static void validarInteiroPositivo(Integer valor, String nomeCampo) {
+            validarObjetoObrigatorio(valor, nomeCampo);
+            if (valor <= 0) {
+                throw new IllegalArgumentException(nomeCampo + " deve ser um valor positivo.");
+            }
+        }
+        
+        public static void validarTamanhoMinimoString(String texto, int min, String nomeCampo) {}
+        public static void validarTamanhoMaximoString(String texto, int max, String nomeCampo) {}
+    }
+
+
 }
