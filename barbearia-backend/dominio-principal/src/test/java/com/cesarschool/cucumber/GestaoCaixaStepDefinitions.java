@@ -5,32 +5,36 @@ package com.cesarschool.cucumber; // CORRIGIDO: Pacote corresponde à localizaç
 // import io.cucumber.java.pt.Então;
 // import io.cucumber.java.pt.E;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.Lancamento;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento;
 
+import io.cucumber.java.pt.Dado;
+import io.cucumber.java.pt.E;
+import io.cucumber.java.pt.Então;
+import io.cucumber.java.pt.Quando;
 
-// public class GestaoCaixaStepDefinitions {
+
+public class GestaoCaixaStepDefinitions {
 
     private double saldoCaixa;
     private List<Lancamento> lancamentos = new ArrayList<>();
     private ClienteId clienteComDividaId;
     private static final AtomicInteger idCounter = new AtomicInteger(0); // Para gerar IDs de cliente únicos por teste
 
-//     @Dado("que o caixa da barbearia tem um saldo inicial de {double}")
-//     public void que_o_caixa_da_barbearia_tem_um_saldo_inicial_de(Double saldoInicial) {
-//         this.saldoCaixa = saldoInicial;
-//         this.lancamentos.clear();
-//     }
+    @Dado("que o caixa da barbearia tem um saldo inicial de {double}")
+    public void que_o_caixa_da_barbearia_tem_um_saldo_inicial_de(Double saldoInicial) {
+        this.saldoCaixa = saldoInicial;
+        this.lancamentos.clear();
+    }
 
     @Quando("um serviço de {string} no valor de {double} é finalizado e pago")
     public void um_servico_de_no_valor_de_e_finalizado_e_pago(String servico, Double valor) {
@@ -46,10 +50,10 @@ import com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancament
         this.saldoCaixa -= valor;
     }
 
-//     @Então("o saldo final do caixa deve ser {double}")
-//     public void o_saldo_final_do_caixa_deve_ser(Double saldoFinal) {
-//         assertEquals(saldoFinal, this.saldoCaixa, 0.01);
-//     }
+    @Então("o saldo final do caixa deve ser {double}")
+    public void o_saldo_final_do_caixa_deve_ser(Double saldoFinal) {
+        assertEquals(saldoFinal, this.saldoCaixa, 0.01);
+    }
 
     @Quando("um cliente finaliza um serviço de {string} no valor de {double} mas não paga")
     public void um_cliente_finaliza_um_servico_de_no_valor_de_mas_nao_paga(String servico, Double valor) {
