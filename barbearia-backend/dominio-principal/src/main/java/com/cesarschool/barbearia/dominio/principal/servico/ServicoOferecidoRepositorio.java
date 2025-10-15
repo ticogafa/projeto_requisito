@@ -3,7 +3,6 @@ package com.cesarschool.barbearia.dominio.principal.servico;
 import java.util.List;
 
 import com.cesarschool.barbearia.dominio.compartilhado.base.Repositorio;
-import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 
 /**
@@ -13,4 +12,5 @@ public interface ServicoOferecidoRepositorio extends Repositorio<ServicoOferecid
     
     List<ServicoOferecido> buscarPorProfissional(ProfissionalId profissionalId);
     
+    ServicoOferecido buscarPorNome(String nome);
 }
