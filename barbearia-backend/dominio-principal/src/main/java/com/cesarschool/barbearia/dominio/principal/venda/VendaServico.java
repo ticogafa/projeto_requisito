@@ -42,7 +42,7 @@ public class VendaServico {
     public Venda buscarPorId(VendaId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID da venda");
         return repositorio.buscarPorId(id.getValor())
-            .orElseThrow(() -> new IllegalArgumentException(
+            .orElseThrow(() -> new IllegalArgumentException(//todas as classes que tem esse metodo tem erro
                 "Venda não encontrada com ID: " + id
         ));
     }

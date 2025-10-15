@@ -46,7 +46,7 @@ public class ServicoOferecidoServico {
     public ServicoOferecido buscarPorId(Integer id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
         return repositorio.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new IllegalArgumentException(//aq tbm
                     "Serviço não encontrado com ID: " + id
         ));
     }
