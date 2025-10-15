@@ -6,15 +6,14 @@ import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.v
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio;
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarStringObrigatoria;
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarValorPositivo;
-import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.ValueObjectId;
-
-
+import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 
 /**
  * Entidade de domínio representando um serviço oferecido por um profissional.
  * Adaptado do código original sem anotações JPA.
  */
 public final class ServicoOferecido {
+    private Integer pontosFidelidade;
     private ServicoOferecidoId id;
     private ProfissionalId profissionalId;
     private String nome;
@@ -47,13 +46,7 @@ public final class ServicoOferecido {
         this(profissionalId, nome, preco, descricao, duracaoMinutos);
         setId(id);
     }
-
-    public final class ProfissionalId extends ValueObjectId<Integer> {
-        public ProfissionalId(Integer valor) {
-            super(valor);
-        }
-    }
-
+    
     // Getters e Setters com validações
     
     public void setId(ServicoOferecidoId id) {
@@ -89,6 +82,11 @@ public final class ServicoOferecido {
             throw new IllegalArgumentException("Descrição deve ter no máximo 255 caracteres");
         }
         this.descricao = descricao;
+    }
+
+    public void setPontosFidelidade(Integer pontosFidelidade) {
+        validarInteiroPositivo(pontosFidelidade, "Pontos de fidelidade");
+        this.pontosFidelidade = pontosFidelidade;
     }
     
     

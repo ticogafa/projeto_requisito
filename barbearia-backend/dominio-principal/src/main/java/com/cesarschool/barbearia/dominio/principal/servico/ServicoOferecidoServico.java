@@ -64,9 +64,6 @@ public class ServicoOferecidoServico {
         return repositorio.listarTodos();
     }
 
-    /**
-     * Atualiza um serviço existente.
-     */
     public ServicoOferecido atualizar(Integer id, ServicoOferecido servico) {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
         Validacoes.validarObjetoObrigatorio(servico, "O serviço");
@@ -86,16 +83,11 @@ public class ServicoOferecidoServico {
             );
         }
         
-        // Verifica se o serviço existe
         buscarPorId(id);
         
         return repositorio.salvar(servico);
     }
 
-    /**
-     * Atualiza apenas o preço de um serviço.
-     * Método de conveniência para ajustes de preço.
-     */
     public ServicoOferecido atualizarPreco(Integer id, BigDecimal novoPreco) {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
         Validacoes.validarValorPositivo(novoPreco, "Novo preço");
@@ -106,10 +98,6 @@ public class ServicoOferecidoServico {
         return repositorio.salvar(servico);
     }
 
-    /**
-     * Atualiza apenas a duração de um serviço.
-     * Método de conveniência para ajustes de duração.
-     */
     public ServicoOferecido atualizarDuracao(Integer id, Integer novaDuracao) {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
         Validacoes.validarInteiroPositivo(novaDuracao, "Nova duração");
@@ -129,44 +117,10 @@ public class ServicoOferecidoServico {
 
     public void remover(Integer id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
-        buscarPorId(id); // Verifica se existe
+        buscarPorId(id); 
         repositorio.remover(id);
     }
 
-    public final class Validacoes {
-
-        private Validacoes() {}
-
-        public static void validarObjetoObrigatorio(Object objeto, String nomeCampo) {
-            if (Objects.isNull(objeto)) {
-                throw new IllegalArgumentException(nomeCampo + " é obrigatório.");
-            }
-        }
-
-        public static void validarStringObrigatoria(String texto, String nomeCampo) {
-            validarObjetoObrigatorio(texto, nomeCampo);
-            if (texto.trim().isEmpty()) {
-                throw new IllegalArgumentException(nomeCampo + " é obrigatório.");
-            }
-        }
-
-        public static void validarValorPositivo(BigDecimal valor, String nomeCampo) {
-            validarObjetoObrigatorio(valor, nomeCampo);
-            if (valor.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new IllegalArgumentException(nomeCampo + " deve ser um valor positivo.");
-            }
-        }
-        
-        public static void validarInteiroPositivo(Integer valor, String nomeCampo) {
-            validarObjetoObrigatorio(valor, nomeCampo);
-            if (valor <= 0) {
-                throw new IllegalArgumentException(nomeCampo + " deve ser um valor positivo.");
-            }
-        }
-        
-        public static void validarTamanhoMinimoString(String texto, int min, String nomeCampo) {}
-        public static void validarTamanhoMaximoString(String texto, int max, String nomeCampo) {}
-    }
 
 
 }
