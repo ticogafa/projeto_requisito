@@ -3,9 +3,11 @@ package com.cesarschool.barbearia.dominio.principal.servico;
 
 import java.math.BigDecimal;
 
-import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarInteiroPositivo;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarStringObrigatoria;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarValorPositivo;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
-import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.*;
 
 
 
@@ -110,4 +112,8 @@ public final class ServicoOferecido {
     public String getDescricao() { return descricao; }
     public Integer getDuracaoMinutos() { return duracaoMinutos; }
 
+
+    //falta fazer uma classe que atribua pontos de fidelidade ao cliente conforme o serviço prestado, tem que atribuir valor de pontos ao serviço
+    //tambem pode ser uma propia tabela no banco de dados
+    //pensar se vale mais a pena usar um banco de dados ou apenas um enum serve
 }
