@@ -65,3 +65,17 @@ class AgendamentoMockRepositorio implements AgendamentoRepositorio {
     public void remover(AgendamentoId id) {
     }
 }
+
+class AgendamentoConflitoRepositorio extends AgendamentoMockRepositorio {
+    @Override
+    public boolean existeAgendamentoNoPeriodo(ProfissionalId profissionalId, LocalDateTime dataHora,
+            int duracaoMinutos) {
+        return true;
+    }
+
+    @Override
+    public Agendamento salvar(Agendamento agendamento) {
+        return null;
+    }
+    
+}

@@ -9,10 +9,9 @@ Feature: Agendamentos via Serviços
     Then o sistema responde sucesso
 
   Scenario: Impedir criação quando horário já está ocupado (falha)
-    Given que já existe um agendamento para "João Barbeiro" no mesmo horário
-    And que tento criar outro agendamento nesse horário com os mesmos Givens essenciais
+    Given que já existe um agendamento para outro cliente no mesmo horário
     When solicito a criação do novo agendamento
-    Then o sistema rejeita a operação
+    Then o sistema rejeita a operação de agendamento com conflito
 
   # ------------------------- Janela de jornada de trabalho -------------------------
 
@@ -20,7 +19,7 @@ Feature: Agendamentos via Serviços
     Given que escolho um agendamento inválido às 02:00 fora da jornada do profissional
     And que informo as informações essenciais
     When solicito a criação do agendamento
-    Then o sistema rejeita a operação
+    Then o sistema rejeita a operação de agendamento fora da jornada
 
   # ------------------------- Cancelamento com antecedência mínima -------------------------
 
@@ -28,13 +27,13 @@ Feature: Agendamentos via Serviços
     Given que existe um agendamento marcado para ocorrer em menos de 2 horas
     And que o status atual do agendamento é "PENDENTE"
     When solicito o cancelamento deste agendamento
-    Then o sistema rejeita a operação
+    Then o sistema rejeita a operação de cancelamento por antecedência insuficiente
 
   # ------------------------- Atribuição automática de profissional -------------------------
   Scenario: Atribuir o primeiro profissional disponível quando não informado (sucesso)
     Given que não informei um profissional explicitamente
     When solicito a criação do agendamento
-    Then o sistema responde sucesso
+    Then o sistema responde sucesso e atribui um profissional automaticamente
 
   # Atribuição automática
   Scenario: Atribuir o primeiro profissional disponível quando não informado (sucesso)
