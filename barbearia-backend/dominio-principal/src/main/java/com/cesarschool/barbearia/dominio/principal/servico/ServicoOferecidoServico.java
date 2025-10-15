@@ -2,7 +2,6 @@ package com.cesarschool.barbearia.dominio.principal.servico;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
@@ -46,10 +45,7 @@ public class ServicoOferecidoServico {
 
     public ServicoOferecido buscarPorId(Integer id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
-        return repositorio.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException(//aq tbm
-                    "Serviço não encontrado com ID: " + id
-        ));
+        return repositorio.buscarPorId(id);
     }
 
     /**

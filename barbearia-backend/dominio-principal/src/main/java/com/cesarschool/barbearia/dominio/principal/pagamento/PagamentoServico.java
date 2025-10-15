@@ -33,10 +33,7 @@ public class PagamentoServico {
 
     public Pagamento buscarPorId(PagamentoId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do pagamento");
-        return repositorio.buscarPorId(id.getValor())
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "Pagamento não encontrado com ID: " + id
-        ));
+        return repositorio.buscarPorId(id.getValor());
     }
 
     public List<Pagamento> listarTodos() {

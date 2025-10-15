@@ -41,10 +41,7 @@ public class ClienteServico {
 
     public Cliente buscarPorId(ClienteId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do cliente");
-        return repository.buscarPorId(id.getValor())
-                .orElseThrow(() -> new IllegalArgumentException(//ta com erro aqui nao sei porque
-                    "Cliente não encontrado com ID: " + id
-        ));
+        return repository.buscarPorId(id.getValor());
     }
 
     /**

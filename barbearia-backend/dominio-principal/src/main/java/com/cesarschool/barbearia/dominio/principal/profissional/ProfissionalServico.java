@@ -39,10 +39,7 @@ public class ProfissionalServico {
      */
     public Profissional buscarPorId(ProfissionalId id) {
         Validacoes.validarObjetoObrigatorio(id, "O ID");
-        return repositorio.buscarPorId(id.getValor())
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "Profissional não encontrado com ID: " + id
-                ));
+        return repositorio.buscarPorId(id.getValor());
     }
 
     /**

@@ -18,10 +18,7 @@ public class ProdutoServico {
 
     public Produto buscarPorId(ProdutoId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do produto");
-        return repository.buscarPorId(id.getValor())
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "Produto não encontrado com ID: " + id.getValor()
-        ));
+        return repository.buscarPorId(id.getValor());
     }
 
     public List<Produto> listarTodos() {
