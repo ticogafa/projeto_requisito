@@ -1,4 +1,4 @@
-package com.cesarschool.cucumber;
+package com.cesarschool.cucumber.gestaoServicos;
 
 import java.math.BigDecimal;
 import java.util.HashMap;

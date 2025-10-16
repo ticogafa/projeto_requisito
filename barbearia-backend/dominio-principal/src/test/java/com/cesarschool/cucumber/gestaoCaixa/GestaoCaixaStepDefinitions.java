@@ -1,4 +1,4 @@
-package com.cesarschool.cucumber; // CORRIGIDO: Pacote corresponde à localização do arquivo
+package com.cesarschool.cucumber.gestaoCaixa; // CORRIGIDO: Pacote corresponde à localização do arquivo
 
 // import io.cucumber.java.pt.Dado;
 // import io.cucumber.java.pt.Quando;

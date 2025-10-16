@@ -1,3 +1,4 @@
+package com.cesarschool.cucumber.fidelidade;
 // package com.cesarschool.cucumber;
 
 // import io.cucumber.java.pt.Dado;

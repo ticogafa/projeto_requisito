@@ -1,9 +1,9 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from '@contexts/AuthContext';
-import LoginForm from '@/components/LoginForm';
 import Dashboard from '@/components/Dashboard';
+import LoginForm from '@/components/LoginForm';
 import ProtectedRoute from '@components/ProtectedRoute';
+import { AuthProvider, useAuth } from '@contexts/AuthContext';
+import React from 'react';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 const AppRoutes: React.FC = () => {
   const { currentUser } = useAuth();
