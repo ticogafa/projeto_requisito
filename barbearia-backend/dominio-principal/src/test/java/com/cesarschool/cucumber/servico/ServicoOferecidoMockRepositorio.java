@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
@@ -16,6 +17,7 @@ public class ServicoOferecidoMockRepositorio implements ServicoOferecidoReposito
 
     private final Map<Integer, ServicoOferecido> dados = new HashMap<>();
     private final AtomicInteger sequenciadorId = new AtomicInteger(1); 
+    private final Map<String, List<String>> qualificacoes = new HashMap<>();
 
     @Override
     public ServicoOferecido salvar(ServicoOferecido servico) {
@@ -29,7 +31,8 @@ public class ServicoOferecidoMockRepositorio implements ServicoOferecidoReposito
                 servico.getNome(),
                 servico.getPreco(),
                 servico.getDescricao(),
-                servico.getDuracaoMinutos()
+                servico.getDuracaoMinutos(),
+                servico.getServicoPrincipalId()
             );
             
             dados.put(novoId, servicoSalvo);
@@ -40,6 +43,20 @@ public class ServicoOferecidoMockRepositorio implements ServicoOferecidoReposito
         }
     }
 
+
+
+    @Override
+    public void salvarAssociacao(String nomeServico, String nomeProfissional) {
+        qualificacoes.computeIfAbsent(nomeServico, k -> new ArrayList<>()).add(nomeProfissional);
+    }
+
+    @Override
+    public boolean estaQualificado(String nomeServico, String nomeProfissional) {
+        List<String> profissionaisQualificados = qualificacoes.get(nomeServico);
+        return profissionaisQualificados != null && profissionaisQualificados.contains(nomeProfissional);
+    }
+
+    @Override
     public ServicoOferecido buscarPorNome(String nome) {
         return dados.values().stream()
                 .filter(s -> s.getNome().equalsIgnoreCase(nome))
@@ -52,6 +69,13 @@ public class ServicoOferecidoMockRepositorio implements ServicoOferecidoReposito
         return listarTodos().stream()
                 .filter(s -> s.getProfissionalId().equals(profissionalId))
                 .toList();
+    }
+
+    @Override
+    public List<ServicoOferecido> buscarAddOnDoServicoPrincipal(ServicoOferecidoId servicoPrincipalId) {
+        return dados.values().stream()
+                .filter(s -> servicoPrincipalId.equals(s.getServicoPrincipalId()))
+                .collect(Collectors.toList());
     }
         
     @Override
@@ -76,5 +100,6 @@ public class ServicoOferecidoMockRepositorio implements ServicoOferecidoReposito
     public void limpar() {
         dados.clear();
         sequenciadorId.set(1);
+        qualificacoes.clear();
     }
 }

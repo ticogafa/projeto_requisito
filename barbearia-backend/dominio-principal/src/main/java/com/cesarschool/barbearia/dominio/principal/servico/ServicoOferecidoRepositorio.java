@@ -13,4 +13,10 @@ public interface ServicoOferecidoRepositorio extends Repositorio<ServicoOferecid
     List<ServicoOferecido> buscarPorProfissional(ProfissionalId profissionalId);
     
     ServicoOferecido buscarPorNome(String nome);
+
+    List<ServicoOferecido> buscarAddOnDoServicoPrincipal(ServicoOferecidoId servicoPrincipalId);
+
+    void salvarAssociacao(String nomeServico, String nomeProfissional);
+
+    boolean estaQualificado(String nomeServico, String nomeProfissional);
 }

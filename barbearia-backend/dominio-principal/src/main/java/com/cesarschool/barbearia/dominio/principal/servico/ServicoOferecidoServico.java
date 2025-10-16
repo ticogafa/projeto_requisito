@@ -20,19 +20,23 @@ public class ServicoOferecidoServico {
         this.repositorio = repositorio;
     }
 
-    /**
-     * Registra um novo serviço oferecido.
-     * Regras de negócio:
-     * - ProfissionalId é obrigatório
-     * - Nome deve ter entre 3 e 100 caracteres
-     * - Preço deve ser positivo
-     * - Descrição é obrigatória e não pode exceder 255 caracteres
-     * - Duração deve ser entre 1 e 480 minutos (8 horas)
-     */
+    public ServicoOferecido buscarPorId(Integer id) {
+        Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
+        ServicoOferecido servico = repositorio.buscarPorId(id);
+        
+        if (servico == null) {
+            throw new IllegalArgumentException("Serviço não encontrado com ID: " + id);
+        }
+        return servico;
+    }
+
     public ServicoOferecido registrar(ServicoOferecido servico) {
-        // Validações já são realizadas nos setters do ServicoOferecido.
         Validacoes.validarObjetoObrigatorio(servico, "O serviço");
         
+        if (repositorio.buscarPorNome(servico.getNome()) != null) {
+            throw new IllegalArgumentException("Já existe um serviço com o nome: " + servico.getNome());
+        }
+
         if (servico.getDuracaoMinutos() > 480) {
             throw new IllegalArgumentException(
                 "Duração não pode exceder 480 minutos (8 horas). Valor fornecido: " + 
@@ -43,14 +47,44 @@ public class ServicoOferecidoServico {
         return repositorio.salvar(servico);
     }
 
-    public ServicoOferecido buscarPorId(Integer id) {
-        Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
-        return repositorio.buscarPorId(id);
+    public void associarProfissional(String nomeServico, String nomeProfissional) {
+        Validacoes.validarStringObrigatoria(nomeServico, "Nome do serviço");
+        Validacoes.validarStringObrigatoria(nomeProfissional, "Nome do profissional");
+
+        if (!repositorio.estaQualificado(nomeServico, nomeProfissional)) {
+            throw new IllegalArgumentException(
+                String.format("Profissional " + nomeProfissional + "não está qualificado para o serviço "+ nomeServico + ".")
+            );
+        }
+        repositorio.salvarAssociacao(nomeServico, nomeProfissional);
     }
 
-    /**
-     * Busca todos os serviços oferecidos por um profissional específico.
-     */
+    public ServicoOferecido definirAddOn(ServicoOferecidoId addOnId, ServicoOferecidoId principalId) {
+        Validacoes.validarObjetoObrigatorio(addOnId, "ID do Add-On");
+        Validacoes.validarObjetoObrigatorio(principalId, "ID do Serviço Principal");
+
+        ServicoOferecido addOn = buscarPorId(addOnId.getValor());
+        buscarPorId(principalId.getValor());
+
+        addOn.definirComoAddonDe(principalId);
+
+        return repositorio.salvar(addOn);
+    }
+    
+    public ServicoOferecido definirIntervaloLimpeza(Integer id, int intervaloMinutos) {
+        Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
+        
+        ServicoOferecido servico = buscarPorId(id);
+        servico.definirIntervaloLimpeza(intervaloMinutos);
+
+        return repositorio.salvar(servico);
+    }
+
+    public boolean podeSerAgendadoSozinho(ServicoOferecido servico) {
+        Validacoes.validarObjetoObrigatorio(servico, "O serviço");
+        return servico.getServicoPrincipalId() == null;
+    }
+
     public List<ServicoOferecido> buscarPorProfissional(ProfissionalId profissionalId) {
         Validacoes.validarObjetoObrigatorio(profissionalId, "ID do profissional");
         return repositorio.buscarPorProfissional(profissionalId);
@@ -60,6 +94,22 @@ public class ServicoOferecidoServico {
         return repositorio.listarTodos();
     }
 
+    public ServicoOferecido desativarServico(Integer id, String motivo) {
+        Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
+        Validacoes.validarStringObrigatoria(motivo, "Motivo da inatividade");
+
+        ServicoOferecido servico = buscarPorId(id);
+        servico.desativar(motivo);
+        
+        return repositorio.salvar(servico);
+    }
+
+    public List<ServicoOferecido> listarServicosAtivos() {
+        return repositorio.listarTodos().stream()
+                .filter(ServicoOferecido::isAtivo)
+                .toList();
+    }
+    
     public ServicoOferecido atualizar(Integer id, ServicoOferecido servico) {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
         Validacoes.validarObjetoObrigatorio(servico, "O serviço");
@@ -116,7 +166,4 @@ public class ServicoOferecidoServico {
         buscarPorId(id); 
         repositorio.remover(id);
     }
-
-
-
 }
