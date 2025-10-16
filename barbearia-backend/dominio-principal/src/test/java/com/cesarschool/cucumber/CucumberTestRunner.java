@@ -7,6 +7,6 @@ import io.cucumber.junit.CucumberOptions;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-    features = "src/resources/gestaoDeServicos.feature")
+    features = "src/test/java/com/cesarschool/resources/gestaoDeServicos.feature")
 public class CucumberTestRunner {
 }
