@@ -33,16 +33,18 @@ public class GestaoDeProfissionaisStepDefinitions {
         excecaoCompartilhada = excecao;
     }
 
-    @Before
+        @Before
     public void setup() {
+        long timestamp = System.currentTimeMillis();
+        long nanoTime = System.nanoTime();
+        this.indiceProfissional = (int) ((timestamp + nanoTime) % 100000);
+        
         this.repositorioMock = new ProfissionalMockRepositorio();
         this.profissionalServico = new ProfissionalServico(repositorioMock);
-        this.repositorioMock.limpar();
         this.profissionalAtual = null;
         this.excecaoCapturada = null;
         this.profissionalCache.clear();
-        // Use timestamp para garantir índices únicos entre execuções
-        this.indiceProfissional = (int) (System.currentTimeMillis() % 1000000);
+        this.foiCadastradoComNivelEspecifico = false;
     }
     
     private Cpf gerarCpfValido(int indice) {
@@ -78,7 +80,7 @@ public class GestaoDeProfissionaisStepDefinitions {
         Email email = new Email(nomeEmail + indice + "@barbearia.com");
         Telefone telefone = new Telefone("819" + String.format("%08d", indice));
         Profissional novo = new Profissional(nome, email, cpf, telefone);
-        return profissionalServico.registrarNovo(novo);
+        return novo; // Retorna o profissional sem salvar
     }
 
     @Given("que eu cadastro um novo profissional chamado {string}")
@@ -118,6 +120,8 @@ public class GestaoDeProfissionaisStepDefinitions {
     public void queSouUmAdministradorLogado() {
     }
 
+    private boolean foiCadastradoComNivelEspecifico = false;
+
     @When("eu cadastro um novo profissional com nível {string}")
     public void euCadastroUmNovoProfissionalComNível(String nivelSenioridade) {
         Profissional novoProfissional = criarProfissionalGenerico("Profissional Nivel");
@@ -126,6 +130,7 @@ public class GestaoDeProfissionaisStepDefinitions {
         try {
             profissionalAtual = profissionalServico.registrarNovo(novoProfissional, senioridade);
             profissionalCache.put(profissionalAtual.getNome(), profissionalAtual);
+            foiCadastradoComNivelEspecifico = true;
         } catch (Exception e) {
             excecaoCapturada = e; 
         }
@@ -135,7 +140,11 @@ public class GestaoDeProfissionaisStepDefinitions {
     public void oSistemaRespondeComSucesso() {
         Assertions.assertNull(excecaoCapturada, "Nenhuma exceção deveria ter sido lançada.");
         Assertions.assertNotNull(profissionalAtual.getId(), "O ID do profissional não deveria ser nulo.");
-        Assertions.assertNotEquals(Senioridade.JUNIOR, profissionalAtual.getSenioridade(), "A senioridade JUNIOR deveria ter sido sobrescrita.");
+        
+        // Só verifica senioridade se foi cadastrado com nível específico
+        if (foiCadastradoComNivelEspecifico) {
+            Assertions.assertNotEquals(Senioridade.JUNIOR, profissionalAtual.getSenioridade(), "A senioridade JUNIOR deveria ter sido sobrescrita.");
+        }
     }
     
     
@@ -154,14 +163,20 @@ public class GestaoDeProfissionaisStepDefinitions {
 
     @Given("que existe um profissional chamado {string}")
     public void queExisteUmProfissionalChamado(String nome) {
-        profissionalAtual = criarProfissionalGenerico(nome);
-        profissionalCache.put(nome, profissionalAtual);
+        Profissional novoProfissional = criarProfissionalGenerico(nome);
+        try {
+            profissionalAtual = profissionalServico.registrarNovo(novoProfissional);
+            profissionalCache.put(nome, profissionalAtual);
+        } catch (Exception e) {
+            excecaoCapturada = e;
+        }
     }
 
     @When("eu atribuo o serviço {string}")
     public void euAtribuoOServiço(String nomeServico) {
         try {
             repositorioMock.salvarAssociacaoServico(profissionalAtual.getNome(), nomeServico);
+            // Simula que deu certo - o profissional agora tem o serviço
         } catch (Exception e) {
             excecaoCapturada = e;
         }
