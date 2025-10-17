@@ -1,5 +1,6 @@
 package com.cesarschool.barbearia.dominio.principal.profissional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,5 +84,9 @@ public class ProfissionalServico {
         return repositorio.listarTodos().stream()
                 .filter(Profissional::isAtivo)
                 .collect(Collectors.toList());
+    }
+
+    public Profissional buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoServicoMinutos) {
+        return repositorio.buscarPrimeiroProfissionalDisponivel(dataHora, duracaoServicoMinutos);
     }
 }
