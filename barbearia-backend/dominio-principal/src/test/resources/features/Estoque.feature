@@ -3,10 +3,6 @@ Feature: Gestão de Estoque e PDV
   Como operador ou administrador do sistema
   Quero cadastrar produtos e registrar vendas corretamente
 
-  Background:
-    Given que o sistema está operacional
-    And que estou autenticado como operador de PDV
-
   # Cenários de Cadastro de Produtos
   Scenario: Cadastrar produto com nome único com sucesso (POSITIVO)
     Given que não existe um produto chamado "Shampoo Anticaspa"
