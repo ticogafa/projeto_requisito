@@ -70,6 +70,10 @@ public class ProfissionalServico {
         repositorio.remover(id.getValor());
     }
 
+    public Profissional buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoServicoMinutos) {
+        return repositorio.buscarPrimeiroProfissionalDisponivel(dataHora, duracaoServicoMinutos);
+    }
+
     public Profissional desativar(ProfissionalId id, String motivo) {
         Validacoes.validarObjetoObrigatorio(id, "O ID do profissional");
         Validacoes.validarStringObrigatoria(motivo, "O motivo da inatividade");

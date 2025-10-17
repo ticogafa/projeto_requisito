@@ -1,24 +1,21 @@
 package com.cesarschool.cucumber.gestaoProfissionais;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.jupiter.api.Assertions;
+
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
 import com.cesarschool.barbearia.dominio.principal.profissional.Senioridade;
-import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
-import com.cesarschool.barbearia.dominio.principal.profissional.Agenda; 
-import com.cesarschool.cucumber.gestaoProfissionais.*;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.jupiter.api.Assertions;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class GestaoDeProfissionaisStepDefinitions {
 
@@ -27,6 +24,7 @@ public class GestaoDeProfissionaisStepDefinitions {
     private Profissional profissionalAtual;
     private Exception excecaoCapturada;
     private Map<String, Profissional> profissionalCache = new HashMap<>();
+    private int indiceProfissional;
 
     @Before
     public void setup() {
@@ -36,6 +34,7 @@ public class GestaoDeProfissionaisStepDefinitions {
         this.profissionalAtual = null;
         this.excecaoCapturada = null;
         this.profissionalCache.clear();
+        this.indiceProfissional = 1;
     }
     
     private Cpf gerarCpfValido(int indice) {
@@ -54,7 +53,8 @@ public class GestaoDeProfissionaisStepDefinitions {
         return String.valueOf(resto < 2 ? 0 : 11 - resto);
     }
     
-    private Profissional criarProfissionalGenerico(String nome, int indice) {
+    private Profissional criarProfissionalGenerico(String nome) {
+        int indice = this.indiceProfissional++;
         Cpf cpf = gerarCpfValido(indice);
         Email email = new Email(nome.replaceAll("\\s+", "").toLowerCase() + indice + "@barbearia.com");
         Telefone telefone = new Telefone("819" + String.format("%08d", indice));
@@ -64,7 +64,7 @@ public class GestaoDeProfissionaisStepDefinitions {
 
     @Given("que eu cadastro um novo profissional chamado {string}")
     public void queEuCadastroUmNovoProfissionalChamado(String nome) {
-        profissionalAtual = criarProfissionalGenerico(nome, 1);
+        profissionalAtual = criarProfissionalGenerico(nome);
         profissionalCache.put(nome, profissionalAtual);
     }
 
@@ -101,8 +101,7 @@ public class GestaoDeProfissionaisStepDefinitions {
 
     @When("eu cadastro um novo profissional com nível {string}")
     public void euCadastroUmNovoProfissionalComNível(String nivelSenioridade) {
-        int indice = profissionalCache.size() + 1;
-        Profissional novoProfissional = criarProfissionalGenerico("Profissional Nivel", indice);
+        Profissional novoProfissional = criarProfissionalGenerico("Profissional Nivel");
         Senioridade senioridade = Senioridade.valueOf(nivelSenioridade.toUpperCase());
 
         try {
@@ -123,8 +122,7 @@ public class GestaoDeProfissionaisStepDefinitions {
     
     @When("eu tento cadastrar um novo profissional com nível {string}")
     public void euTentoCadastrarUmNovoProfissionalComNível(String nivelSenioridade) {
-        int indice = profissionalCache.size() + 1;
-        Profissional novoProfissional = criarProfissionalGenerico("Profissional Invalido", indice);
+        Profissional novoProfissional = criarProfissionalGenerico("Profissional Invalido");
 
         try {
             Senioridade senioridade = Senioridade.valueOf(nivelSenioridade.toUpperCase());
@@ -137,7 +135,7 @@ public class GestaoDeProfissionaisStepDefinitions {
 
     @Given("que existe um profissional chamado {string}")
     public void queExisteUmProfissionalChamado(String nome) {
-        profissionalAtual = criarProfissionalGenerico(nome, profissionalCache.size() + 1);
+        profissionalAtual = criarProfissionalGenerico(nome);
         profissionalCache.put(nome, profissionalAtual);
     }
 

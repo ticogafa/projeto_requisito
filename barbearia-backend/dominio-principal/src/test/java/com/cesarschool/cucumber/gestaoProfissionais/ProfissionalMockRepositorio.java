@@ -1,17 +1,16 @@
 package com.cesarschool.cucumber.gestaoProfissionais;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.time.LocalDateTime; // [ADIÇÃO]
+
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepositorio;
-import com.cesarschool.barbearia.dominio.principal.profissional.Agenda; 
-import com.cesarschool.barbearia.dominio.principal.profissional.Senioridade; 
 
 
 /**
@@ -33,6 +32,7 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
             Integer novoId = sequenciadorId.getAndIncrement();
             ProfissionalId idGerado = new ProfissionalId(novoId);
             
+            // Construtor completo (9 argumentos)
             Profissional profissionalSalvo = new Profissional(
                 idGerado,
                 profissional.getNome(),
@@ -55,8 +55,10 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
         }
     }
     
+    // [ADIÇÃO] IMPLEMENTAÇÃO DO MÉTODO FALTANTE (Simulação de Disponibilidade)
     @Override
     public Profissional buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoServicoMinutos) {
+        // Simulação: Retorna o primeiro profissional encontrado, assumindo que ele está disponível.
         return dados.values().stream().findFirst().orElse(null);
     }
 
@@ -90,6 +92,7 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
         }
     }
     
+    // Métodos Auxiliares para Teste
     public void salvarAssociacaoServico(String nomeProfissional, String nomeServico) {
         associacoesServico.computeIfAbsent(nomeProfissional, k -> new ArrayList<>()).add(nomeServico);
     }
