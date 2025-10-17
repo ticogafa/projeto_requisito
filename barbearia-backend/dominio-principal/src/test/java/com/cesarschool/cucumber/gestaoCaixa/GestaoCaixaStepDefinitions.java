@@ -1,104 +1,106 @@
-package com.cesarschool.cucumber.gestaoCaixa; // CORRIGIDO: Pacote corresponde à localização do arquivo
-
-// import io.cucumber.java.pt.Dado;
-// import io.cucumber.java.pt.Quando;
-// import io.cucumber.java.pt.Então;
-// import io.cucumber.java.pt.E;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+package com.cesarschool.cucumber.gestaoCaixa;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
-import com.cesarschool.barbearia.dominio.principal.cliente.caixa.Lancamento;
+import com.cesarschool.barbearia.dominio.principal.cliente.caixa.GestaoCaixaServico;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento;
+import com.cesarschool.cucumber.gestaoCaixa.infraestrutura.LancamentoMockRepositorio;
 
 import io.cucumber.java.pt.Dado;
 import io.cucumber.java.pt.E;
-import io.cucumber.java.pt.Então;
+import io.cucumber.java.pt.Entao;
 import io.cucumber.java.pt.Quando;
-
 
 public class GestaoCaixaStepDefinitions {
 
-    private double saldoCaixa;
-    private List<Lancamento> lancamentos = new ArrayList<>();
+    private double saldoInicial;
+    private final LancamentoMockRepositorio repo = new LancamentoMockRepositorio();
+    private final GestaoCaixaServico servico = new GestaoCaixaServico(repo);
     private ClienteId clienteComDividaId;
-    private static final AtomicInteger idCounter = new AtomicInteger(0); // Para gerar IDs de cliente únicos por teste
 
     @Dado("que o caixa da barbearia tem um saldo inicial de {double}")
-    public void que_o_caixa_da_barbearia_tem_um_saldo_inicial_de(Double saldoInicial) {
-        this.saldoCaixa = saldoInicial;
-        this.lancamentos.clear();
+    public void caixa_saldo_inicial(Double saldoInicial) {
+        this.saldoInicial = saldoInicial;
+        repo.limpar();
+    }
+
+    @Dado("um cliente possui uma dívida pendente de {double}")
+    public void umClientePossuiUmaDívidaPendenteDe(Double double1) {
+        this.clienteComDividaId = new ClienteId(1);
+        this.servico.registrarDivida(this.clienteComDividaId, "Dívida existente", double1);
     }
 
     @Quando("um serviço de {string} no valor de {double} é finalizado e pago")
-    public void um_servico_de_no_valor_de_e_finalizado_e_pago(String servico, Double valor) {
-        Lancamento lancamento = Lancamento.novaEntrada("Pagamento " + servico, valor);
-        lancamentos.add(lancamento);
-        this.saldoCaixa += valor;
+    public void servico_pago(String servico, Double valor) {
+        servico = ("Pagamento " + servico).trim();
+        this.servico.registrarEntrada(servico, valor);
     }
 
     @Quando("uma despesa de {string} no valor de {double} é registrada")
-    public void uma_despesa_de_no_valor_de_e_registrada(String despesa, Double valor) {
-        Lancamento lancamento = Lancamento.novaSaida(despesa, valor);
-        lancamentos.add(lancamento);
-        this.saldoCaixa -= valor;
+    public void despesa_registrada(String despesa, Double valor) {
+        this.servico.registrarSaida(despesa, valor);
     }
 
-    @Então("o saldo final do caixa deve ser {double}")
-    public void o_saldo_final_do_caixa_deve_ser(Double saldoFinal) {
-        assertEquals(saldoFinal, this.saldoCaixa, 0.01);
+    @Entao("o saldo final do caixa deve ser {double}")
+    public void saldo_final(Double esperado) {
+        double saldoFinal = saldoInicial + this.servico.saldoAtual();
+        assertEquals(esperado, saldoFinal, 0.01);
     }
 
     @Quando("um cliente finaliza um serviço de {string} no valor de {double} mas não paga")
-    public void um_cliente_finaliza_um_servico_de_no_valor_de_mas_nao_paga(String servico, Double valor) {
-        this.clienteComDividaId = new ClienteId(idCounter.incrementAndGet()); // Simula um ID de cliente
-        Lancamento divida = Lancamento.novaDivida(this.clienteComDividaId, "Dívida " + servico, valor);
-        lancamentos.add(divida);
-        // O saldo do caixa não é alterado
+    public void servico_nao_pago(String servico, Double valor) {
+        this.clienteComDividaId = new ClienteId(1);
+        this.servico.registrarDivida(this.clienteComDividaId, "Dívida " + servico, valor);
     }
 
     @E("uma dívida de {double} deve ser registrada para o cliente")
-    public void uma_divida_de_deve_ser_registrada_para_o_cliente(Double valorDivida) {
-        boolean dividaEncontrada = lancamentos.stream()
-                .anyMatch(l -> l.getStatus() == StatusLancamento.PENDENTE && l.getValor() == valorDivida && l.getClienteId().equals(this.clienteComDividaId));
-        assertTrue(dividaEncontrada, "A dívida não foi registrada corretamente para o cliente.");
+    public void verifica_divida(Double valorDivida) {
+        boolean divida = repo.buscarPendentesPorCliente(this.clienteComDividaId).stream()
+            .anyMatch(l -> l.getStatus() == StatusLancamento.PENDENTE
+                        && l.getValor() == valorDivida
+                        && this.clienteComDividaId.equals(l.getClienteId()));
+        assertTrue(divida, "Dívida não registrada para o cliente.");
     }
 
-    @E("um cliente possui uma dívida pendente de {double}")
-    public void um_cliente_possui_uma_divida_pendente_de(Double valorDivida) {
-        this.clienteComDividaId = new ClienteId(idCounter.incrementAndGet());
-        Lancamento dividaExistente = Lancamento.novaDivida(this.clienteComDividaId, "Dívida anterior", valorDivida);
-        lancamentos.add(dividaExistente);
+    @E(" um cliente possui uma dívida pendente de {double}")
+    public void cliente_possui_divida(Double valorDivida) {
+        // garante a existência da dívida neste cenário
+        this.clienteComDividaId = new ClienteId(1);
+        this.servico.registrarDivida(this.clienteComDividaId, "Dívida existente", valorDivida);
     }
 
+    // Casa exatamente com: "Quando o cliente paga a dívida de 40.0"
     @Quando("o cliente paga a dívida de {double}")
     public void o_cliente_paga_a_divida_de(Double valorPago) {
-        Optional<Lancamento> dividaParaPagar = lancamentos.stream()
-                .filter(l -> l.getStatus() == StatusLancamento.PENDENTE && l.getClienteId().equals(this.clienteComDividaId))
-                .findFirst();
-
-        assertTrue(dividaParaPagar.isPresent(), "Dívida pendente do cliente não encontrada para pagamento.");
-        
-        Lancamento divida = dividaParaPagar.get();
-        divida.quitar(); // CORREÇÃO: Usando o método de negócio da entidade
-        
-        // Ao quitar, uma nova entrada é gerada no caixa
-        Lancamento entrada = Lancamento.novaEntrada("Pagamento de dívida", valorPago);
-        lancamentos.add(entrada);
-        this.saldoCaixa += valorPago;
+        if (this.clienteComDividaId == null) {
+            // fallback: garante um cliente com dívida antes de pagar, se não veio de um passo anterior
+            this.clienteComDividaId = new com.cesarschool.barbearia.dominio.principal.cliente.ClienteId(1);
+            this.servico.registrarDivida(this.clienteComDividaId, "Dívida", valorPago);
+        }
+        // chame aqui o método que quita a dívida e registra a entrada de pagamento
+        this.servico.pagarPrimeiraDivida(this.clienteComDividaId, valorPago);
     }
 
+    // Use @E porque no .feature a linha começa com "E ..."
     @E("a dívida do cliente deve ser marcada como {string}")
-    public void a_divida_do_cliente_deve_ser_marcada_como(String statusEsperado) {
-        StatusLancamento statusEnum = StatusLancamento.valueOf(statusEsperado.toUpperCase()); // Converte String para Enum
-        boolean dividaAtualizada = lancamentos.stream()
-                .anyMatch(l -> l.getStatus() == statusEnum && l.getClienteId() != null && l.getClienteId().equals(this.clienteComDividaId));
-        assertTrue(dividaAtualizada, "A dívida não foi marcada como " + statusEsperado);
+    public void a_divida_do_cliente_deve_ser_marcada_como(String status) {
+        var esperado = com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento.valueOf(status.toUpperCase());
+
+        var doCliente = repo.buscarTodos().stream()
+            .filter(l -> this.clienteComDividaId != null && this.clienteComDividaId.equals(l.getClienteId()))
+            .toList();
+
+        boolean temEsperado = doCliente.stream().anyMatch(l -> l.getStatus() == esperado);
+        // Para "PAGO", garanta também que não sobrou nenhuma PENDENTE
+        if (esperado == com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento.PAGO) {
+            temEsperado = temEsperado && doCliente.stream().noneMatch(l ->
+                l.getStatus() == com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento.PENDENTE
+            );
+        }
+
+        org.junit.jupiter.api.Assertions.assertTrue(temEsperado, "Esperado status " + esperado + " para a dívida do cliente.");
     }
+
 }
