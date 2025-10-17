@@ -19,20 +19,20 @@ Feature: Gestão de Agendamentos (cenários essenciais)
 
 	# Cenários de Validação de Serviço e Profissional
 	Scenario: Criar agendamento com serviço associado ao profissional (POSITIVO)
-		Given que existe o profissional "João" qualificado para "Corte Masculino"
+		Given que existe o profissional "João" qualificado para agendamento de "Corte Masculino"
 		And que o serviço "Corte Masculino" está ativo
 		When eu crio um agendamento do serviço "Corte Masculino" com o profissional "João"
 		Then o agendamento é criado com sucesso
 
 	Scenario: Impedir agendamento de serviço não associado ao profissional (NEGATIVO)
-		Given que existe o profissional "João" sem qualificação para "Manicure"
+		Given que existe o profissional "João" sem qualificação para agendamento de "Manicure"
 		When eu tento criar um agendamento do serviço "Manicure" com o profissional "João"
-		Then o sistema rejeita a operação
+		Then o sistema rejeita a operação de agendamento
 
 	Scenario: Impedir agendamento com serviço inativo (NEGATIVO)
-		Given que o serviço "Maquiagem" está inativo por "falta de insumos"
+		Given que o serviço "Maquiagem" está inativo para agendamento por "falta de insumos"
 		When eu tento criar um agendamento do serviço "Maquiagem"
-		Then o sistema rejeita a operação
+		Then o sistema rejeita a operação de agendamento
 
 	# Cenários de Horário e Duração
 	Scenario: Validar duração do serviço no agendamento (POSITIVO)
@@ -54,20 +54,20 @@ Feature: Gestão de Agendamentos (cenários essenciais)
 
 	# Cenários de Add-on
 	Scenario: Agendar serviço add-on junto com serviço principal (POSITIVO)
-		Given que o serviço "Hidratação" é um add-on de "Corte"
+		Given que o serviço "Hidratação" é um add-on para agendamento de "Corte"
 		When eu crio um agendamento do serviço "Corte" com add-on "Hidratação"
 		Then ambos os serviços são agendados em sequência
 
 	Scenario: Impedir agendamento de add-on sem serviço principal (NEGATIVO)
-		Given que o serviço "Hidratação" é um add-on de "Corte"
+		Given que o serviço "Hidratação" é um add-on para agendamento de "Corte"
 		When eu tento agendar apenas o serviço "Hidratação"
-		Then o sistema rejeita a operação
+		Then o sistema rejeita a operação de agendamento
 
 	# Cenários de Disponibilidade de Profissional
 	Scenario: Respeitar jornada de trabalho do profissional (NEGATIVO)
 		Given que o profissional "Paulo Reis" trabalha 8 horas por dia até "18:00"
 		When eu tento criar um agendamento às "18:30" para "Paulo Reis"
-		Then o sistema rejeita a operação
+		Then o sistema rejeita a operação de agendamento
 
 	# Cenários de Cancelamento e Alteração
 	Scenario: Cancelar agendamento com antecedência (POSITIVO)
@@ -78,7 +78,7 @@ Feature: Gestão de Agendamentos (cenários essenciais)
 	Scenario: Impedir cancelamento de agendamento em andamento (NEGATIVO)
 		Given que existe um agendamento em andamento
 		When eu tento cancelar o agendamento
-		Then o sistema rejeita a operação
+		Then o sistema rejeita a operação de agendamento
 
 	Scenario: Reagendar para horário disponível (POSITIVO)
 		Given que existe um agendamento para "14:00"
@@ -95,4 +95,4 @@ Feature: Gestão de Agendamentos (cenários essenciais)
 	Scenario: Impedir agendamento sem identificação do cliente (NEGATIVO)
 		Given que não informo dados do cliente
 		When eu tento criar um agendamento
-		Then o sistema rejeita a operação
+		Then o sistema rejeita a operação de agendamento
