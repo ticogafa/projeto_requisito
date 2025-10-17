@@ -97,8 +97,8 @@ public class GestaoDeServicosStepDefinitions {
         }
     }
 
-    @Then("o sistema rejeita a operação")
-    public void o_sistema_rejeita_a_operacao() {
+    @Then("o sistema rejeita a operação de serviço")
+    public void o_sistema_rejeita_a_operacao_de_servico() {
         Assertions.assertNotNull(excecaoCapturada);
         Assertions.assertTrue(excecaoCapturada instanceof IllegalArgumentException);
     }
@@ -208,8 +208,8 @@ public class GestaoDeServicosStepDefinitions {
         Assertions.assertTrue(excecaoCapturada instanceof IllegalArgumentException);
     }
 
-    @Given("que o serviço {string} tem um intervalo de limpeza de {int} minutos")
-    public void que_o_serviço_tem_um_intervalo_de_limpeza_de_minutos(String nomeServico, Integer intervaloMinutos) {
+    @Given("que o serviço {string} tem um intervalo de limpeza de {int} minutos para serviços")
+    public void que_o_serviço_tem_um_intervalo_de_limpeza_de_minutos_para_serviços(String nomeServico, Integer intervaloMinutos) {
         servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
             ServicoOferecido s = new ServicoOferecido(profissionalIdTeste, n, new BigDecimal("70.00"), "Corte", 60);
             return repositorioMock.salvar(s);

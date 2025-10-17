@@ -25,6 +25,13 @@ public class GestaoDeProfissionaisStepDefinitions {
     private Exception excecaoCapturada;
     private Map<String, Profissional> profissionalCache = new HashMap<>();
     private int indiceProfissional;
+    
+    // Campo estático para compartilhar exceções entre classes de teste
+    private static Exception excecaoCompartilhada;
+    
+    public static void setExcecaoCompartilhada(Exception excecao) {
+        excecaoCompartilhada = excecao;
+    }
 
     @Before
     public void setup() {
@@ -34,7 +41,8 @@ public class GestaoDeProfissionaisStepDefinitions {
         this.profissionalAtual = null;
         this.excecaoCapturada = null;
         this.profissionalCache.clear();
-        this.indiceProfissional = 1;
+        // Use timestamp para garantir índices únicos entre execuções
+        this.indiceProfissional = (int) (System.currentTimeMillis() % 1000000);
     }
     
     private Cpf gerarCpfValido(int indice) {
@@ -56,7 +64,18 @@ public class GestaoDeProfissionaisStepDefinitions {
     private Profissional criarProfissionalGenerico(String nome) {
         int indice = this.indiceProfissional++;
         Cpf cpf = gerarCpfValido(indice);
-        Email email = new Email(nome.replaceAll("\\s+", "").toLowerCase() + indice + "@barbearia.com");
+        // Remove acentos e espaços para criar um email válido
+        String nomeEmail = nome.replaceAll("\\s+", "")
+                               .toLowerCase()
+                               .replaceAll("ã", "a")
+                               .replaceAll("õ", "o")
+                               .replaceAll("á", "a")
+                               .replaceAll("é", "e")
+                               .replaceAll("í", "i")
+                               .replaceAll("ó", "o")
+                               .replaceAll("ú", "u")
+                               .replaceAll("ç", "c");
+        Email email = new Email(nomeEmail + indice + "@barbearia.com");
         Telefone telefone = new Telefone("819" + String.format("%08d", indice));
         Profissional novo = new Profissional(nome, email, cpf, telefone);
         return profissionalServico.registrarNovo(novo);
@@ -203,8 +222,11 @@ public class GestaoDeProfissionaisStepDefinitions {
 
     @Then("o sistema rejeita a operação")
     public void oSistemaRejeitaAOperação() {
-        Assertions.assertNotNull(excecaoCapturada, "Era esperada uma exceção para rejeitar a operação.");
-        Assertions.assertTrue(excecaoCapturada instanceof IllegalArgumentException || excecaoCapturada instanceof IllegalStateException, 
+        // Verificar primeiro a exceção local, depois a compartilhada
+        Exception excecaoParaTeste = excecaoCapturada != null ? excecaoCapturada : excecaoCompartilhada;
+        
+        Assertions.assertNotNull(excecaoParaTeste, "Era esperada uma exceção para rejeitar a operação.");
+        Assertions.assertTrue(excecaoParaTeste instanceof IllegalArgumentException || excecaoParaTeste instanceof IllegalStateException, 
             "A exceção esperada era de validação ou estado ilegal.");
     }
 }

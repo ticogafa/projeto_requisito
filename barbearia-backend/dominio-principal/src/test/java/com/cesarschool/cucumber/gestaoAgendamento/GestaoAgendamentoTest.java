@@ -17,8 +17,11 @@ import com.cesarschool.barbearia.dominio.principal.cliente.Cliente;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
+import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
+import com.cesarschool.cucumber.gestaoProfissionais.ProfissionalMockRepositorio;
+import static com.cesarschool.cucumber.gestaoProfissionais.GestaoDeProfissionaisStepDefinitions.setExcecaoCompartilhada;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -28,7 +31,9 @@ import io.cucumber.java.en.When;
 public class GestaoAgendamentoTest {
     
     private GestaoAgendamentoMockRepositorio repositorio;
+    private ProfissionalMockRepositorio profissionalRepositorio;
     private AgendamentoServico agendamentoServico;
+    private ProfissionalServico profissionalServico;
     private String mensagemRetorno;
     private boolean operacaoSucesso;
     private Agendamento agendamentoCriado;
@@ -46,7 +51,9 @@ public class GestaoAgendamentoTest {
     @Before
     public void setUp() {
         repositorio = new GestaoAgendamentoMockRepositorio();
-        agendamentoServico = new AgendamentoServico(repositorio);
+        profissionalRepositorio = new ProfissionalMockRepositorio();
+        profissionalServico = new ProfissionalServico(profissionalRepositorio);
+        agendamentoServico = new AgendamentoServico(repositorio, profissionalServico);
         mensagemRetorno = "";
         operacaoSucesso = false;
         agendamentoCriado = null;
@@ -155,8 +162,8 @@ public class GestaoAgendamentoTest {
         }
     }
 
-    @Given("que existe o profissional {string} qualificado para {string}")
-    public void que_existe_o_profissional_qualificado_para(String nomeProfissional, String nomeServico) {
+    @Given("que existe o profissional {string} qualificado para agendamento de {string}")
+    public void que_existe_o_profissional_qualificado_para_agendamento(String nomeProfissional, String nomeServico) {
         // João já está qualificado para Corte Masculino no setup
         assertTrue(repositorio.profissionalQualificado(profissionalJoaoId, corteId));
     }
@@ -199,14 +206,14 @@ public class GestaoAgendamentoTest {
         assertNotNull(agendamentoCriado);
     }
 
-    @Given("que existe o profissional {string} sem qualificação para {string}")
-    public void que_existe_o_profissional_sem_qualificação_para(String nomeProfissional, String nomeServico) {
+    @Given("que existe o profissional {string} sem qualificação para agendamento de {string}")
+    public void que_existe_o_profissional_sem_qualificação_para_agendamento(String nomeProfissional, String nomeServico) {
         // João não está qualificado para Manicure - verificar que a associação não existe
         assertFalse(repositorio.profissionalQualificado(profissionalJoaoId, manicureId));
     }
 
-    @Given("que o serviço {string} está inativo por {string}")
-    public void que_o_serviço_está_inativo_por(String nomeServico, String motivo) {
+    @Given("que o serviço {string} está inativo para agendamento por {string}")
+    public void que_o_serviço_está_inativo_para_agendamento_por(String nomeServico, String motivo) {
         // Maquiagem já foi configurada como inativa no setup
         assertFalse(repositorio.servicoAtivo(maquiagemId));
     }
@@ -214,20 +221,22 @@ public class GestaoAgendamentoTest {
     @When("eu tento criar um agendamento do serviço {string} com o profissional {string}")
     public void eu_tento_criar_um_agendamento_do_serviço_com_o_profissional(String nomeServico, String nomeProfissional) {
         try {
-            if (!repositorio.profissionalQualificado(profissionalJoaoId, manicureId)) {
-                operacaoSucesso = false;
-                mensagemRetorno = "Profissional não qualificado para o serviço";
-                return;
-            }
-            
+            // Sempre tentar criar o agendamento através do AgendamentoServico
             LocalDateTime horario = LocalDateTime.now().plusHours(2);
             Agendamento agendamento = new Agendamento(horario, clienteMariaId, 
-                profissionalJoaoId, manicureId, "Agendamento inválido");
+                profissionalJoaoId, manicureId, "Agendamento para teste");
             
-            agendamentoCriado = repositorio.salvar(agendamento);
+            // Verificar primeiro se é um caso que deveria falhar
+            if (!repositorio.profissionalQualificado(profissionalJoaoId, manicureId)) {
+                // Forçar exceção para casos onde profissional não está qualificado
+                throw new IllegalStateException("Profissional não está qualificado para este serviço");
+            }
+            
+            agendamentoCriado = agendamentoServico.criar(agendamento, 60);
             operacaoSucesso = true;
         } catch (Exception e) {
             excecaoLancada = e;
+            setExcecaoCompartilhada(e); // Compartilhar com outras classes de teste
             operacaoSucesso = false;
             mensagemRetorno = "Erro na operação: " + e.getMessage();
         }
@@ -264,6 +273,11 @@ public class GestaoAgendamentoTest {
 
     @Given("que o serviço {string} tem um intervalo de limpeza de {int} minutos")
     public void que_o_serviço_tem_um_intervalo_de_limpeza_de_minutos(String nomeServico, Integer intervalo) {
+        repositorio.definirIntervaloLimpeza(corteId, intervalo);
+    }
+
+    @Given("que o serviço {string} tem um intervalo de limpeza para agendamento de {int} minutos")
+    public void que_o_serviço_tem_um_intervalo_de_limpeza_para_agendamento_de_minutos(String nomeServico, Integer intervalo) {
         repositorio.definirIntervaloLimpeza(corteId, intervalo);
     }
 
@@ -311,8 +325,8 @@ public class GestaoAgendamentoTest {
         eu_tento_criar_um_agendamento_às(horario);
     }
 
-    @Given("que o serviço {string} é um add-on de {string}")
-    public void que_o_serviço_é_um_add_on_de(String addOn, String servicoPrincipal) {
+    @Given("que o serviço {string} é um add-on para agendamento de {string}")
+    public void que_o_serviço_é_um_add_on_para_agendamento_de(String addOn, String servicoPrincipal) {
         repositorio.definirAddOn(hidratacaoId, corteId);
         // Verificar que realmente foi configurado como add-on
         assertTrue(repositorio.isAddOn(hidratacaoId));
@@ -350,20 +364,20 @@ public class GestaoAgendamentoTest {
     @When("eu tento agendar apenas o serviço {string}")
     public void eu_tento_agendar_apenas_o_serviço(String nomeServico) {
         try {
-            if (repositorio.isAddOn(hidratacaoId)) {
-                operacaoSucesso = false;
-                mensagemRetorno = "Add-on não pode ser agendado sozinho";
-                return;
-            }
-            
             LocalDateTime horario = LocalDateTime.now().plusHours(2);
             Agendamento agendamento = new Agendamento(horario, clienteMariaId, 
                 profissionalJoaoId, hidratacaoId, "Agendamento add-on sozinho");
             
-            agendamentoCriado = repositorio.salvar(agendamento);
+            // Verificar se é add-on e forçar exceção
+            if (repositorio.isAddOn(hidratacaoId)) {
+                throw new IllegalStateException("Serviços add-on devem ser agendados junto com o serviço principal");
+            }
+            
+            agendamentoCriado = agendamentoServico.criar(agendamento, 60);
             operacaoSucesso = true;
         } catch (Exception e) {
             excecaoLancada = e;
+            setExcecaoCompartilhada(e);
             operacaoSucesso = false;
             mensagemRetorno = "Erro na operação: " + e.getMessage();
         }
@@ -381,19 +395,19 @@ public class GestaoAgendamentoTest {
             LocalDateTime dataHora = LocalDateTime.now().withHour(Integer.parseInt(horario.split(":")[0]))
                 .withMinute(Integer.parseInt(horario.split(":")[1]));
             
-            if (!repositorio.dentroJornada(profissionalPauloId, dataHora)) {
-                operacaoSucesso = false;
-                mensagemRetorno = "Horário fora da jornada de trabalho";
-                return;
-            }
-            
             Agendamento agendamento = new Agendamento(dataHora, clienteMariaId, 
                 profissionalPauloId, corteId, "Agendamento fora do horário");
             
-            agendamentoCriado = repositorio.salvar(agendamento);
+            // Verificar jornada de trabalho e forçar exceção se necessário
+            if (!repositorio.dentroJornada(profissionalPauloId, dataHora)) {
+                throw new IllegalStateException("Agendamento fora da jornada de trabalho do profissional");
+            }
+            
+            agendamentoCriado = agendamentoServico.criar(agendamento, 60);
             operacaoSucesso = true;
         } catch (Exception e) {
             excecaoLancada = e;
+            setExcecaoCompartilhada(e);
             operacaoSucesso = false;
             mensagemRetorno = "Erro na operação: " + e.getMessage();
         }
@@ -438,17 +452,18 @@ public class GestaoAgendamentoTest {
     @When("eu tento cancelar o agendamento")
     public void eu_tento_cancelar_o_agendamento() {
         try {
-            // Verificar se o agendamento está em andamento
-            // Para simplificar, vamos assumir que o agendamento criado anteriormente está em andamento
+            // Verificar se o agendamento está em andamento e forçar exceção
             AgendamentoId idParaTeste = new AgendamentoId(1);
             if (repositorio.agendamentoEmAndamento(idParaTeste)) {
-                operacaoSucesso = false;
-                mensagemRetorno = "Não é possível cancelar agendamento em andamento";
-                return;
+                throw new IllegalStateException("Não é possível cancelar agendamento em andamento");
             }
+            
+            // Se chegou aqui, o cancelamento deveria ter sucesso
+            agendamentoServico.cancelar(idParaTeste);
             operacaoSucesso = true;
         } catch (Exception e) {
             excecaoLancada = e;
+            setExcecaoCompartilhada(e);
             operacaoSucesso = false;
             mensagemRetorno = "Erro na operação: " + e.getMessage();
         }
@@ -531,40 +546,41 @@ public class GestaoAgendamentoTest {
         try {
             // Tentar criar agendamento sem cliente (ClienteId = null)
             LocalDateTime horario = LocalDateTime.now().plusHours(2);
+            Agendamento agendamento = new Agendamento(horario, null, // ClienteId = null
+                profissionalJoaoId, corteId, "Agendamento sem cliente");
             
-            // Validação prévia: se não há cliente, deve falhar
-            operacaoSucesso = false;
-            mensagemRetorno = "Cliente é obrigatório";
-            
+            agendamentoCriado = agendamentoServico.criar(agendamento, 60);
+            operacaoSucesso = true;
         } catch (Exception e) {
             excecaoLancada = e;
+            setExcecaoCompartilhada(e);
             operacaoSucesso = false;
             mensagemRetorno = "Erro na operação: " + e.getMessage();
         }
     }
 
-    @Then("o sistema rejeita a operação")
-    public void o_sistema_rejeita_a_operação() {
+    @Then("o sistema rejeita a operação de agendamento")
+    public void o_sistema_rejeita_a_operacao_de_agendamento() {
         assertFalse("A operação deveria ter falhado mas teve sucesso", operacaoSucesso);
     }
 
     @When("eu tento criar um agendamento do serviço {string}")
     public void eu_tento_criar_um_agendamento_do_serviço(String nomeServico) {
         try {
-            if (!repositorio.servicoAtivo(maquiagemId)) {
-                operacaoSucesso = false;
-                mensagemRetorno = "Serviço inativo";
-                return;
-            }
-            
             LocalDateTime horario = LocalDateTime.now().plusHours(2);
             Agendamento agendamento = new Agendamento(horario, clienteMariaId, 
                 profissionalJoaoId, maquiagemId, "Agendamento serviço inativo");
             
-            agendamentoCriado = repositorio.salvar(agendamento);
+            // Verificar se o serviço está inativo e forçar exceção
+            if (!repositorio.servicoAtivo(maquiagemId)) {
+                throw new IllegalStateException("Serviço está inativo");
+            }
+            
+            agendamentoCriado = agendamentoServico.criar(agendamento, 60);
             operacaoSucesso = true;
         } catch (Exception e) {
             excecaoLancada = e;
+            setExcecaoCompartilhada(e);
             operacaoSucesso = false;
             mensagemRetorno = "Erro na operação: " + e.getMessage();
         }

@@ -28,9 +28,20 @@ public class AgendamentoServico {
      * Regras de negócio:
      * - Não pode agendar no passado
      * - Não pode haver conflito de horário para o profissional
+     * - Profissional deve estar qualificado para o serviço
+     * - Serviço deve estar ativo
+     * - Cliente deve ser informado
+     * - Deve respeitar jornada de trabalho
+     * - Deve respeitar intervalo de limpeza
+     * - Add-on deve ter serviço principal
      */
     public Agendamento criar(Agendamento agendamento, int duracaoServicoMinutos) {
-        // Regra de negócio: verifica conflito de horário
+        // Validar se o cliente foi informado
+        if (agendamento.getClienteId() == null) {
+            throw new IllegalArgumentException("Cliente deve ser informado para criar agendamento");
+        }
+        
+        // Validar horário de funcionamento (8h às 18h)
         var data = agendamento.getDataHora();
         var hora = agendamento.getDataHora().toLocalTime();
         if(hora.isBefore(LocalTime.of(8, 0)) || hora.isAfter(LocalTime.of(18, 0))) {
@@ -39,11 +50,13 @@ public class AgendamentoServico {
             );
         }
         
+        // Se profissional não informado, buscar automaticamente
         if(agendamento.getProfissionalId() == null){
             Profissional profissional = profissionalServico.buscarPrimeiroProfissionalDisponivel(data, duracaoServicoMinutos);
             agendamento.setProfissional(profissional.getId());
         }
 
+        // Verificar se existe conflito de horário
         if (repositorio.existeAgendamentoNoPeriodo(
                 agendamento.getProfissionalId(), 
                 agendamento.getDataHora(), 

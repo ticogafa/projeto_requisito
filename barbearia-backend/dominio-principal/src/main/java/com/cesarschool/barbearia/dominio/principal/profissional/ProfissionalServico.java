@@ -84,13 +84,4 @@ public class ProfissionalServico {
         return repositorio.salvar(profissional);
     }
 
-    public List<Profissional> listarAtivos() {
-        return repositorio.listarTodos().stream()
-                .filter(Profissional::isAtivo)
-                .collect(Collectors.toList());
-    }
-
-    public Profissional buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoServicoMinutos) {
-        return repositorio.buscarPrimeiroProfissionalDisponivel(dataHora, duracaoServicoMinutos);
-    }
 }
