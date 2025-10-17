@@ -1,4 +1,4 @@
-package com.cesarschool.cucumber.agendamento;
+package com.cesarschool.cucumber.agendamento.infraestrutura;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 
-class AgendamentoMockRepositorio implements AgendamentoRepositorio {
+public class AgendamentoMockRepositorio implements AgendamentoRepositorio {
     private Agendamento ultimoAgendamentoSalvo;
 
     @Override
@@ -61,16 +61,5 @@ class AgendamentoMockRepositorio implements AgendamentoRepositorio {
     public void remover(Integer id) {}
 }
 
-class AgendamentoConflitoRepositorio extends AgendamentoMockRepositorio {
-    @Override
-    public boolean existeAgendamentoNoPeriodo(ProfissionalId profissionalId, LocalDateTime dataHora,
-            int duracaoMinutos) {
-        return true;
-    }
 
-    @Override
-    public Agendamento salvar(Agendamento agendamento) {
-        return null;
-    }
     
-}

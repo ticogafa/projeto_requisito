@@ -1,4 +1,4 @@
-package com.cesarschool.cucumber.agendamento;
+package com.cesarschool.cucumber.agendamento.infraestrutura;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.List;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepositorio;
-import com.cesarschool.cucumber.agendamento.infraestrutura.ProfissionalFactory;
 
 public class ProfissionalMockRepositorio implements ProfissionalRepositorio{
 
@@ -47,10 +46,5 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio{
 
 }
 
-class ProfissionalSemDisponivelRepositorio extends ProfissionalMockRepositorio {
-    @Override
-    public Profissional buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoMinutos) {
-        throw new IllegalStateException("Não há profissionais disponíveis para o horário solicitado");
-    }
-}
+
 

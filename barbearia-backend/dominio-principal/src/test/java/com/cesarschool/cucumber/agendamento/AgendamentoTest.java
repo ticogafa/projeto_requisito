@@ -12,7 +12,11 @@ import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServic
 import com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepositorio;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
+import com.cesarschool.cucumber.agendamento.infraestrutura.AgendamentoConflitoRepositorio;
 import com.cesarschool.cucumber.agendamento.infraestrutura.AgendamentoFactory;
+import com.cesarschool.cucumber.agendamento.infraestrutura.AgendamentoMockRepositorio;
+import com.cesarschool.cucumber.agendamento.infraestrutura.ProfissionalMockRepositorio;
+import com.cesarschool.cucumber.agendamento.infraestrutura.ProfissionalSemDisponivelRepositorio;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
