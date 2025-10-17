@@ -1,21 +1,26 @@
 package com.cesarschool.barbearia.dominio.principal.agendamento;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
+import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
+import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
 
 /**
  * Serviço de domínio contendo as regras de negócio de Agendamento.
  */
 public class AgendamentoServico {
     private final AgendamentoRepositorio repositorio;
+    private final ProfissionalServico profissionalServico;
 
-    public AgendamentoServico(AgendamentoRepositorio repositorio) {
+    public AgendamentoServico(AgendamentoRepositorio repositorio, ProfissionalServico profissionalRepositorio) {
         Validacoes.validarObjetoObrigatorio(repositorio, "O repositório");
         this.repositorio = repositorio;
+        this.profissionalServico = profissionalRepositorio;
     }
 
     /**
@@ -26,6 +31,19 @@ public class AgendamentoServico {
      */
     public Agendamento criar(Agendamento agendamento, int duracaoServicoMinutos) {
         // Regra de negócio: verifica conflito de horário
+        var data = agendamento.getDataHora();
+        var hora = agendamento.getDataHora().toLocalTime();
+        if(hora.isBefore(LocalTime.of(8, 0)) || hora.isAfter(LocalTime.of(18, 0))) {
+            throw new IllegalStateException(
+                "Agendamentos só podem ser feitos entre 08:00 e 18:00"
+            );
+        }
+        
+        if(agendamento.getProfissionalId() == null){
+            Profissional profissional = profissionalServico.buscarPrimeiroProfissionalDisponivel(data, duracaoServicoMinutos);
+            agendamento.setProfissional(profissional.getId());
+        }
+
         if (repositorio.existeAgendamentoNoPeriodo(
                 agendamento.getProfissionalId(), 
                 agendamento.getDataHora(), 
@@ -40,10 +58,7 @@ public class AgendamentoServico {
 
     public Agendamento buscarPorId(AgendamentoId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do agendamento");
-        return repositorio.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException(//por algum motivo nao esta dando erro aqui
-                    "Agendamento não encontrado com ID: " + id
-        ));
+        return repositorio.buscarPorId(id.getValor());
     }
 
     /**

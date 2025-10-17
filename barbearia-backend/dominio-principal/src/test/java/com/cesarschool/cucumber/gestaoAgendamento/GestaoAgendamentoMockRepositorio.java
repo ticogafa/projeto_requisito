@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId;
@@ -21,7 +20,7 @@ import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 public class GestaoAgendamentoMockRepositorio implements AgendamentoRepositorio {
     
-    private final Map<AgendamentoId, Agendamento> agendamentos = new HashMap<>();
+    private final Map<Integer, Agendamento> agendamentos = new HashMap<>();
     public  final Map<ProfissionalId, Profissional> profissionais = new HashMap<>();
     private final Map<ServicoOferecidoId, ServicoOferecido> servicos = new HashMap<>();
     private final Map<ClienteId, Cliente> clientes = new HashMap<>();
@@ -145,7 +144,7 @@ public class GestaoAgendamentoMockRepositorio implements AgendamentoRepositorio 
             agendamento.getServicoId(),
             agendamento.getObservacoes()
         );
-        agendamentos.put(id, novoAgendamento);
+        agendamentos.put(id.getValor(), novoAgendamento);
         return novoAgendamento;
     }
 
@@ -157,8 +156,8 @@ public class GestaoAgendamentoMockRepositorio implements AgendamentoRepositorio 
     }
 
     @Override
-    public Optional<Agendamento> buscarPorId(AgendamentoId id) {
-        return Optional.ofNullable(agendamentos.get(id));
+    public Agendamento buscarPorId(Integer id) {
+        return agendamentos.get(id);
     }
 
     @Override
@@ -203,7 +202,7 @@ public class GestaoAgendamentoMockRepositorio implements AgendamentoRepositorio 
     }
 
     @Override
-    public void remover(AgendamentoId id) {
+    public void remover(Integer id) {
         agendamentos.remove(id);
     }
 }

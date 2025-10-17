@@ -1,10 +1,12 @@
 package com.cesarschool.barbearia.dominio.principal.profissional;
 
-import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.*;
-
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarStringObrigatoria;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
+
+import lombok.Builder;
 
 /**
  * Entidade de domínio representando um Profissional da barbearia.
@@ -19,13 +21,14 @@ public final class Profissional {
     private Telefone telefone;
 
     // Construtor para criação (sem ID)
+    @Builder
     public Profissional(String nome, Email email, Cpf cpf, Telefone telefone) {
         setNome(nome);
         setEmail(email);
         setCpf(cpf);
         setTelefone(telefone);
     }
-
+    @Builder
     public Profissional(ProfissionalId id, String nome, Email email, Cpf cpf, Telefone telefone) {
         this(nome, email, cpf, telefone);
         setId(id);

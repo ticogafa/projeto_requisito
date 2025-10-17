@@ -7,6 +7,11 @@ import io.cucumber.junit.CucumberOptions;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-    features = "src/test/java/com/cesarschool/resources/agendamento.feature")
+    features = "src/test/java/com/cesarschool/resources/agendamento.feature",
+    glue = "com.cesarschool",
+    plugin = {"pretty", "html:target/cucumber-report.html"},
+    monochrome = true,
+    snippets = CucumberOptions.SnippetType.CAMELCASE
+)
 public class CucumberTest {
 }

@@ -1,5 +1,6 @@
 package com.cesarschool.barbearia.dominio.principal.profissional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
@@ -47,10 +48,11 @@ public class ProfissionalServico {
      */
     public Profissional buscarPorCpf(Cpf cpf) {
         Validacoes.validarObjetoObrigatorio(cpf, "O CPF");
-        return repositorio.buscarPorCpf(cpf)
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "Profissional não encontrado com CPF: " + cpf
-                ));
+        return repositorio.buscarPorCpf(cpf);
+    }
+
+    public Profissional buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoMinutos) {
+        return repositorio.buscarPrimeiroProfissionalDisponivel(dataHora, duracaoMinutos);
     }
 
     /**

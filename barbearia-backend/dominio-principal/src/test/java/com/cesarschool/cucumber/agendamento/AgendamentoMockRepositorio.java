@@ -3,26 +3,21 @@ package com.cesarschool.cucumber.agendamento;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
-import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
-import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 class AgendamentoMockRepositorio implements AgendamentoRepositorio {
+    private Agendamento ultimoAgendamentoSalvo;
+
     @Override
     public Agendamento salvar(Agendamento agendamento) {
-        return new Agendamento(
-                LocalDateTime.now().plusHours(2),
-                new ClienteId(1),
-                new ProfissionalId(1),
-                new ServicoOferecidoId(1),
-                "Nenhuma observação"
-            );
+        // Simula salvamento retornando o próprio agendamento
+        ultimoAgendamentoSalvo = agendamento;
+        return agendamento;
     }
 
     @Override
@@ -31,8 +26,9 @@ class AgendamentoMockRepositorio implements AgendamentoRepositorio {
     }
 
     @Override
-    public Optional<Agendamento> buscarPorId(AgendamentoId id) {
-        return Optional.empty();
+    public Agendamento buscarPorId(Integer id) {
+        // Retorna o último agendamento salvo se existir
+        return ultimoAgendamentoSalvo;
     }
 
     @Override
@@ -62,8 +58,7 @@ class AgendamentoMockRepositorio implements AgendamentoRepositorio {
     }
 
     @Override
-    public void remover(AgendamentoId id) {
-    }
+    public void remover(Integer id) {}
 }
 
 class AgendamentoConflitoRepositorio extends AgendamentoMockRepositorio {

@@ -13,7 +13,6 @@ import lombok.Builder;
  * Entidade de domínio representando um Agendamento.
  * Adaptado do código original - sem anotações JPA.
  */
-@Builder
 public final class Agendamento {
     private AgendamentoId id;
     private LocalDateTime dataHora;
@@ -23,7 +22,7 @@ public final class Agendamento {
     private ServicoOferecidoId servicoId; // Referência ao dominio-profissionais
     private String observacoes;
 
-    // Construtor para criação (sem ID)
+    @Builder
     public Agendamento(
             LocalDateTime dataHora,
             ClienteId clienteId,
@@ -38,7 +37,7 @@ public final class Agendamento {
         this.status = StatusAgendamento.PENDENTE;
     }
 
-    // Construtor para reconstrução (com ID)
+    @Builder
     public Agendamento(
             AgendamentoId id,
             LocalDateTime dataHora,
@@ -61,11 +60,12 @@ public final class Agendamento {
     }
 
     public void cancelar() {
-        if (!status.podeSerCancelado() && LocalDateTime.now().compareTo(getDataHora()) <= 2) {
+        if (!status.podeSerCancelado()) {
             throw new IllegalStateException(
                 "Este agendamento não pode ser cancelado no status atual: " + status);
         }
-        if (dataHora.plusHours(2).isBefore(LocalDateTime.now())) {
+        // Verifica se falta menos de 2 horas para o agendamento
+        if (dataHora.isBefore(LocalDateTime.now().plusHours(2))) {
             throw new IllegalStateException(
             "Cancelamentos só são permitidos com duas horas de antecedência."
             );
@@ -95,6 +95,7 @@ public final class Agendamento {
     
     
     public void setProfissional(ProfissionalId profissionalId) {
+        //opcional
         this.profissionalId = profissionalId;
     }
     

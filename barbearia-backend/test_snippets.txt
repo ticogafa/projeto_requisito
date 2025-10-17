@@ -1,0 +1,189 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Barbearia Backend - Configurações PAI                              [pom]
+[INFO] Barbearia Backend - Domínio Principal                              [jar]
+[INFO] Barbearia Backend                                                  [pom]
+[INFO] 
+[INFO] --------------< com.cesarschool.barbearia:barbearia-pai >---------------
+[INFO] Building Barbearia Backend - Configurações PAI 1.0.0-SNAPSHOT      [1/3]
+[INFO]   from pai/pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] -------< com.cesarschool.barbearia:barbearia-dominio-principal >--------
+[INFO] Building Barbearia Backend - Domínio Principal 1.0.0-SNAPSHOT      [2/3]
+[INFO]   from dominio-principal/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ barbearia-dominio-principal ---
+[INFO] skip non existing resourceDirectory /home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/main/resources
+[INFO] skip non existing resourceDirectory /home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ barbearia-dominio-principal ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ barbearia-dominio-principal ---
+[INFO] Copying 7 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ barbearia-dominio-principal ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 16 source files with javac [debug release 21] to target/test-classes
+[INFO] /home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/java/com/cesarschool/cucumber/CucumberTest.java: /home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/java/com/cesarschool/cucumber/CucumberTest.java uses or overrides a deprecated API.
+[INFO] /home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/java/com/cesarschool/cucumber/CucumberTest.java: Recompile with -Xlint:deprecation for details.
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ barbearia-dominio-principal ---
+[INFO] Using configured provider org.apache.maven.surefire.junitcore.JUnitCoreProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running Agendamentos via Serviços
+
+Scenario: Criar agendamento em horário livre com sucesso                       # file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:4
+  ✔ Given que o cliente selecionou um horário futuro livre para o profissional # com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteSelecionaHorarioFuturoLivre()
+  ✘ When o cliente envia a solicitação de criação do agendamento               # com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteEnviaSolicitacaoDeCriacao()
+        java.lang.IllegalStateException: Agendamentos só podem ser feitos entre 08:00 e 18:00
+        	at com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico.criar(AgendamentoServico.java:37)
+        	at com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteEnviaSolicitacaoDeCriacao(AgendamentoTest.java:46)
+        	at ✽.o cliente envia a solicitação de criação do agendamento(file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:6)
+  ↷ Then o sistema confirma a criação do agendamento com sucesso               # com.cesarschool.cucumber.agendamento.AgendamentoTest.sistemaConfirmaCriacaoComSucesso()
+
+Scenario: Impedir criação de agendamento quando o horário já está ocupado                         # file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:10
+  ✔ Given que já existe um agendamento ativo para o profissional "João Barbeiro" no mesmo horário # com.cesarschool.cucumber.agendamento.AgendamentoTest.existeAgendamentoAtivoMesmoHorario(java.lang.String)
+  ✘ When o cliente tenta criar outro agendamento para o mesmo horário                             # com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteTentaCriarOutroAgendamentoMesmoHorario()
+        java.lang.NullPointerException: Cannot invoke "com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento.getDataHora()" because "agendamento" is null
+        	at com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico.criar(AgendamentoServico.java:34)
+        	at com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteTentaCriarOutroAgendamentoMesmoHorario(AgendamentoTest.java:71)
+        	at ✽.o cliente tenta criar outro agendamento para o mesmo horário(file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:12)
+  ↷ Then o sistema deve recusar a criação por conflito de horário                                 # com.cesarschool.cucumber.agendamento.AgendamentoTest.sistemaRecusaCriacaoPorConflito()
+
+Scenario: Bloquear agendamento fora da jornada de trabalho                           # file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:16
+  ✔ Given que o cliente escolheu um horário inválido fora da jornada do profissional # com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteEscolheHorarioForaDaJornada()
+  ✔ When a solicitação de criação é enviada ao sistema                               # com.cesarschool.cucumber.agendamento.AgendamentoTest.solicitacaoEnviadaAoSistema()
+  ✔ Then o sistema deve negar o agendamento por estar fora do horário permitido      # com.cesarschool.cucumber.agendamento.AgendamentoTest.sistemaNegaForaDaJornada()
+
+Scenario: Impedir cancelamento com menos de duas horas de antecedência                                  # file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:22
+  ✔ Given que existe um agendamento marcado para ocorrer em menos de duas horas e com status "PENDENTE" # com.cesarschool.cucumber.agendamento.AgendamentoTest.existeAgendamentoMenosDeDuasHoras(java.lang.String)
+  ✘ When o cliente solicita o cancelamento desse agendamento                                            # com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteSolicitaCancelamentoAgendamento()
+        java.lang.NullPointerException: ID do agendamento não pode ser nulo
+        	at java.base/java.util.Objects.requireNonNull(Objects.java:340)
+        	at org.apache.commons.lang3.Validate.notNull(Validate.java:1063)
+        	at com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio(Validacoes.java:53)
+        	at com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico.cancelar(AgendamentoServico.java:78)
+        	at com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteSolicitaCancelamentoAgendamento(AgendamentoTest.java:126)
+        	at ✽.o cliente solicita o cancelamento desse agendamento(file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:24)
+  ↷ Then o sistema deve recusar o cancelamento por descumprir o prazo mínimo                            # com.cesarschool.cucumber.agendamento.AgendamentoTest.sistemaRecusaCancelamentoPrazoMinimo()
+
+Scenario: Atribuir profissional automaticamente quando não informado (sucesso simples)    # file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:28
+  ✔ Given que o cliente não informou nenhum profissional ao criar o agendamento           # com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteNaoInformouProfissional()
+  ✔ When a solicitação de agendamento é processada pelo sistema                           # com.cesarschool.cucumber.agendamento.AgendamentoTest.solicitacaoAgendamentoProcessada()
+  ✘ Then o sistema deve criar o agendamento atribuindo o primeiro profissional disponível # com.cesarschool.cucumber.agendamento.AgendamentoTest.sistemaAtribuiPrimeiroProfissionalDisponivel()
+        java.lang.AssertionError: Deveria haver um profissional disponível para o horário
+        	at org.junit.Assert.fail(Assert.java:89)
+        	at org.junit.Assert.assertTrue(Assert.java:42)
+        	at com.cesarschool.cucumber.agendamento.AgendamentoTest.sistemaAtribuiPrimeiroProfissionalDisponivel(AgendamentoTest.java:161)
+        	at ✽.o sistema deve criar o agendamento atribuindo o primeiro profissional disponível(file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:31)
+
+Scenario: Falhar ao atribuir profissional automaticamente quando não há profissionais disponíveis                                # file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:33
+  ■ Given que o cliente não informou nenhum profissional ao criar o agendamento e não existie profissional disponível no horário
+  ↷ When a solicitação de agendamento é processada pelo sistema                                                                  # com.cesarschool.cucumber.agendamento.AgendamentoTest.solicitacaoAgendamentoProcessada()
+  ↷ Then o sistema deve recusar a criação do agendamento informando que não há profissionais disponíveis
+[ERROR] Tests run: 6, Failures: 1, Errors: 4, Skipped: 0, Time elapsed: 0.307 s <<< FAILURE! -- in Agendamentos via Serviços
+[ERROR] Agendamentos via Serviços.Criar agendamento em horário livre com sucesso -- Time elapsed: 0.156 s <<< ERROR!
+java.lang.IllegalStateException: Agendamentos só podem ser feitos entre 08:00 e 18:00
+	at com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico.criar(AgendamentoServico.java:37)
+	at com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteEnviaSolicitacaoDeCriacao(AgendamentoTest.java:46)
+	at ✽.o cliente envia a solicitação de criação do agendamento(file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:6)
+
+[ERROR] Agendamentos via Serviços.Impedir criação de agendamento quando o horário já está ocupado -- Time elapsed: 0.010 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento.getDataHora()" because "agendamento" is null
+	at com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico.criar(AgendamentoServico.java:34)
+	at com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteTentaCriarOutroAgendamentoMesmoHorario(AgendamentoTest.java:71)
+	at ✽.o cliente tenta criar outro agendamento para o mesmo horário(file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:12)
+
+[ERROR] Agendamentos via Serviços.Impedir cancelamento com menos de duas horas de antecedência -- Time elapsed: 0.008 s <<< ERROR!
+java.lang.NullPointerException: ID do agendamento não pode ser nulo
+	at java.base/java.util.Objects.requireNonNull(Objects.java:340)
+	at org.apache.commons.lang3.Validate.notNull(Validate.java:1063)
+	at com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio(Validacoes.java:53)
+	at com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico.cancelar(AgendamentoServico.java:78)
+	at com.cesarschool.cucumber.agendamento.AgendamentoTest.clienteSolicitaCancelamentoAgendamento(AgendamentoTest.java:126)
+	at ✽.o cliente solicita o cancelamento desse agendamento(file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:24)
+
+[ERROR] Agendamentos via Serviços.Atribuir profissional automaticamente quando não informado (sucesso simples) -- Time elapsed: 0.004 s <<< FAILURE!
+java.lang.AssertionError: Deveria haver um profissional disponível para o horário
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.cesarschool.cucumber.agendamento.AgendamentoTest.sistemaAtribuiPrimeiroProfissionalDisponivel(AgendamentoTest.java:161)
+	at ✽.o sistema deve criar o agendamento atribuindo o primeiro profissional disponível(file:///home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/src/test/resources/features/agendamento.feature:31)
+
+[ERROR] Agendamentos via Serviços.Falhar ao atribuir profissional automaticamente quando não há profissionais disponíveis -- Time elapsed: 0.029 s <<< ERROR!
+io.cucumber.junit.UndefinedStepException: 
+The step 'que o cliente não informou nenhum profissional ao criar o agendamento e não existie profissional disponível no horário' and 1 other step(s) are undefined.
+You can implement these steps using the snippet(s) below:
+
+@Given("que o cliente não informou nenhum profissional ao criar o agendamento e não existie profissional disponível no horário")
+public void queOClienteNãoInformouNenhumProfissionalAoCriarOAgendamentoENãoExistieProfissionalDisponívelNoHorário() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("o sistema deve recusar a criação do agendamento informando que não há profissionais disponíveis")
+public void oSistemaDeveRecusarACriaçãoDoAgendamentoInformandoQueNãoHáProfissionaisDisponíveis() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   Deveria haver um profissional disponível para o horário
+[ERROR] Errors: 
+[ERROR]   Agendamentos só podem ser feitos entre 08:00 e 18:00
+[ERROR]   The step 'que o cliente não informou nenhum profissional ao criar o agendamento e não existie profissional disponível no horário' and 1 other step(s) are undefined.
+You can implement these steps using the snippet(s) below:
+
+@Given("que o cliente não informou nenhum profissional ao criar o agendamento e não existie profissional disponível no horário")
+public void queOClienteNãoInformouNenhumProfissionalAoCriarOAgendamentoENãoExistieProfissionalDisponívelNoHorário() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("o sistema deve recusar a criação do agendamento informando que não há profissionais disponíveis")
+public void oSistemaDeveRecusarACriaçãoDoAgendamentoInformandoQueNãoHáProfissionaisDisponíveis() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+
+[ERROR]   ID do agendamento não pode ser nulo
+[ERROR]   Cannot invoke "com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento.getDataHora()" because "agendamento" is null
+[INFO] 
+[ERROR] Tests run: 6, Failures: 1, Errors: 4, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for Barbearia Backend 1.0.0-SNAPSHOT:
+[INFO] 
+[INFO] Barbearia Backend - Configurações PAI .............. SUCCESS [  0.002 s]
+[INFO] Barbearia Backend - Domínio Principal .............. FAILURE [  3.267 s]
+[INFO] Barbearia Backend .................................. SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.487 s
+[INFO] Finished at: 2025-10-16T21:55:13-03:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.2.5:test (default-test) on project barbearia-dominio-principal: There are test failures.
+[ERROR] 
+[ERROR] Please refer to /home/miguel/workspace/projeto_requisito/barbearia-backend/dominio-principal/target/surefire-reports for the individual test results.
+[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :barbearia-dominio-principal

@@ -1,6 +1,6 @@
 package com.cesarschool.barbearia.dominio.principal.profissional;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 import com.cesarschool.barbearia.dominio.compartilhado.base.Repositorio;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
@@ -11,6 +11,7 @@ import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
  * Princípio de Inversão de Dependência: o domínio define o contrato.
  */
 public interface ProfissionalRepositorio extends Repositorio<Profissional, Integer>{
-    Optional<Profissional> buscarPorCpf(Cpf cpf);
+    Profissional buscarPorCpf(Cpf cpf);
     boolean existePorCpf(Cpf cpf);
+    Profissional buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoMinutos);
 }
