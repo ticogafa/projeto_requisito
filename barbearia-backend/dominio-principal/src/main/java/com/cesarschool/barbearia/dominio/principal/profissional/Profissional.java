@@ -8,33 +8,46 @@ import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
 
 import lombok.Builder;
 
-/**
- * Entidade de domínio representando um Profissional da barbearia.
- * Sem anotações JPA - domínio puro.
- * Adaptado do código original mantendo as validações e estrutura.
- */
 public final class Profissional {
     private ProfissionalId id;
     private String nome;
     private Email email;
     private Cpf cpf;
     private Telefone telefone;
+    private Agenda agenda; 
+    private Senioridade senioridade; 
+    private boolean ativo; 
+    private String motivoInatividade; 
 
-    // Construtor para criação (sem ID)
     @Builder
     public Profissional(String nome, Email email, Cpf cpf, Telefone telefone) {
         setNome(nome);
         setEmail(email);
         setCpf(cpf);
         setTelefone(telefone);
+        this.agenda = new Agenda();
+        this.senioridade = Senioridade.JUNIOR;
+        this.ativo = true;
+        this.motivoInatividade = null;
     }
+
     @Builder
     public Profissional(ProfissionalId id, String nome, Email email, Cpf cpf, Telefone telefone) {
         this(nome, email, cpf, telefone);
         setId(id);
     }
 
-    // Getters e Setters com validações
+    public Profissional(ProfissionalId id, String nome, Email email, Cpf cpf, Telefone telefone, Agenda agenda) {
+        this(id, nome, email, cpf, telefone);
+        this.agenda = agenda; 
+    }
+
+    public Profissional(ProfissionalId id, String nome, Email email, Cpf cpf, Telefone telefone, Agenda agenda, Senioridade senioridade, boolean ativo, String motivoInatividade) {
+        this(id, nome, email, cpf, telefone, agenda); 
+        setSenioridade(senioridade);
+        this.ativo = ativo;
+        this.motivoInatividade = motivoInatividade;
+    }
     
     public void setId(ProfissionalId id) {
         validarObjetoObrigatorio(id, "Id");
@@ -65,11 +78,29 @@ public final class Profissional {
         validarObjetoObrigatorio(telefone, "Telefone");
         this.telefone = telefone;
     }
+
+    public void setSenioridade(Senioridade senioridade) {
+        validarObjetoObrigatorio(senioridade, "Senioridade");
+        this.senioridade = senioridade;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public void setMotivoInatividade(String motivoInatividade) {
+        this.motivoInatividade = motivoInatividade;
+    }
     
-    // Métodos de negócio
     public void atualizarContato(Email novoEmail, Telefone novoTelefone) {
         setEmail(novoEmail);
         setTelefone(novoTelefone);
+    }
+
+    public void desativar(String motivo) {
+        validarObjetoObrigatorio(motivo, "Motivo");
+        setAtivo(false);
+        setMotivoInatividade(motivo);
     }
 
     public ProfissionalId getId() { return id; }
@@ -77,5 +108,9 @@ public final class Profissional {
     public Email getEmail() { return email; }
     public Cpf getCpf() { return cpf; }
     public Telefone getTelefone() { return telefone; }
+    public Agenda getAgenda() { return agenda; }
+    public Senioridade getSenioridade() { return senioridade; }
+    public boolean isAtivo() { return ativo; }
+    public String getMotivoInatividade() { return motivoInatividade; }
 
 }

@@ -1,15 +1,11 @@
 package com.cesarschool.barbearia.dominio.principal.profissional;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 
-/**
- * Serviço de domínio contendo as regras de negócio de Profissional.
- * Coordena operações complexas e validações.
- */
 public class ProfissionalServico {
     private final ProfissionalRepositorio repositorio;
 
@@ -18,69 +14,74 @@ public class ProfissionalServico {
         this.repositorio = repositorio;
     }
 
-    /**
-     * Registra um novo profissional no sistema.
-     * Verifica se já existe profissional com mesmo CPF.
-     */
     public Profissional registrarNovo(Profissional profissional) {
         Validacoes.validarObjetoObrigatorio(profissional, "O profissional");
         
-        // Regra de negócio: não pode haver profissionais duplicados por CPF
         if (repositorio.existePorCpf(profissional.getCpf())) {
             throw new IllegalArgumentException(
-                "Já existe um profissional cadastrado com o CPF: " + profissional.getCpf()
+                "Já existe um profissional cadastrado com o CPF: " + profissional.getCpf().toString()
             );
         }
         
         return repositorio.salvar(profissional);
     }
 
-    /**
-     * Busca um profissional por ID.
-     */
+    public Profissional registrarNovo(Profissional profissional, Senioridade senioridade) {
+        Validacoes.validarObjetoObrigatorio(profissional, "O profissional");
+        Validacoes.validarObjetoObrigatorio(senioridade, "Senioridade");
+
+        if (repositorio.existePorCpf(profissional.getCpf())) {
+            throw new IllegalArgumentException(
+                "Já existe um profissional cadastrado com o CPF: " + profissional.getCpf().toString()
+            );
+        }
+        
+        profissional.setSenioridade(senioridade);
+        
+        return repositorio.salvar(profissional);
+    }
+
     public Profissional buscarPorId(ProfissionalId id) {
         Validacoes.validarObjetoObrigatorio(id, "O ID");
         return repositorio.buscarPorId(id.getValor());
     }
 
-    /**
-     * Busca um profissional por CPF.
-     */
     public Profissional buscarPorCpf(Cpf cpf) {
         Validacoes.validarObjetoObrigatorio(cpf, "O CPF");
         return repositorio.buscarPorCpf(cpf);
     }
 
-    public Profissional buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoMinutos) {
-        return repositorio.buscarPrimeiroProfissionalDisponivel(dataHora, duracaoMinutos);
-    }
-
-    /**
-     * Lista todos os profissionais.
-     */
     public List<Profissional> listarTodos() {
         return repositorio.listarTodos();
     }
 
-    /**
-     * Atualiza os dados de um profissional existente.
-     */
     public Profissional atualizar(Profissional profissional) {
         Validacoes.validarObjetoObrigatorio(profissional, "O profissional");
         Validacoes.validarObjetoObrigatorio(profissional.getId(), "O ID do profissional");
         
-        // Verifica se existe
         buscarPorId(profissional.getId());
         
         return repositorio.salvar(profissional);
     }
 
-    /**
-     * Remove um profissional do sistema.
-     */
     public void remover(ProfissionalId id) {
-        // Verifica se existe antes de remover
         buscarPorId(id);
         repositorio.remover(id.getValor());
+    }
+
+    public Profissional desativar(ProfissionalId id, String motivo) {
+        Validacoes.validarObjetoObrigatorio(id, "O ID do profissional");
+        Validacoes.validarStringObrigatoria(motivo, "O motivo da inatividade");
+        
+        Profissional profissional = buscarPorId(id);
+        profissional.desativar(motivo);
+        
+        return repositorio.salvar(profissional);
+    }
+
+    public List<Profissional> listarAtivos() {
+        return repositorio.listarTodos().stream()
+                .filter(Profissional::isAtivo)
+                .collect(Collectors.toList());
     }
 }
