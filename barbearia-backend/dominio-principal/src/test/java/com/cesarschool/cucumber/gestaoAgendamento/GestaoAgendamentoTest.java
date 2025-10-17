@@ -28,135 +28,282 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+/**
+ * Classe de testes BDD para o módulo de Gestão de Agendamentos da barbearia.
+ * 
+ * Esta classe implementa os step definitions do Cucumber para testar todos os cenários
+ * relacionados ao sistema de agendamentos, incluindo:
+ * - Criação de agendamentos com validações de disponibilidade
+ * - Verificação de qualificações de profissionais para serviços específicos
+ * - Gestão de conflitos de horários e sobreposições
+ * - Cancelamento e alteração de agendamentos
+ * - Validações de regras de negócio específicas do domínio
+ * 
+ * Os testes seguem o padrão BDD (Behavior Driven Development) usando Cucumber
+ * para garantir que o comportamento do sistema está alinhado com os requisitos
+ * de negócio definidos nos arquivos .feature correspondentes.
+ * 
+ * @author Sistema de Gestão da Barbearia
+ * @since 1.0
+ * @see com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico
+ */
 public class GestaoAgendamentoTest {
     
+    // ==================== ATRIBUTOS DE TESTE ====================
+    
+    /** Repositório mock para simulação de dados de agendamento */
     private GestaoAgendamentoMockRepositorio repositorio;
+    
+    /** Repositório mock para simulação de dados de profissionais */
     private ProfissionalMockRepositorio profissionalRepositorio;
+    
+    /** Serviço principal para operações de agendamento */
     private AgendamentoServico agendamentoServico;
+    
+    /** Serviço para operações relacionadas aos profissionais */
     private ProfissionalServico profissionalServico;
+    
+    /** Mensagem de retorno capturada durante as operações */
     private String mensagemRetorno;
+    
+    /** Flag indicando sucesso ou falha das operações testadas */
     private boolean operacaoSucesso;
+    
+    /** Objeto agendamento criado durante os testes para validação posterior */
     private Agendamento agendamentoCriado;
+    
+    /** Exceção capturada durante operações que falham */
     private Exception excecaoLancada;
     
-    // IDs para testes
+    // ==================== IDENTIFICADORES PARA TESTES ====================
+    
+    /** ID do profissional João para testes de agendamento */
     private final ProfissionalId profissionalJoaoId = new ProfissionalId(1);
+    
+    /** ID do profissional Paulo para testes de agendamento */
     private final ProfissionalId profissionalPauloId = new ProfissionalId(2);
+    
+    /** ID do serviço de corte de cabelo */
     private final ServicoOferecidoId corteId = new ServicoOferecidoId(1);
+    
+    /** ID do serviço de manicure */
     private final ServicoOferecidoId manicureId = new ServicoOferecidoId(2);
+    
+    /** ID do serviço de maquiagem */
     private final ServicoOferecidoId maquiagemId = new ServicoOferecidoId(3);
+    
+    /** ID do serviço de hidratação capilar */
     private final ServicoOferecidoId hidratacaoId = new ServicoOferecidoId(4);
+    
+    /** ID da cliente Maria para testes de agendamento */
     private final ClienteId clienteMariaId = new ClienteId(1);
     
+    /**
+     * Configuração inicial executada antes de cada cenário de teste.
+     * Inicializa todos os repositórios mock, serviços e variáveis de estado
+     * necessárias para a execução dos testes BDD.
+     * 
+     * Este método garante que cada teste inicie com um estado limpo e
+     * controlado, evitando interferências entre diferentes cenários.
+     */
     @Before
     public void setUp() {
+        // Inicializa repositórios mock para simulação de dados
         repositorio = new GestaoAgendamentoMockRepositorio();
         profissionalRepositorio = new ProfissionalMockRepositorio();
+        
+        // Configura serviços com suas dependências
         profissionalServico = new ProfissionalServico(profissionalRepositorio);
         agendamentoServico = new AgendamentoServico(repositorio, profissionalServico);
+        
+        // Reseta variáveis de estado para cada teste
         mensagemRetorno = "";
         operacaoSucesso = false;
         agendamentoCriado = null;
         excecaoLancada = null;
     }
 
+    // ==================== STEP DEFINITIONS - CONFIGURAÇÃO DO SISTEMA ====================
+    
+    /**
+     * Configura o sistema em estado operacional para os testes.
+     * Limpa todos os dados anteriores e estabelece o estado inicial básico
+     * com profissionais, serviços e clientes padrão.
+     * 
+     * @cucumber.step "que o sistema está operacional"
+     */
     @Given("que o sistema está operacional")
     public void que_o_sistema_está_operacional() {
+        // Limpa todos os dados do repositório para começar com estado limpo
         repositorio.limparDados();
+        // Configura dados básicos necessários para os testes
         setupDadosBasicos();
     }
     
+    /**
+     * Método auxiliar para configurar dados básicos do sistema.
+     * Cria profissionais, serviços e clientes padrão necessários
+     * para a execução dos cenários de teste.
+     */
     private void setupDadosBasicos() {
-        // Criar profissionais
+        // ==================== CRIAÇÃO DE PROFISSIONAIS ====================
+        
+        // Profissional João - especialista em cortes masculinos
         Profissional joao = new Profissional(profissionalJoaoId, "João", 
             new Email("joao@barbearia.com"), new Cpf("11144477735"), 
             new Telefone("81999999999"));
         repositorio.adicionarProfissional(profissionalJoaoId, joao);
         
+        // Profissional Paulo - especialista em manicure e maquiagem
         Profissional paulo = new Profissional(profissionalPauloId, "Paulo Reis", 
             new Email("paulo@barbearia.com"), new Cpf("53604042801"), 
             new Telefone("81888888888"));
         repositorio.adicionarProfissional(profissionalPauloId, paulo);
-        // Criar serviços
-                ServicoOferecido corte = new ServicoOferecido(corteId, profissionalJoaoId, "Corte Masculino", BigDecimal.valueOf(30.0), "Corte tradicional", 60);
-                repositorio.adicionarServico(corteId, corte, true);
-                
-                ServicoOferecido manicure = new ServicoOferecido(manicureId, profissionalPauloId, "Manicure", BigDecimal.valueOf(25.0), "Cuidados com unhas", 60);
-                repositorio.adicionarServico(manicureId, manicure, true);
-                
-                ServicoOferecido maquiagem = new ServicoOferecido(maquiagemId, profissionalPauloId, "Maquiagem", BigDecimal.valueOf(50.0), "Maquiagem profissional", 60);
-                repositorio.adicionarServico(maquiagemId, maquiagem, false);
-                
-                ServicoOferecido hidratacao = new ServicoOferecido(hidratacaoId, profissionalJoaoId, "Hidratação", BigDecimal.valueOf(40.0), "Hidratação capilar", 60);
-                repositorio.adicionarServico(hidratacaoId, hidratacao, true);
-                
-                // Criar cliente
-        // Criar cliente
+        
+        // ==================== CRIAÇÃO DE SERVIÇOS ====================
+        
+        // Corte Masculino - oferecido por João
+        ServicoOferecido corte = new ServicoOferecido(corteId, profissionalJoaoId, "Corte Masculino", BigDecimal.valueOf(30.0), "Corte tradicional", 60);
+        repositorio.adicionarServico(corteId, corte, true);
+        
+        // Manicure - oferecida por Paulo
+        ServicoOferecido manicure = new ServicoOferecido(manicureId, profissionalPauloId, "Manicure", BigDecimal.valueOf(25.0), "Cuidados com unhas", 60);
+        repositorio.adicionarServico(manicureId, manicure, true);
+        
+        // Maquiagem - oferecida por Paulo (serviço inativo para alguns testes)
+        ServicoOferecido maquiagem = new ServicoOferecido(maquiagemId, profissionalPauloId, "Maquiagem", BigDecimal.valueOf(50.0), "Maquiagem profissional", 60);
+        repositorio.adicionarServico(maquiagemId, maquiagem, false);
+        
+        // Hidratação Capilar - oferecida por João
+        ServicoOferecido hidratacao = new ServicoOferecido(hidratacaoId, profissionalJoaoId, "Hidratação", BigDecimal.valueOf(40.0), "Hidratação capilar", 60);
+        repositorio.adicionarServico(hidratacaoId, hidratacao, true);
+        
+        // ==================== CRIAÇÃO DE CLIENTES ====================
+        
+        // Cliente Maria - cliente padrão para testes de agendamento
         Cliente maria = new Cliente(clienteMariaId, "Maria Silva", 
             new Email("maria@email.com"), new Cpf("98765432100"), 
             new Telefone("81777777777"));
         repositorio.adicionarCliente(clienteMariaId, maria);
         
-        // Associações básicas
+        // ==================== CONFIGURAÇÕES ADICIONAIS ====================
+        
+        // Associa serviços aos profissionais qualificados
         repositorio.associarServicoAProfissional(corteId, profissionalJoaoId);
-        repositorio.definirDuracaoServico(corteId, 60); // Corte Feminino tem 60 minutos
+        // Define duração padrão para cortes (60 minutos)
+        repositorio.definirDuracaoServico(corteId, 60);
     }
 
+    // ==================== STEP DEFINITIONS - AGENDAMENTOS ====================
+    
+    /**
+     * Verifica que existe um profissional cadastrado com horários disponíveis.
+     * Valida a pré-condição de ter um profissional ativo no sistema.
+     * 
+     * @cucumber.step "que existe um profissional cadastrado com determinado horário livre"
+     */
     @Given("que existe um profissional cadastrado com determinado horário livre")
     public void que_existe_um_profissional_cadastrado_com_determinado_horário_livre() {
-        // Profissional já cadastrado no setup
+        // Verifica que o profissional João foi cadastrado corretamente no setup
         assertNotNull(repositorio.profissionais.get(profissionalJoaoId));
     }
 
+    /**
+     * Executa a criação de um agendamento em horário livre do profissional.
+     * Testa o cenário positivo de agendamento com disponibilidade confirmada.
+     * 
+     * @cucumber.step "solicito a criação do agendamento em horário livre para o profissional"
+     */
     @When("solicito a criação do agendamento em horário livre para o profissional")
     public void solicito_a_criação_do_agendamento_em_horário_livre_para_o_profissional() {
         try {
+            // Define horário livre (2 horas no futuro) para evitar conflitos
             LocalDateTime horarioLivre = LocalDateTime.now().plusHours(2);
+            // Cria agendamento com cliente Maria, profissional João, serviço de corte
             Agendamento agendamento = new Agendamento(horarioLivre, clienteMariaId, 
                 profissionalJoaoId, corteId, "Agendamento teste");
             
+            // Persiste o agendamento no repositório
             agendamentoCriado = repositorio.salvar(agendamento);
             operacaoSucesso = true;
             mensagemRetorno = "Agendamento criado com sucesso";
         } catch (Exception e) {
+            // Captura exceções durante a criação do agendamento
             excecaoLancada = e;
             operacaoSucesso = false;
         }
     }
 
+    // ==================== STEP DEFINITIONS - VALIDAÇÕES DE MENSAGENS ====================
+
+    /**
+     * Valida que o sistema exibiu a mensagem esperada (formato com dois pontos).
+     * Compara a mensagem retornada pelo sistema com o valor esperado.
+     * 
+     * @param mensagemEsperada Texto da mensagem que deve ter sido exibida
+     * @cucumber.step "o sistema exibe a mensagem: {string}"
+     */
     @Then("o sistema exibe a mensagem: {string}")
     public void o_sistema_exibe_a_mensagem(String mensagemEsperada) {
         assertEquals(mensagemEsperada, mensagemRetorno);
     }
 
+    /**
+     * Valida que o sistema exibiu a mensagem esperada (formato sem dois pontos).
+     * Versão alternativa do validador de mensagens para diferentes formatos de feature files.
+     * 
+     * @param mensagemEsperada Texto da mensagem que deve ter sido exibida
+     * @cucumber.step "o sistema exibe a mensagem {string}"
+     */
     @Then("o sistema exibe a mensagem {string}")
     public void o_sistema_exibe_a_mensagem_sem_dois_pontos(String mensagemEsperada) {
         assertEquals(mensagemEsperada, mensagemRetorno);
     }
 
+    // ==================== STEP DEFINITIONS - CONFLITOS DE AGENDAMENTO ====================
+
+    /**
+     * Configura um agendamento pré-existente para um profissional em horário específico.
+     * Usado para testar cenários de conflito de horários e sobreposições.
+     * 
+     * @cucumber.step "que existe um agendamento para o profissional cadastrado em um horário determinado"
+     */
     @Given("que existe um agendamento para o profissional cadastrado em um horário determinado")
     public void que_existe_um_agendamento_para_o_profissional_cadastrado_em_um_horário_determinado() {
+        // Define horário específico para o agendamento existente
         LocalDateTime horario = LocalDateTime.now().plusHours(2);
+        // Cria agendamento que ocupará o horário do profissional
         Agendamento agendamentoExistente = new Agendamento(horario, clienteMariaId, 
             profissionalJoaoId, corteId, "Agendamento existente");
+        // Persiste o agendamento existente para ocupar o horário
         repositorio.salvar(agendamentoExistente);
     }
 
+    /**
+     * Tenta criar um agendamento no mesmo horário já ocupado por outro agendamento.
+     * Testa o cenário de conflito de horários e validação de disponibilidade.
+     * 
+     * @cucumber.step "solicito a criação do agendamento no horário determinado para o profissional"
+     */
     @When("solicito a criação do agendamento no horário determinado para o profissional")
     public void solicito_a_criação_do_agendamento_no_horário_determinado_para_o_profissional() {
         try {
+            // Usa o mesmo horário já ocupado pelo agendamento existente
             LocalDateTime horarioOcupado = LocalDateTime.now().plusHours(2);
             
+            // Verifica se já existe agendamento no período (validação de conflito)
             if (repositorio.existeAgendamentoNoPeriodo(profissionalJoaoId, horarioOcupado, 60)) {
                 mensagemRetorno = "Já existe um agendamento";
                 operacaoSucesso = false;
             } else {
+                // Se não houver conflito, cria o novo agendamento
                 Agendamento agendamento = new Agendamento(horarioOcupado, clienteMariaId, 
                     profissionalJoaoId, corteId, "Segundo agendamento");
                 agendamentoCriado = repositorio.salvar(agendamento);
                 operacaoSucesso = true;
             }
         } catch (Exception e) {
+            // Captura exceções durante a validação de conflito
             excecaoLancada = e;
             operacaoSucesso = false;
         }
@@ -585,4 +732,46 @@ public class GestaoAgendamentoTest {
             mensagemRetorno = "Erro na operação: " + e.getMessage();
         }
     }
+    
+    // ==================== DOCUMENTAÇÃO COMPLEMENTAR ====================
+    
+    /*
+     * RESUMO DA CLASSE GestaoAgendamentoTest:
+     * 
+     * Esta classe implementa mais de 30 step definitions BDD que cobrem
+     * todos os cenários críticos do sistema de gestão de agendamentos:
+     * 
+     * ✅ FUNCIONALIDADES TESTADAS:
+     * - Criação de agendamentos com validação de disponibilidade
+     * - Detecção e prevenção de conflitos de horário
+     * - Verificação de qualificações profissionais para serviços
+     * - Cancelamento e reagendamento de compromissos
+     * - Validações de regras de negócio específicas
+     * - Tratamento de cenários de erro e exceção
+     * - Integração entre profissionais, clientes e serviços
+     * 
+     * 📋 CENÁRIOS COBERTOS:
+     * - Agendamentos em horários livres (cenário positivo)
+     * - Tentativas de agendamento em horários ocupados (conflito)
+     * - Validação de qualificação profissional para serviços específicos
+     * - Cancelamentos com motivos válidos e inválidos
+     * - Alterações de data/hora dentro das políticas da barbearia
+     * - Verificação de disponibilidade em tempo real
+     * 
+     * 🎯 OBJETIVOS DOS TESTES:
+     * - Garantir integridade do sistema de agendamentos
+     * - Validar regras de negócio complexas
+     * - Verificar tratamento adequado de exceções
+     * - Assegurar experiência consistente do usuário
+     * - Manter qualidade e confiabilidade do sistema
+     * 
+     * 🔧 TECNOLOGIAS UTILIZADAS:
+     * - Cucumber BDD para especificações executáveis
+     * - JUnit para assertions e validações
+     * - Repositórios mock para isolamento de testes
+     * - Clean Architecture para separação de responsabilidades
+     * 
+     * Para detalhes específicos de cada cenário, consulte os métodos
+     * individuais documentados e os arquivos .feature correspondentes.
+     */
 }
