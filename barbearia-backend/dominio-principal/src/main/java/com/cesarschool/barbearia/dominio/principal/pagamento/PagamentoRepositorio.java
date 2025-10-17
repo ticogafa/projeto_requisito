@@ -1,6 +1,5 @@
 package com.cesarschool.barbearia.dominio.principal.pagamento;
 
-import com.cesarschool.barbearia.dominio.principal.pagamento.Pagamento;
 import com.cesarschool.barbearia.dominio.compartilhado.base.Repositorio;
 
 

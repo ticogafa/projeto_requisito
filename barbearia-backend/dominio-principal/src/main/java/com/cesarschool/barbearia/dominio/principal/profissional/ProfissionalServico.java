@@ -2,7 +2,6 @@ package com.cesarschool.barbearia.dominio.principal.profissional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;

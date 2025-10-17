@@ -12,7 +12,6 @@ import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico;
-import com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento;
 import com.cesarschool.barbearia.dominio.principal.cliente.Cliente;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
