@@ -1,230 +1,206 @@
-/*
- * Domínio da Barbearia/AeroCenter modelado em CML (Context Mapper)
- * Fonte: BDD (TESTES BDD.txt) e Diagrama PlantUML (DIAGRAMA_PLANT_UML)
- * Linguagem: Português (nomes, descrições e comentários)
- */
+  Domain Barbearia {}
 
-Domain Barbearia {
-  domainVisionStatement = "Gerenciar com excelência o agendamento de serviços, profissionais, vendas/estoque e marketing/fidelização de clientes de uma barbearia."
+  BoundedContext SistemaBarbearia implements Barbearia {
 
-  Subdomain AgendamentoDeServicos {
-    type = CORE_DOMAIN
-    domainVisionStatement = "Coração do sistema: regras críticas para reservar horários com integridade de disponibilidade e status do agendamento."
-  }
-
-  Subdomain ProfissionaisEServicos {
-    type = SUPPORTING_DOMAIN
-    domainVisionStatement = "Catálogo de serviços e cadastro de profissionais, incluindo jornada/agenda base para disponibilidade."
-  }
-
-  Subdomain VendasEEstoque {
-    type = SUPPORTING_DOMAIN
-    domainVisionStatement = "Registro de vendas (serviços e produtos), pagamentos e baixa no estoque."
-  }
-
-  Subdomain MarketingEFidelizacao {
-    type = SUPPORTING_DOMAIN
-    domainVisionStatement = "CRM, programa de fidelidade e relacionamento; consome eventos de agendamento e vendas."
-  }
-}
-
-/* --------------------------- Bounded Contexts ---------------------------- */
-
-BoundedContext ContextoAgendamento implements AgendamentoDeServicos {
-  domainVisionStatement = "Gerenciar o ciclo de vida dos agendamentos (criação, confirmação, cancelamento, conclusão) respeitando disponibilidade e regras." 
-
-  Module agenda {
-    Aggregate Agendamentos {
-      /* Ciclo de vida do Agendamento (para geração de diagrama de estados) */
-      enum StatusAgendamento {
-        aggregateLifecycle
-        PENDENTE, CONFIRMADO, CANCELADO, CONCLUIDO
-      }
-
-      ValueObject PoliticaCancelamento {
-        int antecedenciaHoras
-      }
-
+    Aggregate Agendamento {
       Entity Agendamento {
         aggregateRoot
-
-  String id
-  Date dataHora
-  - StatusAgendamento status
-        /* Referências por ID aos contextos upstream */
-  String profissionalId
-  String servicoId
-        /* Regras como atributos simples; poderiam ser parametrizadas */
-  - PoliticaCancelamento politicaCancelamento
+        AgendamentoId id
+        Date dataHora
+        String status
+        ClienteId clienteId
+        ProfissionalId profissionalId
+        ServicoOferecidoId servicoId
       }
 
-      /* Evento publicado quando um agendamento é concluído */
-      DomainEvent AgendamentoConcluido {
-  String agendamentoId
-  String clienteId
-  String servicoId
-  Date dataHoraConclusao
-        BigDecimal valorDoServico
+      Service AgendamentoServico {
+        @Agendamento criar(@Agendamento agendamento, int duracaoServicoMinutos);
+        @Agendamento buscarPorId(AgendamentoId id);
+        @Agendamento confirmar(AgendamentoId id);
+        @Agendamento cancelar(AgendamentoId id);
       }
-    }
-  }
-}
 
-BoundedContext ContextoServicosProfissionais implements ProfissionaisEServicos {
-  domainVisionStatement = "Cadastrar serviços, preços e duração; gerenciar profissionais e suas jornadas para suportar disponibilidade de agendamentos."
-
-  Module catalogoESquadra {
-    Aggregate Servicos {
-      Entity Servico {
-        aggregateRoot
-
-        Integer id
-        String nome
-        int duracaoMinutos
-        BigDecimal preco
+      Repository AgendamentoRepositorio {
+        List<Agendamento> buscarPorCliente(ClienteId clienteId)
+        List<Agendamento> buscarPorProfissional(ProfissionalId profissionalId)
+        List<Agendamento> buscarPorStatus(String status)
       }
     }
 
-    Aggregate Profissionais {
-      ValueObject JornadaTrabalho {
-        /* Simplificado: intervalos e faixa horária */
-        String diasDaSemana // ex: "TER-SAB"
-        String horaInicio  // ex: "10:00"
-        String horaFim     // ex: "19:00"
-        String pausaInicio // ex: "13:00"
-        String pausaFim    // ex: "14:00"
-      }
-
+    Aggregate Profissional {
       Entity Profissional {
         aggregateRoot
-
-  String id
+        ProfissionalId id
         String nome
-  - JornadaTrabalho jornada
-        /* Serviços habilitados (mesmo BC) */
-        - List<Servico> servicosHabilitados
+        Email email
+        Cpf cpf
+        Telefone telefone
+        String senioridade
+        boolean ativo
+      }
+
+      Service ProfissionalServico {
+        Profissional registrarNovo(Profissional profissional)
+        Profissional buscarPorId(ProfissionalId id)
+        Profissional atualizar(Profissional profissional)
+        Profissional desativar(ProfissionalId id, String motivo)
+      }
+
+      Repository ProfissionalRepositorio {
+        Profissional buscarPorCpf(Cpf cpf)
+        boolean existePorCpf(Cpf cpf)
       }
     }
-  }
-}
 
-BoundedContext ContextoVendasEstoque implements VendasEEstoque {
-  domainVisionStatement = "Registrar vendas de serviços e produtos, processar pagamentos e manter o saldo de estoque."
-
-  Module comercial {
-    Aggregate Vendas {
-      Entity ItemVenda {
-        String descricao
-        BigDecimal preco
-        int quantidade
-      }
-
-      Entity Pagamento {
-  String id
-        String metodo // ex: "DINHEIRO", "CARTAO", "PIX"
-      }
-
-      Entity Venda {
+    Aggregate ServicoOferecido {
+      Entity ServicoOferecido {
         aggregateRoot
+        ServicoOferecidoId id
+        ProfissionalId profissionalId
+        String nome
+        BigDecimal preco
+        Integer duracaoMinutos
+        boolean ativo
+      }
 
-  String id
-  Date dataVenda
-        BigDecimal valorTotal
-        - List<ItemVenda> itens
-        - Pagamento pagamento
+      Service ServicoOferecidoServico {
+        ServicoOferecido buscarPorId(ServicoOferecidoId id)
+        ServicoOferecido registrar(ServicoOferecido servico)
+        ServicoOferecido atualizarPreco(ServicoOferecidoId id, BigDecimal novoPreco)
+      }
+
+      Repository ServicoOferecidoRepositorio {
+        List<ServicoOferecido> buscarPorProfissional(ProfissionalId profissionalId)
       }
     }
 
-    Aggregate Estoque {
+    Aggregate Produto {
       Entity Produto {
         aggregateRoot
-
-  String id
+        ProdutoId id
         String nome
         int estoque
         BigDecimal preco
+        int estoqueMinimo
+      }
+
+      Service ProdutoServico {
+        Produto salvar(Produto produto)
+        Produto buscarPorId(ProdutoId id)
+        Produto aumentarEstoque(ProdutoId id, int quantidade)
+        Produto baixaEstoque(ProdutoId id, int quantidade)
+      }
+
+      Repository ProdutoRepositorio {
+        List<Produto> listarProdutosComEstoqueBaixo()
       }
     }
-  }
-}
 
-BoundedContext ContextoMarketingFidelizacao implements MarketingEFidelizacao {
-  domainVisionStatement = "Fidelização e CRM: pontuação por agendamentos concluídos, recompensas/vouchers e histórico do cliente."
-
-  Module relacionamento {
-    Aggregate Fidelidade {
-      ValueObject Recompensa {
-        String nome
-        int custoPontos
-      }
-
-      ValueObject Voucher {
-        BigDecimal valorDesconto
-        boolean valido
-      }
-
-      Entity ProgramaDeFidelidade {
+    Aggregate ItemVenda {
+      Entity ItemVenda {
         aggregateRoot
-
-        int regraPontuacaoPorAgendamento // ex: 10 pontos por agendamento concluído
-        - List<Recompensa> recompensas
+        ItemVendaId id
+        VendaId vendaId
+        ProdutoId produtoId
+        ServicoOferecidoId servicoId
+        int quantidade
+        BigDecimal precoTotal
       }
+
+      Service ItemVendaServico {
+        ItemVenda registrar(ItemVenda itemVenda)
+        ItemVenda buscarPorId(ItemVendaId id)
+      }
+
+      Repository ItemVendaRepositorio {}
     }
 
-    Aggregate Clientes {
-      ValueObject AgendamentoConcluidoResumo {
-        String servico
-        Date quando
-        BigDecimal valor
+    Aggregate Venda {
+      Entity Venda {
+        aggregateRoot
+        VendaId id
+        ClienteId clienteId
+        Date dataVenda
+        BigDecimal valorTotal
       }
 
+      Service VendaServico {
+        Venda registrarVendaPDV(Venda venda)
+        Venda buscarPorId(VendaId id)
+      }
+
+      Repository VendaRepositorio {}
+    }
+
+    Aggregate Pagamento {
+      Entity Pagamento {
+        aggregateRoot
+        PagamentoId id
+        String meioPagamento
+      }
+
+      Service PagamentoServico {
+        Pagamento registrar(Pagamento pagamento)
+        Pagamento buscarPorId(PagamentoId id)
+      }
+
+      Repository PagamentoRepositorio {}
+    }
+
+    Aggregate Cliente {
       Entity Cliente {
         aggregateRoot
-
-        String id
+        ClienteId id
         String nome
-        int pontosFidelidade
-        - List<AgendamentoConcluidoResumo> historico
+        Email email
+        Cpf cpf
+        Telefone telefone
+        int pontos
+      }
+
+      Service ClienteServico {
+        Cliente criarCliente(Cliente cliente)
+        Cliente buscarPorId(ClienteId id)
+        Cliente adicionarPontos(ClienteId id, int pontos)
+      }
+
+      Repository ClienteRepositorio {
+        Optional<Cliente> buscarPorEmail(Email email)
+        Optional<Cliente> buscarPorCpf(Cpf cpf)
       }
     }
+
+    Aggregate Lancamento {
+      Entity Lancamento {
+        aggregateRoot
+        LancamentoId id
+        ClienteId clienteId
+        String status
+        BigDecimal valor
+        Date quando
+      }
+
+      Service GestaoCaixaServico {
+        void registrarEntrada(String descricao, double valor)
+        void registrarSaida(String descricao, double valor)
+      }
+
+      Repository LancamentoRepositorio {
+        List<Lancamento> buscarPendentesPorCliente(ClienteId clienteId)
+      }
+    }
+
+    Aggregate Voucher {
+      Entity Voucher {
+        aggregateRoot
+        VoucherId id
+        ClienteId clienteId
+        BigDecimal valorDesconto
+        String status
+        Date expiraEm
+      }
+
+      Repository VoucherRepositorio {}
+    }
+
   }
-}
-
-/* ----------------------------- Context Map ------------------------------ */
-
-ContextMap MapaDeContextoBarbearia {
-  type = SYSTEM_LANDSCAPE
-  state = AS_IS
-
-  contains ContextoAgendamento, ContextoServicosProfissionais, ContextoVendasEstoque, ContextoMarketingFidelizacao
-
-  /* Relacionamentos (inspirados no diagrama PlantUML) */
-
-  // Agendamento consome API de Serviços/Profissionais (Serviços é Upstream)
-  ContextoAgendamento [D] <- [U,OHS,PL] ContextoServicosProfissionais {
-    implementationTechnology = "RESTful HTTP"
-  }
-
-  // Vendas/Estoque reage a eventos de Agendamento (Agendamento é Upstream)
-  ContextoVendasEstoque [D,ACL] <- [U,PL] ContextoAgendamento {
-    implementationTechnology = "Eventos de Domínio"
-    exposedAggregates = Agendamentos
-  }
-
-  // Vendas/Estoque também consome API de Serviços (Serviços é Upstream)
-  ContextoVendasEstoque [D] <- [U,OHS,PL] ContextoServicosProfissionais {
-    implementationTechnology = "RESTful HTTP"
-  }
-
-  // Marketing consome eventos de Agendamento
-  ContextoMarketingFidelizacao [D] <- [U,PL] ContextoAgendamento {
-    implementationTechnology = "Eventos de Domínio"
-    exposedAggregates = Agendamentos
-  }
-
-  // Marketing consome eventos de Vendas
-  ContextoMarketingFidelizacao [D] <- [U,PL] ContextoVendasEstoque {
-    implementationTechnology = "Eventos de Domínio"
-    exposedAggregates = Vendas
-  }
-}

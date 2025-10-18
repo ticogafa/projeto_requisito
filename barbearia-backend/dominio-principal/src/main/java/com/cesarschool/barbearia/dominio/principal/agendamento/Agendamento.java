@@ -8,11 +8,13 @@ import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 import lombok.Builder;
+import lombok.Getter;
 
 /**
  * Entidade de domínio representando um Agendamento.
  * Adaptado do código original - sem anotações JPA.
  */
+@Getter
 public final class Agendamento {
     private AgendamentoId id;
     private LocalDateTime dataHora;
@@ -108,13 +110,4 @@ public final class Agendamento {
     public void setObservacoes(String observacoes) {
         this.observacoes = observacoes;
     }
-    // Getters
-    public AgendamentoId getId() { return id; }
-    public LocalDateTime getDataHora() { return dataHora; }
-    public StatusAgendamento getStatus() { return status; }
-    public ClienteId getClienteId() { return clienteId; }
-    public ProfissionalId getProfissionalId() { return profissionalId; }
-    public ServicoOferecidoId getServicoId() { return servicoId; }
-    public String getObservacoes() { return observacoes; }
-
 }
