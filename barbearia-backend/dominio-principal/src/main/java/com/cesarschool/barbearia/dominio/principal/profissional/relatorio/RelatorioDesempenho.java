@@ -1,14 +1,10 @@
 package com.cesarschool.barbearia.dominio.principal.profissional.relatorio;
 
 public class RelatorioDesempenho {
-    // minutos totais de serviço no dia
-    private final double tempo_servico;
-    // soma dos valores dos serviços concluídos no dia
-    private final double receita_gerada;
-    // quantidade de atendimentos concluídos no dia (ou clientes únicos, se preferir)
-    private final int numero_clientes_atendidos;
-    // média das avaliações do dia (1..5), 0.0 se não houver
-    private final double avaliacao_funcionario;
+    private final double tempo_servico; // minutos totais
+    private final double receita_gerada; // soma dos valores
+    private final int numero_clientes_atendidos; // quantidade de execuções concluídas
+    private final double avaliacao_funcionario; // média 1..5
 
     public RelatorioDesempenho(double tempo_servico,
                                double receita_gerada,

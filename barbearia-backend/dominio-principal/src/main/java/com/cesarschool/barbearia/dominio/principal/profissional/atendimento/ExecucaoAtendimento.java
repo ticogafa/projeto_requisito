@@ -13,7 +13,7 @@ public class ExecucaoAtendimento {
     private final ProfissionalId profissionalId;
     private final double valor; // valor do serviço
     private final LocalDateTime inicio;
-    private LocalDateTime fim; // pode ser null até finalizar
+    private LocalDateTime fim; // null até finalizar
 
     private ExecucaoAtendimento(ExecucaoAtendimentoId id,
                                 ProfissionalId profissionalId,
@@ -21,10 +21,10 @@ public class ExecucaoAtendimento {
                                 LocalDateTime inicio,
                                 LocalDateTime fim) {
         if (valor < 0) throw new IllegalArgumentException("Valor não pode ser negativo");
-        this.id = Objects.requireNonNull(id);
-        this.profissionalId = Objects.requireNonNull(profissionalId);
+        this.id = Objects.requireNonNull(id, "id");
+        this.profissionalId = Objects.requireNonNull(profissionalId, "profissionalId");
         this.valor = valor;
-        this.inicio = Objects.requireNonNull(inicio);
+        this.inicio = Objects.requireNonNull(inicio, "inicio");
         this.fim = fim;
     }
 
