@@ -34,65 +34,8 @@ Feature: Gestão de Agendamentos (cenários essenciais)
 		When eu tento criar um agendamento do serviço "Maquiagem"
 		Then o sistema rejeita a operação de agendamento
 
-	# # Cenários de Horário e Duração
-	# Scenario: Validar duração do serviço no agendamento (POSITIVO)
-	# 	Given que o serviço "Corte Feminino" tem duração de 60 minutos
-	# 	When eu crio um agendamento às "14:00" para o serviço "Corte Feminino"
-	# 	Then o sistema reserva o horário até "15:00"
-
-	# Scenario: Respeitar intervalo de limpeza entre serviços (POSITIVO)
-	# 	Given que o serviço "Corte Feminino" tem um intervalo de limpeza de 10 minutos
-	# 	And que existe um agendamento até "15:00"
-	# 	When eu tento criar um agendamento às "15:05"
-	# 	Then o sistema rejeita a operação por não respeitar o intervalo de limpeza
-
-	# Scenario: Permitir agendamento após intervalo de limpeza (POSITIVO)
-	# 	Given que o serviço "Corte Feminino" tem um intervalo de limpeza de 10 minutos
-	# 	And que existe um agendamento até "15:00"
-	# 	When eu crio um agendamento às "15:10"
-	# 	Then o agendamento é criado com sucesso
-
-	# # Cenários de Add-on
-	# Scenario: Agendar serviço add-on junto com serviço principal (POSITIVO)
-	# 	Given que o serviço "Hidratação" é um add-on para agendamento de "Corte"
-	# 	When eu crio um agendamento do serviço "Corte" com add-on "Hidratação"
-	# 	Then ambos os serviços são agendados em sequência
-
-	# Scenario: Impedir agendamento de add-on sem serviço principal (NEGATIVO)
-	# 	Given que o serviço "Hidratação" é um add-on para agendamento de "Corte"
-	# 	When eu tento agendar apenas o serviço "Hidratação"
-	# 	Then o sistema rejeita a operação de agendamento
-
-	# # Cenários de Disponibilidade de Profissional
-	# Scenario: Respeitar jornada de trabalho do profissional (NEGATIVO)
-	# 	Given que o profissional "Paulo Reis" trabalha 8 horas por dia até "18:00"
-	# 	When eu tento criar um agendamento às "18:30" para "Paulo Reis"
-	# 	Then o sistema rejeita a operação de agendamento
-
 	# Cenários de Cancelamento e Alteração
 	Scenario: Cancelar agendamento com antecedência (POSITIVO)
 		Given que existe um agendamento para amanhã às "14:00"
 		When eu cancelo o agendamento
 		Then o horário fica disponível novamente
-
-	# Scenario: Impedir cancelamento de agendamento em andamento (NEGATIVO)
-	# 	Given que existe um agendamento em andamento
-	# 	When eu tento cancelar o agendamento
-	# 	Then o sistema rejeita a operação de agendamento
-
-	# Scenario: Reagendar para horário disponível (POSITIVO)
-	# 	Given que existe um agendamento para "14:00"
-	# 	And que o horário "16:00" está livre para o mesmo profissional
-	# 	When eu reagendo o serviço para "16:00"
-	# 	Then o agendamento é alterado com sucesso
-
-	# # Cenários de Cliente
-	# Scenario: Criar agendamento para cliente cadastrado (POSITIVO)
-	# 	Given que existe um cliente cadastrado "Maria Silva"
-	# 	When eu crio um agendamento para a cliente "Maria Silva"
-	# 	Then o agendamento é vinculado ao cadastro da cliente
-
-	# Scenario: Impedir agendamento sem identificação do cliente (NEGATIVO)
-	# 	Given que não informo dados do cliente
-	# 	When eu tento criar um agendamento
-	# 	Then o sistema rejeita a operação de agendamento
