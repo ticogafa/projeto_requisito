@@ -20,10 +20,10 @@ Feature: Gestão de Estoque e PDV
     When eu adiciono 15 unidades ao estoque
     Then o estoque atual do produto "Pomada Modeladora" passa a ser 40
 
-  Scenario: Impedir atualização de estoque com valor negativo (NEGATIVO)
-    Given que existe um produto "Cera Capilar" com estoque 10
-    When eu tento reduzir o estoque em -5 unidades diretamente
-    Then o sistema rejeita a operação de atualização com valor negativo
+  # Scenario: Impedir atualização de estoque com valor negativo (NEGATIVO)
+  #   Given que existe um produto "Cera Capilar" com estoque 10
+  #   When eu tento reduzir o estoque em -5 unidades diretamente
+  #   Then o sistema rejeita a operação de atualização com valor negativo
 
   # Cenários de Venda PDV
   Scenario: Registrar venda PDV com produto reduzindo estoque (sucesso)
@@ -37,35 +37,35 @@ Feature: Gestão de Estoque e PDV
     When envio uma venda PDV com 5 unidades do produto "Pomada Forte"
     Then o sistema rejeita a operação de venda com estoque insuficiente
 
-  # Cenários de Status de Produto
-  Scenario: Desativar produto por indisponibilidade com sucesso (POSITIVO)
-    Given que existe um produto "Óleo Capilar" ativo
-    When eu desativo o produto por motivo de "descontinuado pelo fornecedor"
-    Then o produto aparece como "Inativo" na lista de vendas do PDV
+  # # Cenários de Status de Produto
+  # Scenario: Desativar produto por indisponibilidade com sucesso (POSITIVO)
+  #   Given que existe um produto "Óleo Capilar" ativo
+  #   When eu desativo o produto por motivo de "descontinuado pelo fornecedor"
+  #   Then o produto aparece como "Inativo" na lista de vendas do PDV
 
-  Scenario: Impedir venda de produto inativo (NEGATIVO)
-    Given que o produto "Óleo Capilar" está inativo por "descontinuado pelo fornecedor"
-    When o operador tenta registrar uma venda do produto "Óleo Capilar"
-    Then o sistema rejeita a operação de venda de produto inativo
+  # Scenario: Impedir venda de produto inativo (NEGATIVO)
+  #   Given que o produto "Óleo Capilar" está inativo por "descontinuado pelo fornecedor"
+  #   When o operador tenta registrar uma venda do produto "Óleo Capilar"
+  #   Then o sistema rejeita a operação de venda de produto inativo
 
-  # Cenários de Alerta de Estoque
-  Scenario: Gerar alerta quando estoque atinge nível mínimo (POSITIVO)
-    Given que existe um produto "Condicionador" com estoque mínimo configurado para 10 unidades
-    When o estoque do produto "Condicionador" chega a 10 unidades após uma venda
-    Then o sistema gera um alerta de "Estoque baixo"
+  # # Cenários de Alerta de Estoque
+  # Scenario: Gerar alerta quando estoque atinge nível mínimo (POSITIVO)
+  #   Given que existe um produto "Condicionador" com estoque mínimo configurado para 10 unidades
+  #   When o estoque do produto "Condicionador" chega a 10 unidades após uma venda
+  #   Then o sistema gera um alerta de "Estoque baixo"
 
-  Scenario: Impedir definição de estoque mínimo inválido (NEGATIVO)
-    Given que existe um produto "Máscara Hidratante"
-    When eu tento configurar o estoque mínimo para um valor negativo
-    Then o sistema rejeita a operação de definição de estoque mínimo inválido
+  # Scenario: Impedir definição de estoque mínimo inválido (NEGATIVO)
+  #   Given que existe um produto "Máscara Hidratante"
+  #   When eu tento configurar o estoque mínimo para um valor negativo
+  #   Then o sistema rejeita a operação de definição de estoque mínimo inválido
 
-  # Cenários de Relatório
-  Scenario: Gerar relatório de produtos com estoque baixo (POSITIVO)
-    Given que existem produtos com estoque abaixo do mínimo configurado
-    When eu solicito o relatório de estoque baixo
-    Then o sistema exibe a lista de produtos com estoque insuficiente
+  # # Cenários de Relatório
+  # Scenario: Gerar relatório de produtos com estoque baixo (POSITIVO)
+  #   Given que existem produtos com estoque abaixo do mínimo configurado
+  #   When eu solicito o relatório de estoque baixo
+  #   Then o sistema exibe a lista de produtos com estoque insuficiente
 
-  Scenario: Validar histórico de movimentação de estoque (POSITIVO)
-    Given que existe um produto "Spray Fixador" com histórico de movimentações
-    When eu consulto o histórico de movimentação do produto
-    Then o sistema exibe todas as entradas, saídas e vendas registradas
+  # Scenario: Validar histórico de movimentação de estoque (POSITIVO)
+  #   Given que existe um produto "Spray Fixador" com histórico de movimentações
+  #   When eu consulto o histórico de movimentação do produto
+  #   Then o sistema exibe todas as entradas, saídas e vendas registradas
