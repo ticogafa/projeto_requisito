@@ -30,7 +30,7 @@ public class Lancamento {
         this.clienteId = clienteId;
     }
 
-    public static Lancamento novaEntrada(String descricao, double valor, MeioPagamento meioPagamento) {
+    public static Lancamento novoRecibemento(String descricao, double valor, MeioPagamento meioPagamento) {
         return new Lancamento(LancamentoId.novo(), null, StatusLancamento.ENTRADA, meioPagamento, descricao, valor, LocalDateTime.now());
     }
 

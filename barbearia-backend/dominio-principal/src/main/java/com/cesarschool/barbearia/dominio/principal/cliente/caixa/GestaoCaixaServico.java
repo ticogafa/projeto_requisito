@@ -13,7 +13,7 @@ public class GestaoCaixaServico {
 
     
     public void registrarEntrada(String descricao, double valor, MeioPagamento meio) {
-        repositorio.salvar(Lancamento.novaEntrada(descricao, valor, meio));
+        repositorio.salvar(Lancamento.novoRecibemento(descricao, valor, meio));
     }
 
     public void registrarSaida(String descricao, double valor, MeioPagamento meio) {
@@ -44,7 +44,7 @@ public class GestaoCaixaServico {
         var divida = pendentes.get(0);
         divida.quitar();
         repositorio.salvar(divida);
-        repositorio.salvar(Lancamento.novaEntrada("Pagamento de dívida", valorPago, meioPagamento));
+        repositorio.salvar(Lancamento.novoRecibemento("Pagamento de dívida", valorPago, meioPagamento));
     }
 
     
