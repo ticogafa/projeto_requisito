@@ -17,7 +17,7 @@ public class GestaoCaixaServico {
     }
 
     public void registrarSaida(String descricao, double valor, MeioPagamento meio) {
-        repositorio.salvar(Lancamento.novaSaida(descricao, valor, meio));
+        repositorio.salvar(Lancamento.novoGasto(descricao, valor, meio));
     }
 
     public void registrarDivida(ClienteId clienteId, String descricao, double valor, MeioPagamento meio) {

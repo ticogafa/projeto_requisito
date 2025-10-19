@@ -353,7 +353,7 @@ Entidade: `Lancamento`
   - `LocalDateTime quando`
 - Métodos públicos:
   - `static Lancamento novaEntrada(String descricao, double valor)`
-  - `static Lancamento novaSaida(String descricao, double valor)`
+  - `static Lancamento novoGasto(String descricao, double valor)`
   - `static Lancamento novaDivida(ClienteId clienteId, String descricao, double valor)`
   - `void quitar()`
   - Getters: `getId()`, `getClienteId()`, `getStatus()`, `getDescricao()`, `getValor()`, `getQuando()`

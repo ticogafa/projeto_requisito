@@ -34,7 +34,7 @@ public class Lancamento {
         return new Lancamento(LancamentoId.novo(), null, StatusLancamento.ENTRADA, meioPagamento, descricao, valor, LocalDateTime.now());
     }
 
-    public static Lancamento novaSaida(String descricao, double valor, MeioPagamento meioPagamento) {
+    public static Lancamento novoGasto(String descricao, double valor, MeioPagamento meioPagamento) {
         return new Lancamento(LancamentoId.novo(), null, StatusLancamento.SAIDA, meioPagamento, descricao, valor, LocalDateTime.now());
     }
 

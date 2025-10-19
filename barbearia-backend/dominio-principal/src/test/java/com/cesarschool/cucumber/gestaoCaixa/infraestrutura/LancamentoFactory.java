@@ -7,6 +7,6 @@ public final class LancamentoFactory {
     private LancamentoFactory() {}
 
     public static Lancamento entrada(String desc, double valor) { return Lancamento.novaEntrada(desc, valor, null); }
-    public static Lancamento saida(String desc, double valor) { return Lancamento.novaSaida(desc, valor, null); }
+    public static Lancamento saida(String desc, double valor) { return Lancamento.novoGasto(desc, valor, null); }
     public static Lancamento pendente(ClienteId cliente, String desc, double valor) { return Lancamento.novaDivida(cliente, desc, valor, null); }
 }
