@@ -2,11 +2,18 @@ package com.cesarschool.cucumber.gestaoCaixa.infraestrutura;
 
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.Lancamento;
+import com.cesarschool.barbearia.dominio.principal.cliente.caixa.MeioPagamento;
 
 public final class LancamentoFactory {
     private LancamentoFactory() {}
 
-    public static Lancamento entrada(String desc, double valor) { return Lancamento.novoRecibementoento(desc, valor, null); }
-    public static Lancamento saida(String desc, double valor) { return Lancamento.novoGasto(desc, valor, null); }
-    public static Lancamento pendente(ClienteId cliente, String desc, double valor) { return Lancamento.novaDivida(cliente, desc, valor, null); }
+    public static Lancamento entrada(String desc, double valor) { 
+        return Lancamento.novoRecibemento(desc, valor, MeioPagamento.DINHEIRO); 
+    }
+    public static Lancamento saida(String desc, double valor) { 
+        return Lancamento.novoGasto(desc, valor, MeioPagamento.DINHEIRO); 
+    }
+    public static Lancamento pendente(ClienteId cliente, String desc, double valor) { 
+        return Lancamento.novaDivida(cliente, desc, valor, MeioPagamento.DINHEIRO); 
+    }
 }
