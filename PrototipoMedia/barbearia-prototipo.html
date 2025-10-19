@@ -10,6 +10,7 @@ Autor: GitHub Copilot
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Barbearia - Agendamento</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     :root {
       --bg-dark: #1a1a2e;
@@ -37,14 +38,39 @@ Autor: GitHub Copilot
     }
     .container {
       width: 100%;
-      max-width: 400px;
+      max-width: 1200px;
       background: var(--bg-card);
       border-radius: var(--border-radius);
       box-shadow: var(--shadow);
-      padding: 32px 24px;
+      padding: 32px 28px;
       margin: 24px;
       transition: box-shadow 0.3s;
     }
+    /* Header Desktop */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo-icon.small { width: 40px; height: 40px; }
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--text-light);
+      text-decoration: none;
+      font-weight: 600;
+      border: 1px solid var(--input-border);
+    }
+    .nav-item .material-icons { font-size: 18px; }
+    .nav-item.active { background: var(--accent-blue); border-color: var(--accent-blue); }
     .logo {
       display: flex;
       flex-direction: column;
@@ -169,9 +195,9 @@ Autor: GitHub Copilot
       color: var(--text-light);
     }
     .services-list {
-      display: flex;
-      gap: 18px;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
       margin-bottom: 18px;
     }
     .service {
@@ -384,6 +410,16 @@ Autor: GitHub Copilot
       .logo-icon { width: 60px; height: 60px; }
       .logo-text { font-size: 1.3rem; }
     }
+    /* Desktop content grid */
+    .desktop-content { margin-top: 8px; }
+    .content-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start; }
+    @media (max-width: 900px) {
+      .content-grid { grid-template-columns: 1fr; }
+      .services-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 600px) {
+      .services-list { grid-template-columns: 1fr; }
+    }
     /* Animações */
     .fade {
       opacity: 0;
@@ -400,6 +436,36 @@ Autor: GitHub Copilot
   <div class="container" id="app"></div>
   <script>
     // =====================
+    // HEADER (DESKTOP NAV)
+    // =====================
+    function renderHeader() {
+      return `
+        <div class="app-header">
+          <div class="brand">
+            <div class="logo-icon small"></div>
+            <div class="logo-text">BARBERSHOP</div>
+          </div>
+          <nav class="nav">
+            <a href="#" class="nav-item ${state.tela==='agendamento'?'active':''}" data-nav="agendamento"><span class="material-icons">content_cut</span><span>Serviços</span></a>
+            <a href="#" class="nav-item ${state.tela==='dashboard'?'active':''}" data-nav="dashboard"><span class="material-icons">dashboard</span><span>Painel</span></a>
+            <a href="#" class="nav-item ${state.tela==='fidelidade'?'active':''}" data-nav="fidelidade"><span class="material-icons">loyalty</span><span>Fidelidade</span></a>
+            <a href="#" class="nav-item ${state.tela==='vendas'?'active':''}" data-nav="vendas"><span class="material-icons">shopping_bag</span><span>Vendas</span></a>
+            <a href="#" class="nav-item ${state.tela==='financeiro'?'active':''}" data-nav="financeiro"><span class="material-icons">account_balance</span><span>Financeiro</span></a>
+          </nav>
+        </div>
+      `;
+    }
+    function attachHeaderEvents() {
+      document.querySelectorAll('.nav-item').forEach(a => {
+        a.onclick = (e) => {
+          e.preventDefault();
+          const dest = a.getAttribute('data-nav');
+          state.tela = dest;
+          render();
+        };
+      });
+    }
+    // =====================
     // MODELO DE DADOS
     // =====================
     // Entidades principais
@@ -409,9 +475,9 @@ Autor: GitHub Copilot
       { id: 3, nome: 'Lucas Souza', servicos: [2,3], agenda: {} },
     ];
     const mockServicos = [
-      { id: 1, nome: 'Corte de Cabelo', duracao: 30, preco: 35, icon: '✂️' },
-      { id: 2, nome: 'Barba', duracao: 20, preco: 25, icon: '🪒' },
-      { id: 3, nome: 'Hair Style', duracao: 40, preco: 50, icon: '💈' },
+      { id: 1, nome: 'Corte de Cabelo', duracao: 30, preco: 35, icon: 'content_cut' },
+      { id: 2, nome: 'Barba', duracao: 20, preco: 25, icon: 'face' },
+      { id: 3, nome: 'Hair Style', duracao: 40, preco: 50, icon: 'brush' },
     ];
     const mockProdutos = [
       { id: 1, nome: 'Shampoo', preco: 20, estoque: 12 },
@@ -494,11 +560,11 @@ Autor: GitHub Copilot
         <form class="fade" id="loginForm">
           <div class="form-group">
             <label class="form-label">E-Mail</label>
-            <input type="email" class="form-input" name="email" required autocomplete="username">
+            <input type="email" class="form-input" name="email" autocomplete="username">
           </div>
           <div class="form-group">
             <label class="form-label">Senha</label>
-            <input type="password" class="form-input" name="senha" required autocomplete="current-password">
+            <input type="password" class="form-input" name="senha" autocomplete="current-password">
           </div>
           <button class="btn" type="submit">LOG IN</button>
           <div class="form-footer">
@@ -511,7 +577,7 @@ Autor: GitHub Copilot
         e.preventDefault();
         const email = this.email.value.trim();
         const senha = this.senha.value.trim();
-        const user = mockClientes.find(u => u.email === email && u.senha === senha);
+        const user = mockClientes.find(u => u.nome === 'Steve');
         if (user) {
           state.usuario = user;
           state.tela = 'agendamento';
@@ -581,51 +647,51 @@ Autor: GitHub Copilot
     function renderAgendamento() {
       const user = state.usuario;
       app.innerHTML = `
-        <div class="fade">
+        ${renderHeader()}
+        <div class="fade desktop-content">
           <div class="welcome">Bem-vindo, ${user.nome}!</div>
           <div style="margin-bottom:12px;color:var(--text-muted);font-size:0.95rem;">Selecione o serviço, profissional e horário desejado.</div>
-          <div class="tabs">
-            <div class="tab active">Serviços</div>
-            <div class="tab" id="tabDashboard">Painel</div>
-            <div class="tab" id="tabFidelidade">Fidelidade</div>
-            <div class="tab" id="tabVendas">Vendas</div>
-            <div class="tab" id="tabFinanceiro">Financeiro</div>
-          </div>
-          <div class="services-list">
-            ${mockServicos.map(s => `
-              <div class="service${state.agendamento.servico===s.id?' selected':''}" data-id="${s.id}">
-                <div class="service-icon">${s.icon}</div>
-                <div class="service-label">${s.nome}</div>
+          <div class="content-grid">
+            <div>
+              <div class="services-list">
+                ${mockServicos.map(s => `
+                  <div class="service${state.agendamento.servico===s.id?' selected':''}" data-id="${s.id}">
+                    <div class="service-icon"><span class="material-icons">${s.icon}</span></div>
+                    <div class="service-label">${s.nome}</div>
+                  </div>
+                `).join('')}
               </div>
-            `).join('')}
-          </div>
-          <div class="form-group">
-            <label class="form-label">Profissional</label>
-            <select class="form-input" id="profSelect">
-              <option value="">Selecione</option>
-              ${mockProfissionais.filter(p => !state.agendamento.servico || p.servicos.includes(state.agendamento.servico)).map(p => `
-                <option value="${p.id}"${state.agendamento.profissional===p.id?' selected':''}>${p.nome}</option>
-              `).join('')}
-            </select>
-          </div>
-          <div class="calendar">
-            <div class="calendar-header">
-              <span style="font-weight:600;">Selecione o dia</span>
-              <span id="calendarMonth">${getMonthName()}</span>
+              <div class="form-group">
+                <label class="form-label">Profissional</label>
+                <select class="form-input" id="profSelect">
+                  <option value="">Selecione</option>
+                  ${mockProfissionais.filter(p => !state.agendamento.servico || p.servicos.includes(state.agendamento.servico)).map(p => `
+                    <option value="${p.id}"${state.agendamento.profissional===p.id?' selected':''}>${p.nome}</option>
+                  `).join('')}
+                </select>
+              </div>
             </div>
-            <div class="calendar-days">
-              ${renderCalendarDays()}
+            <div>
+              <div class="calendar">
+                <div class="calendar-header">
+                  <span style="font-weight:600;">Selecione o dia</span>
+                  <span id="calendarMonth">${getMonthName()}</span>
+                </div>
+                <div class="calendar-days">
+                  ${renderCalendarDays()}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Horário disponível</label>
+                <div class="times-list">
+                  ${renderTimeSlots()}
+                </div>
+              </div>
+              <button class="btn" id="btnAgendar">CONTINUAR</button>
+              <div class="form-footer">
+                <a href="#" id="logout">Sair</a>
+              </div>
             </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Horário disponível</label>
-            <div class="times-list">
-              ${renderTimeSlots()}
-            </div>
-          </div>
-          <button class="btn" id="btnAgendar">CONTINUAR</button>
-          <div class="form-footer">
-            <a href="#" id="logout">Sair</a>
           </div>
         </div>
       `;
@@ -692,22 +758,7 @@ Autor: GitHub Copilot
         state.tela = 'login';
         render();
       };
-      document.getElementById('tabDashboard').onclick = function() {
-        state.tela = 'dashboard';
-        render();
-      };
-      document.getElementById('tabFidelidade').onclick = function() {
-        state.tela = 'fidelidade';
-        render();
-      };
-      document.getElementById('tabVendas').onclick = function() {
-        state.tela = 'vendas';
-        render();
-      };
-      document.getElementById('tabFinanceiro').onclick = function() {
-        state.tela = 'financeiro';
-        render();
-      };
+      attachHeaderEvents();
     }
     // ========== CALENDÁRIO ==========
     function getMonthName() {
@@ -735,7 +786,8 @@ Autor: GitHub Copilot
     // ========== DASHBOARD PROFISSIONAL ==========
     function renderDashboard() {
       app.innerHTML = `
-        <div class="fade">
+        ${renderHeader()}
+        <div class="fade desktop-content">
           <div class="dashboard-title">Painel de Desempenho</div>
           <div class="dashboard-list">
             <div style="margin-bottom:8px;font-weight:600;">Tempo médio de serviço</div>
@@ -751,6 +803,7 @@ Autor: GitHub Copilot
           <button class="btn" id="backAgendamento">Voltar</button>
         </div>
       `;
+      attachHeaderEvents();
       document.getElementById('backAgendamento').onclick = function() {
         state.tela = 'agendamento';
         render();
@@ -760,13 +813,15 @@ Autor: GitHub Copilot
     function renderFidelidade() {
       const user = state.usuario;
       app.innerHTML = `
-        <div class="fade">
+        ${renderHeader()}
+        <div class="fade desktop-content">
           <div class="dashboard-title">Fidelidade</div>
           <div class="points">Pontos acumulados: ${user.pontos}</div>
           <div class="voucher">${user.pontos>=100?'Voucher disponível: 10% OFF':'Junte 100 pontos para ganhar um voucher!'}</div>
           <button class="btn" id="backAgendamento">Voltar</button>
         </div>
       `;
+      attachHeaderEvents();
       document.getElementById('backAgendamento').onclick = function() {
         state.tela = 'agendamento';
         render();
@@ -775,7 +830,8 @@ Autor: GitHub Copilot
     // ========== VENDAS ==========
     function renderVendas() {
       app.innerHTML = `
-        <div class="fade">
+        ${renderHeader()}
+        <div class="fade desktop-content">
           <div class="sales-title">Vendas de Produtos</div>
           <div class="sales-list">
             ${mockProdutos.map(prod => `
@@ -789,6 +845,7 @@ Autor: GitHub Copilot
           <button class="btn" id="backAgendamento">Voltar</button>
         </div>
       `;
+      attachHeaderEvents();
       document.querySelectorAll('.btn.btn-secondary').forEach(btn => {
         btn.onclick = function() {
           const id = parseInt(this.dataset.id);
@@ -806,13 +863,14 @@ Autor: GitHub Copilot
       };
     }
     // ========== FINANCEIRO ==========
-    function renderFinanceiro() {
+  function renderFinanceiro() {
         const totalEntradas = mockLancamentos.filter(l => l.tipo === 'entrada').reduce((acc, l) => acc + l.valor, 0);
         const totalSaidas = mockLancamentos.filter(l => l.tipo === 'saida').reduce((acc, l) => acc + l.valor, 0);
         const saldoCaixa = totalEntradas - totalSaidas;
 
-        app.innerHTML = `
-        <div class="fade">
+    app.innerHTML = `
+    ${renderHeader()}
+    <div class="fade desktop-content">
           <div class="sales-title">Gestão Financeira</div>
 
           <!-- Caixa -->
@@ -846,6 +904,7 @@ Autor: GitHub Copilot
           <button class="btn" id="backAgendamento" style="margin-top: 18px;">Voltar</button>
         </div>
       `;
+       attachHeaderEvents();
        document.getElementById('backAgendamento').onclick = function() {
         state.tela = 'agendamento';
         render();
