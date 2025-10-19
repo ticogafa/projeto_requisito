@@ -1,206 +1,244 @@
-  Domain Barbearia {}
+Domain GerenciamentoBarbearia {
+	Subdomain Principal
+}
 
-  BoundedContext SistemaBarbearia implements Barbearia {
+BoundedContext SistemaBarbearia implements Principal {
 
-    Aggregate Agendamento {
-      Entity Agendamento {
-        aggregateRoot
-        AgendamentoId id
-        Date dataHora
-        String status
-        ClienteId clienteId
-        ProfissionalId profissionalId
-        ServicoOferecidoId servicoId
-      }
+	Aggregate Cliente {
+		Entity Cliente {
+			aggregateRoot
+			-ClienteId id
+			String nome
+			-Email emailCliente
+			-Cpf cpf
+			-Telefone telefone
+			int pontos
 
-      Service AgendamentoServico {
-        @Agendamento criar(@Agendamento agendamento, int duracaoServicoMinutos);
-        @Agendamento buscarPorId(AgendamentoId id);
-        @Agendamento confirmar(AgendamentoId id);
-        @Agendamento cancelar(AgendamentoId id);
-      }
+		Repository ClienteRepository {
+			@Cliente buscarPorEmail(@Email emailCliente);
+			@Cliente buscarPorCpf(@Cpf cpf);
+		  }
+		}
 
-      Repository AgendamentoRepositorio {
-        List<Agendamento> buscarPorCliente(ClienteId clienteId)
-        List<Agendamento> buscarPorProfissional(ProfissionalId profissionalId)
-        List<Agendamento> buscarPorStatus(String status)
-      }
-    }
+		ValueObject ClienteId { int id }
+		ValueObject Email { String valor }
+		ValueObject Cpf { String valor }
+		ValueObject Telefone { String numero }
 
-    Aggregate Profissional {
-      Entity Profissional {
-        aggregateRoot
-        ProfissionalId id
-        String nome
-        Email email
-        Cpf cpf
-        Telefone telefone
-        String senioridade
-        boolean ativo
-      }
-
-      Service ProfissionalServico {
-        Profissional registrarNovo(Profissional profissional)
-        Profissional buscarPorId(ProfissionalId id)
-        Profissional atualizar(Profissional profissional)
-        Profissional desativar(ProfissionalId id, String motivo)
-      }
-
-      Repository ProfissionalRepositorio {
-        Profissional buscarPorCpf(Cpf cpf)
-        boolean existePorCpf(Cpf cpf)
-      }
-    }
-
-    Aggregate ServicoOferecido {
-      Entity ServicoOferecido {
-        aggregateRoot
-        ServicoOferecidoId id
-        ProfissionalId profissionalId
-        String nome
-        BigDecimal preco
-        Integer duracaoMinutos
-        boolean ativo
-      }
-
-      Service ServicoOferecidoServico {
-        ServicoOferecido buscarPorId(ServicoOferecidoId id)
-        ServicoOferecido registrar(ServicoOferecido servico)
-        ServicoOferecido atualizarPreco(ServicoOferecidoId id, BigDecimal novoPreco)
-      }
-
-      Repository ServicoOferecidoRepositorio {
-        List<ServicoOferecido> buscarPorProfissional(ProfissionalId profissionalId)
-      }
-    }
-
-    Aggregate Produto {
-      Entity Produto {
-        aggregateRoot
-        ProdutoId id
-        String nome
-        int estoque
-        BigDecimal preco
-        int estoqueMinimo
-      }
-
-      Service ProdutoServico {
-        Produto salvar(Produto produto)
-        Produto buscarPorId(ProdutoId id)
-        Produto aumentarEstoque(ProdutoId id, int quantidade)
-        Produto baixaEstoque(ProdutoId id, int quantidade)
-      }
-
-      Repository ProdutoRepositorio {
-        List<Produto> listarProdutosComEstoqueBaixo()
-      }
-    }
-
-    Aggregate ItemVenda {
-      Entity ItemVenda {
-        aggregateRoot
-        ItemVendaId id
-        VendaId vendaId
-        ProdutoId produtoId
-        ServicoOferecidoId servicoId
-        int quantidade
-        BigDecimal precoTotal
-      }
-
-      Service ItemVendaServico {
-        ItemVenda registrar(ItemVenda itemVenda)
-        ItemVenda buscarPorId(ItemVendaId id)
-      }
-
-      Repository ItemVendaRepositorio {}
-    }
-
-    Aggregate Venda {
-      Entity Venda {
-        aggregateRoot
-        VendaId id
-        ClienteId clienteId
-        Date dataVenda
-        BigDecimal valorTotal
-      }
-
-      Service VendaServico {
-        Venda registrarVendaPDV(Venda venda)
-        Venda buscarPorId(VendaId id)
-      }
-
-      Repository VendaRepositorio {}
-    }
-
-    Aggregate Pagamento {
-      Entity Pagamento {
-        aggregateRoot
-        PagamentoId id
-        String meioPagamento
-      }
-
-      Service PagamentoServico {
-        Pagamento registrar(Pagamento pagamento)
-        Pagamento buscarPorId(PagamentoId id)
-      }
-
-      Repository PagamentoRepositorio {}
-    }
-
-    Aggregate Cliente {
-      Entity Cliente {
-        aggregateRoot
-        ClienteId id
-        String nome
-        Email email
-        Cpf cpf
-        Telefone telefone
-        int pontos
-      }
-
-      Service ClienteServico {
-        Cliente criarCliente(Cliente cliente)
-        Cliente buscarPorId(ClienteId id)
-        Cliente adicionarPontos(ClienteId id, int pontos)
-      }
-
-      Repository ClienteRepositorio {
-        Optional<Cliente> buscarPorEmail(Email email)
-        Optional<Cliente> buscarPorCpf(Cpf cpf)
-      }
-    }
-
-    Aggregate Lancamento {
-      Entity Lancamento {
-        aggregateRoot
-        LancamentoId id
-        ClienteId clienteId
-        String status
-        BigDecimal valor
-        Date quando
-      }
-
-      Service GestaoCaixaServico {
-        void registrarEntrada(String descricao, double valor)
-        void registrarSaida(String descricao, double valor)
-      }
-
-      Repository LancamentoRepositorio {
-        List<Lancamento> buscarPendentesPorCliente(ClienteId clienteId)
-      }
-    }
-
-    Aggregate Voucher {
-      Entity Voucher {
-        aggregateRoot
-        VoucherId id
-        ClienteId clienteId
-        BigDecimal valorDesconto
-        String status
-        Date expiraEm
-      }
-
-      Repository VoucherRepositorio {}
-    }
+		Service ClienteServico {
+			@Cliente criarCliente(@Cliente cliente);
+			@Cliente buscarPorId(@ClienteId id);
+			@Cliente adicionarPontos(@ClienteId id, int pontos);
+		}
 
   }
+
+
+	Aggregate Agendamento {
+		Entity Agendamento {
+			aggregateRoot
+
+			-AgendamentoId id
+			Date dataHora
+			String status
+			-ClienteId clienteId
+			-ProfissionalId profissionalId
+			-ServicoOferecidoId servicoId
+
+		Repository AgendamentoRepository {
+			List<@Agendamento> buscarPorCliente(@ClienteId clienteId);
+			List<@Agendamento> buscarPorProfissional(@ProfissionalId profissionalId);
+			List<@Agendamento> buscarPorStatus(String status);
+		  }
+		}
+		ValueObject AgendamentoId { int id }
+
+		Service AgendamentoServico {
+			@Agendamento criar(@Agendamento agendamento, int duracaoServicoMinutos);
+			@Agendamento buscarPorId(@AgendamentoId id);
+			@Agendamento confirmar(@AgendamentoId id);
+			@Agendamento cancelar(@AgendamentoId id);
+		}
+
+	}
+
+	Aggregate Profissional {
+		Entity Profissional {
+			aggregateRoot
+
+			-ProfissionalId id
+			String nome
+			-Email emailProfissional
+			-Cpf cpf
+			-Telefone telefone
+			String senioridade
+			boolean ativo
+		  
+      Repository ProfissionalRepository {
+			  @Profissional buscarPorCpf(@Cpf cpf);
+			  boolean existePorCpf(@Cpf cpf);
+		  }
+		}
+    
+		ValueObject ProfissionalId { int id }
+
+		Service ProfissionalServico {
+			@Profissional registrarNovo(@Profissional profissional);
+			@Profissional buscarPorId(@ProfissionalId id);
+			@Profissional atualizar(@Profissional profissional);
+			@Profissional desativar(@ProfissionalId id, String motivo);
+		}
+
+	}
+
+	Aggregate ServicoOferecido {
+		Entity ServicoOferecido {
+			aggregateRoot
+
+			-ServicoOferecidoId id
+			-ProfissionalId profissionalId
+			String nome
+			BigDecimal preco
+			Integer duracaoMinutos
+			boolean ativo
+		  
+      Repository ServicoOferecidoRepository {
+			  List<@ServicoOferecido> buscarPorProfissional(@ProfissionalId profissionalId);
+		  }
+		}
+
+		ValueObject ServicoOferecidoId { int id }
+
+		Service ServicoOferecidoServico {
+			@ServicoOferecido buscarPorId(@ServicoOferecidoId id);
+			@ServicoOferecido registrar(@ServicoOferecido servico);
+			@ServicoOferecido atualizarPreco(@ServicoOferecidoId id, BigDecimal novoPreco);
+		}
+	}
+
+	Aggregate Produto {
+		Entity Produto {
+			aggregateRoot
+
+			-ProdutoId id
+			String nome
+			int estoque
+			BigDecimal preco
+			int estoqueMinimo
+
+		  Repository ProdutoRepository {
+			  List<@Produto> listarProdutosComEstoqueBaixo();
+		  }
+		}
+
+		ValueObject ProdutoId { int id }
+
+		Service ProdutoServico {
+			@Produto salvar(@Produto produto);
+			@Produto buscarPorId(@ProdutoId id);
+			@Produto aumentarEstoque(@ProdutoId id, int quantidade);
+			@Produto baixaEstoque(@ProdutoId id, int quantidade);
+		}
+
+	}
+
+	Aggregate ItemVenda {
+		Entity ItemVenda {
+			aggregateRoot
+
+			-ItemVendaId id
+			-VendaId vendaId
+			-ProdutoId produtoId
+			-ServicoOferecidoId servicoId
+			int quantidade
+			BigDecimal precoTotal
+
+  		Repository ItemVendaRepository {}
+		}
+
+		ValueObject ItemVendaId { int id }
+
+		Service ItemVendaServico {
+			@ItemVenda registrar(@ItemVenda itemVenda);
+			@ItemVenda buscarPorId(@ItemVendaId id);
+		}
+	}
+
+	Aggregate Venda {
+		Entity Venda {
+			aggregateRoot
+
+			-VendaId id
+			-ClienteId clienteId
+			Date dataVenda
+			BigDecimal valorTotal
+
+		  Repository VendaRepository {}
+		}
+
+		ValueObject VendaId { int id }
+
+		Service VendaServico {
+			@Venda registrarVendaPDV(@Venda venda);
+			@Venda buscarPorId(@VendaId id);
+		}
+	}
+
+	Aggregate Pagamento {
+		Entity Pagamento {
+			aggregateRoot
+
+			-PagamentoId id
+			String meioPagamento
+		  Repository PagamentoRepository {}
+		}
+
+		ValueObject PagamentoId {
+			int id
+		}
+
+		Service PagamentoServico {
+			@Pagamento registrar(@Pagamento pagamento);
+			@Pagamento buscarPorId(@PagamentoId id);
+		}
+
+	}
+
+	Aggregate Lancamento {
+		Entity Lancamento {
+			aggregateRoot
+
+			-LancamentoId id
+			-ClienteId clienteId
+			String status
+			BigDecimal valor
+			Date quando
+
+      Repository LancamentoRepository {
+        List<@Lancamento> buscarPendentesPorCliente(@ClienteId clienteId);
+      }
+		}
+
+		ValueObject LancamentoId { int id }
+
+		Service GestaoCaixaServico {
+			void registrarEntrada(String descricao, double valor);
+			void registrarSaida(String descricao, double valor);
+		}
+	}
+
+	Aggregate Voucher {
+		Entity Voucher {
+			aggregateRoot
+
+			-VoucherId id
+			-ClienteId clienteId
+			BigDecimal valorDesconto
+			String status
+			Date expiraEm
+
+		  Repository VoucherRepository {}
+		}
+		ValueObject VoucherId { int id }
+	}
+}
