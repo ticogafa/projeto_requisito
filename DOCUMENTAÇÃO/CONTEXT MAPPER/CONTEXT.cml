@@ -24,7 +24,7 @@ BoundedContext SistemaBarbearia implements Principal {
 		ValueObject Email { String valor }
 		ValueObject Cpf { String valor }
 		ValueObject Telefone { String numero }
-
+    
 		Service ClienteServico {
 			@Cliente criarCliente(@Cliente cliente);
 			@Cliente buscarPorId(@ClienteId id);
@@ -44,6 +44,8 @@ BoundedContext SistemaBarbearia implements Principal {
 			-ClienteId clienteId
 			-ProfissionalId profissionalId
 			-ServicoOferecidoId servicoId
+      def void cancelar(@UsuarioSolicitante usuarioSolicitante);
+
 
 		Repository AgendamentoRepository {
 			List<@Agendamento> buscarPorCliente(@ClienteId clienteId);
@@ -51,13 +53,20 @@ BoundedContext SistemaBarbearia implements Principal {
 			List<@Agendamento> buscarPorStatus(String status);
 		  }
 		}
+    
+    ValueObject UsuarioSolicitante {
+      TipoUsuario tipoUsuario // Enum: CLIENTE, PROFISSIONAL, ADMIN
+      ValueObjectId referenciaId nullable // Pode ser ClienteId, ProfissionalId ou null
+      -ProfissionalId profissionalId nullable
+    }
+
 		ValueObject AgendamentoId { int id }
 
 		Service AgendamentoServico {
 			@Agendamento criar(@Agendamento agendamento, int duracaoServicoMinutos);
 			@Agendamento buscarPorId(@AgendamentoId id);
 			@Agendamento confirmar(@AgendamentoId id);
-			@Agendamento cancelar(@AgendamentoId id);
+			@Agendamento cancelar(@AgendamentoId id, @UsuarioSolicitante usuario);
 		}
 
 	}
@@ -193,9 +202,7 @@ BoundedContext SistemaBarbearia implements Principal {
 		  Repository PagamentoRepository {}
 		}
 
-		ValueObject PagamentoId {
-			int id
-		}
+		ValueObject PagamentoId { int id }
 
 		Service PagamentoServico {
 			@Pagamento registrar(@Pagamento pagamento);

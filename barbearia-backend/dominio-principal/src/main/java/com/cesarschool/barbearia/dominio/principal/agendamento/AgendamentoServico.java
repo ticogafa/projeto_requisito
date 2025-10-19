@@ -87,10 +87,10 @@ public class AgendamentoServico {
     /**
      * Cancela um agendamento.
      */
-    public Agendamento cancelar(AgendamentoId id) {
+    public Agendamento cancelar(AgendamentoId id, UsuarioSolicitante usuario) {
         Validacoes.validarObjetoObrigatorio(id, "ID do agendamento");
         Agendamento agendamento = buscarPorId(id);
-        agendamento.cancelar();
+        agendamento.cancelar(usuario);
         return repositorio.salvar(agendamento);
     }
 

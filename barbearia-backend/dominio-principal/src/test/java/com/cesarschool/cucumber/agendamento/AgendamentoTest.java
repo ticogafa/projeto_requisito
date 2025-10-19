@@ -6,15 +6,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.cesarschool.barbearia.dominio.compartilhado.enums.TipoUsuario;
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico;
 import com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento;
+import com.cesarschool.barbearia.dominio.principal.agendamento.UsuarioSolicitante;
+import com.cesarschool.barbearia.dominio.principal.cliente.Cliente;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepositorio;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
 import com.cesarschool.cucumber.agendamento.infraestrutura.AgendamentoConflitoRepositorio;
 import com.cesarschool.cucumber.agendamento.infraestrutura.AgendamentoFactory;
 import com.cesarschool.cucumber.agendamento.infraestrutura.AgendamentoMockRepositorio;
+import com.cesarschool.cucumber.agendamento.infraestrutura.ClienteFactory;
 import com.cesarschool.cucumber.agendamento.infraestrutura.ProfissionalMockRepositorio;
 import com.cesarschool.cucumber.agendamento.infraestrutura.ProfissionalSemDisponivelRepositorio;
 
@@ -27,10 +31,12 @@ public class AgendamentoTest {
 private LocalDateTime horario;
 private Agendamento agendamento;
 private Agendamento agendamentoSalvo;
+private UsuarioSolicitante clienteSolicitante;
 private ProfissionalRepositorio repositorioProfissional = new ProfissionalMockRepositorio();
 private ProfissionalServico profissionalServico = new ProfissionalServico(repositorioProfissional);
 private AgendamentoRepositorio repositorio = new AgendamentoMockRepositorio();
 boolean lancou = false;
+Cliente cliente;
 
 private AgendamentoServico servico = new AgendamentoServico(repositorio, profissionalServico);
 private StatusAgendamento statusAgendamento;
@@ -136,6 +142,8 @@ public void existeAgendamentoMenosDeDuasHoras(String status) {
     statusAgendamento = StatusAgendamento.valueOf(status);
     repositorio = new AgendamentoMockRepositorio();
     servico = new AgendamentoServico(repositorio, profissionalServico);
+    cliente = ClienteFactory.criarPadrao();
+    clienteSolicitante = new UsuarioSolicitante(TipoUsuario.CLIENTE, cliente.getId());
     
     // Cria e salva o agendamento no repositório
     agendamento = AgendamentoFactory.criarComStatus(statusAgendamento);
@@ -146,7 +154,8 @@ public void existeAgendamentoMenosDeDuasHoras(String status) {
 public void clienteSolicitaCancelamentoAgendamento() {
     lancou = false;
     try {
-        servico.cancelar(agendamentoSalvo.getId());
+
+        servico.cancelar(agendamentoSalvo.getId(), clienteSolicitante);
     } catch (IllegalStateException e) {
         lancou = true;
     }

@@ -61,22 +61,39 @@ public final class Agendamento {
         this.status = StatusAgendamento.CONFIRMADO;
     }
 
-    public void cancelar() {
-        if (!status.podeSerCancelado()) {
-            throw new IllegalStateException(
-                "Este agendamento não pode ser cancelado no status atual: " + status);
-        }
-        // Verifica se falta menos de 2 horas para o agendamento
-        if (dataHora.isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new IllegalStateException(
-            "Cancelamentos só são permitidos com duas horas de antecedência."
-            );
-        }
+    public void cancelar(UsuarioSolicitante usuario) {
+        validarStatusCancelamento();
+        validarPermissaoDeCancelamento(usuario);
+        validarAntecedenciaMinima();
         this.status = StatusAgendamento.CANCELADO;
+    }
+
+    private void validarStatusCancelamento() {
+        if (!status.podeSerCancelado()) 
+            throw new IllegalStateException("Este agendamento não pode ser cancelado no status atual: " + status);
+    }
+
+    private void validarPermissaoDeCancelamento(UsuarioSolicitante usuario) {
+        boolean autorizado = 
+            usuario.isAdmin() ||
+            (usuario.isCliente() && this.getClienteId().equals(usuario.getReferenciaId())) ||
+            (usuario.isProfissional() && this.getProfissionalId().equals(usuario.getReferenciaId()));
+
+        if (!autorizado)
+            throw new IllegalStateException("Usuário não possui permissão para cancelar este agendamento.");
+        
+    }
+
+    private void validarAntecedenciaMinima() {
+        LocalDateTime limiteCancelamento = LocalDateTime.now().plusHours(2);
+
+        if (dataHora.isBefore(limiteCancelamento)) 
+            throw new IllegalStateException("Cancelamentos só são permitidos com pelo menos duas horas de antecedência.");
     }
 
     
     public void setId(AgendamentoId id) {
+        Validacoes.validarObjetoObrigatorio(id, "ID do Agendamento");
         this.id = id;
     }
     
@@ -92,6 +109,7 @@ public final class Agendamento {
     }
     
     public void setCliente(ClienteId clienteId) {
+        Validacoes.validarObjetoObrigatorio(clienteId, "ID do Cliente");
         this.clienteId = clienteId;
     }
     
@@ -103,6 +121,7 @@ public final class Agendamento {
     
     
     public void setServico(ServicoOferecidoId servicoId) {
+        Validacoes.validarObjetoObrigatorio(servicoId, "ID do Serviço");
         this.servicoId = servicoId;
     }
     
