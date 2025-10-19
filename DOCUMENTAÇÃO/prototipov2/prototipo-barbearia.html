@@ -641,14 +641,17 @@
                             <span class="material-icons">event</span>
                             <span class="font-medium">Agendamentos</span>
                         </a>
-                        <a onclick="showToast('Em breve', 'Esta funcionalidade estará disponível em breve.', 'info'); return false;" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-gray-200">
+                        
+                        <a onclick="openAdminModal('professionalManagement'); return false;" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-gray-200">
                             <span class="material-icons">people</span>
                             <span class="font-medium">Profissionais</span>
                         </a>
-                        <a onclick="showToast('Em breve', 'Esta funcionalidade estará disponível em breve.', 'info'); return false;" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-gray-200">
+                        
+                        <a onclick="openAdminModal('serviceManagement'); return false;" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-gray-200">
                             <span class="material-icons">content_cut</span>
                             <span class="font-medium">Serviços</span>
                         </a>
+
                         <a onclick="showToast('Em breve', 'Esta funcionalidade estará disponível em breve.', 'info'); return false;" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-gray-200">
                             <span class="material-icons">inventory_2</span>
                             <span class="font-medium">Produtos</span>
@@ -1198,6 +1201,284 @@
             </div>
         </div>
 
+        <div id="professionalManagementModal" onclick="closeModalOnBackdrop(event, 'professionalManagementModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-6xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons text-primary text-4xl">people</span>
+                        <h3 class="text-2xl font-bold">Gestão de Profissionais</h3>
+                    </div>
+                    <button onclick="closeModal('professionalManagementModal')" class="material-icons text-gray-400 hover:text-primary cursor-pointer">close</button>
+                </div>
+
+                <div class="flex justify-end mb-4">
+                    <button onclick="openNewProfessionalModal()" class="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                        <span class="material-icons">add</span>
+                        Cadastrar Novo
+                    </button>
+                </div>
+                
+                <div class="bg-dark-700 rounded-xl overflow-hidden border border-dark-600">
+                    <table class="w-full">
+                        <thead class="bg-dark-600">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Profissional</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Nível</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Jornada</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Avaliação</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Status</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="professionalsTableBody" class="divide-y divide-dark-600">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="professionalFormModal" onclick="closeModalOnBackdrop(event, 'professionalFormModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-2xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons text-primary text-4xl" id="professionalFormIcon">person_add</span>
+                        <h3 class="text-2xl font-bold" id="professionalFormTitle">Cadastrar Novo Profissional</h3>
+                    </div>
+                    <button onclick="closeModal('professionalFormModal')" class="material-icons text-gray-400 hover:text-primary cursor-pointer">close</button>
+                </div>
+                
+                <form onsubmit="submitProfessionalForm(event)" class="space-y-6">
+                    <input type="hidden" id="professionalFormId">
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nome do Profissional *</label>
+                        <input type="text" id="professionalFormName" required class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none" placeholder="Ex: Carlos Silva">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nível *</label>
+                        <select id="professionalFormLevel" required class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none">
+                            <option value="Júnior">Júnior</option>
+                            <option value="Pleno">Pleno</option>
+                            <option value="Sênior">Sênior</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Descrição da Jornada *</label>
+                        <input type="text" id="professionalFormJornada" required class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none" placeholder="Ex: Seg-Sex (8h-18h)">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Avaliação (Inicial)</label>
+                        <input type="text" id="professionalFormRating" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none" placeholder="Ex: 5.0/5.0 (será atualizado por clientes)">
+                    </div>
+                    
+                    <div class="flex gap-4 pt-4">
+                        <button type="button" onclick="closeModal('professionalFormModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="flex-1 bg-primary hover:bg-primary/90 text-white py-3 rounded-lg font-medium transition">
+                            Salvar Profissional
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="jornadaModal" onclick="closeModalOnBackdrop(event, 'jornadaModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-2xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <input type="hidden" id="jornadaProfessionalId">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons text-blue-400 text-4xl">schedule</span>
+                        <h3 class="text-2xl font-bold">Definir Jornada de Trabalho</h3>
+                    </div>
+                    <button onclick="closeModal('jornadaModal')" class="material-icons text-gray-400 hover:text-primary cursor-pointer">close</button>
+                </div>
+                <h4 class="text-lg font-semibold mb-4 text-primary" id="jornadaProfessionalName"></h4>
+                
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-400">Aqui você pode definir os dias e horários de trabalho, além de registrar bloqueios e férias.</p>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-dark-700 p-4 rounded-lg">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" checked class="form-checkbox bg-dark-600 border-dark-500 text-primary">
+                                Segunda-feira
+                            </label>
+                            <div class="flex gap-2 mt-2">
+                                <input type="time" value="08:00" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm">
+                                <input type="time" value="18:00" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm">
+                            </div>
+                        </div>
+                        <div class="bg-dark-700 p-4 rounded-lg">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" checked class="form-checkbox bg-dark-600 border-dark-500 text-primary">
+                                Terça-feira
+                            </label>
+                            <div class="flex gap-2 mt-2">
+                                <input type="time" value="08:00" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm">
+                                <input type="time" value="18:00" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm">
+                            </div>
+                        </div>
+                        <div class="bg-dark-700 p-4 rounded-lg">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" checked class="form-checkbox bg-dark-600 border-dark-500 text-primary">
+                                Quarta-feira
+                            </label>
+                            <div class="flex gap-2 mt-2">
+                                <input type="time" value="08:00" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm">
+                                <input type="time" value="18:00" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm">
+                            </div>
+                        </div>
+                        <div class="bg-dark-700 p-4 rounded-lg">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" checked class="form-checkbox bg-dark-600 border-dark-500 text-primary">
+                                Quinta-feira
+                            </label>
+                            <div class="flex gap-2 mt-2">
+                                <input type="time" value="08:00" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm">
+                                <input type="time" value="18:00" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm">
+                            </div>
+                        </div>
+                        <div class="bg-dark-700 p-4 rounded-lg">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" checked class="form-checkbox bg-dark-600 border-dark-500 text-primary">
+                                Sexta-feira
+                            </label>
+                            <div class="flex gap-2 mt-2">
+                                <input type="time" value="08:00" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm">
+                                <input type="time" value="18:00" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm">
+                            </div>
+                        </div>
+                        <div class="bg-dark-700 p-4 rounded-lg">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" class="form-checkbox bg-dark-600 border-dark-500 text-primary">
+                                Sábado
+                            </label>
+                            <div class="flex gap-2 mt-2">
+                                <input type="time" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm" disabled>
+                                <input type="time" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-2 py-1 text-sm" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-6">
+                    <button type="button" onclick="closeModal('jornadaModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="submitJornada()" class="flex-1 bg-primary hover:bg-primary/90 text-white py-3 rounded-lg font-medium transition">
+                        Salvar Jornada
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="serviceManagementModal" onclick="closeModalOnBackdrop(event, 'serviceManagementModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-6xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons text-blue-400 text-4xl">content_cut</span>
+                        <h3 class="text-2xl font-bold">Gestão de Serviços</h3>
+                    </div>
+                    <button onclick="closeModal('serviceManagementModal')" class="material-icons text-gray-400 hover:text-primary cursor-pointer">close</button>
+                </div>
+
+                <div class="flex justify-end mb-4">
+                    <button onclick="openNewServiceModal()" class="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                        <span class="material-icons">add</span>
+                        Cadastrar Novo
+                    </button>
+                </div>
+
+                <div class="bg-dark-700 rounded-xl overflow-hidden border border-dark-600">
+                    <table class="w-full">
+                        <thead class="bg-dark-600">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Serviço</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Categoria</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Duração</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Preço</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Profissionais</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Status</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold">Ações</th>
+                            </tr>
+                        </thead>
+                         <tbody id="servicesTableBody" class="divide-y divide-dark-600">
+                           </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="serviceFormModal" onclick="closeModalOnBackdrop(event, 'serviceFormModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-2xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons text-blue-400 text-4xl" id="serviceFormIcon">add_circle</span>
+                        <h3 class="text-2xl font-bold" id="serviceFormTitle">Cadastrar Novo Serviço</h3>
+                    </div>
+                    <button onclick="closeModal('serviceFormModal')" class="material-icons text-gray-400 hover:text-primary cursor-pointer">close</button>
+                </div>
+                
+                <form onsubmit="submitServiceForm(event)" class="space-y-6">
+                    <input type="hidden" id="serviceFormId">
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nome do Serviço *</label>
+                        <input type="text" id="serviceFormName" required class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none" placeholder="Ex: Corte Simples">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Categoria *</label>
+                        <input type="text" id="serviceFormCategory" required class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none" placeholder="Ex: Cortes, Barba, Pacotes">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Duração (minutos) *</label>
+                        <input type="number" id="serviceFormDuration" required class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none" placeholder="Ex: 30">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Preço (R$) *</label>
+                        <input type="number" step="0.01" id="serviceFormPrice" required class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none" placeholder="Ex: 35.00">
+                    </div>
+                    
+                    <div class="flex gap-4 pt-4">
+                        <button type="button" onclick="closeModal('serviceFormModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="flex-1 bg-primary hover:bg-primary/90 text-white py-3 rounded-lg font-medium transition">
+                            Salvar Serviço
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="associateProfessionalModal" onclick="closeModalOnBackdrop(event, 'associateProfessionalModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-lg w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <input type="hidden" id="associateServiceId">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons text-blue-400 text-4xl">group_add</span>
+                        <h3 class="text-2xl font-bold">Associar Profissionais</h3>
+                    </div>
+                    <button onclick="closeModal('associateProfessionalModal')" class="material-icons text-gray-400 hover:text-primary cursor-pointer">close</button>
+                </div>
+                <h4 class="text-lg font-semibold mb-1 text-primary" id="associateServiceName"></h4>
+                <p class="text-sm text-gray-400 mb-6">Selecione os profissionais que podem realizar este serviço.</p>
+                
+                <div id="associateProfessionalList" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                    </div>
+
+                <div class="flex gap-4 pt-6 border-t border-dark-600 mt-6">
+                    <button type="button" onclick="closeModal('associateProfessionalModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="submitAssociation()" class="flex-1 bg-primary hover:bg-primary/90 text-white py-3 rounded-lg font-medium transition">
+                        Salvar Associações
+                    </button>
+                </div>
+            </div>
+        </div>
         <div id="startModal" onclick="closeModalOnBackdrop(event, 'startModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
             <div class="bg-dark-800 rounded-2xl p-8 max-w-md w-full border border-dark-600" onclick="event.stopPropagation()">
                 <div class="flex items-center gap-3 mb-6">
@@ -1319,6 +1600,22 @@
         
     </div>
     <script>
+        let professionalsData = [
+            { id: 'p1', name: 'Carlos Silva', level: 'Sênior', jornada: 'Seg-Sex (8h-18h)', rating: '4.9/5.0', status: 'Ativo' },
+            { id: 'p2', name: 'Pedro Souza', level: 'Pleno', jornada: 'Seg-Sáb (10h-20h)', rating: '4.7/5.0', status: 'Ativo' },
+            { id: 'p3', name: 'Lucas Lima', level: 'Sênior', jornada: 'Ter-Sáb (8h-18h)', rating: '4.8/5.0', status: 'Ativo' }, // Editado no teste anterior
+            { id: 'p4', name: 'Marcos Andrade', level: 'Sênior', jornada: 'N/A', rating: '4.5/5.0', status: 'Inativo' }
+        ];
+
+        let servicesData = [
+            { id: 's1', name: 'Corte Simples', category: 'Cortes', duration: 30, price: 35.00, assignedProfessionals: '3/4', status: 'Ativo', assignedProfIds: ['p1', 'p2', 'p3'] },
+            { id: 's2', name: 'Corte + Barba', category: 'Pacotes', duration: 50, price: 60.00, assignedProfessionals: '2/4', status: 'Ativo', assignedProfIds: ['p1', 'p4'] },
+            { id: 's3', name: 'Barba Completa', category: 'Barba', duration: 25, price: 30.00, assignedProfessionals: '4/4', status: 'Ativo', assignedProfIds: ['p1', 'p2', 'p3', 'p4'] },
+            { id: 's4', name: 'Corte Social', category: 'Cortes', duration: 40, price: 45.00, assignedProfessionals: '1/4', status: 'Inativo', assignedProfIds: ['p1'] },
+            { id: 's5', name: 'Corte Infantil', category: 'Cortes', duration: 25, price: 30.00, assignedProfessionals: '2/4', status: 'Ativo', assignedProfIds: ['p2', 'p3'] },
+            { id: 's6', name: 'Barba Express', category: 'Barba', duration: 15, price: 20.00, assignedProfessionals: '3/4', status: 'Ativo', assignedProfIds: ['p1', 'p3', 'p4'] },
+        ];
+
         // Variáveis globais
         let currentProfile = '';
         let currentRating = 0;
@@ -1339,13 +1636,14 @@
             }
         }
         
-        // Função de login
         function login(event) {
             event.preventDefault();
             document.getElementById('loginScreen').classList.add('hidden');
             
             if (currentProfile === 'admin') {
                 document.getElementById('adminPanel').classList.remove('hidden');
+                renderProfessionalsTable(); 
+                renderServicesTable();
             } else if (currentProfile === 'professional') {
                 document.getElementById('professionalPanel').classList.remove('hidden');
             } else {
@@ -1436,7 +1734,329 @@
                 // Aqui você removeria a linha da tabela no sistema real
             }
         }
+
+        function renderProfessionalsTable() {
+            const tableBody = document.getElementById('professionalsTableBody');
+            if (!tableBody) return; 
+            
+            tableBody.innerHTML = ''; 
+            
+            professionalsData.forEach(prof => {
+                const isInactive = prof.status === 'Inativo';
+                
+                const actionButtons = isInactive
+                    ? `<button onclick="toggleProfessionalStatus('${prof.id}')" class="bg-green-500/10 text-green-400 hover:bg-green-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">Reativar</button>`
+                    : `
+                        <button onclick="openJornadaModal('${prof.id}')" class="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">Jornada</button>
+                        <button onclick="openEditProfessionalModal('${prof.id}')" class="bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">Editar</button>
+                        <button onclick="toggleProfessionalStatus('${prof.id}')" class="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">Desativar</button>
+                    `;
+                
+                const row = `
+                    <tr class="hover:bg-dark-800 ${isInactive ? 'opacity-60' : ''}">
+                        <td class="px-6 py-4 font-medium">${prof.name}</td>
+                        <td class="px-6 py-4">${prof.level}</td>
+                        <td class="px-6 py-4">${prof.jornada}</td>
+                        <td class="px-6 py-4">${prof.rating}</td>
+                        <td class="px-6 py-4">
+                            <span class="${isInactive ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400'} px-3 py-1 rounded-full text-sm">${prof.status}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">${actionButtons}</div>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function openNewProfessionalModal() {
+            document.getElementById('professionalFormId').value = '';
+            document.getElementById('professionalFormName').value = '';
+            document.getElementById('professionalFormLevel').value = 'Júnior';
+            document.getElementById('professionalFormJornada').value = 'Seg-Sex (8h-18h)';
+            document.getElementById('professionalFormRating').value = '5.0/5.0';
+            
+            document.getElementById('professionalFormTitle').textContent = 'Cadastrar Novo Profissional';
+            document.getElementById('professionalFormIcon').textContent = 'person_add';
+            
+            document.getElementById('professionalFormModal').classList.remove('hidden');
+        }
+
+        function openEditProfessionalModal(id) {
+            const prof = professionalsData.find(p => p.id === id);
+            if (!prof) return;
+
+            document.getElementById('professionalFormId').value = prof.id;
+            document.getElementById('professionalFormName').value = prof.name;
+            document.getElementById('professionalFormLevel').value = prof.level;
+            document.getElementById('professionalFormJornada').value = prof.jornada;
+            document.getElementById('professionalFormRating').value = prof.rating;
+
+            document.getElementById('professionalFormTitle').textContent = 'Editar Profissional';
+            document.getElementById('professionalFormIcon').textContent = 'edit';
+            
+            document.getElementById('professionalFormModal').classList.remove('hidden');
+        }
+
+        function submitProfessionalForm(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('professionalFormId').value;
+            const name = document.getElementById('professionalFormName').value;
+            const level = document.getElementById('professionalFormLevel').value;
+            const jornada = document.getElementById('professionalFormJornada').value;
+            const rating = document.getElementById('professionalFormRating').value;
+
+            if (id) {
+                const index = professionalsData.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    professionalsData[index] = { ...professionalsData[index], name, level, jornada, rating };
+                }
+                showToast('Sucesso!', 'Profissional atualizado com sucesso.', 'check_circle');
+            } else {
+                const newProf = {
+                    id: 'p' + new Date().getTime(), 
+                    name,
+                    level,
+                    jornada,
+                    rating: rating || 'N/A',
+                    status: 'Ativo'
+                };
+                professionalsData.push(newProf);
+                showToast('Sucesso!', 'Profissional cadastrado com sucesso.', 'check_circle');
+            }
+
+            closeModal('professionalFormModal');
+            renderProfessionalsTable(); 
+        }
+
+        function toggleProfessionalStatus(id) {
+            const index = professionalsData.findIndex(p => p.id === id);
+            if (index === -1) return;
+
+            const prof = professionalsData[index];
+            const isActivating = prof.status === 'Inativo';
+            
+            const confirmationText = isActivating
+                ? `Deseja realmente REATIVAR ${prof.name}?`
+                : `Deseja realmente DESATIVAR ${prof.name}? Isso irá ocultá-lo de novos agendamentos.`;
+
+            if (confirm(confirmationText)) {
+                prof.status = isActivating ? 'Ativo' : 'Inativo';
+                
+                const toastMessage = isActivating 
+                    ? 'Profissional reativado.' 
+                    : 'Profissional desativado.';
+                
+                showToast('Status Alterado', toastMessage, 'info', 'info');
+                renderProfessionalsTable(); 
+                renderServicesTable();
+            }
+        }
+
+        function openJornadaModal(id) {
+            const prof = professionalsData.find(p => p.id === id);
+            if (!prof) return;
+
+            document.getElementById('jornadaProfessionalId').value = prof.id;
+            document.getElementById('jornadaProfessionalName').textContent = prof.name;
+            
+            document.getElementById('jornadaModal').classList.remove('hidden');
+        }
+
+        function submitJornada() {
+            const id = document.getElementById('jornadaProfessionalId').value;
+            const prof = professionalsData.find(p => p.id === id);
+            
+            closeModal('jornadaModal');
+            showToast('Jornada Salva!', `A jornada de ${prof.name} foi atualizada.`, 'check_circle');
+        }
         
+        
+        function renderServicesTable() {
+            const tableBody = document.getElementById('servicesTableBody');
+             if (!tableBody) return; 
+             
+            tableBody.innerHTML = ''; 
+            const totalActiveProfessionals = professionalsData.filter(p => p.status === 'Ativo').length;
+
+            servicesData.forEach(service => {
+                const isInactive = service.status === 'Inativo';
+
+                const assignedActiveCount = service.assignedProfIds.filter(profId => {
+                    const prof = professionalsData.find(p => p.id === profId);
+                    return prof && prof.status === 'Ativo';
+                }).length;
+                const assignedProfessionalsText = `${assignedActiveCount}/${totalActiveProfessionals}`;
+                service.assignedProfessionals = assignedProfessionalsText;
+
+                 const actionButtons = isInactive
+                    ? `<button onclick="toggleServiceStatus('${service.id}')" class="bg-green-500/10 text-green-400 hover:bg-green-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">Reativar</button>`
+                    : `
+                        <button onclick="openAssociateProfessionalModal('${service.id}')" class="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">Associar</button>
+                        <button onclick="openEditServiceModal('${service.id}')" class="bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">Editar</button>
+                        <button onclick="toggleServiceStatus('${service.id}')" class="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">Desativar</button>
+                    `;
+                
+                const row = `
+                    <tr class="hover:bg-dark-800 ${isInactive ? 'opacity-60' : ''}">
+                        <td class="px-6 py-4 font-medium">${service.name}</td>
+                        <td class="px-6 py-4">${service.category}</td>
+                        <td class="px-6 py-4">${service.duration} min</td>
+                        <td class="px-6 py-4">R$ ${service.price.toFixed(2).replace('.', ',')}</td>
+                        <td class="px-6 py-4">${assignedProfessionalsText}</td>
+                         <td class="px-6 py-4">
+                            <span class="${isInactive ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400'} px-3 py-1 rounded-full text-sm">${service.status}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">${actionButtons}</div>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function openNewServiceModal() {
+            document.getElementById('serviceFormId').value = '';
+            document.getElementById('serviceFormName').value = '';
+            document.getElementById('serviceFormCategory').value = '';
+            document.getElementById('serviceFormDuration').value = '';
+            document.getElementById('serviceFormPrice').value = '';
+            
+            document.getElementById('serviceFormTitle').textContent = 'Cadastrar Novo Serviço';
+            document.getElementById('serviceFormIcon').textContent = 'add_circle';
+            
+            document.getElementById('serviceFormModal').classList.remove('hidden');
+        }
+
+        function openEditServiceModal(id) {
+            const service = servicesData.find(s => s.id === id);
+            if (!service) return;
+
+            document.getElementById('serviceFormId').value = service.id;
+            document.getElementById('serviceFormName').value = service.name;
+            document.getElementById('serviceFormCategory').value = service.category;
+            document.getElementById('serviceFormDuration').value = service.duration;
+            document.getElementById('serviceFormPrice').value = service.price.toFixed(2);
+
+            document.getElementById('serviceFormTitle').textContent = 'Editar Serviço';
+            document.getElementById('serviceFormIcon').textContent = 'edit';
+            
+            document.getElementById('serviceFormModal').classList.remove('hidden');
+        }
+
+        function submitServiceForm(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('serviceFormId').value;
+            const name = document.getElementById('serviceFormName').value;
+            const category = document.getElementById('serviceFormCategory').value;
+            const duration = parseInt(document.getElementById('serviceFormDuration').value);
+            const price = parseFloat(document.getElementById('serviceFormPrice').value);
+
+            if (isNaN(duration) || isNaN(price) || duration <= 0 || price < 0) {
+                 showToast('Erro', 'Duração e Preço devem ser números válidos.', 'error', 'red');
+                 return;
+            }
+
+            if (id) {
+                const index = servicesData.findIndex(s => s.id === id);
+                if (index !== -1) {
+                    servicesData[index] = { ...servicesData[index], name, category, duration, price };
+                }
+                showToast('Sucesso!', 'Serviço atualizado com sucesso.', 'check_circle');
+            } else {
+                const newService = {
+                    id: 's' + new Date().getTime(), 
+                    name,
+                    category,
+                    duration,
+                    price,
+                    assignedProfessionals: `0/${professionalsData.filter(p => p.status === 'Ativo').length}`, 
+                    status: 'Ativo',
+                    assignedProfIds: []
+                };
+                servicesData.push(newService);
+                showToast('Sucesso!', 'Serviço cadastrado com sucesso.', 'check_circle');
+            }
+
+            closeModal('serviceFormModal');
+            renderServicesTable();
+        }
+
+        function toggleServiceStatus(id) {
+            const index = servicesData.findIndex(s => s.id === id);
+            if (index === -1) return;
+
+            const service = servicesData[index];
+            const isActivating = service.status === 'Inativo';
+            
+            const confirmationText = isActivating
+                ? `Deseja realmente REATIVAR o serviço "${service.name}"?`
+                : `Deseja realmente DESATIVAR o serviço "${service.name}"? Clientes não poderão mais agendá-lo.`;
+
+            if (confirm(confirmationText)) {
+                service.status = isActivating ? 'Ativo' : 'Inativo';
+                
+                const toastMessage = isActivating 
+                    ? 'Serviço reativado.' 
+                    : 'Serviço desativado.';
+                
+                showToast('Status Alterado', toastMessage, 'info', 'info');
+                renderServicesTable();
+            }
+        }
+
+        function openAssociateProfessionalModal(serviceId) {
+            const service = servicesData.find(s => s.id === serviceId);
+            if (!service) return;
+
+            document.getElementById('associateServiceId').value = serviceId;
+            document.getElementById('associateServiceName').textContent = service.name;
+            
+            const listContainer = document.getElementById('associateProfessionalList');
+            listContainer.innerHTML = ''; 
+
+            const activeProfessionals = professionalsData.filter(p => p.status === 'Ativo');
+
+            if (activeProfessionals.length === 0) {
+                 listContainer.innerHTML = '<p class="text-sm text-gray-400">Nenhum profissional ativo encontrado.</p>';
+            } else {
+                activeProfessionals.forEach(prof => {
+                    const isChecked = service.assignedProfIds.includes(prof.id);
+                    
+                    const checkboxHTML = `
+                        <label class="flex items-center gap-2 bg-dark-700 p-2 rounded hover:bg-dark-600 cursor-pointer">
+                            <input type="checkbox" value="${prof.id}" ${isChecked ? 'checked' : ''} class="form-checkbox professional-association-checkbox bg-dark-600 border-dark-500 text-primary focus:ring-primary">
+                            <span>${prof.name} (${prof.level})</span>
+                        </label>
+                    `;
+                    listContainer.innerHTML += checkboxHTML;
+                });
+            }
+
+            document.getElementById('associateProfessionalModal').classList.remove('hidden');
+        }
+
+        function submitAssociation() {
+            const serviceId = document.getElementById('associateServiceId').value;
+            const index = servicesData.findIndex(s => s.id === serviceId);
+            if (index === -1) return;
+
+            const selectedCheckboxes = document.querySelectorAll('.professional-association-checkbox:checked');
+            const selectedProfIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+            servicesData[index].assignedProfIds = selectedProfIds;
+
+            const totalActiveProfessionals = professionalsData.filter(p => p.status === 'Ativo').length;
+            servicesData[index].assignedProfessionals = `${selectedProfIds.length}/${totalActiveProfessionals}`;
+
+            closeModal('associateProfessionalModal');
+            renderServicesTable();
+            showToast('Associações Salvas!', 'Os profissionais foram associados ao serviço.', 'check_circle');
+        }
         // Funções do Cliente
         let selectedTimeSlot = null;
         let appointmentData = {};
@@ -1448,8 +2068,9 @@
         }
         
         function setMinDate() {
-            const today = new Date();
-            const dateString = today.toISOString().split('T')[0];
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const dateString = tomorrow.toISOString().split('T')[0];
             document.getElementById('appointmentDate').setAttribute('min', dateString);
         }
         
@@ -1585,8 +2206,25 @@
                 return;
             }
             
+            const date = document.getElementById('appointmentDate').value;
+
+            const appointmentDateTime = new Date(date + 'T' + selectedTimeSlot);
+            const now = new Date();
+            const hoursDifference = (appointmentDateTime - now) / (1000 * 60 * 60);
+            
+            if (hoursDifference < 2) {
+                showToast('Atenção', 'Agendamentos devem ser feitos com pelo menos 2 horas de antecedência.', 'warning', 'yellow');
+                return;
+            }
+            
+            appointmentData.status = 'Pendente';
+            appointmentData.date = date;
+            appointmentData.notes = document.getElementById('appointmentNotes').value;
+            
             closeModal('newAppointmentModal');
-            showToast('Agendamento Criado!', 'Seu agendamento foi criado e aguarda confirmação.', 'check_circle');
+            showToast('Agendamento Criado!', 
+                `Seu agendamento para ${appointmentData.date} às ${selectedTimeSlot} foi criado. Status: Pendente.`, 
+                'check_circle');
             resetAppointmentForm();
         }
         
@@ -1677,12 +2315,15 @@
             }, 4000);
         }
 
-        // Função para abrir modais administrativos
         function openAdminModal(modalType) {
             if (modalType === 'cashControl') {
                 document.getElementById('cashControlModal').classList.remove('hidden');
             } else if (modalType === 'reports') {
                 document.getElementById('reportsModal').classList.remove('hidden');
+            } else if (modalType === 'professionalManagement') {
+                document.getElementById('professionalManagementModal').classList.remove('hidden'); 
+            } else if (modalType === 'serviceManagement') {
+                document.getElementById('serviceManagementModal').classList.remove('hidden'); 
             } else {
                 showToast('Em breve', 'Esta funcionalidade estará disponível em breve.', 'info', 'info');
             }
