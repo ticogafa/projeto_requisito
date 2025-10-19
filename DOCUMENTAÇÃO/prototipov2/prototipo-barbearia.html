@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Barbearia</title>
     
-    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Material Icons via CDN -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -82,9 +79,7 @@
 </head>
 <body class="bg-dark-900 text-gray-100">
     
-    <!-- Container Principal -->
     <div id="app">
-        <!-- Tela de Seleção de Perfil -->
         <div id="profileSelection" class="min-h-screen flex flex-col items-center justify-center p-8">
             <div class="text-center mb-12">
                 <div class="flex items-center justify-center gap-3 mb-4">
@@ -95,7 +90,6 @@
             </div>
             
             <div class="grid grid-cols-3 gap-8 max-w-6xl w-full">
-                <!-- Card Administrador -->
                 <div onclick="selectProfile('admin')" class="profile-card bg-dark-800 rounded-2xl p-8 cursor-pointer border-2 border-dark-600 hover:border-primary">
                     <div class="text-center">
                         <div class="bg-primary/10 w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -106,7 +100,6 @@
                     </div>
                 </div>
                 
-                <!-- Card Profissional -->
                 <div onclick="selectProfile('professional')" class="profile-card bg-dark-800 rounded-2xl p-8 cursor-pointer border-2 border-dark-600 hover:border-primary">
                     <div class="text-center">
                         <div class="bg-primary/10 w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -117,7 +110,6 @@
                     </div>
                 </div>
                 
-                <!-- Card Cliente -->
                 <div onclick="selectProfile('client')" class="profile-card bg-dark-800 rounded-2xl p-8 cursor-pointer border-2 border-dark-600 hover:border-primary">
                     <div class="text-center">
                         <div class="bg-primary/10 w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -130,7 +122,6 @@
             </div>
         </div>
         
-        <!-- Tela de Login -->
         <div id="loginScreen" class="hidden min-h-screen flex items-center justify-center p-8">
             <div class="bg-dark-800 rounded-2xl p-10 w-full max-w-md border border-dark-600">
                 <div class="text-center mb-8">
@@ -167,9 +158,7 @@
             </div>
         </div>
         
-        <!-- Painel do Profissional -->
         <div id="professionalPanel" class="hidden min-h-screen">
-            <!-- Header -->
             <header class="bg-dark-800 border-b border-dark-600 px-8 py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -190,7 +179,6 @@
             </header>
             
             <div class="flex">
-                <!-- Sidebar -->
                 <aside class="w-64 bg-dark-800 min-h-screen border-r border-dark-600 p-6">
                     <nav class="space-y-2">
                         <a onclick="showProfessionalSection('agenda')" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary" id="profAgendaLink">
@@ -216,16 +204,13 @@
                     </nav>
                 </aside>
                 
-                <!-- Main Content -->
                 <main class="flex-1 p-8">
-                    <!-- Seção Agenda -->
                     <div id="professionalAgendaSection">
                         <div class="mb-8">
                             <h2 class="text-3xl font-bold mb-2">Atendimentos de Carlos Silva</h2>
                             <p class="text-gray-400" id="currentDate">19 de Outubro de 2025</p>
                         </div>
                         
-                        <!-- Tabela de Agendamentos -->
                         <div class="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
                             <table class="w-full">
                                 <thead class="bg-dark-700">
@@ -313,14 +298,12 @@
                         </div>
                     </div>
                     
-                    <!-- Seção Minhas Avaliações -->
                     <div id="professionalReviewsSection" class="hidden">
                         <div class="mb-8">
                             <h2 class="text-3xl font-bold mb-2">Minhas Avaliações</h2>
                             <p class="text-gray-400">Feedback dos seus clientes</p>
                         </div>
                         
-                        <!-- Cards de Estatísticas -->
                         <div class="grid grid-cols-4 gap-6 mb-8">
                             <div class="bg-dark-800 border border-dark-600 rounded-xl p-6">
                                 <div class="flex items-center justify-between mb-4">
@@ -359,7 +342,6 @@
                             </div>
                         </div>
                         
-                        <!-- Lista de Avaliações -->
                         <div class="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
                             <div class="px-6 py-4 bg-dark-700 flex items-center justify-between">
                                 <h3 class="text-xl font-semibold">Avaliações Recentes</h3>
@@ -375,7 +357,6 @@
                                 </div>
                             </div>
                             <div class="p-6 space-y-4">
-                                <!-- Avaliação 1 -->
                                 <div class="flex items-start gap-4 p-4 bg-dark-700 rounded-lg">
                                     <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                                         <span class="material-icons text-primary">person</span>
@@ -402,7 +383,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Avaliação 2 -->
                                 <div class="flex items-start gap-4 p-4 bg-dark-700 rounded-lg">
                                     <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                                         <span class="material-icons text-primary">person</span>
@@ -429,7 +409,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Avaliação 3 -->
                                 <div class="flex items-start gap-4 p-4 bg-dark-700 rounded-lg">
                                     <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                                         <span class="material-icons text-primary">person</span>
@@ -456,7 +435,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Avaliação 4 -->
                                 <div class="flex items-start gap-4 p-4 bg-dark-700 rounded-lg">
                                     <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                                         <span class="material-icons text-primary">person</span>
@@ -483,7 +461,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Avaliação 5 -->
                                 <div class="flex items-start gap-4 p-4 bg-dark-700 rounded-lg">
                                     <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                                         <span class="material-icons text-primary">person</span>
@@ -516,9 +493,7 @@
             </div>
         </div>
         
-        <!-- Painel do Cliente -->
         <div id="clientPanel" class="hidden min-h-screen">
-            <!-- Header -->
             <header class="bg-dark-800 border-b border-dark-600 px-8 py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -539,7 +514,6 @@
             </header>
             
             <div class="flex">
-                <!-- Sidebar -->
                 <aside class="w-64 bg-dark-800 min-h-screen border-r border-dark-600 p-6">
                     <nav class="space-y-2">
                         <a onclick="return false;" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary">
@@ -561,7 +535,6 @@
                     </nav>
                 </aside>
                 
-                <!-- Main Content -->
                 <main class="flex-1 p-8">
                     <div class="mb-8 flex items-center justify-between">
                         <div>
@@ -574,7 +547,6 @@
                         </button>
                     </div>
                     
-                    <!-- Tabela de Agendamentos do Cliente -->
                     <div class="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
                         <table class="w-full">
                             <thead class="bg-dark-700">
@@ -638,9 +610,7 @@
             </div>
         </div>
         
-        <!-- Painel do Administrador -->
         <div id="adminPanel" class="hidden min-h-screen">
-            <!-- Header -->
             <header class="bg-dark-800 border-b border-dark-600 px-8 py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -661,7 +631,6 @@
             </header>
             
             <div class="flex">
-                <!-- Sidebar -->
                 <aside class="w-64 bg-dark-800 min-h-screen border-r border-dark-600 p-6">
                     <nav class="space-y-2">
                         <a onclick="return false;" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary">
@@ -684,7 +653,7 @@
                             <span class="material-icons">inventory_2</span>
                             <span class="font-medium">Produtos</span>
                         </a>
-                        <a onclick="showToast('Em breve', 'Esta funcionalidade estará disponível em breve.', 'info'); return false;" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-gray-200">
+                        <a onclick="openAdminModal('cashControl'); return false;" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-gray-200">
                             <span class="material-icons">attach_money</span>
                             <span class="font-medium">Financeiro</span>
                         </a>
@@ -695,14 +664,12 @@
                     </nav>
                 </aside>
                 
-                <!-- Main Content -->
                 <main class="flex-1 p-8">
                     <div class="mb-8">
                         <h2 class="text-3xl font-bold mb-2">Painel Administrativo</h2>
                         <p class="text-gray-400">Visão geral da operação</p>
                     </div>
                     
-                    <!-- Cards de Resumo -->
                     <div class="grid grid-cols-4 gap-6 mb-8">
                         <div class="bg-dark-800 border border-dark-600 rounded-xl p-6">
                             <div class="flex items-center justify-between mb-4">
@@ -741,7 +708,6 @@
                         </div>
                     </div>
                     
-                    <!-- Ações Rápidas -->
                     <div class="grid grid-cols-4 gap-4 mb-8">
                         <button onclick="openAdminModal('appointments')" class="bg-dark-800 border border-dark-600 hover:border-primary rounded-xl p-4 text-left transition group">
                             <span class="material-icons text-primary text-3xl mb-2 group-hover:scale-110 transition">event_note</span>
@@ -766,14 +732,25 @@
                             <h4 class="font-semibold mb-1">Relatórios</h4>
                             <p class="text-xs text-gray-400">Métricas e análises</p>
                         </button>
+
+                        <button onclick="openAdminModal('cashControl')" class="bg-dark-800 border border-dark-600 hover:border-primary rounded-xl p-4 text-left transition group">
+                            <span class="material-icons text-green-400 text-3xl mb-2 group-hover:scale-110 transition">account_balance_wallet</span>
+                            <h4 class="font-semibold mb-1">Controle de Caixa</h4>
+                            <p class="text-xs text-gray-400">Gerenciar entradas e saídas</p>
+                        </button>
+
+                        <button onclick="openAdminModal('reports')" class="bg-dark-800 border border-dark-600 hover:border-primary rounded-xl p-4 text-left transition group">
+                            <span class="material-icons text-blue-400 text-3xl mb-2 group-hover:scale-110 transition">bar_chart</span>
+                            <h4 class="font-semibold mb-1">Relatório de Desempenho</h4>
+                            <p class="text-xs text-gray-400">Métricas por profissional</p>
+                        </button>
                     </div>
                     
-                    <!-- Agendamentos Recentes -->
                     <div class="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden mb-6">
                         <div class="px-6 py-4 bg-dark-700 flex items-center justify-between">
                             <h3 class="text-xl font-semibold">Agendamentos Recentes</h3>
                             <div class="flex gap-2">
-                                <button onclick="openAdminModal('cashRegister')" class="bg-green-500/10 text-green-400 hover:bg-green-500/20 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                                <button onclick="openAdminModal('cashControl')" class="bg-green-500/10 text-green-400 hover:bg-green-500/20 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                                     <span class="material-icons text-sm">point_of_sale</span>
                                     Fechar Caixa
                                 </button>
@@ -862,7 +839,6 @@
                         </table>
                     </div>
                     
-                    <!-- Avaliações Recentes -->
                     <div class="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
                         <div class="px-6 py-4 bg-dark-700 flex items-center justify-between">
                             <h3 class="text-xl font-semibold">Avaliações Recentes</h3>
@@ -919,252 +895,429 @@
                 </main>
             </div>
         </div>
-    </div>
-    
-    <!-- Modal - Novo Agendamento -->
-    <div id="newAppointmentModal" onclick="closeModalOnBackdrop(event, 'newAppointmentModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-        <div class="bg-dark-800 rounded-2xl p-8 max-w-2xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <span class="material-icons text-primary text-4xl">event_available</span>
-                    <h3 class="text-2xl font-bold">Novo Agendamento</h3>
+        
+        <div id="newAppointmentModal" onclick="closeModalOnBackdrop(event, 'newAppointmentModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-2xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons text-primary text-4xl">event_available</span>
+                        <h3 class="text-2xl font-bold">Novo Agendamento</h3>
+                    </div>
+                    <button onclick="closeModal('newAppointmentModal')" class="material-icons text-gray-400 hover:text-primary cursor-pointer">close</button>
                 </div>
-                <button onclick="closeModal('newAppointmentModal')" class="material-icons text-gray-400 hover:text-primary cursor-pointer">close</button>
+                
+                <form onsubmit="submitNewAppointment(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Serviço *</label>
+                        <select id="appointmentService" onchange="updateServiceInfo()" required class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none">
+                            <option value="">Selecione um serviço</option>
+                            <option value="corte_simples" data-duration="30" data-price="35.00">Corte Simples - R$ 35,00 (30 min)</option>
+                            <option value="corte_barba" data-duration="50" data-price="60.00">Corte + Barba - R$ 60,00 (50 min)</option>
+                            <option value="barba" data-duration="25" data-price="30.00">Barba Completa - R$ 30,00 (25 min)</option>
+                            <option value="corte_social" data-duration="40" data-price="45.00">Corte Social - R$ 45,00 (40 min)</option>
+                            <option value="corte_infantil" data-duration="25" data-price="30.00">Corte Infantil - R$ 30,00 (25 min)</option>
+                            <option value="barba_express" data-duration="15" data-price="20.00">Barba Express - R$ 20,00 (15 min)</option>
+                        </select>
+                        <div id="serviceInfo" class="mt-2 text-sm text-gray-400 hidden">
+                            <div class="flex items-center gap-2">
+                                <span class="material-icons text-xs">schedule</span>
+                                <span>Duração: <span id="serviceDuration"></span> minutos</span>
+                                <span class="mx-2">•</span>
+                                <span class="material-icons text-xs">payments</span>
+                                <span>Valor: R$ <span id="servicePrice"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Data *</label>
+                        <input type="date" id="appointmentDate" onchange="loadAvailableSlots()" required min="" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none">
+                        <p class="mt-2 text-xs text-gray-400">
+                            <span class="material-icons text-xs align-middle">info</span>
+                            Horário de funcionamento: 8h às 18h
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2 flex items-center gap-2">
+                            Profissional
+                            <span class="text-xs text-gray-400 font-normal">(opcional - sistema escolherá automaticamente)</span>
+                        </label>
+                        <select id="appointmentProfessional" onchange="loadAvailableSlots()" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none">
+                            <option value="">Sistema escolherá o primeiro disponível</option>
+                            <option value="carlos">Carlos Silva</option>
+                            <option value="pedro">Pedro Souza</option>
+                            <option value="lucas">Lucas Lima</option>
+                            <option value="joao">João Pereira</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-3">Horários Disponíveis *</label>
+                        <div id="availableSlots" class="grid grid-cols-4 gap-2">
+                            <div class="text-center text-gray-400 text-sm col-span-4 py-8">
+                                Selecione um serviço e uma data para ver os horários disponíveis
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Observações</label>
+                        <textarea id="appointmentNotes" rows="3" placeholder="Adicione informações adicionais (opcional)" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none resize-none"></textarea>
+                    </div>
+                    
+                    <div id="appointmentSummary" class="hidden bg-dark-700 rounded-lg p-4 space-y-2">
+                        <h4 class="font-semibold text-primary mb-3">Resumo do Agendamento</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Serviço:</span>
+                                <span class="font-medium" id="summaryService">-</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Data:</span>
+                                <span class="font-medium" id="summaryDate">-</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Horário:</span>
+                                <span class="font-medium" id="summaryTime">-</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Duração:</span>
+                                <span class="font-medium" id="summaryDuration">-</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Profissional:</span>
+                                <span class="font-medium" id="summaryProfessional">-</span>
+                            </div>
+                            <div class="flex justify-between border-t border-dark-600 pt-2 mt-2">
+                                <span class="text-gray-400">Valor:</span>
+                                <span class="font-semibold text-primary text-lg" id="summaryPrice">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <button type="button" onclick="closeModal('newAppointmentModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="flex-1 bg-primary hover:bg-primary/90 text-white py-3 rounded-lg font-medium transition">
+                            Confirmar Agendamento
+                        </button>
+                    </div>
+                </form>
             </div>
-            
-            <form onsubmit="submitNewAppointment(event)" class="space-y-6">
-                <!-- Seleção de Serviço -->
-                <div>
-                    <label class="block text-sm font-medium mb-2">Serviço *</label>
-                    <select id="appointmentService" onchange="updateServiceInfo()" required class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none">
-                        <option value="">Selecione um serviço</option>
-                        <option value="corte_simples" data-duration="30" data-price="35.00">Corte Simples - R$ 35,00 (30 min)</option>
-                        <option value="corte_barba" data-duration="50" data-price="60.00">Corte + Barba - R$ 60,00 (50 min)</option>
-                        <option value="barba" data-duration="25" data-price="30.00">Barba Completa - R$ 30,00 (25 min)</option>
-                        <option value="corte_social" data-duration="40" data-price="45.00">Corte Social - R$ 45,00 (40 min)</option>
-                        <option value="corte_infantil" data-duration="25" data-price="30.00">Corte Infantil - R$ 30,00 (25 min)</option>
-                        <option value="barba_express" data-duration="15" data-price="20.00">Barba Express - R$ 20,00 (15 min)</option>
-                    </select>
-                    <div id="serviceInfo" class="mt-2 text-sm text-gray-400 hidden">
-                        <div class="flex items-center gap-2">
-                            <span class="material-icons text-xs">schedule</span>
-                            <span>Duração: <span id="serviceDuration"></span> minutos</span>
-                            <span class="mx-2">•</span>
-                            <span class="material-icons text-xs">payments</span>
-                            <span>Valor: R$ <span id="servicePrice"></span></span>
+        </div>
+
+        <div id="cashControlModal" onclick="closeModalOnBackdrop(event, 'cashControlModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-5xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons text-green-400 text-4xl">account_balance_wallet</span>
+                        <h3 class="text-2xl font-bold">Controle de Caixa</h3>
+                    </div>
+                    <button onclick="closeModal('cashControlModal')" class="material-icons text-gray-400 hover:text-primary cursor-pointer">close</button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-6 mb-6">
+                    <div class="bg-dark-700 rounded-xl p-4">
+                        <p class="text-gray-400 text-sm">Saldo Atual</p>
+                        <h3 class="text-2xl font-bold mt-1">R$ 1.850,00</h3>
+                        <div class="text-xs text-gray-400 mt-2">Atualizado: 19/10/2025</div>
+                    </div>
+                    <div class="bg-dark-700 rounded-xl p-4">
+                        <p class="text-gray-400 text-sm">Entradas de Hoje</p>
+                        <h3 class="text-2xl font-bold mt-1 text-green-500">R$ 450,00</h3>
+                        <div class="text-xs text-gray-400 mt-2">8 transações</div>
+                    </div>
+                    <div class="bg-dark-700 rounded-xl p-4">
+                        <p class="text-gray-400 text-sm">Saídas de Hoje</p>
+                        <h3 class="text-2xl font-bold mt-1 text-red-500">R$ 120,00</h3>
+                        <div class="text-xs text-gray-400 mt-2">3 transações</div>
+                    </div>
+                </div>
+
+                <div class="bg-dark-700 rounded-xl p-4 mb-6">
+                    <h4 class="font-semibold mb-4">Registrar Lançamento</h4>
+                    <div class="grid grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Descrição</label>
+                            <input type="text" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Valor</label>
+                            <input type="number" step="0.01" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Meio de Pagamento</label>
+                            <select class="w-full bg-dark-600 border border-dark-500 rounded-lg px-3 py-2 text-white">
+                                <option>DINHEIRO</option>
+                                <option>PIX</option>
+                                <option>CARTAO_CREDITO</option>
+                                <option>CARTAO_DEBITO</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex-1">Entrada</button>
+                            <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex-1">Saída</button>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Seleção de Data -->
-                <div>
-                    <label class="block text-sm font-medium mb-2">Data *</label>
-                    <input type="date" id="appointmentDate" onchange="loadAvailableSlots()" required min="" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none">
-                    <p class="mt-2 text-xs text-gray-400">
-                        <span class="material-icons text-xs align-middle">info</span>
-                        Horário de funcionamento: 8h às 18h
-                    </p>
+                <div class="bg-dark-700 rounded-xl p-4">
+                    <h4 class="font-semibold mb-4">Histórico de Lançamentos</h4>
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-sm text-gray-400">
+                                <th class="pb-2">Data/Hora</th>
+                                <th class="pb-2">Descrição</th>
+                                <th class="pb-2">Valor</th>
+                                <th class="pb-2">Meio</th>
+                                <th class="pb-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <tr class="border-t border-dark-600">
+                                <td class="py-2">19/10 10:30</td>
+                                <td class="py-2">Corte Social - Lucas</td>
+                                <td class="py-2 text-green-500">+ R$ 45,00</td>
+                                <td class="py-2">DINHEIRO</td>
+                                <td class="py-2"><span class="bg-green-500/10 text-green-400 px-2 py-1 rounded-full text-xs">Concluído</span></td>
+                            </tr>
+                            <tr class="border-t border-dark-600">
+                                <td class="py-2">19/10 09:00</td>
+                                <td class="py-2">Corte + Barba - João</td>
+                                <td class="py-2 text-green-500">+ R$ 60,00</td>
+                                <td class="py-2">PIX</td>
+                                <td class="py-2"><span class="bg-green-500/10 text-green-400 px-2 py-1 rounded-full text-xs">Concluído</span></td>
+                            </tr>
+                            <tr class="border-t border-dark-600">
+                                <td class="py-2">18/10 16:00</td>
+                                <td class="py-2">Compra de Shampoo</td>
+                                <td class="py-2 text-red-500">- R$ 30,00</td>
+                                <td class="py-2">PIX</td>
+                                <td class="py-2"><span class="bg-green-500/10 text-green-400 px-2 py-1 rounded-full text-xs">Concluído</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="reportsModal" onclick="closeModalOnBackdrop(event, 'reportsModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-5xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons text-blue-400 text-4xl">bar_chart</span>
+                        <h3 class="text-2xl font-bold">Relatório de Desempenho</h3>
+                    </div>
+                    <button onclick="closeModal('reportsModal')" class="material-icons text-gray-400 hover:text-primary cursor-pointer">close</button>
                 </div>
                 
-                <!-- Seleção de Profissional -->
-                <div>
-                    <label class="block text-sm font-medium mb-2 flex items-center gap-2">
-                        Profissional
-                        <span class="text-xs text-gray-400 font-normal">(opcional - sistema escolherá automaticamente)</span>
-                    </label>
-                    <select id="appointmentProfessional" onchange="loadAvailableSlots()" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none">
-                        <option value="">Sistema escolherá o primeiro disponível</option>
-                        <option value="carlos">Carlos Silva</option>
-                        <option value="pedro">Pedro Souza</option>
-                        <option value="lucas">Lucas Lima</option>
-                        <option value="joao">João Pereira</option>
-                    </select>
-                </div>
-                
-                <!-- Horários Disponíveis -->
-                <div>
-                    <label class="block text-sm font-medium mb-3">Horários Disponíveis *</label>
-                    <div id="availableSlots" class="grid grid-cols-4 gap-2">
-                        <div class="text-center text-gray-400 text-sm col-span-4 py-8">
-                            Selecione um serviço e uma data para ver os horários disponíveis
+                <div class="bg-dark-700 rounded-xl p-4 mb-6">
+                    <h4 class="font-semibold mb-4">Filtros</h4>
+                    <div class="grid grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Profissional</label>
+                            <select class="w-full bg-dark-600 border border-dark-500 rounded-lg px-3 py-2 text-white">
+                                <option>Todos</option>
+                                <option>Carlos Silva</option>
+                                <option>Pedro Souza</option>
+                                <option>Lucas Lima</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Data</label>
+                            <input type="date" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-3 py-2 text-white">
+                        </div>
+                        <div class="flex items-end">
+                            <button class="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-lg w-full">Gerar Relatório</button>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Observações -->
-                <div>
-                    <label class="block text-sm font-medium mb-2">Observações</label>
-                    <textarea id="appointmentNotes" rows="3" placeholder="Adicione informações adicionais (opcional)" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none resize-none"></textarea>
-                </div>
-                
-                <!-- Resumo do Agendamento -->
-                <div id="appointmentSummary" class="hidden bg-dark-700 rounded-lg p-4 space-y-2">
-                    <h4 class="font-semibold text-primary mb-3">Resumo do Agendamento</h4>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Serviço:</span>
-                            <span class="font-medium" id="summaryService">-</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Data:</span>
-                            <span class="font-medium" id="summaryDate">-</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Horário:</span>
-                            <span class="font-medium" id="summaryTime">-</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Duração:</span>
-                            <span class="font-medium" id="summaryDuration">-</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Profissional:</span>
-                            <span class="font-medium" id="summaryProfessional">-</span>
-                        </div>
-                        <div class="flex justify-between border-t border-dark-600 pt-2 mt-2">
-                            <span class="text-gray-400">Valor:</span>
-                            <span class="font-semibold text-primary text-lg" id="summaryPrice">-</span>
-                        </div>
+                <div class="grid grid-cols-4 gap-6 mb-6">
+                    <div class="bg-dark-700 rounded-xl p-4">
+                        <p class="text-gray-400 text-sm">Tempo de Serviço</p>
+                        <h3 class="text-2xl font-bold mt-1">45.0 min</h3>
+                        <div class="text-xs text-gray-400 mt-2">Média por atendimento</div>
+                    </div>
+                    <div class="bg-dark-700 rounded-xl p-4">
+                        <p class="text-gray-400 text-sm">Receita</p>
+                        <h3 class="text-2xl font-bold mt-1">R$ 50,00</h3>
+                        <div class="text-xs text-gray-400 mt-2">Valor médio por atendimento</div>
+                    </div>
+                    <div class="bg-dark-700 rounded-xl p-4">
+                        <p class="text-gray-400 text-sm">Atendimentos</p>
+                        <h3 class="text-2xl font-bold mt-1">1</h3>
+                        <div class="text-xs text-gray-400 mt-2">Total no período</div>
+                    </div>
+                    <div class="bg-dark-700 rounded-xl p-4">
+                        <p class="text-gray-400 text-sm">Avaliação Média</p>
+                        <h3 class="text-2xl font-bold mt-1">4.0</h3>
+                        <div class="text-xs text-gray-400 mt-2">Média dos clientes</div>
                     </div>
                 </div>
                 
-                <!-- Botões -->
+                <div class="bg-dark-700 rounded-xl p-4">
+                    <h4 class="font-semibold mb-4">Detalhamento por Profissional</h4>
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-sm text-gray-400">
+                                <th class="pb-2">Profissional</th>
+                                <th class="pb-2">Atendimentos</th>
+                                <th class="pb-2">Tempo Médio</th>
+                                <th class="pb-2">Receita</th>
+                                <th class="pb-2">Avaliação</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <tr class="border-t border-dark-600">
+                                <td class="py-2">Carlos Silva</td>
+                                <td class="py-2">32</td>
+                                <td class="py-2">40 min</td>
+                                <td class="py-2">R$ 1.760,00</td>
+                                <td class="py-2">4.8/5.0</td>
+                            </tr>
+                            <tr class="border-t border-dark-600">
+                                <td class="py-2">Pedro Souza</td>
+                                <td class="py-2">28</td>
+                                <td class="py-2">35 min</td>
+                                <td class="py-2">R$ 1.540,00</td>
+                                <td class="py-2">4.6/5.0</td>
+                            </tr>
+                            <tr class="border-t border-dark-600">
+                                <td class="py-2">Lucas Lima</td>
+                                <td class="py-2">25</td>
+                                <td class="py-2">45 min</td>
+                                <td class="py-2">R$ 1.375,00</td>
+                                <td class="py-2">4.9/5.0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="startModal" onclick="closeModalOnBackdrop(event, 'startModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-md w-full border border-dark-600" onclick="event.stopPropagation()">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-icons text-green-400 text-4xl">play_circle</span>
+                    <h3 class="text-2xl font-bold">Iniciar Atendimento</h3>
+                </div>
+                <p class="text-gray-300 mb-8">Você está prestes a iniciar o atendimento de <strong class="text-primary" id="startClientName">João Pereira</strong>. Deseja continuar?</p>
                 <div class="flex gap-4">
-                    <button type="button" onclick="closeModal('newAppointmentModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
+                    <button onclick="closeModal('startModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
                         Cancelar
                     </button>
-                    <button type="submit" class="flex-1 bg-primary hover:bg-primary/90 text-white py-3 rounded-lg font-medium transition">
-                        Confirmar Agendamento
+                    <button onclick="confirmStart()" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition">
+                        Confirmar
                     </button>
                 </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Modal - Iniciar Atendimento -->
-    <div id="startModal" onclick="closeModalOnBackdrop(event, 'startModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-        <div class="bg-dark-800 rounded-2xl p-8 max-w-md w-full border border-dark-600" onclick="event.stopPropagation()">
-            <div class="flex items-center gap-3 mb-6">
-                <span class="material-icons text-green-400 text-4xl">play_circle</span>
-                <h3 class="text-2xl font-bold">Iniciar Atendimento</h3>
-            </div>
-            <p class="text-gray-300 mb-8">Você está prestes a iniciar o atendimento de <strong class="text-primary" id="startClientName">João Pereira</strong>. Deseja continuar?</p>
-            <div class="flex gap-4">
-                <button onclick="closeModal('startModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
-                    Cancelar
-                </button>
-                <button onclick="confirmStart()" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition">
-                    Confirmar
-                </button>
             </div>
         </div>
-    </div>
-    
-    <!-- Modal - Finalizar Atendimento -->
-    <div id="finishModal" onclick="closeModalOnBackdrop(event, 'finishModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-        <div class="bg-dark-800 rounded-2xl p-8 max-w-md w-full border border-dark-600" onclick="event.stopPropagation()">
-            <div class="flex items-center gap-3 mb-6">
-                <span class="material-icons text-green-400 text-4xl">check_circle</span>
-                <h3 class="text-2xl font-bold">Finalizar Atendimento</h3>
-            </div>
-            <div class="bg-dark-700 rounded-lg p-4 mb-6 space-y-2">
-                <div class="flex justify-between">
-                    <span class="text-gray-400">Cliente:</span>
-                    <span class="font-medium" id="finishClientName">Lucas Lima</span>
+        
+        <div id="finishModal" onclick="closeModalOnBackdrop(event, 'finishModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-md w-full border border-dark-600" onclick="event.stopPropagation()">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-icons text-green-400 text-4xl">check_circle</span>
+                    <h3 class="text-2xl font-bold">Finalizar Atendimento</h3>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-400">Serviço:</span>
-                    <span class="font-medium" id="finishService">Barba + Corte</span>
+                <div class="bg-dark-700 rounded-lg p-4 mb-6 space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Cliente:</span>
+                        <span class="font-medium" id="finishClientName">Lucas Lima</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Serviço:</span>
+                        <span class="font-medium" id="finishService">Barba + Corte</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Tempo de execução:</span>
+                        <span class="font-medium text-primary">45 minutos</span>
+                    </div>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-400">Tempo de execução:</span>
-                    <span class="font-medium text-primary">45 minutos</span>
+                <div class="flex gap-4">
+                    <button onclick="closeModal('finishModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
+                        Cancelar
+                    </button>
+                    <button onclick="confirmFinish()" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition">
+                        Concluir e Enviar Avaliação
+                    </button>
                 </div>
             </div>
-            <div class="flex gap-4">
-                <button onclick="closeModal('finishModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
-                    Cancelar
-                </button>
-                <button onclick="confirmFinish()" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition">
-                    Concluir e Enviar Avaliação
-                </button>
-            </div>
         </div>
-    </div>
-    
-    <!-- Modal - Cancelar Agendamento -->
-    <div id="cancelModal" onclick="closeModalOnBackdrop(event, 'cancelModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-        <div class="bg-dark-800 rounded-2xl p-8 max-w-md w-full border border-dark-600" onclick="event.stopPropagation()">
-            <div class="flex items-center gap-3 mb-6">
-                <span class="material-icons text-red-400 text-4xl">cancel</span>
-                <h3 class="text-2xl font-bold">Cancelar Agendamento</h3>
-            </div>
-            <p class="text-gray-300 mb-8">Deseja realmente cancelar este agendamento? Esta ação não pode ser desfeita.</p>
-            <div class="flex gap-4">
-                <button onclick="closeModal('cancelModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
-                    Voltar
-                </button>
-                <button onclick="confirmCancel()" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition">
-                    Confirmar Cancelamento
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal - Avaliar Profissional -->
-    <div id="ratingModal" onclick="closeModalOnBackdrop(event, 'ratingModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-        <div class="bg-dark-800 rounded-2xl p-8 max-w-md w-full border border-dark-600" onclick="event.stopPropagation()">
-            <div class="flex items-center gap-3 mb-6">
-                <span class="material-icons text-yellow-400 text-4xl">star</span>
-                <h3 class="text-2xl font-bold">Avaliar Profissional</h3>
-            </div>
-            
-            <div class="text-center mb-6">
-                <div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <span class="material-icons text-primary text-5xl">person</span>
+        
+        <div id="cancelModal" onclick="closeModalOnBackdrop(event, 'cancelModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-md w-full border border-dark-600" onclick="event.stopPropagation()">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-icons text-red-400 text-4xl">cancel</span>
+                    <h3 class="text-2xl font-bold">Cancelar Agendamento</h3>
                 </div>
-                <h4 class="text-xl font-semibold mb-1" id="ratingProfessionalName">Lucas Lima</h4>
-                <p class="text-gray-400 text-sm" id="ratingService">Corte Social</p>
-            </div>
-            
-            <div class="mb-6">
-                <label class="block text-sm font-medium mb-3 text-center">Como foi sua experiência?</label>
-                <div class="flex justify-center gap-2 star-rating" id="starRating">
-                    <span class="material-icons text-5xl text-gray-600 hover:text-primary cursor-pointer" onclick="setRating(1)">star</span>
-                    <span class="material-icons text-5xl text-gray-600 hover:text-primary cursor-pointer" onclick="setRating(2)">star</span>
-                    <span class="material-icons text-5xl text-gray-600 hover:text-primary cursor-pointer" onclick="setRating(3)">star</span>
-                    <span class="material-icons text-5xl text-gray-600 hover:text-primary cursor-pointer" onclick="setRating(4)">star</span>
-                    <span class="material-icons text-5xl text-gray-600 hover:text-primary cursor-pointer" onclick="setRating(5)">star</span>
+                <p class="text-gray-300 mb-8">Deseja realmente cancelar este agendamento? Esta ação não pode ser desfeita.</p>
+                <div class="flex gap-4">
+                    <button onclick="closeModal('cancelModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
+                        Voltar
+                    </button>
+                    <button onclick="confirmCancel()" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition">
+                        Confirmar Cancelamento
+                    </button>
                 </div>
             </div>
-            
-            <div class="mb-6">
-                <label class="block text-sm font-medium mb-2">Comentário (opcional)</label>
-                <textarea class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 h-24 resize-none focus:outline-none focus:border-primary" placeholder="Compartilhe sua experiência..."></textarea>
-            </div>
-            
-            <div class="flex gap-4">
-                <button onclick="closeModal('ratingModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
-                    Cancelar
-                </button>
-                <button onclick="submitRating()" class="flex-1 bg-primary hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition">
-                    Enviar Avaliação
-                </button>
+        </div>
+        
+        <div id="ratingModal" onclick="closeModalOnBackdrop(event, 'ratingModal')" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div class="bg-dark-800 rounded-2xl p-8 max-w-md w-full border border-dark-600" onclick="event.stopPropagation()">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-icons text-yellow-400 text-4xl">star</span>
+                    <h3 class="text-2xl font-bold">Avaliar Profissional</h3>
+                </div>
+                
+                <div class="text-center mb-6">
+                    <div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="material-icons text-primary text-5xl">person</span>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-1" id="ratingProfessionalName">Lucas Lima</h4>
+                    <p class="text-gray-400 text-sm" id="ratingService">Corte Social</p>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-3 text-center">Como foi sua experiência?</label>
+                    <div class="flex justify-center gap-2 star-rating" id="starRating">
+                        <span class="material-icons text-5xl text-gray-600 hover:text-primary cursor-pointer" onclick="setRating(1)">star</span>
+                        <span class="material-icons text-5xl text-gray-600 hover:text-primary cursor-pointer" onclick="setRating(2)">star</span>
+                        <span class="material-icons text-5xl text-gray-600 hover:text-primary cursor-pointer" onclick="setRating(3)">star</span>
+                        <span class="material-icons text-5xl text-gray-600 hover:text-primary cursor-pointer" onclick="setRating(4)">star</span>
+                        <span class="material-icons text-5xl text-gray-600 hover:text-primary cursor-pointer" onclick="setRating(5)">star</span>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Comentário (opcional)</label>
+                    <textarea class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 h-24 resize-none focus:outline-none focus:border-primary" placeholder="Compartilhe sua experiência..."></textarea>
+                </div>
+                
+                <div class="flex gap-4">
+                    <button onclick="closeModal('ratingModal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-300 py-3 rounded-lg font-medium transition">
+                        Cancelar
+                    </button>
+                    <button onclick="submitRating()" class="flex-1 bg-primary hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition">
+                        Enviar Avaliação
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed top-8 right-8 bg-dark-800 border border-primary rounded-lg p-4 shadow-2xl z-50 max-w-sm">
-        <div class="flex items-center gap-3">
-            <span class="material-icons text-primary" id="toastIcon">check_circle</span>
-            <div>
-                <p class="font-semibold" id="toastTitle">Sucesso!</p>
-                <p class="text-sm text-gray-400" id="toastMessage">Operação realizada com sucesso.</p>
+        
+        <div id="toast" class="hidden fixed top-8 right-8 bg-dark-800 border border-primary rounded-lg p-4 shadow-2xl z-50 max-w-sm">
+            <div class="flex items-center gap-3">
+                <span class="material-icons text-primary" id="toastIcon">check_circle</span>
+                <div>
+                    <p class="font-semibold" id="toastTitle">Sucesso!</p>
+                    <p class="text-sm text-gray-400" id="toastMessage">Operação realizada com sucesso.</p>
+                </div>
             </div>
         </div>
+        
     </div>
-    
     <script>
         // Variáveis globais
         let currentProfile = '';
@@ -1296,9 +1449,7 @@
         
         function setMinDate() {
             const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const dateString = tomorrow.toISOString().split('T')[0];
+            const dateString = today.toISOString().split('T')[0];
             document.getElementById('appointmentDate').setAttribute('min', dateString);
         }
         
@@ -1347,13 +1498,12 @@
             }
             
             // Simular carregamento de horários disponíveis
-            // Em um sistema real, isso seria uma chamada ao backend
             const slots = generateTimeSlots(professional);
             
             let slotsHTML = '';
             slots.forEach(slot => {
                 slotsHTML += `
-                    <button type="button" onclick="selectTimeSlot('${slot.time}', ${slot.available})" 
+                    <button type="button" onclick="selectTimeSlot(this, '${slot.time}', ${slot.available})" 
                         class="time-slot ${slot.available ? 'bg-dark-700 hover:bg-primary/20 hover:border-primary' : 'bg-dark-700/50 cursor-not-allowed'} 
                         border border-dark-600 rounded-lg py-3 text-sm font-medium transition ${!slot.available ? 'text-gray-600' : ''}"
                         ${!slot.available ? 'disabled' : ''}>
@@ -1366,7 +1516,6 @@
         }
         
         function generateTimeSlots(professional) {
-            // Horários de 8h às 18h (última entrada às 17:30 para serviços de 30min)
             const slots = [];
             const startHour = 8;
             const endHour = 18;
@@ -1374,15 +1523,11 @@
             for (let hour = startHour; hour < endHour; hour++) {
                 for (let minute = 0; minute < 60; minute += 30) {
                     const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                    
-                    // Simular disponibilidade aleatória
-                    // Em sistema real, verificar contra agendamentos existentes
                     const random = Math.random();
-                    let available = random > 0.3; // 70% de chance de estar disponível
+                    let available = random > 0.3;
                     
-                    // Se não especificou profissional, aumentar chances de disponibilidade
                     if (!professional) {
-                        available = random > 0.2; // 80% de chance
+                        available = random > 0.2;
                     }
                     
                     slots.push({ time, available });
@@ -1392,16 +1537,14 @@
             return slots;
         }
         
-        function selectTimeSlot(time, available) {
+        function selectTimeSlot(element, time, available) {
             if (!available) return;
             
-            // Remover seleção anterior
             document.querySelectorAll('.time-slot').forEach(slot => {
                 slot.classList.remove('bg-primary', 'border-primary', 'text-white');
             });
             
-            // Adicionar seleção ao slot clicado
-            event.target.classList.add('bg-primary', 'border-primary', 'text-white');
+            element.classList.add('bg-primary', 'border-primary', 'text-white');
             
             selectedTimeSlot = time;
             appointmentData.time = time;
@@ -1416,29 +1559,20 @@
             const date = document.getElementById('appointmentDate').value;
             const professional = document.getElementById('appointmentProfessional');
             
-            // Formatar data
             const dateObj = new Date(date + 'T00:00:00');
-            const formattedDate = dateObj.toLocaleDateString('pt-BR', { 
-                day: '2-digit', 
-                month: '2-digit', 
-                year: 'numeric' 
-            });
+            const formattedDate = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
             
-            // Calcular horário de término
             const [hours, minutes] = selectedTimeSlot.split(':');
             const endTime = new Date();
             endTime.setHours(parseInt(hours), parseInt(minutes) + parseInt(appointmentData.duration));
             const endTimeStr = `${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
             
-            // Atualizar resumo
             document.getElementById('summaryService').textContent = appointmentData.service;
             document.getElementById('summaryDate').textContent = formattedDate;
             document.getElementById('summaryTime').textContent = `${selectedTimeSlot} - ${endTimeStr}`;
             document.getElementById('summaryDuration').textContent = `${appointmentData.duration} minutos`;
-            document.getElementById('summaryProfessional').textContent = professional.value ? 
-                professional.options[professional.selectedIndex].text : 
-                'Sistema escolherá automaticamente';
-            document.getElementById('summaryPrice').textContent = `R$ ${appointmentData.price}`;
+            document.getElementById('summaryProfessional').textContent = professional.value ? professional.options[professional.selectedIndex].text : 'Sistema escolherá automaticamente';
+            document.getElementById('summaryPrice').textContent = `R$ ${parseFloat(appointmentData.price).toFixed(2)}`;
             
             document.getElementById('appointmentSummary').classList.remove('hidden');
         }
@@ -1451,38 +1585,8 @@
                 return;
             }
             
-            const date = document.getElementById('appointmentDate').value;
-            const professional = document.getElementById('appointmentProfessional');
-            const notes = document.getElementById('appointmentNotes').value;
-            
-            // Verificar se o agendamento tem mais de 2 horas de antecedência
-            const appointmentDateTime = new Date(date + 'T' + selectedTimeSlot);
-            const now = new Date();
-            const hoursDifference = (appointmentDateTime - now) / (1000 * 60 * 60);
-            
-            if (hoursDifference < 2) {
-                showToast('Atenção', 'Agendamentos devem ser feitos com pelo menos 2 horas de antecedência.', 'warning', 'yellow');
-                return;
-            }
-            
-            // Salvar dados do agendamento
-            appointmentData.date = date;
-            appointmentData.professional = professional.value || 'auto';
-            appointmentData.professionalName = professional.value ? 
-                professional.options[professional.selectedIndex].text : 
-                'A definir';
-            appointmentData.notes = notes;
-            appointmentData.status = 'Pendente';
-            
-            // Em um sistema real, aqui faria a chamada ao backend
-            console.log('Novo agendamento:', appointmentData);
-            
             closeModal('newAppointmentModal');
-            showToast('Agendamento Criado!', 
-                `Seu agendamento foi criado com sucesso para ${appointmentData.date} às ${selectedTimeSlot}. Status: Pendente de confirmação.`, 
-                'check_circle');
-            
-            // Resetar formulário
+            showToast('Agendamento Criado!', 'Seu agendamento foi criado e aguarda confirmação.', 'check_circle');
             resetAppointmentForm();
         }
         
@@ -1507,11 +1611,7 @@
             currentRating = stars;
             const starElements = document.querySelectorAll('#starRating .material-icons');
             starElements.forEach((star, index) => {
-                if (index < stars) {
-                    star.style.color = '#FF8C00';
-                } else {
-                    star.style.color = '#4a5568';
-                }
+                star.style.color = index < stars ? '#FF8C00' : '#4a5568';
             });
         }
         
@@ -1528,22 +1628,19 @@
                 return;
             }
             closeModal('ratingModal');
-            showToast('Avaliação Enviada', 'Obrigado pela sua avaliação! Ela ajuda nossos profissionais a evoluírem.', 'star', 'yellow');
+            showToast('Avaliação Enviada', 'Obrigado pelo seu feedback!', 'star', 'yellow');
         }
         
-        // Função genérica para fechar modais
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
         }
         
-        // Função para fechar modal ao clicar no fundo
         function closeModalOnBackdrop(event, modalId) {
             if (event.target.id === modalId) {
                 closeModal(modalId);
             }
         }
         
-        // Função para mostrar toast
         function showToast(title, message, icon = 'check_circle', color = 'primary') {
             const toast = document.getElementById('toast');
             const toastIcon = document.getElementById('toastIcon');
@@ -1554,33 +1651,41 @@
             toastMessage.textContent = message;
             toastIcon.textContent = icon;
             
+            // Reset classes
+            toast.className = 'hidden fixed top-8 right-8 bg-dark-800 border rounded-lg p-4 shadow-2xl z-50 max-w-sm';
+            toastIcon.className = 'material-icons';
+            
             if (color === 'red') {
-                toastIcon.classList.remove('text-primary', 'text-yellow-400', 'text-blue-400');
                 toastIcon.classList.add('text-red-400');
-                toast.classList.remove('border-primary', 'border-yellow-400', 'border-blue-400');
                 toast.classList.add('border-red-400');
             } else if (color === 'yellow') {
-                toastIcon.classList.remove('text-primary', 'text-red-400', 'text-blue-400');
                 toastIcon.classList.add('text-yellow-400');
-                toast.classList.remove('border-primary', 'border-red-400', 'border-blue-400');
                 toast.classList.add('border-yellow-400');
             } else if (color === 'info') {
-                toastIcon.classList.remove('text-primary', 'text-red-400', 'text-yellow-400');
                 toastIcon.classList.add('text-blue-400');
-                toast.classList.remove('border-primary', 'border-red-400', 'border-yellow-400');
                 toast.classList.add('border-blue-400');
             } else {
-                toastIcon.classList.remove('text-red-400', 'text-yellow-400', 'text-blue-400');
                 toastIcon.classList.add('text-primary');
-                toast.classList.remove('border-red-400', 'border-yellow-400', 'border-blue-400');
                 toast.classList.add('border-primary');
             }
             
             toast.classList.remove('hidden');
+            toast.classList.add('toast');
             
             setTimeout(() => {
                 toast.classList.add('hidden');
             }, 4000);
+        }
+
+        // Função para abrir modais administrativos
+        function openAdminModal(modalType) {
+            if (modalType === 'cashControl') {
+                document.getElementById('cashControlModal').classList.remove('hidden');
+            } else if (modalType === 'reports') {
+                document.getElementById('reportsModal').classList.remove('hidden');
+            } else {
+                showToast('Em breve', 'Esta funcionalidade estará disponível em breve.', 'info', 'info');
+            }
         }
     </script>
 </body>
