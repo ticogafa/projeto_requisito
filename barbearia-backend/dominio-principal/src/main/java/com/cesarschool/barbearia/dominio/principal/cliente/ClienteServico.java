@@ -83,31 +83,6 @@ public class ClienteServico {
         return repository.listarTodos();
     }
 
-    /**
-     * Adiciona pontos de fidelidade a um cliente.
-     */
-    public Cliente adicionarPontos(ClienteId id, int pontos) {
-        Validacoes.validarObjetoObrigatorio(id, "ID do cliente");
-        Validacoes.validarInteiroPositivo(pontos, "Pontos a adicionar");
-        
-        Cliente cliente = buscarPorId(id);
-        cliente.adicionarPontos(pontos);
-        return repository.salvar(cliente);
-    }
-
-    /**
-     * Usa pontos de fidelidade de um cliente.
-     * Regra de negócio: cliente deve ter pontos suficientes.
-     */
-    public Cliente usarPontos(ClienteId id, int pontos) {
-        Validacoes.validarObjetoObrigatorio(id, "ID do cliente");
-        Validacoes.validarInteiroPositivo(pontos, "Pontos a usar");
-        
-        Cliente cliente = buscarPorId(id);
-        cliente.usarPontos(pontos);
-        return repository.salvar(cliente);
-    }
-
     public void deletarCliente(ClienteId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do cliente");
         Cliente cliente = buscarPorId(id);

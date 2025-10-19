@@ -8,7 +8,7 @@ import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 public class Lancamento {
 
     private final LancamentoId id;
-    private final ClienteId clienteId; // opcional (apenas para dívidas)
+    private final ClienteId clienteId; 
     private StatusLancamento status;
     private final String descricao;
     private final double valor;
@@ -17,6 +17,7 @@ public class Lancamento {
     private Lancamento(LancamentoId id,
                        ClienteId clienteId,
                        StatusLancamento status,
+                       MeioPagamento meioPagamento,
                        String descricao,
                        double valor,
                        LocalDateTime quando) {
@@ -29,16 +30,16 @@ public class Lancamento {
         this.clienteId = clienteId;
     }
 
-    public static Lancamento novaEntrada(String descricao, double valor) {
-        return new Lancamento(LancamentoId.novo(), null, StatusLancamento.ENTRADA, descricao, valor, LocalDateTime.now());
+    public static Lancamento novaEntrada(String descricao, double valor, MeioPagamento meioPagamento) {
+        return new Lancamento(LancamentoId.novo(), null, StatusLancamento.ENTRADA, meioPagamento, descricao, valor, LocalDateTime.now());
     }
 
-    public static Lancamento novaSaida(String descricao, double valor) {
-        return new Lancamento(LancamentoId.novo(), null, StatusLancamento.SAIDA, descricao, valor, LocalDateTime.now());
+    public static Lancamento novaSaida(String descricao, double valor, MeioPagamento meioPagamento) {
+        return new Lancamento(LancamentoId.novo(), null, StatusLancamento.SAIDA, meioPagamento, descricao, valor, LocalDateTime.now());
     }
 
-    public static Lancamento novaDivida(ClienteId clienteId, String descricao, double valor) {
-        return new Lancamento(LancamentoId.novo(), Objects.requireNonNull(clienteId), StatusLancamento.PENDENTE, descricao, valor, LocalDateTime.now());
+    public static Lancamento novaDivida(ClienteId clienteId, String descricao, double valor, MeioPagamento meioPagamento) {
+        return new Lancamento(LancamentoId.novo(), Objects.requireNonNull(clienteId), StatusLancamento.PENDENTE, meioPagamento, descricao, valor, LocalDateTime.now());
     }
 
     public void quitar() {

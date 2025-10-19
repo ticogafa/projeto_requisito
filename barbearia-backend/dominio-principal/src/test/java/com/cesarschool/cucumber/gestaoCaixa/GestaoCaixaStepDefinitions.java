@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.GestaoCaixaServico;
+import com.cesarschool.barbearia.dominio.principal.cliente.caixa.MeioPagamento;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento;
 import com.cesarschool.cucumber.gestaoCaixa.infraestrutura.LancamentoMockRepositorio;
 
@@ -32,10 +33,19 @@ public class GestaoCaixaStepDefinitions {
         this.servico.registrarDivida(this.clienteComDividaId, "Dívida existente", double1);
     }
 
+    // passo antigo mantido (sem meio) - compatibilidade
     @Quando("um serviço de {string} no valor de {double} é finalizado e pago")
     public void servico_pago(String servico, Double valor) {
         servico = ("Pagamento " + servico).trim();
         this.servico.registrarEntrada(servico, valor);
+    }
+
+    // novo passo que recebe o meio de pagamento
+    @Quando("um serviço de {string} no valor de {double} é finalizado e pago via {string}")
+    public void servico_pago_via(String servico, Double valor, String meio) {
+        servico = ("Pagamento " + servico).trim();
+        MeioPagamento mp = MeioPagamento.valueOf(meio.toUpperCase());
+        this.servico.registrarEntrada(servico, valor, mp);
     }
 
     @Quando("uma despesa de {string} no valor de {double} é registrada")
@@ -71,19 +81,27 @@ public class GestaoCaixaStepDefinitions {
         this.servico.registrarDivida(this.clienteComDividaId, "Dívida existente", valorDivida);
     }
 
-    // Casa exatamente com: "Quando o cliente paga a dívida de 40.0"
+    // passo antigo mantido (sem meio) - compatibilidade
     @Quando("o cliente paga a dívida de {double}")
     public void o_cliente_paga_a_divida_de(Double valorPago) {
         if (this.clienteComDividaId == null) {
-            // fallback: garante um cliente com dívida antes de pagar, se não veio de um passo anterior
             this.clienteComDividaId = new com.cesarschool.barbearia.dominio.principal.cliente.ClienteId(1);
             this.servico.registrarDivida(this.clienteComDividaId, "Dívida", valorPago);
         }
-        // chame aqui o método que quita a dívida e registra a entrada de pagamento
         this.servico.pagarPrimeiraDivida(this.clienteComDividaId, valorPago);
     }
 
-    // Use @E porque no .feature a linha começa com "E ..."
+    // novo passo que indica o meio de pagamento para quitar a dívida
+    @Quando("o cliente paga a dívida de {double} via {string}")
+    public void o_cliente_paga_a_divida_de_via(Double valorPago, String meio) {
+        if (this.clienteComDividaId == null) {
+            this.clienteComDividaId = new com.cesarschool.barbearia.dominio.principal.cliente.ClienteId(1);
+            this.servico.registrarDivida(this.clienteComDividaId, "Dívida", valorPago);
+        }
+        MeioPagamento mp = MeioPagamento.valueOf(meio.toUpperCase());
+        this.servico.pagarPrimeiraDivida(this.clienteComDividaId, valorPago, mp);
+    }
+
     @E("a dívida do cliente deve ser marcada como {string}")
     public void a_divida_do_cliente_deve_ser_marcada_como(String status) {
         var esperado = com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento.valueOf(status.toUpperCase());
@@ -93,7 +111,6 @@ public class GestaoCaixaStepDefinitions {
             .toList();
 
         boolean temEsperado = doCliente.stream().anyMatch(l -> l.getStatus() == esperado);
-        // Para "PAGO", garanta também que não sobrou nenhuma PENDENTE
         if (esperado == com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento.PAGO) {
             temEsperado = temEsperado && doCliente.stream().noneMatch(l ->
                 l.getStatus() == com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento.PENDENTE

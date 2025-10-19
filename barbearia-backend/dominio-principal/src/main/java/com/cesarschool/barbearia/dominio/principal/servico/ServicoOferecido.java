@@ -12,7 +12,6 @@ import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
  * Entidade de domínio representando um serviço oferecido por um profissional.
  */
 public final class ServicoOferecido {
-    private Integer pontosFidelidade;
     private ServicoOferecidoId id;
     private ProfissionalId profissionalId;
     private String nome;
@@ -123,11 +122,6 @@ public final class ServicoOferecido {
         this.descricao = descricao;
     }
 
-    public void setPontosFidelidade(Integer pontosFidelidade) {
-        validarInteiroPositivo(pontosFidelidade, "Pontos de fidelidade");
-        this.pontosFidelidade = pontosFidelidade;
-    }
-    
     public void setDuracaoMinutos(Integer duracaoMinutos) {
         validarObjetoObrigatorio(duracaoMinutos, "Duração");
         validarInteiroPositivo(duracaoMinutos, "Duração");
@@ -203,7 +197,6 @@ public final class ServicoOferecido {
     public boolean isAtivo() { return ativo; }
     public String getMotivoInatividade() { return motivoInatividade; }
 
-    //falta fazer uma classe que atribua pontos de fidelidade ao cliente conforme o serviço prestado, tem que atribuir valor de pontos ao serviço
     //tambem pode ser uma propia tabela no banco de dados
     //pensar se vale mais a pena usar um banco de dados ou apenas um enum serve
 }

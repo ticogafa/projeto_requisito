@@ -11,25 +11,45 @@ public class GestaoCaixaServico {
         this.repositorio = repositorio;
     }
 
+    
+    public void registrarEntrada(String descricao, double valor, MeioPagamento meio) {
+        repositorio.salvar(Lancamento.novaEntrada(descricao, valor, meio));
+    }
+
+    public void registrarSaida(String descricao, double valor, MeioPagamento meio) {
+        repositorio.salvar(Lancamento.novaSaida(descricao, valor, meio));
+    }
+
+    public void registrarDivida(ClienteId clienteId, String descricao, double valor, MeioPagamento meio) {
+        repositorio.salvar(Lancamento.novaDivida(clienteId, descricao, valor, meio));
+    }
+
+    
     public void registrarEntrada(String descricao, double valor) {
-        repositorio.salvar(Lancamento.novaEntrada(descricao, valor));
+        registrarEntrada(descricao, valor, MeioPagamento.DINHEIRO);
     }
 
     public void registrarSaida(String descricao, double valor) {
-        repositorio.salvar(Lancamento.novaSaida(descricao, valor));
+        registrarSaida(descricao, valor, MeioPagamento.DINHEIRO);
     }
 
     public void registrarDivida(ClienteId clienteId, String descricao, double valor) {
-        repositorio.salvar(Lancamento.novaDivida(clienteId, descricao, valor));
+        registrarDivida(clienteId, descricao, valor, MeioPagamento.DINHEIRO);
     }
 
-    public void pagarPrimeiraDivida(ClienteId clienteId, double valorPago) {
+    
+    public void pagarPrimeiraDivida(ClienteId clienteId, double valorPago, MeioPagamento meioPagamento) {
         var pendentes = repositorio.buscarPendentesPorCliente(clienteId);
         if (pendentes.isEmpty()) throw new IllegalStateException("Nenhuma dívida pendente para o cliente");
         var divida = pendentes.get(0);
         divida.quitar();
         repositorio.salvar(divida);
-        repositorio.salvar(Lancamento.novaEntrada("Pagamento de dívida", valorPago));
+        repositorio.salvar(Lancamento.novaEntrada("Pagamento de dívida", valorPago, meioPagamento));
+    }
+
+    
+    public void pagarPrimeiraDivida(ClienteId clienteId, double valorPago) {
+        pagarPrimeiraDivida(clienteId, valorPago, MeioPagamento.DINHEIRO);
     }
 
     public double saldoAtual() {
@@ -38,6 +58,6 @@ public class GestaoCaixaServico {
                 .mapToDouble(Lancamento::getValor).sum();
         double saidas = todos.stream().filter(l -> l.getStatus() == StatusLancamento.SAIDA)
                 .mapToDouble(Lancamento::getValor).sum();
-        return entradas - saidas; // pendentes não afetam saldo
+        return entradas - saidas; 
     }
 }
