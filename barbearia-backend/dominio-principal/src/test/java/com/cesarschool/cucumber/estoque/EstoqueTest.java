@@ -10,20 +10,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-/**
- * Classe de testes BDD (Behavior Driven Development) para funcionalidades de gestão de estoque e PDV.
- * Esta classe implementa os step definitions do Cucumber para validar os cenários de:
- * - Cadastro de produtos
- * - Controle de estoque (entrada/saída)
- * - Vendas no PDV (Ponto de Venda)
- * - Gestão de status de produtos (ativo/inativo)
- * - Alertas de estoque mínimo
- * - Relatórios de estoque
- * - Histórico de movimentações
- * 
- * @author Sistema de Barbearia
- * @version 1.0
- */
 public class EstoqueTest {
     
     // ==================== ATRIBUTOS DE CONTROLE DE TESTE ====================
@@ -51,11 +37,6 @@ public class EstoqueTest {
     
     // ==================== CONFIGURAÇÃO DE TESTE ====================
     
-    /**
-     * Método executado antes de cada cenário de teste.
-     * Inicializa o repositório mock e reseta todas as variáveis de estado
-     * para garantir que cada teste execute de forma independente.
-     */
     @Before
     public void setUp() {
         // Inicializa o repositório mock para simular o banco de dados
@@ -74,14 +55,7 @@ public class EstoqueTest {
     }
 
     // ==================== STEP DEFINITIONS - CADASTRO DE PRODUTOS ====================
-    
-    /**
-     * Verifica que um produto específico não existe no sistema.
-     * Este step é usado como pré-condição para testar o cadastro de novos produtos.
-     * 
-     * @param nomeProduto Nome do produto que não deve existir
-     * @cucumber.step "que não existe um produto chamado {string}"
-     */
+
     @Given("que não existe um produto chamado {string}")
     public void que_não_existe_um_produto_chamado(String nomeProduto) {
         // Verifica que o produto realmente não existe no repositório
@@ -90,14 +64,6 @@ public class EstoqueTest {
         produtoAtual = nomeProduto;
     }
 
-    /**
-     * Executa o cadastro de um novo produto com nome e estoque inicial especificados.
-     * Testa o cenário positivo onde um produto válido é cadastrado no sistema.
-     * 
-     * @param nomeProduto Nome do produto a ser cadastrado
-     * @param estoqueInicial Quantidade inicial de estoque
-     * @cucumber.step "eu cadastro um novo produto com o nome {string} e estoque inicial {int}"
-     */
     @When("eu cadastro um novo produto com o nome {string} e estoque inicial {int}")
     public void eu_cadastro_um_novo_produto_com_o_nome_e_estoque_inicial(String nomeProduto, Integer estoqueInicial) {
         try {
@@ -113,12 +79,6 @@ public class EstoqueTest {
         }
     }
 
-    /**
-     * Valida que o produto foi cadastrado com sucesso no sistema.
-     * Verifica tanto o flag de sucesso quanto a existência do produto no repositório.
-     * 
-     * @cucumber.step "o produto é cadastrado com sucesso"
-     */
     @Then("o produto é cadastrado com sucesso")
     public void o_produto_é_cadastrado_com_sucesso() {
         // Verifica que a operação foi bem-sucedida
@@ -127,13 +87,6 @@ public class EstoqueTest {
         assertTrue("Produto deveria existir no repositório", repositorio.produtoExiste(produtoAtual));
     }
 
-    /**
-     * Configura um produto que já existe no sistema.
-     * Este step é usado como pré-condição para testar cenários de nome duplicado.
-     * 
-     * @param nomeProduto Nome do produto que já deve existir
-     * @cucumber.step "que já existe um produto chamado {string}"
-     */
     @Given("que já existe um produto chamado {string}")
     public void que_já_existe_um_produto_chamado(String nomeProduto) {
         // Cadastra o produto previamente para simular que já existe
@@ -144,13 +97,6 @@ public class EstoqueTest {
         produtoAtual = nomeProduto;
     }
 
-    /**
-     * Tenta cadastrar um produto que já existe no sistema.
-     * Testa o cenário negativo onde deve ocorrer falha por nome duplicado.
-     * 
-     * @param nomeProduto Nome do produto duplicado
-     * @cucumber.step "eu tento cadastrar um novo produto com o nome {string}"
-     */
     @When("eu tento cadastrar um novo produto com o nome {string}")
     public void eu_tento_cadastrar_um_novo_produto_com_o_nome(String nomeProduto) {
         try {
@@ -166,12 +112,6 @@ public class EstoqueTest {
         }
     }
 
-    /**
-     * Valida que o sistema rejeitou cadastro de produto com nome duplicado.
-     * Verifica se a regra de negócio de unicidade de nomes está funcionando.
-     * 
-     * @cucumber.step "o sistema rejeita a operação de cadastro com nome duplicado"
-     */
     @Then("o sistema rejeita a operação de cadastro com nome duplicado")
     public void o_sistema_rejeita_a_operação_de_cadastro_com_nome_duplicado() {
         assertFalse("A operação de cadastro deveria ter falhado devido ao nome duplicado", operacaoSucesso);
@@ -179,14 +119,6 @@ public class EstoqueTest {
 
     // ==================== STEP DEFINITIONS - ATUALIZAÇÃO DE ESTOQUE ====================
     
-    /**
-     * Configura um produto pré-existente com estoque definido.
-     * Usado como pré-condição para testar operações de atualização de estoque.
-     * 
-     * @param nomeProduto Nome do produto a ser criado
-     * @param estoque Quantidade inicial de estoque
-     * @cucumber.step "que existe um produto {string} com estoque {int}"
-     */
     @Given("que existe um produto {string} com estoque {int}")
     public void que_existe_um_produto_com_estoque(String nomeProduto, Integer estoque) {
         // Cadastra o produto com estoque inicial e preço padrão de R$ 20,00
@@ -199,13 +131,6 @@ public class EstoqueTest {
         assertEquals("Estoque deveria ser igual", estoque.intValue(), produto.getEstoque());
     }
 
-    /**
-     * Executa a adição de unidades ao estoque do produto atual.
-     * Testa o cenário de incremento positivo no estoque.
-     * 
-     * @param quantidade Número de unidades a adicionar
-     * @cucumber.step "eu adiciono {int} unidades ao estoque"
-     */
     @When("eu adiciono {int} unidades ao estoque")
     public void eu_adiciono_unidades_ao_estoque(Integer quantidade) {
         try {
@@ -218,14 +143,6 @@ public class EstoqueTest {
         }
     }
 
-    /**
-     * Valida que o estoque do produto foi atualizado para o valor esperado.
-     * Verifica se a operação de adição/subtração de estoque funcionou corretamente.
-     * 
-     * @param nomeProduto Nome do produto a verificar
-     * @param estoqueEsperado Valor esperado do estoque após a atualização
-     * @cucumber.step "o estoque atual do produto {string} passa a ser {int}"
-     */
     @Then("o estoque atual do produto {string} passa a ser {int}")
     public void o_estoque_atual_do_produto_passa_a_ser(String nomeProduto, Integer estoqueEsperado) {
         // Obtém o produto do repositório
@@ -245,14 +162,6 @@ public class EstoqueTest {
 
     // ==================== STEP DEFINITIONS - VENDAS PDV ====================
     
-    /**
-     * Registra uma venda no PDV (Ponto de Venda) reduzindo o estoque.
-     * Simula o processo completo de venda com redução automática do estoque.
-     * 
-     * @param quantidade Número de produtos vendidos
-     * @param nomeProduto Nome do produto vendido
-     * @cucumber.step "eu envio a venda de {int} produtos {string} para registro"
-     */
     @When("eu envio a venda de {int} produtos {string} para registro")
     public void eu_envio_a_venda_de_produtos_para_registro(Integer quantidade, String nomeProduto) {
         try {
@@ -272,25 +181,11 @@ public class EstoqueTest {
         }
     }
 
-    /**
-     * Valida que o sistema processou uma venda com sucesso.
-     * Confirma que operações válidas são executadas corretamente.
-     * 
-     * @cucumber.step "o sistema responde sucesso e registra a venda"
-     */
     @Then("o sistema responde sucesso e registra a venda")
     public void o_sistema_responde_sucesso_e_registra_a_venda() {
         assertTrue("A operação de venda deveria ter sido bem-sucedida", operacaoSucesso);
     }
 
-    
-
-        /**
-     * Valida que o sistema rejeitou venda por estoque insuficiente.
-     * Verifica se o controle de estoque está impedindo vendas inválidas.
-     * 
-     * @cucumber.step "o sistema rejeita a operação de venda com estoque insuficiente"
-     */
     @Then("o sistema rejeita a operação de venda com estoque insuficiente")
     public void o_sistema_rejeita_a_operação_de_venda_com_estoque_insuficiente() {
         assertFalse("A operação de venda deveria ter falhado devido ao estoque insuficiente", operacaoSucesso);
