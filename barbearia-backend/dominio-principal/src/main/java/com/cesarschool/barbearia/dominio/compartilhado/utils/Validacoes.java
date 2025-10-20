@@ -52,6 +52,13 @@ public final class Validacoes {
     public static void validarObjetoObrigatorio(Object valor, String nomeCampo) {
         Validate.notNull(valor, "%s não pode ser nulo", nomeCampo);
     }
+    /**
+     * Valida que um objeto não é nulo.
+     */
+    public static <T> T requerirObjetoObrigatorio(T valor, String nomeCampo) {
+        Validate.notNull(valor, "%s não pode ser nulo", nomeCampo);
+        return valor;
+    }
     
     /**
      * Valida que um número inteiro é positivo.

@@ -1,10 +1,13 @@
 package com.cesarschool.barbearia.dominio.principal.cliente.caixa;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
+import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 
+import lombok.Getter;
+
+@Getter
 public class Lancamento {
 
     private final LancamentoId id;
@@ -13,21 +16,23 @@ public class Lancamento {
     private final String descricao;
     private final double valor;
     private final LocalDateTime quando;
+    private final MeioPagamento meioPagamento;
 
     private Lancamento(LancamentoId id,
-                       ClienteId clienteId,
-                       StatusLancamento status,
-                       MeioPagamento meioPagamento,
-                       String descricao,
-                       double valor,
-                       LocalDateTime quando) {
-        if (valor < 0) throw new IllegalArgumentException("Valor não pode ser negativo");
-        this.id = Objects.requireNonNull(id, "id");
-        this.status = Objects.requireNonNull(status, "status");
-        this.descricao = Objects.requireNonNull(descricao, "descricao");
-        this.quando = Objects.requireNonNull(quando, "quando");
-        this.valor = valor;
-        this.clienteId = clienteId;
+        ClienteId clienteId,
+        StatusLancamento status,
+        MeioPagamento meioPagamento,
+        String descricao,
+        double valor,
+        LocalDateTime quando) {
+            if (valor < 0) throw new IllegalArgumentException("Valor não pode ser negativo");
+            this.id = Validacoes.requerirObjetoObrigatorio(id, "id");
+            this.status = Validacoes.requerirObjetoObrigatorio(status, "status");
+            this.descricao = Validacoes.requerirObjetoObrigatorio(descricao, "descricao");
+            this.quando = Validacoes.requerirObjetoObrigatorio(quando, "quando");
+            this.meioPagamento = Validacoes.requerirObjetoObrigatorio(meioPagamento, "meioPagamento");
+            this.valor = valor;
+            this.clienteId = clienteId;
     }
 
     public static Lancamento novoRecibemento(String descricao, double valor, MeioPagamento meioPagamento) {
@@ -39,7 +44,7 @@ public class Lancamento {
     }
 
     public static Lancamento novaDivida(ClienteId clienteId, String descricao, double valor, MeioPagamento meioPagamento) {
-        return new Lancamento(LancamentoId.novo(), Objects.requireNonNull(clienteId), StatusLancamento.PENDENTE, meioPagamento, descricao, valor, LocalDateTime.now());
+        return new Lancamento(LancamentoId.novo(), Validacoes.requerirObjetoObrigatorio(clienteId, "clienteId"), StatusLancamento.PENDENTE, meioPagamento, descricao, valor, LocalDateTime.now());
     }
 
     public void quitar() {
@@ -48,11 +53,4 @@ public class Lancamento {
         }
         this.status = StatusLancamento.PAGO;
     }
-
-    public LancamentoId getId() { return id; }
-    public ClienteId getClienteId() { return clienteId; }
-    public StatusLancamento getStatus() { return status; }
-    public String getDescricao() { return descricao; }
-    public double getValor() { return valor; }
-    public LocalDateTime getQuando() { return quando; }
 }
