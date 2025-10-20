@@ -567,11 +567,18 @@
                         Com certeza voltarei!"
                       </p>
                       <div
-                        class="flex items-center gap-2 text-xs text-gray-500"
+                        class="flex items-center gap-2 text-xs text-gray-500 mb-3"
                       >
                         <span class="material-icons text-xs">verified</span>
                         <span>Atendimento verificado</span>
                       </div>
+                      <button
+                        onclick="openProfessionalResponseModal(1, 'João Pereira', 'Corte + Barba', 5)"
+                        class="text-primary hover:text-orange-400 text-sm font-medium flex items-center gap-1 transition"
+                      >
+                        <span class="material-icons text-sm">reply</span>
+                        Responder avaliação
+                      </button>
                     </div>
                   </div>
 
@@ -614,11 +621,18 @@
                         gosto."
                       </p>
                       <div
-                        class="flex items-center gap-2 text-xs text-gray-500"
+                        class="flex items-center gap-2 text-xs text-gray-500 mb-3"
                       >
                         <span class="material-icons text-xs">verified</span>
                         <span>Atendimento verificado</span>
                       </div>
+                      <button
+                        onclick="openProfessionalResponseModal(2, 'Lucas Lima', 'Corte Social', 4)"
+                        class="text-primary hover:text-orange-400 text-sm font-medium flex items-center gap-1 transition"
+                      >
+                        <span class="material-icons text-sm">reply</span>
+                        Responder avaliação
+                      </button>
                     </div>
                   </div>
 
@@ -661,11 +675,18 @@
                         caprichoso no trabalho."
                       </p>
                       <div
-                        class="flex items-center gap-2 text-xs text-gray-500"
+                        class="flex items-center gap-2 text-xs text-gray-500 mb-3"
                       >
                         <span class="material-icons text-xs">verified</span>
                         <span>Atendimento verificado</span>
                       </div>
+                      <button
+                        onclick="openProfessionalResponseModal(3, 'Rafael Costa', 'Barba Completa', 5)"
+                        class="text-primary hover:text-orange-400 text-sm font-medium flex items-center gap-1 transition"
+                      >
+                        <span class="material-icons text-sm">reply</span>
+                        Responder avaliação
+                      </button>
                     </div>
                   </div>
 
@@ -708,11 +729,18 @@
                         Ambiente limpo e organizado."
                       </p>
                       <div
-                        class="flex items-center gap-2 text-xs text-gray-500"
+                        class="flex items-center gap-2 text-xs text-gray-500 mb-3"
                       >
                         <span class="material-icons text-xs">verified</span>
                         <span>Atendimento verificado</span>
                       </div>
+                      <button
+                        onclick="openProfessionalResponseModal(4, 'Marcos Oliveira', 'Corte + Barba', 5)"
+                        class="text-primary hover:text-orange-400 text-sm font-medium flex items-center gap-1 transition"
+                      >
+                        <span class="material-icons text-sm">reply</span>
+                        Responder avaliação
+                      </button>
                     </div>
                   </div>
 
@@ -755,11 +783,18 @@
                         Parabéns pelo trabalho!"
                       </p>
                       <div
-                        class="flex items-center gap-2 text-xs text-gray-500"
+                        class="flex items-center gap-2 text-xs text-gray-500 mb-3"
                       >
                         <span class="material-icons text-xs">verified</span>
                         <span>Atendimento verificado</span>
                       </div>
+                      <button
+                        onclick="openProfessionalResponseModal(5, 'André Santos', 'Corte Infantil', 5)"
+                        class="text-primary hover:text-orange-400 text-sm font-medium flex items-center gap-1 transition"
+                      >
+                        <span class="material-icons text-sm">reply</span>
+                        Responder avaliação
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -2762,6 +2797,105 @@
         </div>
       </div>
 
+      <!-- Modal de Resposta do Profissional -->
+      <div
+        id="professionalResponseModal"
+        onclick="closeModalOnBackdrop(event, 'professionalResponseModal')"
+        class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+      >
+        <div
+          class="bg-dark-800 rounded-2xl p-8 max-w-2xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto"
+          onclick="event.stopPropagation()"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <span class="material-icons text-primary text-3xl">reply</span>
+              <h3 class="text-2xl font-bold">Responder Avaliação</h3>
+            </div>
+            <button
+              onclick="closeModal('professionalResponseModal')"
+              class="text-gray-400 hover:text-white transition"
+            >
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+
+          <!-- Informações da Avaliação -->
+          <div class="bg-dark-700 rounded-lg p-4 mb-6">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <span class="material-icons text-primary">person</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="font-semibold" id="responseClientName"></h4>
+                  <div class="flex gap-1" id="responseStars"></div>
+                </div>
+                <p class="text-sm text-gray-400" id="responseService"></p>
+              </div>
+            </div>
+          </div>
+
+          <form onsubmit="submitProfessionalResponse(event)">
+            <input type="hidden" id="responseReviewId" />
+            
+            <div class="mb-6">
+              <label class="block text-sm font-medium mb-2">
+                Sua Resposta
+                <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                id="professionalResponseText"
+                rows="5"
+                required
+                maxlength="500"
+                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 focus:outline-none focus:border-primary transition resize-none"
+                placeholder="Escreva uma resposta profissional e atenciosa para o cliente..."
+              ></textarea>
+              <div class="flex justify-between items-center mt-1">
+                <p class="text-xs text-gray-400">Máximo de 500 caracteres</p>
+                <p class="text-xs text-gray-400">
+                  <span id="charCount">0</span>/500
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
+              <div class="flex items-start gap-2">
+                <span class="material-icons text-blue-400 text-sm mt-0.5">info</span>
+                <div class="flex-1">
+                  <p class="text-sm text-blue-100 font-medium mb-1">Dicas para uma boa resposta:</p>
+                  <ul class="text-xs text-blue-200 space-y-1">
+                    <li>• Agradeça o feedback do cliente</li>
+                    <li>• Seja profissional e cortês</li>
+                    <li>• Sua resposta será pública</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <button
+                type="button"
+                onclick="closeModal('professionalResponseModal')"
+                class="flex-1 bg-dark-700 hover:bg-dark-600 text-white py-3 rounded-lg font-medium transition"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="flex-1 bg-primary hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition"
+              >
+                <span class="flex items-center justify-center gap-2">
+                  <span class="material-icons text-sm">send</span>
+                  Enviar Resposta
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <div
         id="ratingModal"
         onclick="closeModalOnBackdrop(event, 'ratingModal')"
@@ -3746,10 +3880,163 @@
           const link = document.getElementById("profReviewsLink");
           link.classList.add("bg-primary/10", "text-primary");
           link.classList.remove("text-gray-400", "hover:text-gray-200");
+          
+          // Carregar respostas salvas quando visualizar avaliações
+          setTimeout(() => loadSavedResponses(), 100);
         }
 
         return false; // Prevenir navegação padrão do link
       }
+
+      // ==================== FUNÇÕES DE RESPOSTA DO PROFISSIONAL ====================
+      
+      let currentReviewId = null;
+      let professionalResponses = JSON.parse(localStorage.getItem('professionalResponses')) || {};
+
+      function openProfessionalResponseModal(id, clientName, service, stars) {
+        currentReviewId = id;
+        
+        // Preencher informações da avaliação
+        document.getElementById('responseReviewId').value = id;
+        document.getElementById('responseClientName').textContent = clientName;
+        document.getElementById('responseService').textContent = service;
+        
+        // Gerar estrelas
+        let starsHTML = '';
+        for (let i = 0; i < 5; i++) {
+          starsHTML += `<span class="material-icons ${i < stars ? 'text-yellow-400' : 'text-gray-600'} text-sm">star</span>`;
+        }
+        document.getElementById('responseStars').innerHTML = starsHTML;
+        
+        // Limpar campo de texto
+        document.getElementById('professionalResponseText').value = '';
+        document.getElementById('charCount').textContent = '0';
+        
+        // Abrir modal
+        document.getElementById('professionalResponseModal').classList.remove('hidden');
+      }
+
+      function submitProfessionalResponse(event) {
+        event.preventDefault();
+        
+        const reviewId = document.getElementById('responseReviewId').value;
+        const responseText = document.getElementById('professionalResponseText').value.trim();
+        
+        // Validação
+        if (!responseText) {
+          showToast('Atenção', 'Por favor, escreva uma resposta antes de enviar.', 'warning', 'yellow');
+          return;
+        }
+        
+        if (responseText.length > 500) {
+          showToast('Atenção', 'A resposta não pode ter mais de 500 caracteres.', 'warning', 'yellow');
+          return;
+        }
+        
+        // Salvar resposta
+        professionalResponses[reviewId] = {
+          text: responseText,
+          date: new Date().toISOString()
+        };
+        localStorage.setItem('professionalResponses', JSON.stringify(professionalResponses));
+        
+        // Fechar modal
+        closeModal('professionalResponseModal');
+        
+        // Exibir toast de sucesso
+        showToast('Resposta Enviada!', 'Sua resposta foi publicada e o cliente receberá uma notificação.', 'check_circle');
+        
+        // Em produção, aqui seria feita a chamada ao backend
+        console.log('Resposta do profissional:', {
+          reviewId: reviewId,
+          response: responseText,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Atualizar UI para mostrar a resposta
+        addResponseToReviewCard(reviewId, responseText);
+      }
+
+      function addResponseToReviewCard(reviewId, responseText) {
+        // Encontrar o card de avaliação correspondente
+        const reviewCards = document.querySelectorAll('#professionalReviewsSection .bg-dark-700');
+        
+        // Mapeamento de IDs para índices (começando em 0)
+        const reviewIndex = parseInt(reviewId) - 1;
+        
+        if (reviewCards[reviewIndex]) {
+          const card = reviewCards[reviewIndex];
+          
+          // Verificar se já existe uma resposta
+          const existingResponse = card.querySelector('.professional-response');
+          if (existingResponse) {
+            existingResponse.remove();
+          }
+          
+          // Criar elemento de resposta
+          const responseDiv = document.createElement('div');
+          responseDiv.className = 'professional-response mt-4 pt-4 border-t border-dark-600';
+          responseDiv.innerHTML = `
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <span class="material-icons text-primary text-sm">badge</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-sm font-semibold text-primary">Resposta do Profissional</span>
+                  <span class="text-xs text-gray-500">${new Date().toLocaleDateString('pt-BR')}</span>
+                </div>
+                <p class="text-sm text-gray-300 leading-relaxed">${escapeHtml(responseText)}</p>
+              </div>
+            </div>
+          `;
+          
+          // Adicionar ao card, antes do botão "Responder avaliação"
+          const replyButton = card.querySelector('button[onclick^="openProfessionalResponseModal"]');
+          if (replyButton) {
+            // Esconder o botão após responder
+            replyButton.classList.add('hidden');
+            // Adicionar resposta antes do botão
+            replyButton.parentElement.insertBefore(responseDiv, replyButton);
+          }
+        }
+      }
+
+      // Função para escapar HTML e prevenir XSS
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Carregar respostas salvas ao mostrar as avaliações
+      function loadSavedResponses() {
+        const savedResponses = JSON.parse(localStorage.getItem('professionalResponses')) || {};
+        Object.keys(savedResponses).forEach(reviewId => {
+          addResponseToReviewCard(reviewId, savedResponses[reviewId].text);
+        });
+      }
+
+      // Adicionar contador de caracteres ao carregar a página
+      document.addEventListener('DOMContentLoaded', function() {
+        const responseTextarea = document.getElementById('professionalResponseText');
+        if (responseTextarea) {
+          responseTextarea.addEventListener('input', function() {
+            const count = this.value.length;
+            document.getElementById('charCount').textContent = count;
+            
+            // Alertar quando próximo do limite
+            const charCountElement = document.getElementById('charCount');
+            if (count > 450) {
+              charCountElement.classList.add('text-red-400', 'font-semibold');
+            } else {
+              charCountElement.classList.remove('text-red-400', 'font-semibold');
+            }
+          });
+        }
+      });
+
+      // ==================== FIM DAS FUNÇÕES DE RESPOSTA DO PROFISSIONAL ====================
 
       // Funções do Profissional
       function startAppointment(id) {

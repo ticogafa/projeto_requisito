@@ -28,3 +28,13 @@ Feature: Gestão de Serviços
         Given que o serviço "Maquiagem" está inativo por "falta de insumos"
         When o cliente acessa as opções de agendamento
         Then o sistema não exibe o serviço "Maquiagem" na lista
+
+    Scenario: Associar serviço a um profissional qualificado com sucesso (POSITIVO)
+        Given que existe o profissional "João" qualificado para "Corte Masculino"
+        When eu associo o serviço "Corte Masculino" ao profissional "João"
+        Then o sistema salva a associação com sucesso
+
+    Scenario: Impedir associação de serviço a profissional não qualificado (NEGATIVO)
+        Given que existe o profissional "João" sem qualificação para "Manicure"
+        When eu tento associar o serviço "Manicure" ao profissional "João"
+        Then o sistema irá rejeitar a operação

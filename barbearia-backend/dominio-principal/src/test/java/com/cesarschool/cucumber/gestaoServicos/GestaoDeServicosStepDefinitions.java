@@ -212,4 +212,49 @@ public class GestaoDeServicosStepDefinitions {
         Assertions.assertNotNull(excecaoCapturada);
         Assertions.assertTrue(excecaoCapturada instanceof IllegalArgumentException);
     }
+
+     @Given("que existe o profissional {string} qualificado para {string}")
+    public void que_existe_o_profissional_qualificado_para(String nomeProfissional, String nomeServico) {
+        servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
+            ServicoOferecido s = new ServicoOferecido(profissionalIdTeste, n, new BigDecimal("80.00"), "Serviço", 60);
+            return repositorioMock.salvar(s);
+        });
+        repositorioMock.salvarAssociacao(nomeServico, nomeProfissional);
+        servicosCache.put(nomeProfissional, null); 
+        Assertions.assertTrue(repositorioMock.estaQualificado(nomeServico, nomeProfissional));
+    }
+
+    @When("eu associo o serviço {string} ao profissional {string}")
+    public void eu_associo_o_serviço_ao_profissional(String nomeServico, String nomeProfissional) {
+        try {
+            servicoOferecidoServico.associarProfissional(nomeServico, nomeProfissional);
+        } catch (Exception e) {
+            excecaoCapturada = e;
+        }
+    }
+
+    @Then("o sistema salva a associação com sucesso")
+    public void o_sistema_salva_a_associação_com_sucesso() {
+        Assertions.assertTrue(repositorioMock.estaQualificado("Corte Masculino", "João"));
+        Assertions.assertNull(excecaoCapturada);
+    }
+
+    @Given("que existe o profissional {string} sem qualificação para {string}")
+    public void que_existe_o_profissional_sem_qualificacao_para(String nomeProfissional, String nomeServico) {
+        servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
+            ServicoOferecido s = new ServicoOferecido(profissionalIdTeste, n, new BigDecimal("80.00"), "Serviço", 60);
+            return repositorioMock.salvar(s);
+        });
+        Assertions.assertFalse(repositorioMock.estaQualificado(nomeServico, nomeProfissional));
+        servicosCache.put(nomeProfissional, null); 
+    }
+
+    @When("eu tento associar o serviço {string} ao profissional {string}")
+    public void eu_tento_associar_o_serviço_ao_profissional(String nomeServico, String nomeProfissional) {
+        try {
+            servicoOferecidoServico.associarProfissional(nomeServico, nomeProfissional);
+        } catch (Exception e) {
+            excecaoCapturada = e;
+        }
+    }
 }

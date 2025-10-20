@@ -19,6 +19,11 @@ public class AgendamentoMockRepositorio implements AgendamentoRepositorio {
         ultimoAgendamentoSalvo = agendamento;
         return agendamento;
     }
+    @Override
+    public boolean existeAgendamentoNoPeriodo(ProfissionalId profissionalId, LocalDateTime dataHora,
+            int duracaoMinutos) {
+        return false;
+    }
 
     @Override
     public List<Agendamento> buscarPorCliente(ClienteId clienteId) {
@@ -46,11 +51,6 @@ public class AgendamentoMockRepositorio implements AgendamentoRepositorio {
         return new ArrayList<>();
     }
 
-    @Override
-    public boolean existeAgendamentoNoPeriodo(ProfissionalId profissionalId, LocalDateTime dataHora,
-            int duracaoMinutos) {
-        return false;
-    }
 
     @Override
     public List<Agendamento> listarTodos() {
