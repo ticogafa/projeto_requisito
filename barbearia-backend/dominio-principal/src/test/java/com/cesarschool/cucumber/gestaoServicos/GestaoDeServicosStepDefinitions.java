@@ -206,4 +206,10 @@ public class GestaoDeServicosStepDefinitions {
         Assertions.assertNotNull(servicoPersistido);
         Assertions.assertEquals(10, servicoPersistido.getIntervaloLimpezaMinutos());
     }
+
+    @Then("o sistema irá rejeitar a operação")
+    public void oSistemaIráRejeitarAOperação() {     
+        Assertions.assertNotNull(excecaoCapturada);
+        Assertions.assertTrue(excecaoCapturada instanceof IllegalArgumentException);
+    }
 }

@@ -7,7 +7,7 @@ Feature: Gestão de Serviços
     Scenario: Impedir criação de serviço com nome duplicado (NEGATIVO)
         Given que já existe um serviço chamado "Corte Masculino"
         When eu tento criar um novo serviço com o nome "Corte Masculino"
-        Then o sistema rejeita a operação
+        Then o sistema irá rejeitar a operação
 
     Scenario: Atualizar um serviço com preço e duração válidos (POSITIVO)
         Given que existe um serviço chamado "Corte Feminino"
@@ -17,7 +17,7 @@ Feature: Gestão de Serviços
     Scenario: Impedir atualização de serviço com duração ou preço inválidos (NEGATIVO)
         Given que existe um serviço chamado "Corte Feminino"
         When eu tento alterar a duração para um valor negativo
-        Then o sistema rejeita a operação
+        Then o sistema irá rejeitar a operação
 
     Scenario: Desativar um serviço por período de indisponibilidade com sucesso (POSITIVO)
         Given que existe um serviço chamado "Maquiagem" ativo

@@ -20,7 +20,6 @@ import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
-import static com.cesarschool.cucumber.gestaoProfissionais.GestaoDeProfissionaisStepDefinitions.setExcecaoCompartilhada;
 import com.cesarschool.cucumber.gestaoProfissionais.ProfissionalMockRepositorio;
 
 import io.cucumber.java.Before;
@@ -29,6 +28,13 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 public class GestaoAgendamentoTest {
+
+        private static Exception excecaoCompartilhada;
+
+
+    public static void setExcecaoCompartilhada(Exception excecao) {
+        excecaoCompartilhada = excecao;
+    }
     
     
     private GestaoAgendamentoMockRepositorio repositorio;

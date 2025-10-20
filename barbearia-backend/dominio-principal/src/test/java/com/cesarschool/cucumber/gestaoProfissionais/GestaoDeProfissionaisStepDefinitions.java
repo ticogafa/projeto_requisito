@@ -161,65 +161,8 @@ public class GestaoDeProfissionaisStepDefinitions {
     }
     
 
-    @Given("que existe um profissional chamado {string}")
-    public void queExisteUmProfissionalChamado(String nome) {
-        Profissional novoProfissional = criarProfissionalGenerico(nome);
-        try {
-            profissionalAtual = profissionalServico.registrarNovo(novoProfissional);
-            profissionalCache.put(nome, profissionalAtual);
-        } catch (Exception e) {
-            excecaoCapturada = e;
-        }
-    }
-
-    @When("eu atribuo o serviço {string}")
-    public void euAtribuoOServiço(String nomeServico) {
-        try {
-            repositorioMock.salvarAssociacaoServico(profissionalAtual.getNome(), nomeServico);
-            // Simula que deu certo - o profissional agora tem o serviço
-        } catch (Exception e) {
-            excecaoCapturada = e;
-        }
-    }
-    
-
-    @When("eu tento atribuir o serviço {string}")
-    public void euTentoAtribuirOServiço(String nomeServicoInexistente) {
-        try {
-            if (nomeServicoInexistente.equals("Serviço Inexistente")) {
-                 throw new IllegalArgumentException("Serviço não encontrado.");
-            }
-            repositorioMock.salvarAssociacaoServico(profissionalAtual.getNome(), nomeServicoInexistente);
-        } catch (IllegalArgumentException e) {
-            excecaoCapturada = e;
-        }
-    }
-        
-    @Given("que o profissional {string} possui o serviço {string}")
-    public void queOProfissionalPossuiOServiço(String nomeProfissional, String nomeServico) {
-        queExisteUmProfissionalChamado(nomeProfissional);
-        repositorioMock.salvarAssociacaoServico(nomeProfissional, nomeServico);
-        profissionalAtual = profissionalCache.get(nomeProfissional);
-    }
-
-    @When("eu removo o serviço {string}")
-    public void euRemovoOServiço(String nomeServico) {
-        try {
-            repositorioMock.removerAssociacaoServico(profissionalAtual.getNome(), nomeServico);
-        } catch (Exception e) {
-            excecaoCapturada = e;
-        }
-    }
-
-    @Then("o serviço é removido corretamente")
-    public void oServiçoÉRemovidoCorretamente() {
-        Assertions.assertFalse(repositorioMock.possuiAssociacaoServico(profissionalAtual.getNome(), "Coloração Capilar"), 
-            "O serviço não deve mais estar vinculado após a remoção.");
-    }
-
     @Given("que o profissional {string} possui o serviço {string} com agendamentos ativos")
     public void queOProfissionalPossuiOServiçoComAgendamentosAtivos(String nomeProfissional, String nomeServico) {
-        queOProfissionalPossuiOServiço(nomeProfissional, nomeServico); 
         repositorioMock.simularAgendamentoAtivo(nomeServico, true);
     }
     
@@ -227,7 +170,7 @@ public class GestaoDeProfissionaisStepDefinitions {
     public void euTentoRemoverOServiço(String nomeServico) {
         try {
             if (repositorioMock.temAgendamentoAtivo(nomeServico)) {
-                 throw new IllegalStateException("Não é possível remover serviço com agendamentos ativos.");
+                throw new IllegalStateException("Não é possível remover serviço com agendamentos ativos.");
             }
             repositorioMock.removerAssociacaoServico(profissionalAtual.getNome(), nomeServico);
         } catch (IllegalStateException e) {
@@ -235,8 +178,8 @@ public class GestaoDeProfissionaisStepDefinitions {
         }
     }
 
-    @Then("o sistema rejeita a operação")
-    public void oSistemaRejeitaAOperação() {
+    @Then("o sistema vai rejeitar a operação")
+    public void oSistemaVaiRejeitarAOperação() {
         // Verificar primeiro a exceção local, depois a compartilhada
         Exception excecaoParaTeste = excecaoCapturada != null ? excecaoCapturada : excecaoCompartilhada;
         
