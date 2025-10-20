@@ -151,6 +151,70 @@ BoundedContext SistemaBarbearia implements Principal {
 
 	}
 
+	Aggregate MovimentacaoEstoque {
+		Entity MovimentacaoEstoque {
+			aggregateRoot
+
+			-MovimentacaoEstoqueId id
+			-ProdutoId produtoId
+			String nomeProduto
+			TipoMovimentacao tipo
+			int quantidade
+			int estoqueAnterior
+			int estoqueAtual
+			DateTime dataHora
+			String observacao
+			String usuarioResponsavel
+
+			Repository MovimentacaoEstoqueRepository {
+				List<@MovimentacaoEstoque> buscarPorProduto(@ProdutoId produtoId);
+				List<@MovimentacaoEstoque> buscarPorProdutoEPeriodo(@ProdutoId produtoId, DateTime dataInicio, DateTime dataFim);
+				List<@MovimentacaoEstoque> buscarPorTipo(TipoMovimentacao tipo);
+				List<@MovimentacaoEstoque> buscarPorPeriodo(DateTime dataInicio, DateTime dataFim);
+				List<@MovimentacaoEstoque> buscarUltimasMovimentacoes(@ProdutoId produtoId, int limite);
+			}
+		}
+
+		ValueObject MovimentacaoEstoqueId { int id }
+
+		enum TipoMovimentacao {
+			ENTRADA,
+			SAIDA,
+			VENDA,
+			AJUSTE,
+			ESTOQUE_INICIAL,
+			DESATIVACAO
+		}
+
+		Service GestaoEstoqueServico {
+			// Operações de Cadastro
+			@Produto cadastrarProduto(@Produto produto, String usuarioResponsavel);
+			@Produto atualizarProduto(@ProdutoId produtoId, @Produto produto, String usuarioResponsavel);
+			
+			// Operações de Estoque
+			@Produto adicionarEstoque(@ProdutoId produtoId, int quantidade, String observacao, String usuarioResponsavel);
+			@Produto removerEstoque(@ProdutoId produtoId, int quantidade, String observacao, String usuarioResponsavel);
+			@Produto registrarVendaPDV(@ProdutoId produtoId, int quantidade, String usuarioResponsavel);
+			boolean validarEstoqueDisponivel(@ProdutoId produtoId, int quantidade);
+			
+			// Consultas e Relatórios
+			@Produto buscarProduto(@ProdutoId produtoId);
+			List<@Produto> listarTodosProdutos();
+			List<@Produto> listarProdutosComEstoqueBaixo();
+			boolean isEstoqueBaixo(@ProdutoId produtoId);
+			
+			// Histórico de Movimentações
+			List<@MovimentacaoEstoque> buscarHistoricoProduto(@ProdutoId produtoId);
+			List<@MovimentacaoEstoque> buscarHistoricoPorPeriodo(@ProdutoId produtoId, DateTime dataInicio, DateTime dataFim);
+			List<@MovimentacaoEstoque> buscarUltimasMovimentacoes(@ProdutoId produtoId, int limite);
+			List<@MovimentacaoEstoque> listarMovimentacoesPorTipo(TipoMovimentacao tipo);
+			
+			// Operações de Ativação/Desativação
+			void desativarProduto(@ProdutoId produtoId, String motivo, String usuarioResponsavel);
+		}
+
+	}
+
 	Aggregate ItemVenda {
 		Entity ItemVenda {
 			aggregateRoot
