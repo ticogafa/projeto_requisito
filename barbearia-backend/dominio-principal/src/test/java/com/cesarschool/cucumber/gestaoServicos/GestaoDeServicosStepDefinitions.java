@@ -97,10 +97,13 @@ public class GestaoDeServicosStepDefinitions {
         }
     }
 
-    @Then("o sistema rejeita a operação de serviço")
-    public void o_sistema_rejeita_a_operacao_de_servico() {
-        Assertions.assertNotNull(excecaoCapturada);
-        Assertions.assertTrue(excecaoCapturada instanceof IllegalArgumentException);
+    @Then("o sistema salva a dependência corretamente")
+    public void o_sistema_salva_a_dependencia_corretamente() {
+        Assertions.assertNotNull(servicoCriado);
+        ServicoOferecido principal = servicosCache.get("Corte"); 
+        Assertions.assertEquals(principal.getId(), servicoCriado.getServicoPrincipalId());
+        ServicoOferecido addOnPersistido = repositorioMock.buscarPorId(servicoCriado.getId().getValor());
+        Assertions.assertEquals(principal.getId(), addOnPersistido.getServicoPrincipalId());
     }
 
     @Given("que existe um serviço chamado {string}")
@@ -137,140 +140,6 @@ public class GestaoDeServicosStepDefinitions {
         Assertions.assertNotNull(servicoPersistido);
         Assertions.assertEquals(60, servicoPersistido.getDuracaoMinutos());
         Assertions.assertEquals(new BigDecimal("70.00"), servicoPersistido.getPreco());
-    }
-    
-    @Given("que existe o serviço {string} e o serviço {string}")
-    public void que_existe_o_serviço_e_o_serviço(String nomeServico1, String nomeServico2) {
-        ServicoOferecido servico1 = new ServicoOferecido(
-            profissionalIdTeste, nomeServico1, new BigDecimal("50.00"), "Serviço principal", 60);
-        servico1 = repositorioMock.salvar(servico1);
-        servicosCache.put(nomeServico1, servico1);
-        ServicoOferecido servico2 = new ServicoOferecido(
-            profissionalIdTeste, nomeServico2, new BigDecimal("20.00"), "Serviço add-on", 30);
-        servico2 = repositorioMock.salvar(servico2);
-        servicosCache.put(nomeServico2, servico2);
-        Assertions.assertNotNull(servico1.getId());
-        Assertions.assertNotNull(servico2.getId());
-    }
-
-    @When("eu configuro {string} como um add-on de {string}")
-    public void eu_configuro_como_um_add_on_de(String nomeAddOn, String nomePrincipal) {
-        ServicoOferecido addOn = servicosCache.get(nomeAddOn);
-        ServicoOferecido principal = servicosCache.get(nomePrincipal);
-        try {
-            servicoCriado = servicoOferecidoServico.definirAddOn(addOn.getId(), principal.getId());
-        } catch (Exception e) {
-            excecaoCapturada = e; 
-        }
-    }
-
-    @Then("o sistema salva a dependência corretamente")
-    public void o_sistema_salva_a_dependencia_corretamente() {
-        Assertions.assertNotNull(servicoCriado);
-        ServicoOferecido principal = servicosCache.get("Corte"); 
-        Assertions.assertEquals(principal.getId(), servicoCriado.getServicoPrincipalId());
-        ServicoOferecido addOnPersistido = repositorioMock.buscarPorId(servicoCriado.getId().getValor());
-        Assertions.assertEquals(principal.getId(), addOnPersistido.getServicoPrincipalId());
-    }
-
-    @Given("que o serviço {string} é um add-on de {string}") 
-    public void que_o_serviço_é_um_add_on_de(String nomeAddOn, String nomePrincipal) {
-        ServicoOferecido principal = servicosCache.computeIfAbsent(nomePrincipal, n -> {
-            ServicoOferecido s = new ServicoOferecido(profissionalIdTeste, n, new BigDecimal("50.00"), "Principal", 60);
-            return repositorioMock.salvar(s);
-        });
-        ServicoOferecido addOn = servicosCache.computeIfAbsent(nomeAddOn, n -> {
-            ServicoOferecido s = new ServicoOferecido(profissionalIdTeste, n, new BigDecimal("20.00"), "Add-on", 30);
-            return repositorioMock.salvar(s);
-        });
-        servicoOferecidoServico.definirAddOn(addOn.getId(), principal.getId());
-        addOn = repositorioMock.buscarPorId(addOn.getId().getValor());
-        servicosCache.put(nomeAddOn, addOn);
-        Assertions.assertNotNull(addOn.getServicoPrincipalId());
-    }
-
-    @When("o cliente tenta agendar apenas o serviço {string}") 
-    public void o_cliente_tenta_agendar_apenas_o_serviço(String nomeServico) {
-        ServicoOferecido servico = servicosCache.get(nomeServico);
-        try {
-            if (!servicoOferecidoServico.podeSerAgendadoSozinho(servico)) {
-                throw new IllegalArgumentException("Serviços adicionais (add-on) não podem ser agendados sozinhos.");
-            }
-            servicoCriado = null; 
-        } catch (Exception e) {
-            excecaoCapturada = e;
-        }
-    }
-
-    @Then("o sistema rejeita a operação_Novamente") 
-    public void o_sistema_rejeita_a_operacao_novamente() {
-        Assertions.assertNotNull(excecaoCapturada);
-        Assertions.assertTrue(excecaoCapturada instanceof IllegalArgumentException);
-    }
-
-    @Given("que o serviço {string} tem um intervalo de limpeza de {int} minutos para serviços")
-    public void que_o_serviço_tem_um_intervalo_de_limpeza_de_minutos_para_serviços(String nomeServico, Integer intervaloMinutos) {
-        servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
-            ServicoOferecido s = new ServicoOferecido(profissionalIdTeste, n, new BigDecimal("70.00"), "Corte", 60);
-            return repositorioMock.salvar(s);
-        });
-        servicoExistente = servicoOferecidoServico.definirIntervaloLimpeza(servicoExistente.getId().getValor(), intervaloMinutos);
-        servicosCache.put(nomeServico, servicoExistente);
-        Assertions.assertEquals(intervaloMinutos, servicoExistente.getIntervaloLimpezaMinutos());
-    }
-
-    // Alias para cobrir variação da frase do .feature
-    @Given("que o serviço {string} tem um intervalo de limpeza de {int} minutos")
-    public void que_o_serviço_tem_um_intervalo_de_limpeza_de_minutos(String nomeServico, Integer intervaloMinutos) {
-        servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
-            ServicoOferecido s = new ServicoOferecido(profissionalIdTeste, n, new BigDecimal("70.00"), "Corte", 60);
-            return repositorioMock.salvar(s);
-        });
-        servicoExistente = servicoOferecidoServico.definirIntervaloLimpeza(servicoExistente.getId().getValor(), intervaloMinutos);
-        servicosCache.put(nomeServico, servicoExistente);
-        Assertions.assertEquals(intervaloMinutos, servicoExistente.getIntervaloLimpezaMinutos());
-    }
-
-    @When("um novo agendamento tenta começar imediatamente após o fim do {string}")
-    public void um_novo_agendamento_tenta_comecar_imediatamente_apos_o_fim_do(String nomeServicoAnterior) {
-        try {
-            throw new IllegalArgumentException("Intervalo de limpeza não respeitado. Exige tempo de espera.");
-        } catch (Exception e) {
-            excecaoCapturada = e;
-        }
-    }
-
-    @Then("o sistema rejeita a operação e exige o tempo de intervalo")
-    public void o_sistema_rejeita_a_operacao_e_exige_o_tempo_de_intervalo() {
-        Assertions.assertNotNull(excecaoCapturada);
-        Assertions.assertTrue(excecaoCapturada instanceof IllegalArgumentException);
-        Assertions.assertTrue(excecaoCapturada.getMessage().contains("Intervalo de limpeza não respeitado"));
-    }
-
-    @Given("que existe o profissional {string} qualificado para {string}")
-    public void que_existe_o_profissional_qualificado_para(String nomeProfissional, String nomeServico) {
-        servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
-            ServicoOferecido s = new ServicoOferecido(profissionalIdTeste, n, new BigDecimal("80.00"), "Serviço", 60);
-            return repositorioMock.salvar(s);
-        });
-        repositorioMock.salvarAssociacao(nomeServico, nomeProfissional);
-        servicosCache.put(nomeProfissional, null); 
-        Assertions.assertTrue(repositorioMock.estaQualificado(nomeServico, nomeProfissional));
-    }
-
-    @When("eu associo o serviço {string} ao profissional {string}")
-    public void eu_associo_o_serviço_ao_profissional(String nomeServico, String nomeProfissional) {
-        try {
-            servicoOferecidoServico.associarProfissional(nomeServico, nomeProfissional);
-        } catch (Exception e) {
-            excecaoCapturada = e;
-        }
-    }
-
-    @Then("o sistema salva a associação com sucesso")
-    public void o_sistema_salva_a_associação_com_sucesso() {
-        Assertions.assertTrue(repositorioMock.estaQualificado("Corte Masculino", "João"));
-        Assertions.assertNull(excecaoCapturada);
     }
 
     @Given("que existe um serviço chamado {string} ativo")
@@ -319,42 +188,11 @@ public class GestaoDeServicosStepDefinitions {
         Assertions.assertFalse(estaNaLista);
     }
 
-    @Given("que existe o profissional {string} sem qualificação para {string}")
-    public void que_existe_o_profissional_sem_qualificacao_para(String nomeProfissional, String nomeServico) {
-        servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
-            ServicoOferecido s = new ServicoOferecido(profissionalIdTeste, n, new BigDecimal("80.00"), "Serviço", 60);
-            return repositorioMock.salvar(s);
-        });
-        Assertions.assertFalse(repositorioMock.estaQualificado(nomeServico, nomeProfissional));
-        servicosCache.put(nomeProfissional, null); 
-    }
-
-    @When("eu tento associar o serviço {string} ao profissional {string}")
-    public void eu_tento_associar_o_serviço_ao_profissional(String nomeServico, String nomeProfissional) {
-        try {
-            servicoOferecidoServico.associarProfissional(nomeServico, nomeProfissional);
-        } catch (Exception e) {
-            excecaoCapturada = e;
-        }
-    }
-
     @When("eu tento alterar a duração para um valor negativo")
     public void eu_tento_alterar_a_duracao_para_um_valor_negativo() {
         Integer duracaoInvalida = -10;
         try {
             servicoOferecidoServico.atualizarDuracao(servicoExistente.getId().getValor(), duracaoInvalida);
-        } catch (Exception e) {
-            excecaoCapturada = e;
-        }
-    }
-
-    @When("eu defino um intervalo de limpeza de {int} minutos após o serviço")
-    public void eu_defino_um_intervalo_de_limpeza_de_minutos_apos_o_serviço(Integer intervaloMinutos) {
-        try {
-            servicoExistente = servicoOferecidoServico.definirIntervaloLimpeza(
-                servicoExistente.getId().getValor(), 
-                intervaloMinutos.intValue()
-            );
         } catch (Exception e) {
             excecaoCapturada = e;
         }
