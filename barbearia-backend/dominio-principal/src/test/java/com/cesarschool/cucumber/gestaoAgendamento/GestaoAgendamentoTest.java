@@ -158,6 +158,17 @@ public class GestaoAgendamentoTest {
         assertNotNull(repositorio.profissionais.get(profissionalJoaoId));
     }
 
+    @Given("que existe um profissional cadastrado com o horário {string} livre")
+    public void que_existe_um_profissional_cadastrado_com_o_horário_livre(String horario) {
+        assertNotNull(repositorio.profissionais.get(profissionalJoaoId));
+        LocalDateTime dataHora = LocalDateTime.now()
+            .withHour(Integer.parseInt(horario.split(":" )[0]))
+            .withMinute(Integer.parseInt(horario.split(":" )[1]))
+            .withSecond(0).withNano(0);
+        assertFalse("Deveria estar livre no horário informado",
+            repositorio.existeAgendamentoNoPeriodo(profissionalJoaoId, dataHora, 60));
+    }
+
     @When("solicito a criação do agendamento em horário livre para o profissional")
     public void solicito_a_criação_do_agendamento_em_horário_livre_para_o_profissional() {
         try {
@@ -177,7 +188,18 @@ public class GestaoAgendamentoTest {
     @Given("que existe um agendamento para o profissional cadastrado em um horário determinado")
     public void que_existe_um_agendamento_para_o_profissional_cadastrado_em_um_horário_determinado() {
         LocalDateTime horario = LocalDateTime.now().plusHours(2);
-        Agendamento agendamentoExistente = new Agendamento(horario, clienteMariaId, 
+        Agendamento agendamentoExistente = new Agendamento(horario, clienteMariaId,
+            profissionalJoaoId, corteId, "Agendamento existente");
+        repositorio.salvar(agendamentoExistente);
+    }
+
+    @Given("que existe um agendamento para o profissional cadastrado no horário {string}")
+    public void que_existe_um_agendamento_para_o_profissional_cadastrado_no_horário(String horario) {
+        LocalDateTime dataHora = LocalDateTime.now()
+            .withHour(Integer.parseInt(horario.split(":" )[0]))
+            .withMinute(Integer.parseInt(horario.split(":" )[1]))
+            .withSecond(0).withNano(0);
+        Agendamento agendamentoExistente = new Agendamento(dataHora, clienteMariaId,
             profissionalJoaoId, corteId, "Agendamento existente");
         repositorio.salvar(agendamentoExistente);
     }
@@ -186,16 +208,38 @@ public class GestaoAgendamentoTest {
     public void solicito_a_criação_do_agendamento_no_horário_determinado_para_o_profissional() {
         try {
             LocalDateTime horarioOcupado = LocalDateTime.now().plusHours(2);
-            
             if (repositorio.existeAgendamentoNoPeriodo(profissionalJoaoId, horarioOcupado, 60)) {
-                mensagemRetorno = "Já existe um agendamento";
                 operacaoSucesso = false;
             } else {
-                Agendamento agendamento = new Agendamento(horarioOcupado, clienteMariaId, 
+                Agendamento agendamento = new Agendamento(horarioOcupado, clienteMariaId,
                     profissionalJoaoId, corteId, "Segundo agendamento");
                 agendamentoCriado = repositorio.salvar(agendamento);
                 operacaoSucesso = true;
             }
+        } catch (Exception e) {
+            excecaoLancada = e;
+            operacaoSucesso = false;
+        }
+    }
+
+    @When("solicito a criação do agendamento no horário {string} para o profissional {string}")
+    public void solicito_a_criação_do_agendamento_no_horário_para_o_profissional(String horario, String nomeProfissional) {
+        try {
+            LocalDateTime dataHora = LocalDateTime.now()
+                .withHour(Integer.parseInt(horario.split(":" )[0]))
+                .withMinute(Integer.parseInt(horario.split(":" )[1]))
+                .withSecond(0).withNano(0);
+            ProfissionalId profissionalEscolhido = obterProfissionalIdPorNome(nomeProfissional);
+
+            if (repositorio.existeAgendamentoNoPeriodo(profissionalEscolhido, dataHora, 60)) {
+                operacaoSucesso = false;
+                return;
+            }
+
+            Agendamento agendamento = new Agendamento(dataHora, clienteMariaId,
+                profissionalEscolhido, corteId, "Agendamento no horário especificado");
+            agendamentoCriado = repositorio.salvar(agendamento);
+            operacaoSucesso = true;
         } catch (Exception e) {
             excecaoLancada = e;
             operacaoSucesso = false;

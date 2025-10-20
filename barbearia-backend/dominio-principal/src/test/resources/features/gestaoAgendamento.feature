@@ -5,13 +5,13 @@ Feature: Gestão de Agendamentos (cenários essenciais)
 
 	# Cenários Básicos de Criação
 	Scenario: Criar agendamento em horário livre (sucesso)
-		Given que existe um profissional cadastrado com determinado horário livre
-		When solicito a criação do agendamento em horário livre para o profissional
+		Given que existe um profissional cadastrado com o horário "14:00" livre
+		When solicito a criação do agendamento no horário "14:00" para o profissional "João"
 		Then o agendamento é criado com sucesso
 
 	Scenario: Impedir criação quando já existe agendamento no mesmo horário (conflito)
-		Given que existe um agendamento para o profissional cadastrado em um horário determinado
-		When solicito a criação do agendamento no horário determinado para o profissional
+		Given que existe um agendamento para o profissional cadastrado no horário "14:00"
+		When solicito a criação do agendamento no horário "14:00" para o profissional "João"
 		Then o sistema rejeita a operação de agendamento
 
 	# Cenários de Validação de Serviço e Profissional
