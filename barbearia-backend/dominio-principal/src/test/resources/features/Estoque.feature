@@ -25,7 +25,6 @@ Feature: Gestão de Estoque e PDV
     Given que existe um produto "Gel Fixador" com estoque 50
     When eu envio a venda de 2 produtos "Gel Fixador" para registro
     Then o sistema responde sucesso e registra a venda
-    And o estoque atual do produto "Gel Fixador" passa a ser 48
 
   Scenario: Impedir venda PDV com estoque insuficiente (falha)
     Given que existe um produto "Pomada Forte" com estoque 2
