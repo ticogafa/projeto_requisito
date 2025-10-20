@@ -218,6 +218,31 @@ public class EstoqueTest {
         }
     }
 
+    /**
+     * Valida que o estoque do produto foi atualizado para o valor esperado.
+     * Verifica se a operação de adição/subtração de estoque funcionou corretamente.
+     * 
+     * @param nomeProduto Nome do produto a verificar
+     * @param estoqueEsperado Valor esperado do estoque após a atualização
+     * @cucumber.step "o estoque atual do produto {string} passa a ser {int}"
+     */
+    @Then("o estoque atual do produto {string} passa a ser {int}")
+    public void o_estoque_atual_do_produto_passa_a_ser(String nomeProduto, Integer estoqueEsperado) {
+        // Obtém o produto do repositório
+        EstoqueMockRepositorio.Produto produto = repositorio.obterProduto(nomeProduto);
+        
+        // Valida que o produto existe
+        assertNotNull("Produto deveria existir no repositório", produto);
+        
+        // Valida que o estoque foi atualizado corretamente
+        assertEquals("O estoque do produto deveria ser " + estoqueEsperado, 
+                     estoqueEsperado.intValue(), 
+                     produto.getEstoque());
+        
+        // Confirma que a operação foi bem-sucedida
+        assertTrue("A operação de atualização deveria ter sido bem-sucedida", operacaoSucesso);
+    }
+
     // ==================== STEP DEFINITIONS - VENDAS PDV ====================
     
     /**
