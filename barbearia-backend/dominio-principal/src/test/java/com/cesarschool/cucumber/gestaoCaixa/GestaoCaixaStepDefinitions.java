@@ -33,14 +33,14 @@ public class GestaoCaixaStepDefinitions {
         this.servico.registrarDivida(this.clienteComDividaId, "Dívida existente", double1);
     }
 
-    // passo antigo mantido (sem meio) - compatibilidade
+    
     @Quando("um serviço de {string} no valor de {double} é finalizado e pago")
     public void servico_pago(String servico, Double valor) {
         servico = ("Pagamento " + servico).trim();
         this.servico.registrarEntrada(servico, valor);
     }
 
-    // novo passo que recebe o meio de pagamento
+    
     @Quando("um serviço de {string} no valor de {double} é finalizado e pago via {string}")
     public void servico_pago_via(String servico, Double valor, String meio) {
         servico = ("Pagamento " + servico).trim();
@@ -76,12 +76,12 @@ public class GestaoCaixaStepDefinitions {
 
     @E(" um cliente possui uma dívida pendente de {double}")
     public void cliente_possui_divida(Double valorDivida) {
-        // garante a existência da dívida neste cenário
+        
         this.clienteComDividaId = new ClienteId(1);
         this.servico.registrarDivida(this.clienteComDividaId, "Dívida existente", valorDivida);
     }
 
-    // passo antigo mantido (sem meio) - compatibilidade
+    
     @Quando("o cliente paga a dívida de {double}")
     public void o_cliente_paga_a_divida_de(Double valorPago) {
         if (this.clienteComDividaId == null) {
@@ -91,7 +91,7 @@ public class GestaoCaixaStepDefinitions {
         this.servico.pagarPrimeiraDivida(this.clienteComDividaId, valorPago);
     }
 
-    // novo passo que indica o meio de pagamento para quitar a dívida
+    
     @Quando("o cliente paga a dívida de {double} via {string}")
     public void o_cliente_paga_a_divida_de_via(Double valorPago, String meio) {
         if (this.clienteComDividaId == null) {
