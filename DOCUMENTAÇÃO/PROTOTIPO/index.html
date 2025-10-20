@@ -3115,137 +3115,6 @@
         </div>
       </div>
 
-      <!-- Modal Editar Agendamento (Admin) -->
-      <div
-        id="editAppointmentModal"
-        onclick="closeModalOnBackdrop(event, 'editAppointmentModal')"
-        class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50"
-      >
-        <div
-          class="bg-dark-800 rounded-2xl w-full max-w-2xl border border-dark-600"
-          onclick="event.stopPropagation()"
-        >
-          <div class="flex items-center justify-between p-6 border-b border-dark-600">
-            <div class="flex items-center gap-3">
-              <span class="material-icons text-primary text-4xl">edit_calendar</span>
-              <h3 class="text-2xl font-bold">Editar Agendamento</h3>
-            </div>
-            <button
-              onclick="closeModal('editAppointmentModal')"
-              class="material-icons text-gray-400 hover:text-primary cursor-pointer"
-            >
-              close
-            </button>
-          </div>
-
-          <form onsubmit="submitEditAppointment(event)" class="p-6">
-            <input type="hidden" id="editAppointmentId" />
-            
-            <div class="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label class="block text-sm font-medium mb-2">Data</label>
-                <input
-                  type="date"
-                  id="editAppointmentDate"
-                  required
-                  class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium mb-2">Horário</label>
-                <input
-                  type="time"
-                  id="editAppointmentTime"
-                  required
-                  class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
-                />
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-sm font-medium mb-2">Cliente</label>
-              <input
-                type="text"
-                id="editAppointmentClient"
-                required
-                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
-                placeholder="Nome do cliente"
-              />
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-sm font-medium mb-2">Serviço</label>
-              <select
-                id="editAppointmentService"
-                required
-                onchange="updateEditServiceInfo()"
-                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
-              >
-                <option value="">Selecione um serviço</option>
-              </select>
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-sm font-medium mb-2">Profissional</label>
-              <select
-                id="editAppointmentProfessional"
-                required
-                onchange="checkEditProfessionalQualification()"
-                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
-              >
-                <option value="">Selecione um profissional</option>
-              </select>
-            </div>
-
-            <div id="editServiceInfoCard" class="hidden bg-dark-700 rounded-lg p-4 mb-4 border border-dark-600">
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <span class="text-sm text-gray-400">Duração</span>
-                  <p class="font-medium" id="editServiceDuration">-</p>
-                </div>
-                <div>
-                  <span class="text-sm text-gray-400">Valor</span>
-                  <p class="font-medium text-primary" id="editServicePrice">-</p>
-                </div>
-              </div>
-            </div>
-
-            <div id="editQualificationWarning" class="hidden bg-red-500/10 border border-red-500 rounded-lg p-4 mb-4">
-              <div class="flex items-center gap-2">
-                <span class="material-icons text-red-400">warning</span>
-                <span class="text-red-400 text-sm">Profissional não está qualificado para este serviço!</span>
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-sm font-medium mb-2">Observações</label>
-              <textarea
-                id="editAppointmentObservations"
-                rows="3"
-                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary resize-none"
-                placeholder="Observações adicionais (opcional)"
-              ></textarea>
-            </div>
-
-            <div class="flex justify-end gap-3">
-              <button
-                type="button"
-                onclick="closeModal('editAppointmentModal')"
-                class="bg-dark-700 hover:bg-dark-600 border border-dark-600 text-gray-300 px-6 py-2 rounded-lg font-medium transition"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                class="bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition"
-              >
-                Salvar Alterações
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
       <!-- Modal de Gestão de Estoque -->
       <div
         id="stockManagementModal"
@@ -5139,6 +5008,11 @@
         localStorage.setItem("appointments", JSON.stringify(appointments));
       }
 
+      // Variáveis globais para edição de agendamento
+      let editAppointmentId = null;
+      let editSelectedTimeSlot = null;
+      let editOriginalData = {};
+
       // Função para abrir modal de edição de agendamento
       function openEditAppointmentModal(appointmentId) {
         const appointment = appointments.find(apt => apt.id === appointmentId);
@@ -5154,53 +5028,143 @@
           return;
         }
 
-        // Preencher campos do modal
-        document.getElementById("editAppointmentId").value = appointment.id;
-        document.getElementById("editAppointmentDate").value = appointment.date;
-        document.getElementById("editAppointmentTime").value = appointment.time;
-        document.getElementById("editAppointmentClient").value = appointment.clientName;
-        document.getElementById("editAppointmentObservations").value = appointment.observations || "";
+        // Armazenar ID e dados originais
+        editAppointmentId = appointmentId;
+        editSelectedTimeSlot = null;
+        editOriginalData = {
+          date: appointment.date,
+          time: appointment.time,
+          observations: appointment.observations || ''
+        };
 
-        // Preencher serviços
-        const serviceSelect = document.getElementById("editAppointmentService");
-        serviceSelect.innerHTML = '<option value="">Selecione um serviço</option>';
+        // Preencher informações atuais
+        const dateObj = new Date(appointment.date + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        document.getElementById('editCurrentDateTime').textContent = `${formattedDate} ${appointment.time}`;
+        document.getElementById('editCurrentProfessional').textContent = appointment.professionalName;
+        document.getElementById('editCurrentService').textContent = appointment.serviceName;
         
-        servicesData
-          .filter(s => s.active)
-          .forEach(service => {
-            const option = document.createElement("option");
-            option.value = service.id;
-            option.textContent = service.name;
-            option.dataset.duration = service.duration;
-            option.dataset.price = service.price;
-            option.dataset.professionalId = service.professionalId;
-            if (service.id === appointment.serviceId) {
-              option.selected = true;
-            }
-            serviceSelect.appendChild(option);
-          });
+        const statusLabels = {
+          'pendente': 'Pendente',
+          'confirmado': 'Confirmado',
+          'concluido': 'Concluído',
+          'cancelado': 'Cancelado'
+        };
+        document.getElementById('editCurrentStatus').textContent = statusLabels[appointment.status] || appointment.status;
 
-        // Preencher profissionais
-        const profSelect = document.getElementById("editAppointmentProfessional");
-        profSelect.innerHTML = '<option value="">Selecione um profissional</option>';
-        
-        professionalsData
-          .filter(p => p.active)
-          .forEach(prof => {
-            const option = document.createElement("option");
-            option.value = prof.id;
-            option.textContent = `${prof.name} (${prof.seniority})`;
-            if (prof.id === appointment.professionalId) {
-              option.selected = true;
-            }
-            profSelect.appendChild(option);
-          });
+        // Preencher observações atuais
+        document.getElementById('editAppointmentNotes').value = appointment.observations || '';
 
-        // Atualizar informações do serviço
-        updateEditServiceInfo();
+        // Configurar data mínima (hoje)
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('editAppointmentDate').setAttribute('min', today);
+        document.getElementById('editAppointmentDate').value = '';
+
+        // Limpar seleção de horários
+        document.getElementById('editAvailableSlots').innerHTML = 
+          '<div class="text-center text-gray-400 text-sm col-span-4 py-8">Selecione uma data para ver os horários disponíveis</div>';
+
+        // Ocultar resumo
+        document.getElementById('editSummary').classList.add('hidden');
 
         // Abrir modal
         document.getElementById("editAppointmentModal").classList.remove("hidden");
+      }
+
+      // Função para carregar horários disponíveis para edição
+      function loadEditAvailableSlots() {
+        const date = document.getElementById('editAppointmentDate').value;
+        
+        if (!date) {
+          document.getElementById('editAvailableSlots').innerHTML = 
+            '<div class="text-center text-gray-400 text-sm col-span-4 py-8">Selecione uma data para ver os horários disponíveis</div>';
+          return;
+        }
+
+        // Gerar horários disponíveis (8h às 18h)
+        const slots = generateTimeSlots(null);
+        
+        let slotsHTML = '';
+        slots.forEach(slot => {
+          slotsHTML += `
+            <button type="button" onclick="selectEditTimeSlot(this, '${slot.time}', ${slot.available})" 
+              class="edit-time-slot ${slot.available ? 'bg-dark-700 hover:bg-dark-600 hover:border-primary' : 'bg-dark-700/50 cursor-not-allowed'} 
+              border border-dark-600 rounded-lg py-3 text-sm font-medium transition ${!slot.available ? 'text-gray-600' : ''}"
+              ${!slot.available ? 'disabled' : ''}>
+              ${slot.time}
+            </button>
+          `;
+        });
+        
+        document.getElementById('editAvailableSlots').innerHTML = slotsHTML;
+      }
+
+      // Função para selecionar horário de edição
+      function selectEditTimeSlot(element, time, available) {
+        if (!available) return;
+        
+        // Remover seleção anterior
+        document.querySelectorAll('.edit-time-slot').forEach(slot => {
+          slot.classList.remove('bg-primary', 'border-primary', 'text-white');
+          slot.classList.add('border-dark-600');
+        });
+        
+        // Adicionar seleção ao slot clicado
+        element.classList.remove('border-dark-600');
+        element.classList.add('bg-primary', 'border-primary', 'text-white');
+        
+        editSelectedTimeSlot = time;
+        updateEditSummary();
+      }
+
+      // Função para atualizar resumo de edição
+      function updateEditSummary() {
+        const date = document.getElementById('editAppointmentDate').value;
+        const notes = document.getElementById('editAppointmentNotes').value.trim();
+        
+        const hasDateChange = date && editSelectedTimeSlot;
+        const hasNotesChange = notes !== editOriginalData.observations;
+        
+        if (!hasDateChange && !hasNotesChange) {
+          document.getElementById('editSummary').classList.add('hidden');
+          return;
+        }
+        
+        // Mostrar resumo
+        document.getElementById('editSummary').classList.remove('hidden');
+        
+        // Atualizar alteração de data/hora
+        if (hasDateChange) {
+          const dateObj = new Date(date + 'T00:00:00');
+          const formattedDate = dateObj.toLocaleDateString('pt-BR', { 
+            day: '2-digit', 
+            month: '2-digit'
+          });
+          
+          document.getElementById('editNewDateTime').textContent = `${formattedDate} ${editSelectedTimeSlot}`;
+          document.getElementById('editSummaryDateTime').classList.remove('hidden');
+        } else {
+          document.getElementById('editSummaryDateTime').classList.add('hidden');
+        }
+        
+        // Atualizar alteração de observações
+        if (hasNotesChange) {
+          document.getElementById('editNewNotes').textContent = notes || '(Observações removidas)';
+          document.getElementById('editSummaryNotes').classList.remove('hidden');
+        } else {
+          document.getElementById('editSummaryNotes').classList.add('hidden');
+        }
+      }
+
+      // Adicionar listener para observações
+      if (!window.editNotesListenerAdded) {
+        window.addEventListener('DOMContentLoaded', function() {
+          const editNotesField = document.getElementById('editAppointmentNotes');
+          if (editNotesField) {
+            editNotesField.addEventListener('input', updateEditSummary);
+          }
+        });
+        window.editNotesListenerAdded = true;
       }
 
       // Função para atualizar informações do serviço no modal de edição
@@ -5250,74 +5214,97 @@
       function submitEditAppointment(event) {
         event.preventDefault();
 
-        const appointmentId = document.getElementById("editAppointmentId").value;
-        const date = document.getElementById("editAppointmentDate").value;
-        const time = document.getElementById("editAppointmentTime").value;
-        const clientName = document.getElementById("editAppointmentClient").value;
-        const observations = document.getElementById("editAppointmentObservations").value;
-
-        const serviceSelect = document.getElementById("editAppointmentService");
-        const serviceId = serviceSelect.value;
-        const serviceName = serviceSelect.options[serviceSelect.selectedIndex].textContent;
-        const duration = parseInt(serviceSelect.options[serviceSelect.selectedIndex].dataset.duration);
-        const price = parseFloat(serviceSelect.options[serviceSelect.selectedIndex].dataset.price);
-
-        const profSelect = document.getElementById("editAppointmentProfessional");
-        const professionalId = profSelect.value;
-        const professionalName = profSelect.options[profSelect.selectedIndex].textContent.split(' (')[0];
-
-        // Verificar conflito de horário (exceto com o próprio agendamento)
-        const selectedDateTime = new Date(`${date}T${time}`);
-        const conflict = appointments.find(apt => {
-          if (apt.id === appointmentId) return false; // Ignorar o próprio agendamento
-          if (apt.status === 'cancelado') return false;
-          if (apt.professionalId !== professionalId) return false;
-
-          const aptDateTime = new Date(`${apt.date}T${apt.time}`);
-          const aptEndTime = new Date(aptDateTime.getTime() + apt.duration * 60000);
-          const selectedEndTime = new Date(selectedDateTime.getTime() + duration * 60000);
-
-          return (
-            (selectedDateTime >= aptDateTime && selectedDateTime < aptEndTime) ||
-            (selectedEndTime > aptDateTime && selectedEndTime <= aptEndTime) ||
-            (selectedDateTime <= aptDateTime && selectedEndTime >= aptEndTime)
-          );
-        });
-
-        if (conflict) {
-          showToast(
-            "Conflito de horário! Já existe um agendamento neste horário para o profissional selecionado.",
-            "error",
-            "red"
-          );
+        const date = document.getElementById('editAppointmentDate').value;
+        const notes = document.getElementById('editAppointmentNotes').value.trim();
+        
+        const hasDateChange = date && editSelectedTimeSlot;
+        const hasNotesChange = notes !== editOriginalData.observations;
+        
+        if (!hasDateChange && !hasNotesChange) {
+          showToast('Nenhuma alteração foi realizada.', 'warning', 'yellow');
           return;
         }
+        
+        // Validar antecedência de 2 horas se houver mudança de horário
+        if (hasDateChange) {
+          const appointmentDateTime = new Date(date + 'T' + editSelectedTimeSlot);
+          const now = new Date();
+          const hoursDifference = (appointmentDateTime - now) / (1000 * 60 * 60);
+          
+          if (hoursDifference < 2) {
+            showToast('Alterações de horário devem ser feitas com pelo menos 2 horas de antecedência.', 'warning', 'yellow');
+            return;
+          }
 
+          // Verificar conflito de horário
+          const appointment = appointments.find(apt => apt.id === editAppointmentId);
+          if (appointment) {
+            const conflict = appointments.find(apt => {
+              if (apt.id === editAppointmentId) return false;
+              if (apt.status === 'cancelado') return false;
+              if (apt.professionalId !== appointment.professionalId) return false;
+              if (apt.date !== date) return false;
+
+              // Verificar sobreposição de horários
+              const aptTime = apt.time;
+              const selectedTime = editSelectedTimeSlot;
+              
+              const aptStart = new Date(date + 'T' + aptTime);
+              const aptEnd = new Date(aptStart.getTime() + apt.duration * 60000);
+              const selectedStart = new Date(date + 'T' + selectedTime);
+              const selectedEnd = new Date(selectedStart.getTime() + appointment.duration * 60000);
+
+              return (
+                (selectedStart >= aptStart && selectedStart < aptEnd) ||
+                (selectedEnd > aptStart && selectedEnd <= aptEnd) ||
+                (selectedStart <= aptStart && selectedEnd >= aptEnd)
+              );
+            });
+
+            if (conflict) {
+              showToast('O profissional já possui agendamento neste horário.', 'error', 'red');
+              return;
+            }
+          }
+        }
+        
         // Atualizar agendamento
-        const appointmentIndex = appointments.findIndex(apt => apt.id === appointmentId);
+        const appointmentIndex = appointments.findIndex(apt => apt.id === editAppointmentId);
         if (appointmentIndex !== -1) {
-          appointments[appointmentIndex] = {
-            ...appointments[appointmentIndex],
-            date,
-            time,
-            clientName,
-            serviceId,
-            serviceName,
-            duration,
-            price,
-            professionalId,
-            professionalName,
-            observations
-          };
+          if (hasDateChange) {
+            appointments[appointmentIndex].date = date;
+            appointments[appointmentIndex].time = editSelectedTimeSlot;
+          }
+          if (hasNotesChange) {
+            appointments[appointmentIndex].observations = notes;
+          }
 
           saveAppointments();
           renderAppointmentsTable();
-          closeModal("editAppointmentModal");
-          showToast("Agendamento atualizado com sucesso!", "success", "green");
+
+          // Processar mensagem de alterações
+          const changes = [];
+          if (hasDateChange) {
+            const dateObj = new Date(date + 'T00:00:00');
+            const formattedDate = dateObj.toLocaleDateString('pt-BR', { 
+              day: '2-digit', 
+              month: '2-digit'
+            });
+            changes.push(`horário alterado para ${formattedDate} às ${editSelectedTimeSlot}`);
+          }
+          if (hasNotesChange) {
+            changes.push('observações atualizadas');
+          }
+          
+          const message = `Agendamento atualizado com sucesso! ${changes.join(' e ')}.`;
+          
+          closeModal('editAppointmentModal');
+          showToast(message, 'check_circle', 'green');
         } else {
-          showToast("Erro ao atualizar agendamento!", "error", "red");
+          showToast('Agendamento não encontrado.', 'error', 'red');
         }
       }
+
 
       // ==================== FIM DAS FUNÇÕES DE AGENDAMENTOS ====================
 
@@ -5541,194 +5528,6 @@
           "cancel",
           "red",
         );
-      }
-
-      // Funções de Edição de Agendamento
-      let editAppointmentId = null;
-      let editSelectedTimeSlot = null;
-      let editOriginalData = {};
-
-      function openEditAppointmentModal(id, dateTime, professional, service, status, notes) {
-        editAppointmentId = id;
-        editSelectedTimeSlot = null;
-        
-        // Armazenar dados originais
-        editOriginalData = {
-          dateTime: dateTime,
-          professional: professional,
-          service: service,
-          status: status,
-          notes: notes || ''
-        };
-
-        // Preencher informações atuais
-        document.getElementById('editCurrentDateTime').textContent = dateTime;
-        document.getElementById('editCurrentProfessional').textContent = professional;
-        document.getElementById('editCurrentService').textContent = service;
-        document.getElementById('editCurrentStatus').textContent = status;
-        
-        // Preencher observações atuais
-        document.getElementById('editAppointmentNotes').value = notes || '';
-        
-        // Configurar data mínima
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const dateString = tomorrow.toISOString().split('T')[0];
-        document.getElementById('editAppointmentDate').setAttribute('min', dateString);
-        document.getElementById('editAppointmentDate').value = '';
-        
-        // Limpar seleção de horários
-        document.getElementById('editAvailableSlots').innerHTML = 
-          '<div class="text-center text-gray-400 text-sm col-span-4 py-8">Selecione uma data para ver os horários disponíveis</div>';
-        
-        // Ocultar resumo
-        document.getElementById('editSummary').classList.add('hidden');
-        
-        // Abrir modal
-        document.getElementById('editAppointmentModal').classList.remove('hidden');
-      }
-
-      function loadEditAvailableSlots() {
-        const date = document.getElementById('editAppointmentDate').value;
-        
-        if (!date) {
-          document.getElementById('editAvailableSlots').innerHTML = 
-            '<div class="text-center text-gray-400 text-sm col-span-4 py-8">Selecione uma data para ver os horários disponíveis</div>';
-          return;
-        }
-        
-        // Gerar horários disponíveis
-        const slots = generateTimeSlots(null);
-        
-        let slotsHTML = '';
-        slots.forEach(slot => {
-          slotsHTML += `
-            <button type="button" onclick="selectEditTimeSlot(this, '${slot.time}', ${slot.available})" 
-              class="time-slot ${slot.available ? 'bg-dark-700 hover:bg-primary/20 hover:border-primary' : 'bg-dark-700/50 cursor-not-allowed'} 
-              border border-dark-600 rounded-lg py-3 text-sm font-medium transition ${!slot.available ? 'text-gray-600' : ''}"
-              ${!slot.available ? 'disabled' : ''}>
-              ${slot.time}
-            </button>
-          `;
-        });
-        
-        document.getElementById('editAvailableSlots').innerHTML = slotsHTML;
-      }
-
-      function selectEditTimeSlot(element, time, available) {
-        if (!available) return;
-        
-        // Remover seleção anterior
-        document.querySelectorAll('#editAvailableSlots .time-slot').forEach(slot => {
-          slot.classList.remove('bg-primary', 'border-primary', 'text-white');
-        });
-        
-        // Adicionar seleção ao slot clicado
-        element.classList.add('bg-primary', 'border-primary', 'text-white');
-        
-        editSelectedTimeSlot = time;
-        updateEditSummary();
-      }
-
-      function updateEditSummary() {
-        const date = document.getElementById('editAppointmentDate').value;
-        const notes = document.getElementById('editAppointmentNotes').value.trim();
-        
-        const hasDateChange = date && editSelectedTimeSlot;
-        const hasNotesChange = notes !== editOriginalData.notes;
-        
-        if (!hasDateChange && !hasNotesChange) {
-          document.getElementById('editSummary').classList.add('hidden');
-          return;
-        }
-        
-        // Mostrar resumo
-        document.getElementById('editSummary').classList.remove('hidden');
-        
-        // Atualizar alteração de data/hora
-        if (hasDateChange) {
-          const dateObj = new Date(date + 'T00:00:00');
-          const formattedDate = dateObj.toLocaleDateString('pt-BR', { 
-            day: '2-digit', 
-            month: '2-digit'
-          });
-          
-          document.getElementById('editNewDateTime').textContent = `${formattedDate} ${editSelectedTimeSlot}`;
-          document.getElementById('editSummaryDateTime').classList.remove('hidden');
-        } else {
-          document.getElementById('editSummaryDateTime').classList.add('hidden');
-        }
-        
-        // Atualizar alteração de observações
-        if (hasNotesChange) {
-          document.getElementById('editNewNotes').textContent = notes || '(Observações removidas)';
-          document.getElementById('editSummaryNotes').classList.remove('hidden');
-        } else {
-          document.getElementById('editSummaryNotes').classList.add('hidden');
-        }
-      }
-
-      // Adicionar listener para observações
-      document.addEventListener('DOMContentLoaded', function() {
-        const editNotesField = document.getElementById('editAppointmentNotes');
-        if (editNotesField) {
-          editNotesField.addEventListener('input', updateEditSummary);
-        }
-      });
-
-      function submitEditAppointment(event) {
-        event.preventDefault();
-        
-        const date = document.getElementById('editAppointmentDate').value;
-        const notes = document.getElementById('editAppointmentNotes').value.trim();
-        
-        const hasDateChange = date && editSelectedTimeSlot;
-        const hasNotesChange = notes !== editOriginalData.notes;
-        
-        if (!hasDateChange && !hasNotesChange) {
-          showToast('Atenção', 'Nenhuma alteração foi realizada.', 'warning', 'yellow');
-          return;
-        }
-        
-        // Validar antecedência de 2 horas se houver mudança de horário
-        if (hasDateChange) {
-          const appointmentDateTime = new Date(date + 'T' + editSelectedTimeSlot);
-          const now = new Date();
-          const hoursDifference = (appointmentDateTime - now) / (1000 * 60 * 60);
-          
-          if (hoursDifference < 2) {
-            showToast('Atenção', 'Alterações de horário devem ser feitas com pelo menos 2 horas de antecedência.', 'warning', 'yellow');
-            return;
-          }
-        }
-        
-        // Processar alterações
-        const changes = [];
-        if (hasDateChange) {
-          const dateObj = new Date(date + 'T00:00:00');
-          const formattedDate = dateObj.toLocaleDateString('pt-BR', { 
-            day: '2-digit', 
-            month: '2-digit'
-          });
-          changes.push(`horário alterado para ${formattedDate} às ${editSelectedTimeSlot}`);
-        }
-        if (hasNotesChange) {
-          changes.push('observações atualizadas');
-        }
-        
-        const message = `Agendamento atualizado com sucesso! ${changes.join(' e ')}.`;
-        
-        closeModal('editAppointmentModal');
-        showToast('Alterações Salvas!', message, 'check_circle');
-        
-        // Em produção, aqui seria feita a chamada ao backend
-        console.log('Agendamento editado:', {
-          id: editAppointmentId,
-          newDate: date,
-          newTime: editSelectedTimeSlot,
-          notes: notes
-        });
       }
 
       function openRatingModal(professional, service) {
