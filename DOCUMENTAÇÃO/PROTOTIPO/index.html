@@ -3115,6 +3115,137 @@
         </div>
       </div>
 
+      <!-- Modal Editar Agendamento (Admin) -->
+      <div
+        id="editAppointmentModal"
+        onclick="closeModalOnBackdrop(event, 'editAppointmentModal')"
+        class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+      >
+        <div
+          class="bg-dark-800 rounded-2xl w-full max-w-2xl border border-dark-600"
+          onclick="event.stopPropagation()"
+        >
+          <div class="flex items-center justify-between p-6 border-b border-dark-600">
+            <div class="flex items-center gap-3">
+              <span class="material-icons text-primary text-4xl">edit_calendar</span>
+              <h3 class="text-2xl font-bold">Editar Agendamento</h3>
+            </div>
+            <button
+              onclick="closeModal('editAppointmentModal')"
+              class="material-icons text-gray-400 hover:text-primary cursor-pointer"
+            >
+              close
+            </button>
+          </div>
+
+          <form onsubmit="submitEditAppointment(event)" class="p-6">
+            <input type="hidden" id="editAppointmentId" />
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-sm font-medium mb-2">Data</label>
+                <input
+                  type="date"
+                  id="editAppointmentDate"
+                  required
+                  class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Horário</label>
+                <input
+                  type="time"
+                  id="editAppointmentTime"
+                  required
+                  class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
+                />
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2">Cliente</label>
+              <input
+                type="text"
+                id="editAppointmentClient"
+                required
+                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
+                placeholder="Nome do cliente"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2">Serviço</label>
+              <select
+                id="editAppointmentService"
+                required
+                onchange="updateEditServiceInfo()"
+                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
+              >
+                <option value="">Selecione um serviço</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2">Profissional</label>
+              <select
+                id="editAppointmentProfessional"
+                required
+                onchange="checkEditProfessionalQualification()"
+                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
+              >
+                <option value="">Selecione um profissional</option>
+              </select>
+            </div>
+
+            <div id="editServiceInfoCard" class="hidden bg-dark-700 rounded-lg p-4 mb-4 border border-dark-600">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <span class="text-sm text-gray-400">Duração</span>
+                  <p class="font-medium" id="editServiceDuration">-</p>
+                </div>
+                <div>
+                  <span class="text-sm text-gray-400">Valor</span>
+                  <p class="font-medium text-primary" id="editServicePrice">-</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="editQualificationWarning" class="hidden bg-red-500/10 border border-red-500 rounded-lg p-4 mb-4">
+              <div class="flex items-center gap-2">
+                <span class="material-icons text-red-400">warning</span>
+                <span class="text-red-400 text-sm">Profissional não está qualificado para este serviço!</span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2">Observações</label>
+              <textarea
+                id="editAppointmentObservations"
+                rows="3"
+                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary resize-none"
+                placeholder="Observações adicionais (opcional)"
+              ></textarea>
+            </div>
+
+            <div class="flex justify-end gap-3">
+              <button
+                type="button"
+                onclick="closeModal('editAppointmentModal')"
+                class="bg-dark-700 hover:bg-dark-600 border border-dark-600 text-gray-300 px-6 py-2 rounded-lg font-medium transition"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition"
+              >
+                Salvar Alterações
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- Modal de Gestão de Estoque -->
       <div
         id="stockManagementModal"
@@ -4650,6 +4781,13 @@
                   ` : ''}
                   ${apt.status !== 'cancelado' && apt.status !== 'concluido' ? `
                     <button
+                      onclick="openEditAppointmentModal('${apt.id}')"
+                      class="material-icons text-blue-400 hover:text-blue-300 cursor-pointer"
+                      title="Editar"
+                    >
+                      edit
+                    </button>
+                    <button
                       onclick="cancelAppointmentAdmin('${apt.id}')"
                       class="material-icons text-red-400 hover:text-red-300 cursor-pointer"
                       title="Cancelar"
@@ -4999,6 +5137,186 @@
       // Função para salvar agendamentos
       function saveAppointments() {
         localStorage.setItem("appointments", JSON.stringify(appointments));
+      }
+
+      // Função para abrir modal de edição de agendamento
+      function openEditAppointmentModal(appointmentId) {
+        const appointment = appointments.find(apt => apt.id === appointmentId);
+        
+        if (!appointment) {
+          showToast("Agendamento não encontrado!", "error", "red");
+          return;
+        }
+
+        // Verificar se o agendamento pode ser editado
+        if (appointment.status === 'cancelado' || appointment.status === 'concluido') {
+          showToast("Não é possível editar agendamentos cancelados ou concluídos!", "error", "red");
+          return;
+        }
+
+        // Preencher campos do modal
+        document.getElementById("editAppointmentId").value = appointment.id;
+        document.getElementById("editAppointmentDate").value = appointment.date;
+        document.getElementById("editAppointmentTime").value = appointment.time;
+        document.getElementById("editAppointmentClient").value = appointment.clientName;
+        document.getElementById("editAppointmentObservations").value = appointment.observations || "";
+
+        // Preencher serviços
+        const serviceSelect = document.getElementById("editAppointmentService");
+        serviceSelect.innerHTML = '<option value="">Selecione um serviço</option>';
+        
+        servicesData
+          .filter(s => s.active)
+          .forEach(service => {
+            const option = document.createElement("option");
+            option.value = service.id;
+            option.textContent = service.name;
+            option.dataset.duration = service.duration;
+            option.dataset.price = service.price;
+            option.dataset.professionalId = service.professionalId;
+            if (service.id === appointment.serviceId) {
+              option.selected = true;
+            }
+            serviceSelect.appendChild(option);
+          });
+
+        // Preencher profissionais
+        const profSelect = document.getElementById("editAppointmentProfessional");
+        profSelect.innerHTML = '<option value="">Selecione um profissional</option>';
+        
+        professionalsData
+          .filter(p => p.active)
+          .forEach(prof => {
+            const option = document.createElement("option");
+            option.value = prof.id;
+            option.textContent = `${prof.name} (${prof.seniority})`;
+            if (prof.id === appointment.professionalId) {
+              option.selected = true;
+            }
+            profSelect.appendChild(option);
+          });
+
+        // Atualizar informações do serviço
+        updateEditServiceInfo();
+
+        // Abrir modal
+        document.getElementById("editAppointmentModal").classList.remove("hidden");
+      }
+
+      // Função para atualizar informações do serviço no modal de edição
+      function updateEditServiceInfo() {
+        const serviceSelect = document.getElementById("editAppointmentService");
+        const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+        const infoCard = document.getElementById("editServiceInfoCard");
+
+        if (selectedOption.value) {
+          const duration = selectedOption.dataset.duration;
+          const price = parseFloat(selectedOption.dataset.price);
+
+          document.getElementById("editServiceDuration").textContent = `${duration} minutos`;
+          document.getElementById("editServicePrice").textContent = `R$ ${price.toFixed(2)}`;
+          infoCard.classList.remove("hidden");
+
+          // Verificar qualificação do profissional
+          checkEditProfessionalQualification();
+        } else {
+          infoCard.classList.add("hidden");
+        }
+      }
+
+      // Função para verificar qualificação do profissional no modal de edição
+      function checkEditProfessionalQualification() {
+        const serviceSelect = document.getElementById("editAppointmentService");
+        const profSelect = document.getElementById("editAppointmentProfessional");
+        const warning = document.getElementById("editQualificationWarning");
+
+        if (!serviceSelect.value || !profSelect.value) {
+          warning.classList.add("hidden");
+          return;
+        }
+
+        const selectedServiceOption = serviceSelect.options[serviceSelect.selectedIndex];
+        const serviceProfId = selectedServiceOption.dataset.professionalId;
+        const selectedProfId = profSelect.value;
+
+        if (serviceProfId !== selectedProfId) {
+          warning.classList.remove("hidden");
+        } else {
+          warning.classList.add("hidden");
+        }
+      }
+
+      // Função para submeter edição de agendamento
+      function submitEditAppointment(event) {
+        event.preventDefault();
+
+        const appointmentId = document.getElementById("editAppointmentId").value;
+        const date = document.getElementById("editAppointmentDate").value;
+        const time = document.getElementById("editAppointmentTime").value;
+        const clientName = document.getElementById("editAppointmentClient").value;
+        const observations = document.getElementById("editAppointmentObservations").value;
+
+        const serviceSelect = document.getElementById("editAppointmentService");
+        const serviceId = serviceSelect.value;
+        const serviceName = serviceSelect.options[serviceSelect.selectedIndex].textContent;
+        const duration = parseInt(serviceSelect.options[serviceSelect.selectedIndex].dataset.duration);
+        const price = parseFloat(serviceSelect.options[serviceSelect.selectedIndex].dataset.price);
+
+        const profSelect = document.getElementById("editAppointmentProfessional");
+        const professionalId = profSelect.value;
+        const professionalName = profSelect.options[profSelect.selectedIndex].textContent.split(' (')[0];
+
+        // Verificar conflito de horário (exceto com o próprio agendamento)
+        const selectedDateTime = new Date(`${date}T${time}`);
+        const conflict = appointments.find(apt => {
+          if (apt.id === appointmentId) return false; // Ignorar o próprio agendamento
+          if (apt.status === 'cancelado') return false;
+          if (apt.professionalId !== professionalId) return false;
+
+          const aptDateTime = new Date(`${apt.date}T${apt.time}`);
+          const aptEndTime = new Date(aptDateTime.getTime() + apt.duration * 60000);
+          const selectedEndTime = new Date(selectedDateTime.getTime() + duration * 60000);
+
+          return (
+            (selectedDateTime >= aptDateTime && selectedDateTime < aptEndTime) ||
+            (selectedEndTime > aptDateTime && selectedEndTime <= aptEndTime) ||
+            (selectedDateTime <= aptDateTime && selectedEndTime >= aptEndTime)
+          );
+        });
+
+        if (conflict) {
+          showToast(
+            "Conflito de horário! Já existe um agendamento neste horário para o profissional selecionado.",
+            "error",
+            "red"
+          );
+          return;
+        }
+
+        // Atualizar agendamento
+        const appointmentIndex = appointments.findIndex(apt => apt.id === appointmentId);
+        if (appointmentIndex !== -1) {
+          appointments[appointmentIndex] = {
+            ...appointments[appointmentIndex],
+            date,
+            time,
+            clientName,
+            serviceId,
+            serviceName,
+            duration,
+            price,
+            professionalId,
+            professionalName,
+            observations
+          };
+
+          saveAppointments();
+          renderAppointmentsTable();
+          closeModal("editAppointmentModal");
+          showToast("Agendamento atualizado com sucesso!", "success", "green");
+        } else {
+          showToast("Erro ao atualizar agendamento!", "error", "red");
+        }
       }
 
       // ==================== FIM DAS FUNÇÕES DE AGENDAMENTOS ====================
