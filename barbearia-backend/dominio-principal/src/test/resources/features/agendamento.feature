@@ -14,9 +14,9 @@ Feature: Agendamentos via Serviços
 
   # ------------------------- Janela de jornada de trabalho -------------------------
   Scenario: Bloquear agendamento fora da jornada de trabalho
-    Given que o cliente escolheu um horário inválido fora da jornada do profissional
-    When a solicitação de criação é enviada ao sistema
-    Then o sistema deve negar o agendamento por estar fora do horário permitido
+    Given que o sistema funciona das 8h às 18h
+    When cliente solicita um horário fora da jornada
+    Then o sistema nega o agendamento por não estar entre 8h e 18h
 
   # ------------------------- Cancelamento com antecedência mínima -------------------------
   Scenario: Impedir cancelamento com menos de duas horas de antecedência

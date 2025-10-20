@@ -110,15 +110,15 @@ public void sistemaRecusaCriacaoPorConflito() {
 // Cenário: Bloquear agendamento fora da jornada
 // --------------------------------------------------------------------------
 
-@Given("que o cliente escolheu um horário inválido fora da jornada do profissional")
-public void clienteEscolheHorarioForaDaJornada() {
+@Given("que o sistema funciona das 8h às 18h")
+public void queOSistemaFuncionaDas8hÀs18h() {
     horario = LocalDateTime.now().withHour(7).withMinute(0).withSecond(0).withNano(0);
     repositorio = new AgendamentoMockRepositorio();
     servico = new AgendamentoServico(repositorio, profissionalServico);
 }
 
-@When("a solicitação de criação é enviada ao sistema")
-public void solicitacaoEnviadaAoSistema() {
+@When("cliente solicita um horário fora da jornada")
+public void clienteSolicitaUmHorárioForaDaJornada() {
     agendamento = AgendamentoFactory.criarParaHorario(horario);
     lancou = false;
     try {
@@ -128,8 +128,8 @@ public void solicitacaoEnviadaAoSistema() {
     }
 }
 
-@Then("o sistema deve negar o agendamento por estar fora do horário permitido")
-public void sistemaNegaForaDaJornada() {
+@Then("o sistema nega o agendamento por não estar entre 8h e 18h")
+public void oSistemaNegaOAgendamentoPorNãoEstarEntre8hE18h() {
     assertTrue("Deveria recusar a criação por estar fora do horário permitido", lancou);
 }
 
