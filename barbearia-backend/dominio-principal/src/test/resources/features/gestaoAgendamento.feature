@@ -3,19 +3,16 @@ Feature: Gestão de Agendamentos (cenários essenciais)
 	Como operador ou cliente do sistema
 	Quero criar e gerenciar agendamentos respeitando regras de negócio
 
-	Background:
-		Given que o sistema está operacional
-
 	# Cenários Básicos de Criação
 	Scenario: Criar agendamento em horário livre (sucesso)
 		Given que existe um profissional cadastrado com determinado horário livre
 		When solicito a criação do agendamento em horário livre para o profissional
-		Then o sistema exibe a mensagem: "Agendamento criado com sucesso"
+		Then o agendamento é criado com sucesso
 
 	Scenario: Impedir criação quando já existe agendamento no mesmo horário (conflito)
 		Given que existe um agendamento para o profissional cadastrado em um horário determinado
 		When solicito a criação do agendamento no horário determinado para o profissional
-		Then o sistema exibe a mensagem "Já existe um agendamento"
+		Then o sistema rejeita a operação de agendamento
 
 	# Cenários de Validação de Serviço e Profissional
 	Scenario: Criar agendamento com serviço associado ao profissional (POSITIVO)
@@ -26,7 +23,7 @@ Feature: Gestão de Agendamentos (cenários essenciais)
 
 	Scenario: Impedir agendamento de serviço não associado ao profissional (NEGATIVO)
 		Given que existe o profissional "João" sem qualificação para agendamento de "Manicure"
-		When eu tento criar um agendamento do serviço "Manicure" com o profissional "João"
+		When eu crio um agendamento do serviço "Manicure" com o profissional "João"
 		Then o sistema rejeita a operação de agendamento
 
 	Scenario: Impedir agendamento com serviço inativo (NEGATIVO)

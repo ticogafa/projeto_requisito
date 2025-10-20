@@ -219,6 +219,18 @@ public class GestaoDeServicosStepDefinitions {
         Assertions.assertEquals(intervaloMinutos, servicoExistente.getIntervaloLimpezaMinutos());
     }
 
+    // Alias para cobrir variação da frase do .feature
+    @Given("que o serviço {string} tem um intervalo de limpeza de {int} minutos")
+    public void que_o_serviço_tem_um_intervalo_de_limpeza_de_minutos(String nomeServico, Integer intervaloMinutos) {
+        servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
+            ServicoOferecido s = new ServicoOferecido(profissionalIdTeste, n, new BigDecimal("70.00"), "Corte", 60);
+            return repositorioMock.salvar(s);
+        });
+        servicoExistente = servicoOferecidoServico.definirIntervaloLimpeza(servicoExistente.getId().getValor(), intervaloMinutos);
+        servicosCache.put(nomeServico, servicoExistente);
+        Assertions.assertEquals(intervaloMinutos, servicoExistente.getIntervaloLimpezaMinutos());
+    }
+
     @When("um novo agendamento tenta começar imediatamente após o fim do {string}")
     public void um_novo_agendamento_tenta_comecar_imediatamente_apos_o_fim_do(String nomeServicoAnterior) {
         try {
