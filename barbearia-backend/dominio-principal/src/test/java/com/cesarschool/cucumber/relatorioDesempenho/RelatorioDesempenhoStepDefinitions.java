@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.profissional.atendimento.ExecucaoAtendimento;
+import com.cesarschool.barbearia.dominio.principal.profissional.avaliacao.Avaliacao;
 import com.cesarschool.barbearia.dominio.principal.profissional.relatorio.RelatorioDesempenho;
 import com.cesarschool.barbearia.dominio.principal.profissional.relatorio.RelatorioDesempenhoServico;
 import com.cesarschool.cucumber.relatorioDesempenho.infraestrutura.AvaliacaoMockRepositorio;
@@ -64,7 +65,7 @@ public class RelatorioDesempenhoStepDefinitions {
         for (int i = 0; i < partes.length; i++) {
             int nota = Integer.parseInt(partes[i].trim());
             var quando = this.dia.atTime(12, 0).plusMinutes(5L * i);
-            avaliacaoRepo.salvar(new com.cesarschool.barbearia.dominio.principal.profissional.avaliacao.Avaliacao(
+            avaliacaoRepo.salvar(new Avaliacao(
                 this.profissionalId, null, nota, quando
             ));
         }
@@ -78,22 +79,22 @@ public class RelatorioDesempenhoStepDefinitions {
     @Entao("o tempo de serviço deve ser {double} minutos")
     public void o_tempo_de_servico_deve_ser_minutos(Double esperado) {
         System.out.println("[DEBUG] Valor esperado do .feature para 'tempo de serviço': " + esperado);
-        assertEquals(esperado, relatorio.getTempo_servico(), 0.01);
+        assertEquals(esperado, relatorio.getTempoServico());
     }
 
     @Entao("a receita gerada deve ser {double}")
     public void a_receita_gerada_deve_ser(Double esperado) {
-        assertEquals(esperado, relatorio.getReceita_gerada(), 0.01);
+        assertEquals(esperado, relatorio.getReceitaGerada());
     }
 
     @Entao("o número de atendimentos deve ser {int}")
     public void o_numero_de_atendimentos_deve_ser(Integer esperado) {
-        assertEquals(esperado.intValue(), relatorio.getNumero_clientes_atendidos());
+        assertEquals(esperado.intValue(), relatorio.getNumeroClientesAtendidos());
     }
 
     @Entao("a avaliação média do funcionário deve ser {double}")
     public void a_avaliacao_media_do_funcionario_deve_ser(Double esperado) {
         System.out.println("[DEBUG] Valor esperado do .feature para 'avaliação média': " + esperado);
-        assertEquals(esperado, relatorio.getAvaliacao_funcionario(), 0.01);
+        assertEquals(esperado, relatorio.getAvaliacaoFuncionario());
     }
 }

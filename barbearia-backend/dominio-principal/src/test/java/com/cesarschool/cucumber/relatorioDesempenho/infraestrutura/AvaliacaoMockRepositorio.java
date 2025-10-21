@@ -25,7 +25,7 @@ public class AvaliacaoMockRepositorio implements AvaliacaoRepositorio {
     public List<Avaliacao> porProfissionalNoPeriodo(ProfissionalId profissionalId, LocalDateTime inicio, LocalDateTime fim) {
         return store.stream()
             .filter(a -> a.getProfissionalId().equals(profissionalId))
-            .filter(a -> !a.getQuando().isBefore(inicio) && a.getQuando().isBefore(fim))
+            .filter(a -> a.getQuando().isAfter(inicio) && a.getQuando().isBefore(fim))
             .collect(Collectors.toList());
     }
 }
