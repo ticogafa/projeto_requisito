@@ -257,10 +257,7 @@ public class GestaoAgendamentoTest {
         assertTrue(repositorio.profissionalQualificado(profissionalJoaoId, corteId));
     }
 
-    @Given("que o serviço {string} está ativo")
-    public void que_o_serviço_está_ativo(String nomeServico) {
-        assertTrue(repositorio.servicoAtivo(corteId));
-    }
+
 
     @When("eu crio um agendamento do serviço {string} com o profissional {string}")
     public void criar_ou_tentar_criar_agendamento_do_serviço_com_o_profissional(String nomeServico, String nomeProfissional) {

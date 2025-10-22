@@ -17,7 +17,6 @@ Feature: Gestão de Agendamentos (cenários essenciais)
 	# Cenários de Validação de Serviço e Profissional
 	Scenario: Criar agendamento com serviço associado ao profissional (POSITIVO)
 		Given que existe o profissional "João" qualificado para agendamento de "Corte Masculino"
-		And que o serviço "Corte Masculino" está ativo
 		When eu crio um agendamento do serviço "Corte Masculino" com o profissional "João"
 		Then o agendamento é criado com sucesso
 
