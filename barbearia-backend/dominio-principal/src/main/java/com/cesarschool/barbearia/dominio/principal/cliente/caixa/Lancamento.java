@@ -1,5 +1,6 @@
 package com.cesarschool.barbearia.dominio.principal.cliente.caixa;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
@@ -14,7 +15,7 @@ public class Lancamento {
     private final ClienteId clienteId; 
     private StatusLancamento status;
     private final String descricao;
-    private final double valor;
+    private final BigDecimal valor; // Alterado para BigDecimal
     private final LocalDateTime quando;
     private final MeioPagamento meioPagamento;
 
@@ -23,9 +24,9 @@ public class Lancamento {
         StatusLancamento status,
         MeioPagamento meioPagamento,
         String descricao,
-        double valor,
+        BigDecimal valor, // Alterado para BigDecimal
         LocalDateTime quando) {
-            if (valor < 0) throw new IllegalArgumentException("Valor não pode ser negativo");
+            if (valor.signum() < 0) throw new IllegalArgumentException("Valor não pode ser negativo");
             this.id = Validacoes.requerirObjetoObrigatorio(id, "id");
             this.status = Validacoes.requerirObjetoObrigatorio(status, "status");
             this.descricao = Validacoes.requerirObjetoObrigatorio(descricao, "descricao");
@@ -35,15 +36,15 @@ public class Lancamento {
             this.clienteId = clienteId;
     }
 
-    public static Lancamento novoRecibemento(String descricao, double valor, MeioPagamento meioPagamento) {
+    public static Lancamento novoRecibemento(String descricao, BigDecimal valor, MeioPagamento meioPagamento) {
         return new Lancamento(LancamentoId.novo(), null, StatusLancamento.ENTRADA, meioPagamento, descricao, valor, LocalDateTime.now());
     }
 
-    public static Lancamento novoGasto(String descricao, double valor, MeioPagamento meioPagamento) {
+    public static Lancamento novoGasto(String descricao, BigDecimal valor, MeioPagamento meioPagamento) {
         return new Lancamento(LancamentoId.novo(), null, StatusLancamento.SAIDA, meioPagamento, descricao, valor, LocalDateTime.now());
     }
 
-    public static Lancamento novaDivida(ClienteId clienteId, String descricao, double valor, MeioPagamento meioPagamento) {
+    public static Lancamento novaDivida(ClienteId clienteId, String descricao, BigDecimal valor, MeioPagamento meioPagamento) {
         return new Lancamento(LancamentoId.novo(), Validacoes.requerirObjetoObrigatorio(clienteId, "clienteId"), StatusLancamento.PENDENTE, meioPagamento, descricao, valor, LocalDateTime.now());
     }
 
