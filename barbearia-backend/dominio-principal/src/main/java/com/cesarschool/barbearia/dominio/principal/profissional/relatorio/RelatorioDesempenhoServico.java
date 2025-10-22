@@ -1,9 +1,9 @@
 package com.cesarschool.barbearia.dominio.principal.profissional.relatorio;
 
+import java.math.BigDecimal; // Importar BigDecimal
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
@@ -34,15 +34,15 @@ public class RelatorioDesempenhoServico {
                 .mapToLong(Duration::toMinutes)
                 .sum();
 
-        DoubleSummaryStatistics receitaStats = concluidas.stream()
-                .mapToDouble(ExecucaoAtendimento::getValor)
-                .summaryStatistics();
-        double receitaTotal = receitaStats.getSum();
+        // Lógica de soma com BigDecimal
+        BigDecimal receitaTotal = concluidas.stream()
+                .map(ExecucaoAtendimento::getValor) // Assumindo que getValor() retornará BigDecimal
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         int atendimentos = concluidas.size();
 
         List<Avaliacao> avs = avaliacoes.porProfissionalNoPeriodo(profissionalId, inicio, fim);
         
-        // Ajuste aqui: obtenha o valor da nota com .getNota().getValue()
         double media = avs.isEmpty() ? 0.0 : avs.stream()
                 .mapToInt(avaliacao -> avaliacao.getNota().getValue())
                 .average()

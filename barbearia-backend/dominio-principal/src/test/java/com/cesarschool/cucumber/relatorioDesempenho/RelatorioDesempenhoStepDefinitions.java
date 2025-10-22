@@ -1,5 +1,6 @@
 package com.cesarschool.cucumber.relatorioDesempenho;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -91,8 +92,9 @@ public class RelatorioDesempenhoStepDefinitions {
 
     @Entao("a receita gerada deve ser {string}")
     public void a_receita_gerada_deve_ser(String esperadoStr) {
-        Double esperado = parseDoublePt(esperadoStr);
-        assertEquals(esperado, relatorio.getReceitaGerada(), 0.01);
+        
+        BigDecimal esperado = new BigDecimal(esperadoStr.replace(',', '.'));
+        assertEquals(0, esperado.compareTo(relatorio.getReceitaGerada()), "A receita gerada não corresponde ao esperado.");
     }
 
     @Entao("o número de atendimentos deve ser {int}")

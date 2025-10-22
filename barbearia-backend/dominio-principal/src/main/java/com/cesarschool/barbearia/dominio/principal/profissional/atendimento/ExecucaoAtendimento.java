@@ -1,5 +1,6 @@
 package com.cesarschool.barbearia.dominio.principal.profissional.atendimento;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -11,16 +12,16 @@ public class ExecucaoAtendimento {
 
     private final ExecucaoAtendimentoId id;
     private final ProfissionalId profissionalId;
-    private final double valor; // valor do serviço
+    private final BigDecimal valor; // valor do serviço
     private final LocalDateTime inicio;
     private LocalDateTime fim; // null até finalizar
 
     private ExecucaoAtendimento(ExecucaoAtendimentoId id,
                                 ProfissionalId profissionalId,
-                                double valor,
+                                BigDecimal valor,
                                 LocalDateTime inicio,
                                 LocalDateTime fim) {
-        if (valor < 0) throw new IllegalArgumentException("Valor não pode ser negativo");
+        if (valor.compareTo(BigDecimal.ZERO) < 0) throw new IllegalArgumentException("Valor não pode ser negativo");
         this.id = Objects.requireNonNull(id, "id");
         this.profissionalId = Objects.requireNonNull(profissionalId, "profissionalId");
         this.valor = valor;
@@ -29,7 +30,8 @@ public class ExecucaoAtendimento {
     }
 
     public static ExecucaoAtendimento iniciar(ProfissionalId profissionalId, double valor, LocalDateTime inicio) {
-        return new ExecucaoAtendimento(ExecucaoAtendimentoId.novo(), profissionalId, valor, inicio, null);
+        // CORREÇÃO: Converter o double para BigDecimal na criação
+        return new ExecucaoAtendimento(ExecucaoAtendimentoId.novo(), profissionalId, BigDecimal.valueOf(valor), inicio, null);
     }
 
     public void finalizar(LocalDateTime fim) {
@@ -47,7 +49,8 @@ public class ExecucaoAtendimento {
 
     public ExecucaoAtendimentoId getId() { return id; }
     public ProfissionalId getProfissionalId() { return profissionalId; }
-    public double getValor() { return valor; }
+    // CORREÇÃO: O getter deve retornar BigDecimal
+    public BigDecimal getValor() { return valor; }
     public LocalDateTime getInicio() { return inicio; }
     public LocalDateTime getFim() { return fim; }
 }
