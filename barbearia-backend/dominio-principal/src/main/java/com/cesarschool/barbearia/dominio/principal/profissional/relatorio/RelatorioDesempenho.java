@@ -3,10 +3,10 @@ package com.cesarschool.barbearia.dominio.principal.profissional.relatorio;
 import lombok.Builder;
 
 public class RelatorioDesempenho {
-    private final double tempoServico; // minutos totais
-    private final double receitaGerada; // soma dos valores
-    private final int numeroClientesAtendidos; // quantidade de execuções concluídas
-    private final double avaliacaoFuncionario; // média 1..5
+    private final double tempoServico; 
+    private final double receitaGerada; 
+    private final int numeroClientesAtendidos; 
+    private final double avaliacaoFuncionario; 
 
     @Builder
     public RelatorioDesempenho(double tempoServico,

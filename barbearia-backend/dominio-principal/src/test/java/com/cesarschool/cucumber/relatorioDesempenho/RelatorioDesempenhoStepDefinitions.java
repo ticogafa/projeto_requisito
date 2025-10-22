@@ -31,6 +31,10 @@ public class RelatorioDesempenhoStepDefinitions {
 
     private final DateTimeFormatter dt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+    private Double parseDoublePt(String valorStr) {
+        return Double.parseDouble(valorStr.replace(',', '.'));
+    }
+
     @Dado("que existe um profissional com id {int}")
     public void que_existe_um_profissional_com_id(Integer id) {
         this.profissionalId = new ProfissionalId(id);
@@ -43,8 +47,9 @@ public class RelatorioDesempenhoStepDefinitions {
         this.dia = LocalDate.parse(diaStr);
     }
 
-    @Dado("foi concluído um atendimento de {string} até {string} no valor de {double}")
-    public void foi_concluido_um_atendimento_de_ate_no_valor_de(String inicioStr, String fimStr, Double valor) {
+    @Dado("foi concluído um atendimento de {string} até {string} no valor de {string}")
+    public void foi_concluido_um_atendimento_de_ate_no_valor_de(String inicioStr, String fimStr, String valorStr) {
+        Double valor = parseDoublePt(valorStr);
         LocalDateTime inicio = LocalDateTime.parse(inicioStr, dt);
         LocalDateTime fim = LocalDateTime.parse(fimStr, dt);
         ExecucaoAtendimento exec = ExecucaoAtendimento.iniciar(this.profissionalId, valor, inicio);
@@ -52,8 +57,9 @@ public class RelatorioDesempenhoStepDefinitions {
         execRepo.salvar(exec);
     }
 
-    @Dado("existe um atendimento em andamento iniciado às {string} no valor de {double}")
-    public void existe_um_atendimento_em_andamento_iniciado_as_no_valor_de(String inicioStr, Double valor) {
+    @Dado("existe um atendimento em andamento iniciado às {string} no valor de {string}")
+    public void existe_um_atendimento_em_andamento_iniciado_as_no_valor_de(String inicioStr, String valorStr) {
+        Double valor = parseDoublePt(valorStr);
         LocalDateTime inicio = LocalDateTime.parse(inicioStr, dt);
         ExecucaoAtendimento exec = ExecucaoAtendimento.iniciar(this.profissionalId, valor, inicio);
         execRepo.salvar(exec);
@@ -77,13 +83,15 @@ public class RelatorioDesempenhoStepDefinitions {
         this.relatorio = servico.gerarParaDia(this.profissionalId, this.dia);
     }
 
-    @Entao("o tempo de serviço deve ser {double} minutos")
-    public void o_tempo_de_servico_deve_ser_minutos(Double esperado) {
+    @Entao("o tempo de serviço deve ser {string} minutos")
+    public void o_tempo_de_servico_deve_ser_minutos(String esperadoStr) {
+        Double esperado = parseDoublePt(esperadoStr);
         assertEquals(esperado, relatorio.getTempoServico(), 0.01);
     }
 
-    @Entao("a receita gerada deve ser {double}")
-    public void a_receita_gerada_deve_ser(Double esperado) {
+    @Entao("a receita gerada deve ser {string}")
+    public void a_receita_gerada_deve_ser(String esperadoStr) {
+        Double esperado = parseDoublePt(esperadoStr);
         assertEquals(esperado, relatorio.getReceitaGerada(), 0.01);
     }
 
@@ -92,8 +100,9 @@ public class RelatorioDesempenhoStepDefinitions {
         assertEquals(esperado.intValue(), relatorio.getNumeroClientesAtendidos());
     }
 
-    @Entao("a avaliação média do funcionário deve ser {double}")
-    public void a_avaliacao_media_do_funcionario_deve_ser(Double esperado) {
+    @Entao("a avaliação média do funcionário deve ser {string}")
+    public void a_avaliacao_media_do_funcionario_deve_ser(String esperadoStr) {
+        Double esperado = parseDoublePt(esperadoStr);
         assertEquals(esperado, relatorio.getAvaliacaoFuncionario(), 0.01);
     }
 }
