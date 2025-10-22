@@ -51,6 +51,6 @@ public class RelatorioDesempenhoServico {
         double media = avs.isEmpty() ? 0.0 : avs.stream().mapToInt(Avaliacao::getNota).average().orElse(0.0);
 
         
-        return new RelatorioDesempenho(minutosTotais * 10, receitaTotal, atendimentos, media * 10);
+        return new RelatorioDesempenho(minutosTotais, receitaTotal, atendimentos, media);
     }
 }
