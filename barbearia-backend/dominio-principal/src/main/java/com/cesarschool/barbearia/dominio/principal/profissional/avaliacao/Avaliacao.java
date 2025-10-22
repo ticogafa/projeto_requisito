@@ -9,19 +9,18 @@ import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 public class Avaliacao {
     private final ProfissionalId profissionalId;
     private final ExecucaoAtendimentoId execucaoId; // opcional
-    private final int nota; // 1..5
+    private final Nota nota;
     private final LocalDateTime quando;
 
-    public Avaliacao(ProfissionalId profissionalId, ExecucaoAtendimentoId execucaoId, int nota, LocalDateTime quando) {
+    public Avaliacao(ProfissionalId profissionalId, ExecucaoAtendimentoId execucaoId, Nota nota, LocalDateTime quando) {
         this.profissionalId = Objects.requireNonNull(profissionalId, "profissionalId");
-        if (nota < 1 || nota > 5) throw new IllegalArgumentException("Nota deve ser entre 1 e 5");
         this.execucaoId = execucaoId;
-        this.nota = nota;
+        this.nota = Objects.requireNonNull(nota, "nota");
         this.quando = Objects.requireNonNull(quando, "quando");
     }
 
     public ProfissionalId getProfissionalId() { return profissionalId; }
     public ExecucaoAtendimentoId getExecucaoId() { return execucaoId; }
-    public int getNota() { return nota; }
+    public Nota getNota() { return nota; }
     public LocalDateTime getQuando() { return quando; }
 }

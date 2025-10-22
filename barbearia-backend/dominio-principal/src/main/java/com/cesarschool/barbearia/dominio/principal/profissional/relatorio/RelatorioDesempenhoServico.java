@@ -16,15 +16,8 @@ public class RelatorioDesempenhoServico {
 
     private final ExecucaoAtendimentoRepositorio execucoes;
     private final AvaliacaoRepositorio avaliacoes;
-    
 
-    // Construtor padrão (produção) — comportamento inalterado
     public RelatorioDesempenhoServico(ExecucaoAtendimentoRepositorio execucoes, AvaliacaoRepositorio avaliacoes) {
-        this(execucoes, avaliacoes, 1.0);
-    }
-
-    // Construtor com multiplicador (use apenas nos testes se quiser)
-    public RelatorioDesempenhoServico(ExecucaoAtendimentoRepositorio execucoes, AvaliacaoRepositorio avaliacoes, double multiplier) {
         this.execucoes = execucoes;
         this.avaliacoes = avaliacoes;
     }
@@ -48,9 +41,13 @@ public class RelatorioDesempenhoServico {
         int atendimentos = concluidas.size();
 
         List<Avaliacao> avs = avaliacoes.porProfissionalNoPeriodo(profissionalId, inicio, fim);
-        double media = avs.isEmpty() ? 0.0 : avs.stream().mapToInt(Avaliacao::getNota).average().orElse(0.0);
-
         
+        // Ajuste aqui: obtenha o valor da nota com .getNota().getValue()
+        double media = avs.isEmpty() ? 0.0 : avs.stream()
+                .mapToInt(avaliacao -> avaliacao.getNota().getValue())
+                .average()
+                .orElse(0.0);
+
         return new RelatorioDesempenho(minutosTotais, receitaTotal, atendimentos, media);
     }
 }
