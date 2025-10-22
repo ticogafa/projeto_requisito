@@ -21,52 +21,61 @@ public class GestaoCaixaStepDefinitions {
     private final GestaoCaixaServico servico = new GestaoCaixaServico(repo);
     private ClienteId clienteComDividaId;
 
-    @Dado("que o caixa da barbearia tem um saldo inicial de {double}")
-    public void caixa_saldo_inicial(Double saldoInicial) {
-        this.saldoInicial = saldoInicial;
+    private Double parseDoublePt(String valorStr) {
+        return Double.parseDouble(valorStr.replace(',', '.'));
+    }
+
+    @Dado("que o caixa da barbearia tem um saldo inicial de {string}")
+    public void caixa_saldo_inicial(String saldoInicialStr) {
+        this.saldoInicial = parseDoublePt(saldoInicialStr);
         repo.limpar();
     }
 
-    @Dado("um cliente possui uma dívida pendente de {double}")
-    public void umClientePossuiUmaDívidaPendenteDe(Double double1) {
+    @Dado("um cliente possui uma dívida pendente de {string}")
+    public void um_cliente_possui_uma_divida_pendente_de(String valorDividaStr) {
         this.clienteComDividaId = new ClienteId(1);
-        this.servico.registrarDivida(this.clienteComDividaId, "Dívida existente", double1);
+        this.servico.registrarDivida(this.clienteComDividaId, "Dívida existente", parseDoublePt(valorDividaStr));
     }
 
-    
-    @Quando("um serviço de {string} no valor de {double} é finalizado e pago")
-    public void servico_pago(String servico, Double valor) {
-        servico = ("Pagamento " + servico).trim();
-        this.servico.registrarEntrada(servico, valor);
-    }
-
-    
-    @Quando("um serviço de {string} no valor de {double} é finalizado e pago via {string}")
-    public void servico_pago_via(String servico, Double valor, String meio) {
-        servico = ("Pagamento " + servico).trim();
+    @Quando("um serviço de {string} no valor de {string} é pago em {string}")
+    public void servico_pago_em(String descricao, String valorStr, String meio) {
+        String servico = ("Pagamento " + descricao).trim();
+        Double valor = parseDoublePt(valorStr);
         MeioPagamento mp = MeioPagamento.valueOf(meio.toUpperCase());
         this.servico.registrarEntrada(servico, valor, mp);
     }
 
-    @Quando("uma despesa de {string} no valor de {double} é registrada")
-    public void despesa_registrada(String despesa, Double valor) {
-        this.servico.registrarSaida(despesa, valor);
+    @Quando("uma despesa de {string} no valor de {string} é registrada")
+    public void despesa_registrada(String despesa, String valorStr) {
+        this.servico.registrarSaida(despesa, parseDoublePt(valorStr));
     }
 
-    @Entao("o saldo final do caixa deve ser {double}")
-    public void saldo_final(Double esperado) {
+    @Quando("um cliente finaliza um serviço de {string} no valor de {string} mas não paga")
+    public void servico_nao_pago(String servico, String valorStr) {
+        this.clienteComDividaId = new ClienteId(1);
+        this.servico.registrarDivida(this.clienteComDividaId, "Dívida " + servico, parseDoublePt(valorStr));
+    }
+
+    @Quando("o cliente paga a dívida de {string} em {string}")
+    public void o_cliente_paga_a_divida_de_em(String valorPagoStr, String meio) {
+        if (this.clienteComDividaId == null) {
+            this.clienteComDividaId = new ClienteId(1);
+        }
+        Double valorPago = parseDoublePt(valorPagoStr);
+        MeioPagamento mp = MeioPagamento.valueOf(meio.toUpperCase());
+        this.servico.pagarPrimeiraDivida(this.clienteComDividaId, valorPago, mp);
+    }
+
+    @Entao("o saldo final do caixa deve ser {string}")
+    public void saldo_final(String esperadoStr) {
+        Double esperado = parseDoublePt(esperadoStr);
         double saldoFinal = saldoInicial + this.servico.saldoAtual();
         assertEquals(esperado, saldoFinal, 0.01);
     }
 
-    @Quando("um cliente finaliza um serviço de {string} no valor de {double} mas não paga")
-    public void servico_nao_pago(String servico, Double valor) {
-        this.clienteComDividaId = new ClienteId(1);
-        this.servico.registrarDivida(this.clienteComDividaId, "Dívida " + servico, valor);
-    }
-
-    @E("uma dívida de {double} deve ser registrada para o cliente")
-    public void verifica_divida(Double valorDivida) {
+    @E("uma dívida de {string} deve ser registrada para o cliente")
+    public void verifica_divida(String valorDividaStr) {
+        Double valorDivida = parseDoublePt(valorDividaStr);
         boolean divida = repo.buscarPendentesPorCliente(this.clienteComDividaId).stream()
             .anyMatch(l -> l.getStatus() == StatusLancamento.PENDENTE
                         && l.getValor() == valorDivida
@@ -74,50 +83,16 @@ public class GestaoCaixaStepDefinitions {
         assertTrue(divida, "Dívida não registrada para o cliente.");
     }
 
-    @E(" um cliente possui uma dívida pendente de {double}")
-    public void cliente_possui_divida(Double valorDivida) {
-        
-        this.clienteComDividaId = new ClienteId(1);
-        this.servico.registrarDivida(this.clienteComDividaId, "Dívida existente", valorDivida);
-    }
-
-    
-    @Quando("o cliente paga a dívida de {double}")
-    public void o_cliente_paga_a_divida_de(Double valorPago) {
-        if (this.clienteComDividaId == null) {
-            this.clienteComDividaId = new com.cesarschool.barbearia.dominio.principal.cliente.ClienteId(1);
-            this.servico.registrarDivida(this.clienteComDividaId, "Dívida", valorPago);
-        }
-        this.servico.pagarPrimeiraDivida(this.clienteComDividaId, valorPago);
-    }
-
-    
-    @Quando("o cliente paga a dívida de {double} via {string}")
-    public void o_cliente_paga_a_divida_de_via(Double valorPago, String meio) {
-        if (this.clienteComDividaId == null) {
-            this.clienteComDividaId = new com.cesarschool.barbearia.dominio.principal.cliente.ClienteId(1);
-            this.servico.registrarDivida(this.clienteComDividaId, "Dívida", valorPago);
-        }
-        MeioPagamento mp = MeioPagamento.valueOf(meio.toUpperCase());
-        this.servico.pagarPrimeiraDivida(this.clienteComDividaId, valorPago, mp);
-    }
-
     @E("a dívida do cliente deve ser marcada como {string}")
     public void a_divida_do_cliente_deve_ser_marcada_como(String status) {
-        var esperado = com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento.valueOf(status.toUpperCase());
+        var esperado = StatusLancamento.valueOf(status.toUpperCase());
+        // Correção: Buscar todos os lançamentos do cliente, não apenas os pendentes.
+        var doCliente = repo.buscarTodosPorCliente(this.clienteComDividaId);
 
-        var doCliente = repo.buscarTodos().stream()
-            .filter(l -> this.clienteComDividaId != null && this.clienteComDividaId.equals(l.getClienteId()))
-            .toList();
+        boolean temPago = doCliente.stream().anyMatch(l -> l.getStatus() == esperado);
+        boolean naoTemPendente = doCliente.stream().noneMatch(l -> l.getStatus() == StatusLancamento.PENDENTE);
 
-        boolean temEsperado = doCliente.stream().anyMatch(l -> l.getStatus() == esperado);
-        if (esperado == com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento.PAGO) {
-            temEsperado = temEsperado && doCliente.stream().noneMatch(l ->
-                l.getStatus() == com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento.PENDENTE
-            );
-        }
-
-        org.junit.jupiter.api.Assertions.assertTrue(temEsperado, "Esperado status " + esperado + " para a dívida do cliente.");
+        assertTrue(temPago, "A dívida não foi marcada como PAGO.");
+        assertTrue(naoTemPendente, "Ainda existe uma dívida PENDENTE para o cliente.");
     }
-
 }

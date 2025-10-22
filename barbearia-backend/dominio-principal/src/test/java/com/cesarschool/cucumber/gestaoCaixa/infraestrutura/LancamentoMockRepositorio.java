@@ -38,5 +38,11 @@ public class LancamentoMockRepositorio implements LancamentoRepositorio {
                 .collect(Collectors.toList());
     }
 
+    public List<Lancamento> buscarTodosPorCliente(ClienteId clienteId) {
+        return store.values().stream()
+                .filter(l -> clienteId.equals(l.getClienteId()))
+                .collect(Collectors.toList());
+    }
+
     public void limpar() { store.clear(); }
 }
