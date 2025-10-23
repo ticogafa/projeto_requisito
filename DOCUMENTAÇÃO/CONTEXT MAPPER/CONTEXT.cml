@@ -158,7 +158,7 @@ BoundedContext SistemaBarbearia implements Principal {
 			-MovimentacaoEstoqueId id
 			-ProdutoId produtoId
 			String nomeProduto
-			TipoMovimentacao tipo
+			-TipoMovimentacao tipo
 			int quantidade
 			int estoqueAnterior
 			int estoqueAtual
@@ -169,7 +169,7 @@ BoundedContext SistemaBarbearia implements Principal {
 			Repository MovimentacaoEstoqueRepository {
 				List<@MovimentacaoEstoque> buscarPorProduto(@ProdutoId produtoId);
 				List<@MovimentacaoEstoque> buscarPorProdutoEPeriodo(@ProdutoId produtoId, DateTime dataInicio, DateTime dataFim);
-				List<@MovimentacaoEstoque> buscarPorTipo(TipoMovimentacao tipo);
+				List<@MovimentacaoEstoque> buscarPorTipo(@TipoMovimentacao tipo);
 				List<@MovimentacaoEstoque> buscarPorPeriodo(DateTime dataInicio, DateTime dataFim);
 				List<@MovimentacaoEstoque> buscarUltimasMovimentacoes(@ProdutoId produtoId, int limite);
 			}
@@ -207,7 +207,7 @@ BoundedContext SistemaBarbearia implements Principal {
 			List<@MovimentacaoEstoque> buscarHistoricoProduto(@ProdutoId produtoId);
 			List<@MovimentacaoEstoque> buscarHistoricoPorPeriodo(@ProdutoId produtoId, DateTime dataInicio, DateTime dataFim);
 			List<@MovimentacaoEstoque> buscarUltimasMovimentacoes(@ProdutoId produtoId, int limite);
-			List<@MovimentacaoEstoque> listarMovimentacoesPorTipo(TipoMovimentacao tipo);
+			List<@MovimentacaoEstoque> listarMovimentacoesPorTipo(@TipoMovimentacao tipo);
 			
 			// Operações de Ativação/Desativação
 			void desativarProduto(@ProdutoId produtoId, String motivo, String usuarioResponsavel);
