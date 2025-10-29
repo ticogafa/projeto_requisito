@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoServico;
-import com.cesarschool.cucumber.servico.ServicoOferecidoMockRepositorio;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;

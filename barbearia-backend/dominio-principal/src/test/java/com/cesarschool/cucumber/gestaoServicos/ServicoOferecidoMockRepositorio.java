@@ -1,4 +1,4 @@
-package com.cesarschool.cucumber.servico;
+package com.cesarschool.cucumber.gestaoServicos;
 
 import java.util.ArrayList;
 import java.util.HashMap;
