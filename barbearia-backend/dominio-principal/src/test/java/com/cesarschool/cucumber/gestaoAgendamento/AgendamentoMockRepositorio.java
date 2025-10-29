@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
-import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento;
