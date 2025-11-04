@@ -87,6 +87,9 @@
   </head>
   <body class="bg-dark-900 text-gray-100">
     <div id="app">
+   <!-- Component: Profile Selection (Split into: Header + ProfileCards component)
+     Usage: Shown to all users before login. NOT user-type specific.
+     Note: Header area repeats branding used in each panel header -> extract to shared Header component. -->
       <div
         id="profileSelection"
         class="min-h-screen flex flex-col items-center justify-center p-8"
@@ -163,6 +166,8 @@
         </div>
       </div>
 
+   <!-- Component: Login Screen (Split into: LoginForm component)
+     Usage: Shown to all users. Keep as a shared component that toggles role-specific redirects. -->
       <div
         id="loginScreen"
         class="hidden min-h-screen flex items-center justify-center p-8"
@@ -208,7 +213,9 @@
 
             <div class="text-center">
               <a
-                onclick="showToast('Em breve', 'Funcionalidade de recuperação de senha em desenvolvimento.', 'info'); return false;"
+                data-toast-title="Em breve"
+                data-toast-message="Funcionalidade de recuperação de senha em desenvolvimento."
+                data-toast-icon="info"
                 href="#"
                 class="text-primary hover:underline text-sm cursor-pointer"
                 >Esqueceu sua senha?</a
@@ -228,7 +235,11 @@
         </div>
       </div>
 
-      <div id="professionalPanel" class="hidden min-h-screen">
+   <!-- Component: Professional Panel (Split into: Header, Nav, Agenda, Reviews)
+     Usage: Visible only to 'professional' users.
+     Redundancy: Header and top-right account area (name + logout) repeat across Admin/Client panels. Extract to SharedHeader(professionalName, role).
+     Sidebar: professional nav is specific but shares structure with Admin sidebar; extract nav list generator to avoid duplicate markup. -->
+   <div id="professionalPanel" class="hidden min-h-screen">
         <header class="bg-dark-800 border-b border-dark-600 px-8 py-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -806,7 +817,10 @@
         </div>
       </div>
 
-      <div id="clientPanel" class="hidden min-h-screen">
+   <!-- Component: Client Panel (Split into: Header, Booking, History)
+     Usage: Visible only to 'client' users.
+     Redundancy: Header markup repeats; booking widgets reuse time-slot UI also used in admin booking modal; extract TimeSlot component and BookingForm partial. -->
+   <div id="clientPanel" class="hidden min-h-screen">
         <header class="bg-dark-800 border-b border-dark-600 px-8 py-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -987,7 +1001,10 @@
         </div>
       </div>
 
-      <div id="adminPanel" class="hidden min-h-screen">
+   <!-- Component: Admin Panel (Split into: Header, Dashboard, Management Sections)
+     Usage: Visible only to 'admin' users.
+     Redundancy: Management tables (professionals/services) share column structures and actions (edit/toggle) with other tables; extract Table component and ActionButtons group to reuse. -->
+   <div id="adminPanel" class="hidden min-h-screen">
         <header class="bg-dark-800 border-b border-dark-600 px-8 py-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -1191,18 +1208,6 @@
               </button>
 
               <button
-                onclick="openAdminModal('reports')"
-                class="bg-dark-800 border border-dark-600 hover:border-primary rounded-xl p-4 text-left transition group"
-              >
-                <span
-                  class="material-icons text-purple-400 text-3xl mb-2 group-hover:scale-110 transition"
-                  >analytics</span
-                >
-                <h4 class="font-semibold mb-1">Relatórios</h4>
-                <p class="text-xs text-gray-400">Métricas e análises</p>
-              </button>
-
-              <button
                 onclick="openAdminModal('cashControl')"
                 class="bg-dark-800 border border-dark-600 hover:border-primary rounded-xl p-4 text-left transition group"
               >
@@ -1234,21 +1239,12 @@
                 class="px-6 py-4 bg-dark-700 flex items-center justify-between"
               >
                 <h3 class="text-xl font-semibold">Agendamentos Recentes</h3>
-                <div class="flex gap-2">
-                  <button
-                    onclick="openAdminModal('cashControl')"
-                    class="bg-green-500/10 text-green-400 hover:bg-green-500/20 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2"
-                  >
-                    <span class="material-icons text-sm">point_of_sale</span>
-                    Fechar Caixa
-                  </button>
                   <button
                     onclick="openAdminModal('appointments')"
                     class="text-primary hover:text-orange-400 text-sm font-medium cursor-pointer px-4 py-2"
                   >
                     Ver todos
                   </button>
-                </div>
               </div>
               <table class="w-full">
                 <thead class="bg-dark-700 border-t border-dark-600">
@@ -1480,7 +1476,9 @@
         </div>
       </div>
 
-      <div
+   <!-- Component: Modals (Split into separate modal components files or partials)
+     Usage: Many modals are shared between roles (confirm, toast, forms). Extract generic Modal component and specific content templates. Avoid duplicating modal scaffolding. -->
+   <div
         id="newAppointmentModal"
         onclick="closeModalOnBackdrop(event, 'newAppointmentModal')"
         class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
@@ -3586,7 +3584,9 @@
         </div>
       </div>
 
-      <div
+   <!-- Component: Shared Widgets (toasts, global modals)
+     Usage: Global UI shared by all roles. Keep as singletons. Redundant alert/toast code found in multiple functions; centralize showToast logic (already present) and reuse it rather than duplicating notifications. -->
+   <div
         id="toast"
         class="hidden fixed top-8 right-8 bg-dark-800 border border-primary rounded-lg p-4 shadow-2xl z-50 max-w-sm"
       >
