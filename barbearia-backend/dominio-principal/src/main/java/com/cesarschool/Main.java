@@ -1,7 +1,28 @@
 package com.cesarschool;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+/**
+ * Aplicação principal do sistema de Barbearia.
+ * 
+ * Configurações:
+ * - @SpringBootApplication: Habilita autoconfiguração do Spring Boot
+ * - @EnableJpaRepositories: Ativa os repositórios JPA no pacote especificado
+ * - @EntityScan: Escaneia as entidades JPA no pacote especificado
+ */
+@SpringBootApplication(scanBasePackages = "com.cesarschool.barbearia")
+@EnableJpaRepositories(basePackages = "com.cesarschool.barbearia.infraestrutura.persistencia.jpa")
+@EntityScan(basePackages = "com.cesarschool.barbearia.infraestrutura.persistencia.jpa")
 public class Main {
+    
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        SpringApplication.run(Main.class, args);
+        System.out.println("========================================");
+        System.out.println("  Barbearia Backend - Sistema Iniciado");
+        System.out.println("  H2 Console: http://localhost:8080/h2-console");
+        System.out.println("========================================");
     }
 }
