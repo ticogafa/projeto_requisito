@@ -35,9 +35,7 @@ public class LivroPesquisarRota extends VerticalLayout implements AfterNavigatio
 
 	private RouterLink link(LivroResumo resumo) {
 		var id = resumo.getId();
-		var titulo = resumo.getTitulo();
-
-		return new RouterLink(titulo, LivroEditarRota.class, id);
+		return new RouterLink(id, LivroEditarRota.class, id);
 	}
 
 	@Override
