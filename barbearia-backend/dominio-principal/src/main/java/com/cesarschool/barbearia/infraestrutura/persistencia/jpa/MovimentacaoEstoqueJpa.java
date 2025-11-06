@@ -28,7 +28,7 @@ import jakarta.persistence.Table;
 
 /**
  * Entidade JPA representando uma Movimentação de Estoque no banco de dados.
- * Package-private seguindo o padrão do projeto.
+ * Package-private seguindo o padrão do projeto.j
  */
 @Entity
 @Table(name = "MOVIMENTACAO_ESTOQUE")

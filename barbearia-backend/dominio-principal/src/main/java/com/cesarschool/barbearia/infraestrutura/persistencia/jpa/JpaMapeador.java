@@ -219,9 +219,6 @@ class JpaMapeador extends ModelMapper {
         });
     }
     
-    /**
-     * Sobrescreve o método map para tratar valores nulos.
-     */
     @Override
     public <D> D map(Object source, Class<D> destinationType) {
         return source != null ? super.map(source, destinationType) : null;

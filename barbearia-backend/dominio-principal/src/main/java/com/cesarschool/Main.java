@@ -5,14 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-/**
- * Aplicação principal do sistema de Barbearia.
- * 
- * Configurações:
- * - @SpringBootApplication: Habilita autoconfiguração do Spring Boot
- * - @EnableJpaRepositories: Ativa os repositórios JPA no pacote especificado
- * - @EntityScan: Escaneia as entidades JPA no pacote especificado
- */
+
 @SpringBootApplication(scanBasePackages = "com.cesarschool.barbearia")
 @EnableJpaRepositories(basePackages = "com.cesarschool.barbearia.infraestrutura.persistencia.jpa")
 @EntityScan(basePackages = "com.cesarschool.barbearia.infraestrutura.persistencia.jpa")
