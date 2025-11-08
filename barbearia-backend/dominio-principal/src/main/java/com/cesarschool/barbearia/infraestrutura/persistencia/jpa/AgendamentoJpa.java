@@ -22,49 +22,53 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "AGENDAMENTO")
 class AgendamentoJpa {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
+    @Column(name = "ID")
     Integer id;
     
-    @Column(nullable = false)
+    @Column(name = "DATA_HORA", nullable = false)
     LocalDateTime dataHora;
     
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "STATUS", nullable = false, length = 20)
     StatusAgendamento status;
     
-    @Column(nullable = false)
+    @Column(name = "CLIENTE_ID", nullable = false)
     Integer clienteId;
     
-    @Column
+    @Column(name = "PROFISSIONAL_ID")
     Integer profissionalId;
     
-    @Column(nullable = false)
+    @Column(name = "SERVICO_ID", nullable = false)
     Integer servicoId;
     
-    @Column(length = 500)
+    @Column(name = "OBSERVACOES", length = 500)
     String observacoes;
+    
+    @Override
+    public String toString() {
+        return "Agendamento #" + id + " - " + dataHora;
+    }
 }
 
 interface AgendamentoJpaRepository extends JpaRepository<AgendamentoJpa, Integer> {
     
-    @Query("SELECT a FROM AgendamentoJpa a WHERE a.clienteId = :clienteId ORDER BY a.dataHora DESC")
     List<AgendamentoJpa> findByClienteId(@Param("clienteId") Integer clienteId);
     
-    @Query("SELECT a FROM AgendamentoJpa a WHERE a.profissionalId = :profissionalId ORDER BY a.dataHora DESC")
-    List<AgendamentoJpa> findByProfissionalId(@Param("profissionalId") Integer profissionalId);
+    List<AgendamentoJpa> findByProfissionalIdOrderByDataHoraDesc(@Param("profissionalId") Integer profissionalId);
     
-    @Query("SELECT a FROM AgendamentoJpa a WHERE a.status = :status ORDER BY a.dataHora")
-    List<AgendamentoJpa> findByStatus(@Param("status") StatusAgendamento status);
+    List<AgendamentoJpa> findByStatusOrderByDataHoraDesc(@Param("status") StatusAgendamento status);
     
     @Query("SELECT a FROM AgendamentoJpa a WHERE a.dataHora BETWEEN :inicio AND :fim ORDER BY a.dataHora")
     List<AgendamentoJpa> findByPeriodo(
-        @Param("inicio") LocalDateTime inicio, 
+        @Param("inicio") LocalDateTime inicio,
         @Param("fim") LocalDateTime fim
     );
     
@@ -106,7 +110,6 @@ class AgendamentoRepositorioImpl implements AgendamentoRepositorio {
     
     @Autowired
     JpaMapeador mapeador;
-    
     @Override
     public Agendamento salvar(Agendamento agendamento) {
         var agendamentoJpa = mapeador.map(agendamento, AgendamentoJpa.class);
@@ -144,7 +147,7 @@ class AgendamentoRepositorioImpl implements AgendamentoRepositorio {
     
     @Override
     public List<Agendamento> buscarPorProfissional(ProfissionalId profissionalId) {
-        var agendamentosJpa = repositorio.findByProfissionalId(profissionalId.getValor());
+        var agendamentosJpa = repositorio.findByProfissionalIdOrderByDataHoraDesc(profissionalId.getValor());
         return agendamentosJpa.stream()
             .map(aj -> mapeador.map(aj, Agendamento.class))
             .toList();
@@ -152,7 +155,7 @@ class AgendamentoRepositorioImpl implements AgendamentoRepositorio {
     
     @Override
     public List<Agendamento> buscarPorStatus(StatusAgendamento status) {
-        var agendamentosJpa = repositorio.findByStatus(status);
+        var agendamentosJpa = repositorio.findByStatusOrderByDataHoraDesc(status);
         return agendamentosJpa.stream()
             .map(aj -> mapeador.map(aj, Agendamento.class))
             .toList();
@@ -168,11 +171,11 @@ class AgendamentoRepositorioImpl implements AgendamentoRepositorio {
     
     @Override
     public boolean existeAgendamentoNoPeriodo(
-            ProfissionalId profissionalId, 
-            LocalDateTime dataHora, 
+            ProfissionalId profissionalId,
+            LocalDateTime dataHora,
             int duracaoMinutos) {
         return repositorio.existeAgendamentoConflitante(
-            profissionalId.getValor(), 
+            profissionalId.getValor(),
             dataHora
         );
     }

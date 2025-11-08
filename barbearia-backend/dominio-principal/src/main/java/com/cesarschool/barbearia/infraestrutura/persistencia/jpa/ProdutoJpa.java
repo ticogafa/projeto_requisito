@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.cesarschool.barbearia.dominio.principal.produto.Produto;
-import com.cesarschool.barbearia.dominio.principal.produto.ProdutoId;
 import com.cesarschool.barbearia.dominio.principal.produto.ProdutoRepositorio;
 
 import jakarta.persistence.Column;

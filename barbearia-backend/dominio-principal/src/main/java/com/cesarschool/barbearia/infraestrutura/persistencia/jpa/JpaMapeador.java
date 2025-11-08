@@ -18,7 +18,6 @@ import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 /**
  * Mapeador centralizado para conversões entre entidades JPA e entidades de domínio.
  * Estende ModelMapper e configura conversores personalizados para Value Objects.
- * 
  * Seguindo o padrão do projeto SGB.
  */
 @Component

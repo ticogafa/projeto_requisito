@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import com.cesarschool.barbearia.dominio.principal.produto.ProdutoId;
 import com.cesarschool.barbearia.dominio.principal.produto.estoque.MovimentacaoEstoque;
-import com.cesarschool.barbearia.dominio.principal.produto.estoque.MovimentacaoEstoqueId;
 import com.cesarschool.barbearia.dominio.principal.produto.estoque.MovimentacaoEstoqueRepositorio;
 import com.cesarschool.barbearia.dominio.principal.produto.estoque.TipoMovimentacao;
 
