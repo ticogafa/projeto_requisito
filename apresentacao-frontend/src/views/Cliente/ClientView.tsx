@@ -9,6 +9,17 @@ export default function ClientView() {
 
   const [modalVisible, setModalVisible] = useState(false);
 
+// <!-- Component: Client Panel (Split into: Header, Booking, History)
+//    Usage: Visible only to 'client' users.
+//    Redundancy: Header markup repeats; booking widgets reuse time-slot UI also used in admin booking modal; extract TimeSlot component and BookingForm partial. -->
+
+import { useState } from "react";
+import NewAppointmentModal from "./NewAppointmentModal";
+
+export default function ClientView() {
+
+  const [modalVisible, setModalVisible] = useState(false);
+
 	return (
    <div className="min-h-screen">
         <NewAppointmentModal visible={modalVisible} closeModal={() => setModalVisible(false)}/>
@@ -110,12 +121,8 @@ export default function ClientView() {
                 </p>
               </div>
               <button
-                onClick={
-					() => {
-						setModalVisible(true);
-					}
-				}
-                className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-medium transition flex items-center gap-2"
+                onClick={setModalVisible.bind(null, true)}
+                className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-medium transition flex items-center gap-2 cursor-pointer"
               >
                 <span className="material-icons">add</span>
                 Novo Agendamento

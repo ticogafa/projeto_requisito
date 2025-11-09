@@ -21,8 +21,6 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
         // Lógica para carregar horários disponíveis com base na data e profissional selecionados
     }
     
-    const availableSlots = [];
-
     if (!props.visible) return null;
 
   return (
@@ -43,11 +41,7 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
               <h3 className="text-2xl font-bold">Novo Agendamento</h3>
             </div>
             <button
-              onClick={
-                ()=> {
-                    props.closeModal()
-                }
-              }
+              onClick={props.closeModal}
               className="material-icons text-gray-400 hover:text-primary cursor-pointer"
             >
               close
