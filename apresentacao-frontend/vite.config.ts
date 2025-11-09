@@ -12,5 +12,10 @@ export default defineConfig({
     alias: [
       { find: '@', replacement: '/src' }
     ]
-  }
+  },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:8080',
+    },
+  },
 })

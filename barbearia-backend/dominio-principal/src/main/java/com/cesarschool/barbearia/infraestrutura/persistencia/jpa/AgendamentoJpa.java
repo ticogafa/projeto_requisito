@@ -1,6 +1,7 @@
 package com.cesarschool.barbearia.infraestrutura.persistencia.jpa;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ class AgendamentoJpa {
     
     @Column(name = "OBSERVACOES", length = 500)
     String observacoes;
-    
+
     @Override
     public String toString() {
         return "Agendamento #" + id + " - " + dataHora;

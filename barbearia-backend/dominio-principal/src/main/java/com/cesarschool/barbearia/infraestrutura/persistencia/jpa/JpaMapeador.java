@@ -13,6 +13,7 @@ import com.cesarschool.barbearia.dominio.principal.produto.ProdutoId;
 import com.cesarschool.barbearia.dominio.principal.produto.estoque.MovimentacaoEstoque;
 import com.cesarschool.barbearia.dominio.principal.produto.estoque.MovimentacaoEstoqueId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 /**
@@ -166,6 +167,34 @@ class JpaMapeador extends ModelMapper {
         });
     }
     
+    // ==================== CONVERSORES DE SERVICOS ====================
+
+    public void configurarConversoresServicos() {
+        
+        addConverter(new AbstractConverter<ServicoOferecidoJpa, ServicoOferecido>() {
+            @Override
+            protected ServicoOferecido convert(ServicoOferecidoJpa source) {
+                var id = source.getId() != null ? new ServicoOferecidoId(source.getId()) : null;
+                var profissionalId = new ProfissionalId(source.getProfissional().getId());
+                var servicoPrincipalId = source.getServicoPrincipal() != null ? 
+                    new ServicoOferecidoId(source.getServicoPrincipal().getId()) : null;
+                
+                return ServicoOferecido.builder()
+                    .id(id)
+                    .profissionalId(profissionalId)
+                    .nome(source.getNome())
+                    .preco(source.getPreco())
+                    .descricao(source.getDescricao())
+                    .duracaoMinutos(source.getDuracaoMinutos())
+                    .servicoPrincipalId(servicoPrincipalId)
+                    .intervaloLimpezaMinutos(source.getIntervaloLimpezaMinutos())
+                    .ativo(source.isAtivo())
+                    .motivoInatividade(source.getMotivoInatividade())
+                    .build();
+            }
+        });
+    }
+    
     // ==================== CONVERSORES DE IDs ====================
     
     private void configurarConversoresIds() {
@@ -218,6 +247,8 @@ class JpaMapeador extends ModelMapper {
         });
     }
     
+    //
+
     @Override
     public <D> D map(Object source, Class<D> destinationType) {
         return source != null ? super.map(source, destinationType) : null;

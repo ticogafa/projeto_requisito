@@ -3,14 +3,15 @@ package com.cesarschool.barbearia.dominio.principal.servico;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 
+import jakarta.transaction.Transactional;
 
-/**
- * Serviço de domínio para ServicoOferecido.
- * Gerencia os serviços oferecidos pelos profissionais.
- */
+@Service
+@Transactional
 public class ServicoOferecidoServico {
     
     private final ServicoOferecidoRepositorio repositorio;

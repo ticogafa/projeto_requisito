@@ -1,7 +1,19 @@
 @import "tailwindcss";
 
-body {
-  font-family: "Inter", sans-serif;
+@theme {
+  --color-primary: #FF8C00;
+  --color-dark-900: #0F0F0F;
+  --color-dark-800: #1A1A1A;
+  --color-dark-700: #252525;
+  --color-dark-600: #303030;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-dark-800);
+    color: var(--color-gray-200);
+    font-family: "Inter", sans-serif;
+  }
 }
 
 .profile-card {
@@ -55,9 +67,4 @@ body {
 .time-slot:disabled {
   cursor: not-allowed;
   opacity: 0.5;
-}
-
-.bg-primary {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 140 0 / var(--tw-bg-opacity, 1));
 }

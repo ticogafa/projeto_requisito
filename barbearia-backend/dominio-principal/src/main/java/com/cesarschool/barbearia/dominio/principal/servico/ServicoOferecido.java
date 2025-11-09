@@ -8,9 +8,12 @@ import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.v
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarValorPositivo;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 
+import lombok.Builder;
+
 /**
  * Entidade de domínio representando um serviço oferecido por um profissional.
  */
+@Builder
 public final class ServicoOferecido {
     private ServicoOferecidoId id;
     private ProfissionalId profissionalId;
