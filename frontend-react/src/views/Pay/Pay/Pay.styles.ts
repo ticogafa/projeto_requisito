@@ -1,0 +1,1 @@
+// a gente define os styles como no componentes 

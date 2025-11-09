@@ -1,0 +1,141 @@
+🧠 O que são Hooks?
+
+Hooks são funções especiais do React que permitem usar estado e ciclo de vida em componentes funcionais, sem precisar usar classes.
+
+Antes dos hooks, só era possível fazer coisas como componentDidMount() ou this.state em componentes de classe.
+Com hooks, podemos fazer tudo isso usando funções comuns — o que simplifica muito o código.
+
+🔹 Hooks mais usados
+Hook	O que faz
+useState	Armazena e atualiza valores dentro do componente
+useEffect	Executa efeitos colaterais (ex: chamadas de API, listeners)
+useCallback	Memoriza funções para evitar recriação desnecessária
+useMemo	Memoriza cálculos complexos
+useContext	Lê o contexto global (como temas, auth, etc.)
+useRef	Guarda uma referência mutável (como acessar um input diretamente)
+useFocusEffect	Executa código quando a tela ganha foco (React Navigation)
+
+E você também pode criar seus próprios hooks — como esse useBackAction.
+
+⚙️ Agora, o seu código: useBackAction
+
+Esse hook é um ótimo exemplo de abstração de comportamento reutilizável.
+Ele serve para interceptar o botão “voltar” (tanto o botão físico do Android quanto o “voltar” da navegação), e executar alguma ação personalizada.
+
+Vamos destrinchar passo a passo 👇
+
+1️⃣ Importações importantes
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useEffect, useCallback } from 'react';
+import { BackHandler } from 'react-native';
+
+
+useFocusEffect: executa um efeito toda vez que a tela está em foco.
+
+useNavigation: permite acessar o objeto de navegação do React Navigation.
+
+BackHandler: API nativa do React Native que detecta o botão físico “voltar”.
+
+2️⃣ O Hook em si
+const useBackAction = ({
+	disabled,
+	onPress,
+	stopPropagateAfterPress
+}) => { ... }
+
+
+Ele recebe três opções:
+
+disabled: desativa o comportamento do “voltar”.
+
+onPress: função a ser executada quando o usuário aperta “voltar”.
+
+stopPropagateAfterPress: define se o evento deve parar ali ou continuar.
+
+3️⃣ A função handleOnHardwareBackPress
+const handleOnHardwareBackPress = useCallback(() => {
+	if (disabled) return true;
+
+	onPress?.();
+	return stopPropagateAfterPress;
+}, [disabled, onPress, stopPropagateAfterPress]);
+
+
+➡️ Essa função é chamada quando o botão físico “voltar” é pressionado.
+
+Se disabled for true, ele bloqueia o botão.
+
+Se tiver uma função onPress, ele executa.
+
+Se stopPropagateAfterPress for verdadeiro, ele impede que a navegação padrão aconteça.
+
+4️⃣ O useEffect
+useEffect(() => {
+	const listener = navigation.addListener('beforeRemove', event => {
+		if (disabled) return event.preventDefault();
+
+		onPress?.();
+		navigation.dispatch(event.data.action);
+	});
+
+	return listener;
+}, [disabled, navigation, onPress]);
+
+
+➡️ Esse trecho intercepta o evento de “voltar” via navegação (por exemplo, botão de voltar do header).
+Ele faz a mesma lógica do BackHandler, mas para o fluxo de navegação (React Navigation).
+
+5️⃣ O useFocusEffect
+useFocusEffect(
+	useCallback(() => {
+		const listener = BackHandler.addEventListener('hardwareBackPress', handleOnHardwareBackPress);
+		return () => listener.remove();
+	}, [handleOnHardwareBackPress])
+);
+
+
+➡️ Isso garante que:
+
+O listener do botão físico só funcione quando a tela está visível.
+
+E que seja removido automaticamente ao sair da tela (evitando vazamentos de memória).
+
+🧩 Como você usaria esse Hook
+
+Em uma tela, você poderia fazer assim:
+
+import useBackAction from '@hooks/useBackAction';
+
+export default function MinhaTela() {
+  useBackAction({
+    onPress: () => console.log('Voltando...'),
+    stopPropagateAfterPress: true
+  });
+
+  return <Text>Tela de exemplo</Text>;
+}
+
+
+👉 Quando o usuário apertar “voltar”:
+
+Ele não sairá da tela imediatamente.
+
+Em vez disso, o log "Voltando..." será mostrado.
+
+Você poderia trocar isso por um alerta de confirmação, por exemplo:
+
+useBackAction({
+  onPress: () => Alert.alert('Tem certeza que deseja sair?', '', [
+    { text: 'Cancelar', style: 'cancel' },
+    { text: 'Sim', onPress: () => navigation.goBack() }
+  ]),
+  stopPropagateAfterPress: true
+});
+
+🧭 Em resumo
+Termo	O que faz
+Hook	Função especial do React que adiciona comportamentos a componentes funcionais
+useEffect	Executa ações no ciclo de vida do componente
+useCallback	Evita recriar funções desnecessariamente
+useFocusEffect	Executa ações quando a tela é focada
+useBackAction (custom hook)	Intercepta o botão “voltar” (físico ou de navegação) e executa ações personalizadas

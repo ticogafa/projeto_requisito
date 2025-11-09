@@ -1,0 +1,1 @@
+// aqui a gente exporta o componente

@@ -1,0 +1,239 @@
+vamos, lá basicamente a gente só vai usar esse que eu já vou colocar aqui nesse TXT
+
+Nesse arquivo, o que vai acontecer é, a gente vai criar literalmente as utilidades do APP,
+como conferir um cpf valido, conferir alguma informacao, ver se uma data é valida
+
+esse codigo foi tirado diretamente do validador da Amigo, caso peguem esse codigo, saibam pelo amor de deus, um codigo basico desse é free code, até o chat gpt faz isso 
+mas basicamente, é isso, pode ver ai que tem até outros imports desse mesmo arquivo pra conferir se é valido, frescura do carai
+
+import { isValid } from '@utils/date';
+// export const isValid = (date, format, strict) => moment(date, format, strict).isValid();
+import { clearMask } from '@utils/formatter';
+//
+
+export const cpfValidator = cpf => {
+	const BLACK_LIST = ['00000000000', '11111111111', '22222222222', '33333333333', '44444444444', '55555555555', '66666666666', '77777777777', '88888888888', '99999999999'];
+	let sum = 0;
+	let rest;
+	let i = 1;
+	let j = 1;
+
+	cpf = clearMask(cpf);
+
+	if (!cpf || (cpf.length !== 11) || (BLACK_LIST.indexOf(cpf) !== -1)) {
+		return false;
+	}
+
+	for (; i <= 9; i++) {
+		sum = (sum + parseInt(cpf.substring(i - 1, i), 10) * (11 - i));
+	}
+
+	rest = ((sum * 10) % 11);
+
+	if ((rest === 10) || (rest === 11)) {
+		rest = 0;
+	}
+
+	if (rest !== parseInt(cpf.substring(9, 10), 10)) {
+		return false;
+	}
+
+	sum = 0;
+
+	for (; j <= 10; j++) {
+		sum = (sum + parseInt(cpf.substring(j - 1, j), 10) * (12 - j));
+	}
+
+	rest = ((sum * 10) % 11);
+
+	if ((rest === 10) || (rest === 11)) {
+		rest = 0;
+	}
+
+	if (rest !== parseInt(cpf.substring(10, 11), 10)) {
+		return false;
+	}
+
+	return true;
+};
+
+export const dateValidator = (date = '', format = 'DD/MM/YYYY') => isValid(date, format, true);
+
+export const cnpjValidator = cnpj => {
+	cnpj = clearMask(cnpj);
+
+	if (cnpj.length !== 14) {
+		return false;
+	}
+
+	const multipliers1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+	const multipliers2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+	const calculateDigit = (segment, multipliers) => {
+		const sum = segment.split('').reduce((acc, digit, index) => acc + parseInt(digit, 10) * multipliers[index], 0);
+		const remainder = sum % 11;
+		return (remainder < 2) ? 0 : 11 - remainder;
+	};
+
+	const digit1 = calculateDigit(cnpj.slice(0, 12), multipliers1);
+	const digit2 = calculateDigit(cnpj.slice(0, 12) + digit1, multipliers2);
+
+	return cnpj.slice(12) === digit1.toString() + digit2.toString();
+};
+
+export const phoneValidator = phone => {
+	phone = clearMask(phone);
+
+	if (phone.length !== 11) {
+		return false;
+	}
+
+	const validAreaCodePrefixes = ['11', '12', '13', '14', '15', '16', '17', '18', '19', '21', '22', '24', '27', '28', '31', '32', '33', '34', '35', '37', '38', '41', '42', '43', '44', '45', '46', '47', '48', '49', '51', '53', '54', '55', '61', '62', '63', '64', '65', '66', '67', '68', '69', '71', '73', '74', '75', '77', '79', '81', '82', '83', '84', '85', '86', '87', '88', '89', '91', '92', '93', '94', '95', '96', '97', '98', '99'];
+
+	if (!validAreaCodePrefixes.includes(phone.substring(0, 2))) {
+		return false;
+	}
+
+	if (phone.charAt(2) !== '9') {
+		return false;
+	}
+
+	if (!/^\d+$/.test(phone)) {
+		return false;
+	}
+
+	return true;
+};
+
+export const emailValidator = email => {
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	return emailRegex.test(email);
+};
+
+export const domainValidator = input => {
+	const hasOnlyAllowedCharacters = input && /^[a-zA-Z0-9-]+$/.test(input); // inclui maiúsculas só para detectar
+	const isAllLowercase = input && input === input.toLowerCase();
+	const hasNoSpaces = input && !/\s/.test(input);
+
+	const results = {
+		allLowercase: isAllLowercase,
+		noSpecialCharacters: hasOnlyAllowedCharacters, // apenas -, letras e números
+		noSpaces: hasNoSpaces
+	};
+
+	return {
+		isValid: input && results.allLowercase && results.noSpecialCharacters && results.noSpaces,
+		...results
+	};
+};
+
+
+// outro exemplo de arquivo!! ESSE é importante igual!!
+
+import currency from 'currency.js';
+
+export const formatCpf = (cpf = '') =>
+	cpf
+		.replace(/\D/g, '')
+		.replace(/(\d{3})(\d)/, '$1.$2')
+		.replace(/(\d{3})(\d)/, '$1.$2')
+		.replace(/(\d{3})(\d{1,2})/, '$1-$2')
+		.replace(/(-\d{2})\d+?$/, '$1');
+
+export const formatDate = (date = '') =>
+	date
+		.replace(/\D/g, '')
+		.replace(/(\d{2})(\d)/, '$1/$2')
+		.replace(/(\d{2})(\d)/, '$1/$2')
+		.replace(/(\d{4})(\d{1,2})/, '$1');
+
+export const formatMoney = (value, { precision = 2, prefix = '' } = {}) => prefix + currency(value, { separator: '.', decimal: ',', precision }).format({
+	symbol: ''
+});
+
+export const formatPhone = phone => {
+	if (!phone) {
+		return phone;
+	}
+
+	if (phone.startsWith('0800')) {
+		return phone;
+	}
+
+	let phoneNumber = phone.replace(/\D/g, '');
+	const match = phoneNumber.length > 10
+		? phoneNumber.match(/^(\d{1,2})(\d{0,5})(\d{0,4})$/)
+		: phoneNumber.match(/^(\d{1,2})(\d{0,4})(\d{0,4})$/);
+
+	if (match) {
+		phoneNumber = `(${match[1]}${match[2] ? ') ' : ''}${match[2]}${match[3] ? '-' : ''}${match[3]}`;
+	}
+
+	return phoneNumber;
+};
+
+export const formatCnpj = cnpj => {
+	if (!cnpj) {
+		return cnpj;
+	}
+
+	return cnpj.replace(/\D/g, '')
+		.replace(/^(\d{2})(\d)/, '$1.$2')
+		.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+		.replace(/\.(\d{3})(\d)/, '.$1/$2')
+		.replace(/(\d{4})(\d)/, '$1-$2');
+};
+
+export const formatZipcode = zipcode => {
+	if (!zipcode) {
+		return zipcode;
+	}
+
+	return zipcode.replace(/\D/g, '')
+		.replace(/(\d{5})(\d)/, '$1-$2')
+		.replace(/(-\d{3})\d+?$/, '$1');
+};
+
+export const clearMask = value => {
+	if (!value) {
+		return null;
+	}
+
+	return value.replace(/\D/g, '');
+};
+
+export const toCurrency = ({ amount, hideSymbol }) => {
+	if (!amount && amount !== 0) {
+		return '';
+	}
+
+	let j;
+	let n = amount;
+	let c = 2;
+	let d = ',';
+	let t = '.';
+	let s = n < 0 ? '-' : '';
+	let i = parseInt(n = Math.abs(+n || 0).toFixed(c), 10) + '';
+
+	j = (j = i.length) > 3 ? j % 3 : 0;
+
+	return (!hideSymbol ? 'R$ ' : '') + s + (j ? i.substring(0, j) + t : '') + i.substring(j).replace(/(\d{3})(?=\d)/g, '$1' + t) + (d + Math.abs(n - i).toFixed(c).slice(2));
+};
+
+export const formatCpfCnpj = value => value.length === 11 ? formatCpf(value) : formatCnpj(value);
+
+export const formatNumber = (value, decimals) => {
+	const valueNumber = value?.toString().replace(/[^0-9]/g, '') || '';
+
+	const formattedValue = valueNumber.padStart(decimals + 1, '0');
+
+	let integerPart = decimals > 0
+		? formattedValue.slice(0, -decimals)
+		: valueNumber;
+
+	integerPart = integerPart.replace(/^0+/, '') || '0';
+	integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+	const decimalPart = formattedValue.slice(-decimals);
+
+	return decimals > 0 ? `${integerPart},${decimalPart}` : integerPart;
+};

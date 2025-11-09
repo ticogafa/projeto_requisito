@@ -1,0 +1,98 @@
+🧠 O que é um Selector
+
+Um selector é uma função que pega dados da store (Redux) e retorna exatamente as informações que um componente precisa — nem mais, nem menos.
+
+Ele é como um “filtro inteligente” para os dados da store.
+
+📦 Pensa assim:
+
+A store guarda todos os dados do app (usuário, produtos, configurações…)
+
+O selector serve pra pegar um pedacinho específico desses dados, de forma organizada e performática
+
+🎯 Pra que serve o createSelector
+
+O createSelector vem da lib Reselect, e serve pra:
+
+Evitar cálculos desnecessários
+
+Aumentar a performance do app
+
+Deixar o código mais limpo e reutilizável
+
+Ele “memoriza” (faz memoization) os resultados:
+se nada mudou na store, ele reutiliza o último resultado em vez de recalcular tudo de novo.
+
+🧩 O que o seu arquivo faz (em português simples)
+
+Seu arquivo define vários selectors que pegam dados da store do Redux — por exemplo:
+
+🔹 getCurrentUserSession
+export const getCurrentUserSession = (state) => state.session?.currentUser;
+
+
+Pega o usuário atual logado.
+
+🔹 getCurrentUserId
+export const getCurrentUserId = createSelector(
+	getCurrentUserSession,
+	(currentUser) => currentUser?.id
+);
+
+
+Usa o Reselect pra pegar só o ID do usuário atual, e memoriza o resultado.
+
+🔹 getAccountSettings
+export const getAccountSettings = createSelector(
+	getCurrentUserSession,
+	(currentUser) => currentUser?.accountSettings || {}
+);
+
+
+Pega as configurações da conta do usuário logado.
+
+🔹 getUserById
+export const getUserById = createSelector(
+	getUserId,
+	getUsersEntities,
+	getImagesEntities,
+	(id, users, images) => {
+		const user = users[id];
+		return {
+			...user,
+			image: images[user?.imageId]
+		};
+	}
+);
+
+
+Retorna um usuário completo (dados + imagem), unindo informações de diferentes partes da store.
+— Isso evita que o componente precise fazer toda essa lógica manualmente.
+
+⚙️ Exemplo prático de como seria usado
+
+No componente:
+
+import { useSelector } from 'react-redux';
+import { getUserById } from '@selectors/userSelector';
+
+function ProfileScreen({ userId }) {
+  const user = useSelector((state) => getUserById(state, userId));
+
+  return <Text>{user.name}</Text>;
+}
+
+
+👉 Assim, o componente não precisa saber onde os dados estão na store nem como montar o objeto completo.
+Ele apenas chama o selector e recebe o dado pronto.
+
+🧭 Em resumo (pra você explicar pros seus amigos)
+Termo	O que faz
+Selector	Uma função que pega dados da store do Redux de forma organizada
+createSelector (Reselect)	Deixa o selector mais rápido, evitando recalcular o mesmo dado
+Por que usar	Melhora a performance e deixa o código mais limpo
+Exemplo prático	getUserById busca o usuário e já retorna sua imagem junto
+
+📘 Em uma frase pra você usar:
+
+“Os selectors servem pra buscar e montar dados da store do Redux de forma otimizada e organizada, pra que os componentes não precisem se preocupar com a estrutura interna da store.”

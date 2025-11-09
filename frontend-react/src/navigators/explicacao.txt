@@ -1,0 +1,197 @@
+basicamente é pra a gente criar os links com os outros lugares, pra ter a nossa navegação do app
+
+um exemplo é esse:
+
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { useSelector } from 'react-redux';
+
+import { WHITE_SCREEN_OPTIONS, WITHOUT_HEADER, DEFAULT_SCREEN_OPTIONS, TAB_BAR_HIDDEN_PARAMS } from '@constants/navigators';
+import AccountingNavigator from '@navigators/AccountingNavigator';
+import AmigoPayNavigator from '@navigators/AmigoPayNavigator';
+import ChatNavigator from '@navigators/ChatNavigator';
+import PatientNavigator from '@navigators/PatientNavigator';
+import SettingsNavigator from '@navigators/SettingsNavigator';
+import { getAccountSettingsModule } from '@selectors/usersSelector';
+import AccountingSubscriptionView from '@views/AccountingSubscription';
+import AmigoOneFinanceView from '@views/AmigoOneFinance';
+import AmigoOneFinanceShowView from '@views/AmigoOneFinanceShow';
+import AttendanceBlockShowView from '@views/AttendanceBlockShow';
+import AttendanceDutyConfigFormView from '@views/AttendanceDutyConfigForm';
+import AttendanceDutyFormView from '@views/AttendanceDutyForm';
+import AttendanceDutyShowView from '@views/AttendanceDutyShow';
+import AttendanceFormView from '@views/AttendanceForm';
+import AttendanceShowView from '@views/AttendanceShow';
+import FinanceShowView from '@views/FinanceShow';
+import FinanceTabView from '@views/FinanceTab';
+import NfseEmissionView from '@views/NfseEmission';
+import NotificationsListView from '@views/NotificationsList';
+import PlaceFormView from '@views/PlaceForm';
+import UnpaidAttendancesListNavigator from '@views/UnpaidAttendancesList';
+
+const FinanceStack = createStackNavigator();
+
+const FinanceNavigator = () => {
+	const allowNfseModule = useSelector(state => getAccountSettingsModule(state, 'nfse'))?.active || false;
+	const hasAmigoPay = useSelector(state => getAccountSettingsModule(state, 'amigoPay'))?.active || false;
+
+	const initialRouteName = (allowNfseModule || hasAmigoPay) ? 'FinanceMenu' : 'AccountingSubscription';
+
+	return (
+		<FinanceStack.Navigator initialRouteName={initialRouteName} screenOptions={WHITE_SCREEN_OPTIONS}>
+			<FinanceStack.Screen
+				component={FinanceTabView}
+				name="FinanceMenu"
+				options={{ title: 'Finanças' }}
+			/>
+
+			<FinanceStack.Screen
+				component={AmigoOneFinanceView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="AmigoOneFinance"
+				options={{ title: 'Produção', ...DEFAULT_SCREEN_OPTIONS }}
+			/>
+
+			<FinanceStack.Screen
+				component={FinanceShowView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="FinanceShow"
+				options={{ ...WHITE_SCREEN_OPTIONS, title: 'Financeiro' }}
+			/>
+
+			<FinanceStack.Screen
+				component={AccountingNavigator}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="Accounting"
+				options={{ title: 'Contabilidade', ...WITHOUT_HEADER }}
+			/>
+
+			<FinanceStack.Screen
+				component={AmigoOneFinanceShowView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="AmigoOneFinanceShow"
+				options={{ title: 'Produção', ...DEFAULT_SCREEN_OPTIONS }}
+			/>
+
+			<FinanceStack.Screen
+				component={AttendanceShowView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="AttendanceShow"
+				options={{
+					title: 'Detalhes do agendamento',
+					...TransitionPresets.RevealFromBottomAndroid
+				}}
+			/>
+
+			<FinanceStack.Screen
+				component={AttendanceDutyShowView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="AttendanceDutyShow"
+				options={{
+					title: 'Detalhes do agendamento',
+					...TransitionPresets.RevealFromBottomAndroid
+				}}
+			/>
+
+			<FinanceStack.Screen
+				component={AttendanceBlockShowView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="AttendanceBlockShow"
+				options={{
+					title: 'Detalhes do bloqueio',
+					...TransitionPresets.RevealFromBottomAndroid
+				}}
+			/>
+
+			<FinanceStack.Screen
+				component={UnpaidAttendancesListNavigator}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="UnpaidAttendancesList"
+				options={{ title: 'Marcar como pago', ...WHITE_SCREEN_OPTIONS }}
+			/>
+
+			<FinanceStack.Screen
+				component={NotificationsListView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="Notifications"
+				options={{ ...WHITE_SCREEN_OPTIONS, title: 'Notificações' }}
+			/>
+
+			<FinanceStack.Screen
+				component={SettingsNavigator}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="Settings"
+				options={WITHOUT_HEADER}
+			/>
+
+			<FinanceStack.Screen
+				component={ChatNavigator}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="Chat"
+				options={WITHOUT_HEADER}
+			/>
+
+			<FinanceStack.Screen
+				component={PlaceFormView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="PlaceForm"
+				options={{ title: 'Local do agendamento' }}
+			/>
+
+			<FinanceStack.Screen
+				component={PatientNavigator}
+				name="Patient"
+				options={{ title: 'Paciente', ...WITHOUT_HEADER }}
+			/>
+
+			<FinanceStack.Screen
+				component={AttendanceDutyConfigFormView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="AttendanceDutyConfigForm"
+				options={{ ...WHITE_SCREEN_OPTIONS, title: 'Término da repetição' }}
+			/>
+
+			<FinanceStack.Screen
+				component={AttendanceFormView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="AttendanceForm"
+				options={{ title: 'Novo evento' }}
+			/>
+
+			<FinanceStack.Screen
+				component={AttendanceDutyFormView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="AttendanceDutyForm"
+				options={{ title: 'Novo evento' }}
+			/>
+
+			<FinanceStack.Screen
+				component={AmigoPayNavigator}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="AmigoPayMenu"
+				options={{ ...WITHOUT_HEADER }}
+			/>
+
+			<FinanceStack.Screen
+				component={AmigoPayNavigator}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="AmigoPay"
+				options={{ ...WITHOUT_HEADER }}
+			/>
+
+			<FinanceStack.Screen
+				component={NfseEmissionView}
+				initialParams={TAB_BAR_HIDDEN_PARAMS}
+				name="NfseEmission"
+				options={{ title: 'Emitir nota fiscal', ...WHITE_SCREEN_OPTIONS }}
+			/>
+
+			<FinanceStack.Screen
+				component={AccountingSubscriptionView}
+				name="AccountingSubscription"
+				options={{ title: 'Amigo Contábil', ...WHITE_SCREEN_OPTIONS }}
+			/>
+		</FinanceStack.Navigator>
+	);
+};
+
+export default FinanceNavigator;

@@ -1,0 +1,5 @@
+Aqui a gente cria literalmente as telas, Mano, depois de ter feito tudo isso 
+eu to com medo da gente não puder usar pelo meu projeto ser para mobile, tipo,
+vamos lá a gente tem q fazer uma aplicacao web e esse aqui é de mobile, vou tentar
+ver com luiz pra pegar o deles, inclusive eles Não codam com react puro, eu vi muito
+html css e js na aplicacao deles tlgd
