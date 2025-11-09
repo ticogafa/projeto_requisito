@@ -1,5 +1,18 @@
-Aqui a gente cria literalmente as telas, Mano, depois de ter feito tudo isso 
+Aqui a gente cria literalmente as telas, Mano, depois de ter feito tudo isso
 eu to com medo da gente não puder usar pelo meu projeto ser para mobile, tipo,
 vamos lá a gente tem q fazer uma aplicacao web e esse aqui é de mobile, vou tentar
 ver com luiz pra pegar o deles, inclusive eles Não codam com react puro, eu vi muito
 html css e js na aplicacao deles tlgd
+
+vamo lá o que a gente faz, aqui a gente cria um arquivo, tipo, literalmente uma tela
+
+HOME
+
+depois de criar a HOME, a gente vai criar tudo que for da HOME dentro dessa pagina home
+tentando sempre deixar o minimo possivel de codigo dentro de um arquivo, para deixar o codigo
+mais facil
+
+tipo, se a gente tem q modificar um componente para ser usado nessa pagina somente,
+
+a gente cria tipo, dentro da HOME, um HOMEBOTTOMSHEET para asssim botar esse componente
+fazendo assim as pessoas que lerem o codigo conseguirem ler mais facil
