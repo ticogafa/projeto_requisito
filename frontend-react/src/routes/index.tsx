@@ -1,13 +1,11 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Pay from '../views/Pay/Pay';
-
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import ClientNavigator from '../navigators/ClientNavigator';
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Pay />} />
+        <Route path="/client/*" element={<ClientNavigator />} />
       </Routes>
     </BrowserRouter>
   );
