@@ -9,6 +9,9 @@ import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoRepositorio;
 
 /**
  * Serviço de domínio contendo as regras de negócio de Agendamento.
@@ -16,11 +19,26 @@ import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServ
 public class AgendamentoServico {
     private final AgendamentoRepositorio repositorio;
     private final ProfissionalServico profissionalServico;
+    private final ServicoOferecidoRepositorio servicoRepositorio;
 
-    public AgendamentoServico(AgendamentoRepositorio repositorio, ProfissionalServico profissionalRepositorio) {
+    public AgendamentoServico(
+            AgendamentoRepositorio repositorio, 
+            ProfissionalServico profissionalServico) {
         Validacoes.validarObjetoObrigatorio(repositorio, "O repositório");
         this.repositorio = repositorio;
-        this.profissionalServico = profissionalRepositorio;
+        this.profissionalServico = profissionalServico;
+        this.servicoRepositorio = null; // Opcional para manter compatibilidade
+    }
+
+    public AgendamentoServico(
+            AgendamentoRepositorio repositorio, 
+            ProfissionalServico profissionalServico,
+            ServicoOferecidoRepositorio servicoRepositorio) {
+        Validacoes.validarObjetoObrigatorio(repositorio, "O repositório");
+        Validacoes.validarObjetoObrigatorio(profissionalServico, "O serviço de profissional");
+        this.repositorio = repositorio;
+        this.profissionalServico = profissionalServico;
+        this.servicoRepositorio = servicoRepositorio;
     }
 
     /**
@@ -50,10 +68,20 @@ public class AgendamentoServico {
             );
         }
         
+        // Validar se o serviço está ativo (se repositório estiver disponível)
+        if (servicoRepositorio != null && agendamento.getServicoId() != null) {
+            validarServicoAtivo(agendamento.getServicoId());
+        }
+        
         // Se profissional não informado, buscar automaticamente
         if(agendamento.getProfissionalId() == null){
             Profissional profissional = profissionalServico.buscarPrimeiroProfissionalDisponivel(data, duracaoServicoMinutos);
             agendamento.setProfissional(profissional.getId());
+        }
+        
+        // Validar se o profissional está qualificado para o serviço (se repositório estiver disponível)
+        if (servicoRepositorio != null && agendamento.getProfissionalId() != null && agendamento.getServicoId() != null) {
+            validarProfissionalQualificado(agendamento.getProfissionalId(), agendamento.getServicoId());
         }
 
         // Verificar se existe conflito de horário
@@ -67,6 +95,41 @@ public class AgendamentoServico {
         }
         
         return repositorio.salvar(agendamento);
+    }
+
+    /**
+     * Valida se o serviço está ativo para agendamento.
+     * 
+     * @param servicoId ID do serviço a validar
+     * @throws IllegalStateException se o serviço estiver inativo
+     */
+    private void validarServicoAtivo(ServicoOferecidoId servicoId) {
+        if (!servicoRepositorio.isAtivo(servicoId.getValor())) {
+            throw new IllegalStateException("Serviço está inativo");
+        }
+    }
+
+    /**
+     * Valida se o profissional está qualificado para realizar o serviço.
+     * 
+     * @param profissionalId ID do profissional
+     * @param servicoId ID do serviço
+     * @throws IllegalStateException se o profissional não estiver qualificado
+     */
+    private void validarProfissionalQualificado(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
+        Profissional profissional = profissionalServico.buscarPorId(profissionalId);
+        ServicoOferecido servico = servicoRepositorio.buscarPorId(servicoId.getValor());
+        
+        if (profissional == null || servico == null) {
+            throw new IllegalArgumentException("Profissional ou serviço não encontrado");
+        }
+        
+        boolean qualificado = servicoRepositorio.estaQualificado(servico.getNome(), profissional.getNome());
+        if (!qualificado) {
+            throw new IllegalStateException(
+                "Profissional não está qualificado para este serviço"
+            );
+        }
     }
 
     public Agendamento buscarPorId(AgendamentoId id) {

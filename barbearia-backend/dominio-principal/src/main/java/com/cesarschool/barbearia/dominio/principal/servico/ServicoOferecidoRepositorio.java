@@ -12,4 +12,11 @@ public interface ServicoOferecidoRepositorio extends Repositorio<ServicoOferecid
     void salvarAssociacao(String nomeServico, String nomeProfissional);
 
     boolean estaQualificado(String nomeServico, String nomeProfissional);
+    
+    /**
+     * Verifica se um serviço está ativo.
+     * @param servicoId ID do serviço
+     * @return true se o serviço está ativo, false caso contrário
+     */
+    boolean isAtivo(Integer servicoId);
 }

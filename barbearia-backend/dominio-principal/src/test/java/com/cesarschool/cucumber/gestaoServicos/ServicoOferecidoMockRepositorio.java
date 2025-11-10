@@ -79,6 +79,13 @@ public class ServicoOferecidoMockRepositorio implements ServicoOferecidoReposito
         dados.remove(id);
     }
 
+    @Override
+    public boolean isAtivo(Integer servicoId) {
+        // Repositório mock para testes de gestão de serviços
+        // Assume que todos os serviços cadastrados estão ativos
+        return dados.containsKey(servicoId);
+    }
+
     public void limpar() {
         dados.clear();
         sequenciadorId.set(1);

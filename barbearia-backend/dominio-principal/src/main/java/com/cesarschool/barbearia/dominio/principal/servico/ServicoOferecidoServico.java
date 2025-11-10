@@ -3,14 +3,15 @@ package com.cesarschool.barbearia.dominio.principal.servico;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 
-import jakarta.transaction.Transactional;
-
-@Service
-@Transactional
+/**
+ * Domain Service para ServicoOferecido.
+ * Contém regras de negócio relacionadas a serviços oferecidos pela barbearia.
+ * 
+ * IMPORTANTE: Sem anotações de infraestrutura (@Service, @Transactional).
+ * A configuração de beans deve ser feita na camada de infraestrutura ou aplicação.
+ */
 public class ServicoOferecidoServico {
     
     private final ServicoOferecidoRepositorio repositorio;

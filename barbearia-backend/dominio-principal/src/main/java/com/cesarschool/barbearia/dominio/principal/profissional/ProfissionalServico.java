@@ -3,20 +3,20 @@ package com.cesarschool.barbearia.dominio.principal.profissional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
-import jakarta.transaction.Transactional;
-
-@Service
-@Transactional
+/**
+ * Domain Service para Profissional.
+ * Contém lógica de negócio que não pertence naturalmente a uma entidade.
+ * 
+ * IMPORTANTE: Sem anotações de infraestrutura (@Service, @Transactional, @Autowired).
+ * A configuração de beans deve ser feita na camada de infraestrutura ou aplicação.
+ */
 public class ProfissionalServico {
     
-    private @Autowired ProfissionalRepositorio repositorio;
+    private final ProfissionalRepositorio repositorio;
 
     public List<Profissional> buscarQualificadosParaServico(ServicoOferecidoId servicoId) {
         return repositorio.buscarQualificadosParaServico(servicoId);

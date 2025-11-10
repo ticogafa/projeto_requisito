@@ -118,5 +118,12 @@ class ServicoOferecidoJpaRepositorioImpl implements ServicoOferecidoRepositorio 
         return null;
     }
 
+    @Override
+    public boolean isAtivo(Integer servicoId) {
+        // TODO: Implementar lógica de verificação de status ativo
+        // Por enquanto, retorna true para não bloquear operações
+        return true;
+    }
+
     
 }

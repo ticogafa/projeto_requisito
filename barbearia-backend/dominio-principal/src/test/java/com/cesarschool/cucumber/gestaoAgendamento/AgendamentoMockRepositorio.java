@@ -27,17 +27,17 @@ public class AgendamentoMockRepositorio implements AgendamentoRepositorio {
     @Override
     public Agendamento salvar(Agendamento agendamento) {
         if (agendamento.getId() == null || !agendamentos.containsKey(agendamento.getId().getValor())) {
-            // Novo agendamento - gera ID
+            // Novo agendamento - gera ID usando o construtor completo
             Integer novoId = idGenerator.getAndIncrement();
-            Agendamento novo = Agendamento.builder()
-                .id(new AgendamentoId(novoId))
-                .dataHora(agendamento.getDataHora())
-                .status(agendamento.getStatus())
-                .clienteId(agendamento.getClienteId())
-                .profissionalId(agendamento.getProfissionalId())
-                .servicoId(agendamento.getServicoId())
-                .observacoes(agendamento.getObservacoes())
-                .build();
+            Agendamento novo = new Agendamento(
+                new AgendamentoId(novoId),
+                agendamento.getDataHora(),
+                agendamento.getStatus(),
+                agendamento.getClienteId(),
+                agendamento.getProfissionalId(),
+                agendamento.getServicoId(),
+                agendamento.getObservacoes()
+            );
             agendamentos.put(novoId, novo);
             return novo;
         } else {

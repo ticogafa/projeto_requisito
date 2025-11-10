@@ -82,9 +82,9 @@ public class GestaoAgendamentoTest {
         servicoRepositorio = new ServicoOferecidoMockRepositorio();
         clienteRepositorio = new ClienteMockRepositorio();
         
-        // Inicializar serviços reais
+        // Inicializar serviços reais - agora com servicoRepositorio para validações
         profissionalServico = new ProfissionalServico(profissionalRepositorio);
-        agendamentoServico = new AgendamentoServico(agendamentoRepositorio, profissionalServico);
+        agendamentoServico = new AgendamentoServico(agendamentoRepositorio, profissionalServico, servicoRepositorio);
         
         mensagemRetorno = "";
         operacaoSucesso = false;
@@ -313,14 +313,7 @@ public class GestaoAgendamentoTest {
             ServicoOferecidoId servicoEscolhido = obterServicoIdPorNome(nomeServico);
             ProfissionalId profissionalEscolhido = obterProfissionalIdPorNome(nomeProfissional);
 
-            if (!servicoRepositorio.isAtivo(servicoEscolhido.getValor())) {
-                throw new IllegalStateException("Serviço está inativo");
-            }
-
-            if (!servicoRepositorio.estaQualificado(nomeServico, nomeProfissional)) {
-                throw new IllegalStateException("Profissional não está qualificado para este serviço");
-            }
-
+            // As validações de serviço ativo e profissional qualificado agora são feitas pelo AgendamentoServico
             LocalDateTime horario = LocalDateTime.now().plusDays(1).withHour(14).withMinute(0);
             Agendamento agendamento = Agendamento.builder()
                 .dataHora(horario)
@@ -383,10 +376,23 @@ public class GestaoAgendamentoTest {
     @When("eu cancelo o agendamento")
     public void eu_cancelo_o_agendamento() {
         try {
+            // Verificar se o agendamento foi criado
+            if (agendamentoCriado == null) {
+                throw new IllegalStateException("Nenhum agendamento foi criado para cancelar");
+            }
+            if (agendamentoCriado.getId() == null) {
+                throw new IllegalStateException("Agendamento criado não possui ID");
+            }
+            
+            // Chama o método de cancelamento do serviço de domínio
+            agendamentoServico.cancelar(agendamentoCriado.getId(), adminSolicitante);
             operacaoSucesso = true;
+            mensagemRetorno = "Agendamento cancelado com sucesso";
         } catch (Exception e) {
             excecaoLancada = e;
+            setExcecaoCompartilhada(e);
             operacaoSucesso = false;
+            mensagemRetorno = "Erro ao cancelar: " + e.getMessage();
         }
     }
 
@@ -407,10 +413,7 @@ public class GestaoAgendamentoTest {
                 .observacoes("Agendamento serviço inativo")
                 .build();
             
-            if (!servicoRepositorio.isAtivo(maquiagemId.getValor())) {
-                throw new IllegalStateException("Serviço está inativo");
-            }
-            
+            // A validação de serviço ativo agora é feita pelo AgendamentoServico
             agendamentoCriado = agendamentoServico.criar(agendamento, 60);
             operacaoSucesso = true;
         } catch (IllegalStateException e) {
