@@ -1,9 +1,9 @@
 import type { AxiosError, AxiosResponse } from "axios";
-import AuthService from "./AuthService";
 import AuthStorage from "./AuthStorage";
+import MainService from "./MainService";
 
 
-const _AUTH_SERVICE: AuthService = new AuthService();
+const service = MainService.getInstance();
 
 /**
  * A class for manipulating the login.
@@ -31,6 +31,6 @@ export default class AuthController {
         AuthStorage.setIsLogged(true);
       } 
     };
-    _AUTH_SERVICE.signInUser(user, authSuccessCallback, errorCallback, finallyCallback);
+    service.signInUser(user, authSuccessCallback, errorCallback, finallyCallback);
   }
 }

@@ -18,6 +18,9 @@ public class ServicoOferecidoControlador {
 
     @RequestMapping("/listar/")
     public ResponseEntity<List<ServicoOferecido>> listarTodos() {
-        return ResponseEntity.ok(servico.listarTodos());
+        
+        return ResponseEntity
+        .()
+        .body(servico.listarTodos());
     }
 }

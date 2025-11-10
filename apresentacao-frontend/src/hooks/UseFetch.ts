@@ -14,7 +14,7 @@ export function useServicosOferecidos(params: object = {}, headers: object = {})
   const headersStr = JSON.stringify(headers);
 
   useEffect(() => {
-    const service = new MainService();
+    const service = MainService.getInstance();
     setLoading(true);
 
     const successCallback = (response: AxiosResponse) => {
