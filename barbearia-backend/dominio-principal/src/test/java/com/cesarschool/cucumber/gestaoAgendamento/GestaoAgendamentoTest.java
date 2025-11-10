@@ -1,11 +1,9 @@
 package com.cesarschool.cucumber.gestaoAgendamento;
 
+import static org.junit.Assert.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import com.cesarschool.barbearia.dominio.compartilhado.enums.TipoUsuario;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
@@ -125,19 +123,19 @@ public class GestaoAgendamentoTest {
         profissionalRepositorio.salvar(paulo);
         
         
-        ServicoOferecido corte = new ServicoOferecido(corteId, profissionalJoaoId, "Corte Masculino", BigDecimal.valueOf(30.0), "Corte tradicional", 60);
+        ServicoOferecido corte = new ServicoOferecido(corteId, "Corte Masculino", BigDecimal.valueOf(30.0), "Corte tradicional", 60);
         servicoRepositorio.salvar(corte);
         servicoRepositorio.definirAtivo(corteId.getValor(), true);
         
-        ServicoOferecido manicure = new ServicoOferecido(manicureId, profissionalPauloId, "Manicure", BigDecimal.valueOf(25.0), "Cuidados com unhas", 60);
+        ServicoOferecido manicure = new ServicoOferecido(manicureId, "Manicure", BigDecimal.valueOf(25.0), "Cuidados com unhas", 60);
         servicoRepositorio.salvar(manicure);
         servicoRepositorio.definirAtivo(manicureId.getValor(), true);
         
-        ServicoOferecido maquiagem = new ServicoOferecido(maquiagemId, profissionalPauloId, "Maquiagem", BigDecimal.valueOf(50.0), "Maquiagem profissional", 60);
+        ServicoOferecido maquiagem = new ServicoOferecido(maquiagemId, "Maquiagem", BigDecimal.valueOf(50.0), "Maquiagem profissional", 60);
         servicoRepositorio.salvar(maquiagem);
         servicoRepositorio.definirAtivo(maquiagemId.getValor(), false);
         
-        ServicoOferecido hidratacao = new ServicoOferecido(hidratacaoId, profissionalJoaoId, "Hidratação", BigDecimal.valueOf(40.0), "Hidratação capilar", 60);
+        ServicoOferecido hidratacao = new ServicoOferecido(hidratacaoId, "Hidratação", BigDecimal.valueOf(40.0), "Hidratação capilar", 60);
         servicoRepositorio.salvar(hidratacao);
         servicoRepositorio.definirAtivo(hidratacaoId.getValor(), true);
         

@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
-import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoRepositorio;
 
 /**
@@ -53,20 +50,6 @@ public class ServicoOferecidoMockRepositorio implements ServicoOferecidoReposito
             .filter(s -> s.getNome().equalsIgnoreCase(nome))
             .findFirst()
             .orElse(null);
-    }
-    
-    @Override
-    public List<ServicoOferecido> buscarPorProfissional(ProfissionalId profissionalId) {
-        return servicos.values().stream()
-            .filter(s -> s.getProfissionalId() != null && s.getProfissionalId().equals(profissionalId))
-            .collect(Collectors.toList());
-    }
-    
-    @Override
-    public List<ServicoOferecido> buscarAddOnDoServicoPrincipal(ServicoOferecidoId servicoPrincipalId) {
-        return servicos.values().stream()
-            .filter(s -> s.getServicoPrincipalId() != null && s.getServicoPrincipalId().equals(servicoPrincipalId))
-            .collect(Collectors.toList());
     }
     
     @Override

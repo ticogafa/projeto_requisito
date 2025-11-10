@@ -39,6 +39,8 @@ class JpaMapeador extends ModelMapper {
         configurarConversoresProduto();
         configurarConversoresMovimentacaoEstoque();
         configurarConversoresAgendamento();
+        configurarConversoresProfissional();
+        configurarConversoresServicos();
         configurarConversoresIds();
     }
     
@@ -175,19 +177,69 @@ class JpaMapeador extends ModelMapper {
             @Override
             protected ServicoOferecido convert(ServicoOferecidoJpa source) {
                 var id = source.getId() != null ? new ServicoOferecidoId(source.getId()) : null;
-                var profissionalId = new ProfissionalId(source.getProfissional().getId());
-                var servicoPrincipalId = source.getServicoPrincipal() != null ? 
-                    new ServicoOferecidoId(source.getServicoPrincipal().getId()) : null;
                 
-                return ServicoOferecido.builder()
-                    .id(id)
-                    .profissionalId(profissionalId)
+                return new ServicoOferecido(
+                    id,
+                    source.getNome(),
+                    source.getPreco(),
+                    source.getDescricao(),
+                    source.getDuracaoMinutos()
+                );
+            }
+        });
+        
+        addConverter(new AbstractConverter<ServicoOferecido, ServicoOferecidoJpa>() {
+            @Override
+            protected ServicoOferecidoJpa convert(ServicoOferecido source) {
+                var servicoJpa = new ServicoOferecidoJpa();
+                servicoJpa.setId(source.getId() != null ? source.getId().getValor() : null);
+                servicoJpa.setNome(source.getNome());
+                servicoJpa.setPreco(source.getPreco());
+                servicoJpa.setDescricao(source.getDescricao());
+                servicoJpa.setDuracaoMinutos(source.getDuracaoMinutos());
+                return servicoJpa;
+            }
+        });
+    }
+
+    // ==================== CONVERSORES DE PROFISSIONAL ====================
+    
+    private void configurarConversoresProfissional() {
+        // ProfissionalJpa -> Profissional
+        addConverter(new AbstractConverter<ProfissionalJpa, com.cesarschool.barbearia.dominio.principal.profissional.Profissional>() {
+            @Override
+            protected com.cesarschool.barbearia.dominio.principal.profissional.Profissional convert(ProfissionalJpa source) {
+                var id = source.getId() != null ? new ProfissionalId(source.getId()) : null;
+                var email = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email(source.getEmail());
+                var cpf = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf(source.getCpf());
+                var telefone = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone(source.getTelefone());
+                var agenda = new com.cesarschool.barbearia.dominio.principal.profissional.Agenda();
+                
+                return new com.cesarschool.barbearia.dominio.principal.profissional.Profissional(
+                    id,
+                    source.getNome(),
+                    email,
+                    cpf,
+                    telefone,
+                    agenda,
+                    source.getSenioridade(),
+                    source.isAtivo(),
+                    source.getMotivoInatividade()
+                );
+            }
+        });
+        
+        // Profissional -> ProfissionalJpa
+        addConverter(new AbstractConverter<com.cesarschool.barbearia.dominio.principal.profissional.Profissional, ProfissionalJpa>() {
+            @Override
+            protected ProfissionalJpa convert(com.cesarschool.barbearia.dominio.principal.profissional.Profissional source) {
+                return ProfissionalJpa.builder()
+                    .id(source.getId() != null ? source.getId().getValor() : null)
                     .nome(source.getNome())
-                    .preco(source.getPreco())
-                    .descricao(source.getDescricao())
-                    .duracaoMinutos(source.getDuracaoMinutos())
-                    .servicoPrincipalId(servicoPrincipalId)
-                    .intervaloLimpezaMinutos(source.getIntervaloLimpezaMinutos())
+                    .email(source.getEmail().getValue())
+                    .cpf(source.getCpf().getValue())
+                    .telefone(source.getTelefone().getValue())
+                    .senioridade(source.getSenioridade())
                     .ativo(source.isAtivo())
                     .motivoInatividade(source.getMotivoInatividade())
                     .build();

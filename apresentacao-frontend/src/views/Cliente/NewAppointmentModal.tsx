@@ -1,5 +1,8 @@
+import type { ServicosOferecidosResponse } from '@/interfaces/ServicoOferecidoInterface';
+
 interface NewAppointmentModalProps {
   visible: boolean;
+  servicos: ServicosOferecidosResponse;
   closeModal: () => void;
 }
 
@@ -53,56 +56,29 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
             <label className="block text-sm font-medium mb-2">Serviço *</label>
             <select
               id="appointmentService"
-              onChange={updateServiceInfo }
+              onChange={updateServiceInfo}
               required
               className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none"
             >
               <option value="">Selecione um serviço</option>
-              <option
-                value="corte_simples"
-                data-duration="30"
-                data-price="35.00"
-              >
-                Corte Simples - R$ 35,00 (30 min)
-              </option>
-              <option
-                value="corte_barba"
-                data-duration="50"
-                data-price="60.00"
-              >
-                Corte + Barba - R$ 60,00 (50 min)
-              </option>
-              <option value="barba" data-duration="25" data-price="30.00">
-                Barba Completa - R$ 30,00 (25 min)
-              </option>
-              <option
-                value="corte_social"
-                data-duration="40"
-                data-price="45.00"
-              >
-                Corte Social - R$ 45,00 (40 min)
-              </option>
-              <option
-                value="corte_infantil"
-                data-duration="25"
-                data-price="30.00"
-              >
-                Corte Infantil - R$ 30,00 (25 min)
-              </option>
-              <option
-                value="barba_express"
-                data-duration="15"
-                data-price="20.00"
-              >
-                Barba Express - R$ 20,00 (15 min)
-              </option>
+              {props.servicos.map((servico) => (
+                <option
+                  key={servico.id}
+                  value={servico.id}
+                  data-duration={servico.duracaoMinutos}
+                  data-price={servico.preco.toFixed(2)}
+                  data-nome={servico.nome}
+                >
+                  {servico.nome} - R$ {servico.preco.toFixed(2)} ({servico.duracaoMinutos} min)
+                </option>
+              ))}
             </select>
             <div id="serviceInfo" className="mt-2 text-sm text-gray-400 hidden">
               <div className="flex items-center gap-2">
                 <span className="material-icons text-xs">schedule</span>
-                <span
-                >Duração: <span id="serviceDuration"></span> minutos</span
-                >
+                <span>
+                  Duração: <span id="serviceDuration"></span> minutos
+                </span>
                 <span className="mx-2">•</span>
                 <span className="material-icons text-xs">payments</span>
                 <span>Valor: R$ <span id="servicePrice"></span></span>
@@ -127,13 +103,11 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
           </div>
 
           <div>
-            <label
-              className="block text-sm font-medium mb-2 flex items-center gap-2"
-            >
+            <label className="flex text-sm font-medium mb-2 items-center gap-2">
               Profissional
-              <span className="text-xs text-gray-400 font-normal"
-              >(opcional - sistema escolherá automaticamente)</span
-              >
+              <span className="text-xs text-gray-400 font-normal">
+                (opcional - sistema escolherá automaticamente)
+              </span>
             </label>
             <select
               id="appointmentProfessional"

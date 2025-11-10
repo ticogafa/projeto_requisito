@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
-import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 
 import jakarta.transaction.Transactional;
 
@@ -60,61 +59,13 @@ public class ServicoOferecidoServico {
         repositorio.salvarAssociacao(nomeServico, nomeProfissional);
     }
 
-    public ServicoOferecido definirAddOn(ServicoOferecidoId addOnId, ServicoOferecidoId principalId) {
-        Validacoes.validarObjetoObrigatorio(addOnId, "ID do Add-On");
-        Validacoes.validarObjetoObrigatorio(principalId, "ID do Serviço Principal");
-
-        ServicoOferecido addOn = buscarPorId(addOnId.getValor());
-        buscarPorId(principalId.getValor());
-
-        addOn.definirComoAddonDe(principalId);
-
-        return repositorio.salvar(addOn);
-    }
-    
-    public ServicoOferecido definirIntervaloLimpeza(Integer id, int intervaloMinutos) {
-        Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
-        
-        ServicoOferecido servico = buscarPorId(id);
-        servico.definirIntervaloLimpeza(intervaloMinutos);
-
-        return repositorio.salvar(servico);
-    }
-
-    public boolean podeSerAgendadoSozinho(ServicoOferecido servico) {
-        Validacoes.validarObjetoObrigatorio(servico, "O serviço");
-        return servico.getServicoPrincipalId() == null;
-    }
-
-    public List<ServicoOferecido> buscarPorProfissional(ProfissionalId profissionalId) {
-        Validacoes.validarObjetoObrigatorio(profissionalId, "ID do profissional");
-        return repositorio.buscarPorProfissional(profissionalId);
-    }
-
     public List<ServicoOferecido> listarTodos() {
         return repositorio.listarTodos();
-    }
-
-    public ServicoOferecido desativarServico(Integer id, String motivo) {
-        Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
-        Validacoes.validarStringObrigatoria(motivo, "Motivo da inatividade");
-
-        ServicoOferecido servico = buscarPorId(id);
-        servico.desativar(motivo);
-        
-        return repositorio.salvar(servico);
-    }
-
-    public List<ServicoOferecido> listarServicosAtivos() {
-        return repositorio.listarTodos().stream()
-                .filter(ServicoOferecido::isAtivo)
-                .toList();
     }
     
     public ServicoOferecido atualizar(Integer id, ServicoOferecido servico) {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
         Validacoes.validarObjetoObrigatorio(servico, "O serviço");
-        Validacoes.validarObjetoObrigatorio(servico.getProfissionalId(), "ID do profissional");
         Validacoes.validarStringObrigatoria(servico.getNome(), "Nome do serviço");
         Validacoes.validarTamanhoMinimoString(servico.getNome(), 3, "Nome do serviço");
         Validacoes.validarTamanhoMaximoString(servico.getNome(), 100, "Nome do serviço");

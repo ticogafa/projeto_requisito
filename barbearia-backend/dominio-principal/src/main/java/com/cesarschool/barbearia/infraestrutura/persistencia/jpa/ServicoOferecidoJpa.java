@@ -9,24 +9,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
-import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoRepositorio;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Entidade de domínio representando um serviço oferecido por um profissional.
+ * Entidade JPA representando um serviço oferecido pela barbearia.
  */
 @AllArgsConstructor
 @NoArgsConstructor
@@ -40,10 +36,6 @@ class ServicoOferecidoJpa {
     @Column(name = "ID")
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "PROFISSIONAL_ID", referencedColumnName = "ID")
-    private ProfissionalJpa profissional;
-
     @Column(name = "NOME", nullable = false, length = 100)
     private String nome;
 
@@ -56,33 +48,16 @@ class ServicoOferecidoJpa {
     @Column(name = "DURACAO_MINUTOS", nullable = false)
     private Integer duracaoMinutos;
 
-    @ManyToOne
-    @JoinColumn(name = "SERVICO_PRINCIPAL_ID", referencedColumnName = "ID")
-    private ServicoOferecidoJpa servicoPrincipal;
-
-    @Column(name = "INTERVALO_LIMPEZA_MINUTOS")
-    private Integer intervaloLimpezaMinutos;
-
-    @Column(name = "ATIVO", nullable = false)
-    private boolean ativo;
-
-    @Column(name = "MOTIVO_INATIVIDADE", length = 255)
-    private String motivoInatividade;
-
     public ServicoOferecidoJpa(
-            ProfissionalJpa profissional,
             String nome,
             BigDecimal preco,
             String descricao,
             Integer duracaoMinutos
         ) {
-        setProfissional(profissional);
         setNome(nome);
         setPreco(preco);
         setDescricao(descricao);
         setDuracaoMinutos(duracaoMinutos);
-        this.ativo = true;
-        this.motivoInatividade = null;
     }
 }
 
@@ -108,19 +83,7 @@ class ServicoOferecidoJpaRepositorioImpl implements ServicoOferecidoRepositorio 
     }
 
     @Override
-    public List<ServicoOferecido> buscarAddOnDoServicoPrincipal(ServicoOferecidoId servicoPrincipalId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public ServicoOferecido buscarPorNome(String nome) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<ServicoOferecido> buscarPorProfissional(ProfissionalId profissionalId) {
         // TODO Auto-generated method stub
         return null;
     }

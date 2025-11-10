@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
-import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoRepositorio;
@@ -27,12 +25,10 @@ public class ServicoOferecidoMockRepositorio implements ServicoOferecidoReposito
             
             ServicoOferecido servicoSalvo = new ServicoOferecido(
                 idGerado,
-                servico.getProfissionalId(),
                 servico.getNome(),
                 servico.getPreco(),
                 servico.getDescricao(),
-                servico.getDuracaoMinutos(),
-                servico.getServicoPrincipalId()
+                servico.getDuracaoMinutos()
             );
             
             dados.put(novoId, servicoSalvo);
@@ -62,20 +58,6 @@ public class ServicoOferecidoMockRepositorio implements ServicoOferecidoReposito
                 .filter(s -> s.getNome().equalsIgnoreCase(nome))
                 .findFirst()
                 .orElse(null); 
-    }
-    
-    @Override
-    public List<ServicoOferecido> buscarPorProfissional(ProfissionalId profissionalId) {
-        return listarTodos().stream()
-                .filter(s -> s.getProfissionalId().equals(profissionalId))
-                .toList();
-    }
-
-    @Override
-    public List<ServicoOferecido> buscarAddOnDoServicoPrincipal(ServicoOferecidoId servicoPrincipalId) {
-        return dados.values().stream()
-                .filter(s -> servicoPrincipalId.equals(s.getServicoPrincipalId()))
-                .collect(Collectors.toList());
     }
         
     @Override
