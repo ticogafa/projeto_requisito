@@ -1,4 +1,4 @@
-// hooks/useServicosOferecidos.ts
+/* eslint-disable react-hooks/exhaustive-deps */
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
@@ -9,6 +9,9 @@ import { useLoadingStore } from '../store/useLoadingStore';
 export function useServicosOferecidos(params: object = {}, headers: object = {}) {
   const [data, setData] = useState<AxiosResponse | null>(null);
   const { setLoading } = useLoadingStore();
+
+  const paramsStr = JSON.stringify(params);
+  const headersStr = JSON.stringify(headers);
 
   useEffect(() => {
     const service = new MainService();
@@ -33,7 +36,7 @@ export function useServicosOferecidos(params: object = {}, headers: object = {})
       errorCallback,
       finallyCallback
     );
-  }, [headers, params]);
+  }, [headersStr, paramsStr, setLoading]);
 
   return { data };
 }
