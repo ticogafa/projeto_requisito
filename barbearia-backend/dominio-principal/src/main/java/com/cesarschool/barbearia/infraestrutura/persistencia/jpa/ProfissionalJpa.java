@@ -3,21 +3,28 @@ package com.cesarschool.barbearia.infraestrutura.persistencia.jpa;
 import static jakarta.persistence.GenerationType.*;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepositorio;
 import com.cesarschool.barbearia.dominio.principal.profissional.Senioridade;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,10 +72,33 @@ public final class ProfissionalJpa {
 
     @Column(name = "MOTIVO_INATIVIDADE", length = 255)
     private String motivoInatividade; 
+
+    // Em ProfissionalJpa:
+    @ManyToMany
+    @JoinTable(
+        name = "profissional_servico",
+        joinColumns = @JoinColumn(name = "profissional_id"),
+        inverseJoinColumns = @JoinColumn(name = "servico_id")
+    )
+    private List<ServicoOferecidoJpa> servicosOferecidos;
 }
 
 interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integer> {
     ProfissionalJpa findByCpf(String cpf);
+    
+    /**
+     * Busca profissionais que oferecem um determinado serviço.
+     * @param servicoId ID do serviço
+     * @return Lista de profissionais qualificados
+     */
+    @Query("SELECT DISTINCT p FROM ProfissionalJpa p JOIN p.servicosOferecidos s WHERE s.id = :servicoId AND p.ativo = true")
+    List<ProfissionalJpa> findByServicoId(@Param("servicoId") Integer servicoId);
+    
+    /**
+     * Busca todos os profissionais ativos.
+     * @return Lista de profissionais ativos
+     */
+    List<ProfissionalJpa> findByAtivoTrue();
 }
 
 @Repository
@@ -76,6 +106,9 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
 
     @Autowired
     private ProfissionalJpaRepository profissionalJpaRepository;
+    
+    @Autowired
+    private ServicoOferecidoJpaRepository servicoOferecidoJpaRepository;
     
     @Autowired
     private JpaMapeador mapeador;
@@ -119,8 +152,75 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
     }
 
     @Override
+    public List<Profissional> buscarQualificadosParaServico(ServicoOferecidoId servicoId) {
+        List<ProfissionalJpa> profissionaisJpa = profissionalJpaRepository.findByServicoId(servicoId.getValor());
+        return profissionaisJpa.stream()
+            .map(jpa -> mapeador.map(jpa, Profissional.class))
+            .toList();
+    }
+
+    @Override
+    public List<Profissional> buscarDisponiveisNaDataHora(java.time.LocalDateTime dataHora, Integer duracaoMinutos) {
+        // Busca todos os profissionais ativos
+        List<ProfissionalJpa> profissionaisAtivos = profissionalJpaRepository.findByAtivoTrue();
+        
+        // Filtra por horário de trabalho
+        LocalTime horaInicio = dataHora.toLocalTime();
+        LocalTime horaFim = horaInicio.plusMinutes(duracaoMinutos);
+        
+        List<Profissional> disponiveis = new ArrayList<>();
+        
+        for (ProfissionalJpa jpa : profissionaisAtivos) {
+            // Verifica se o horário solicitado está dentro da jornada do profissional
+            boolean dentroDaJornada = 
+                !horaInicio.isBefore(jpa.getInicioJornada()) && 
+                !horaFim.isAfter(jpa.getFimJornada());
+            
+            if (dentroDaJornada) {
+                // TODO: Verificar agendamentos existentes para esse profissional nesse horário
+                // Por enquanto, assume que está disponível se estiver na jornada
+                disponiveis.add(mapeador.map(jpa, Profissional.class));
+            }
+        }
+        
+        return disponiveis;
+    }
+
+    @Override
     public Profissional buscarPrimeiroProfissionalDisponivel(java.time.LocalDateTime dataHora, int duracaoServicoMinutos) {
-        // TODO: Implementar lógica de disponibilidade
-        return null;
+        List<Profissional> disponiveis = buscarDisponiveisNaDataHora(dataHora, duracaoServicoMinutos);
+        return disponiveis.isEmpty() ? null : disponiveis.get(0);
+    }
+
+    @Override
+    public void adicionarQualificacao(Integer profissionalId, Integer servicoId) {
+        ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
+            .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
+        
+        ServicoOferecidoJpa servico = servicoOferecidoJpaRepository.findById(servicoId)
+            .orElseThrow(() -> new IllegalArgumentException("Serviço não encontrado: " + servicoId));
+        
+        if (!profissional.getServicosOferecidos().contains(servico)) {
+            profissional.getServicosOferecidos().add(servico);
+            profissionalJpaRepository.save(profissional);
+        }
+    }
+
+    @Override
+    public void removerQualificacao(Integer profissionalId, Integer servicoId) {
+        ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
+            .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
+        
+        profissional.getServicosOferecidos().removeIf(s -> s.getId().equals(servicoId));
+        profissionalJpaRepository.save(profissional);
+    }
+
+    @Override
+    public boolean estaQualificado(Integer profissionalId, Integer servicoId) {
+        ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
+            .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
+        
+        return profissional.getServicosOferecidos().stream()
+            .anyMatch(s -> s.getId().equals(servicoId));
     }
 }

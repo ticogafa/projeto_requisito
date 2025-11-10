@@ -41,4 +41,6 @@ public class ServicoOferecidoControlador {
         
         return ResponseEntity.ok(resumos);
     }
+
+    
 }

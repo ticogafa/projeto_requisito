@@ -3,11 +3,29 @@ package com.cesarschool.barbearia.dominio.principal.profissional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
 public class ProfissionalServico {
-    private final ProfissionalRepositorio repositorio;
+    
+    private @Autowired ProfissionalRepositorio repositorio;
+
+    public List<Profissional> buscarQualificadosParaServico(ServicoOferecidoId servicoId) {
+        return repositorio.buscarQualificadosParaServico(servicoId);
+    }
+
+    public List<Profissional> buscarDisponiveisNaDataHora(LocalDateTime dataHora, Integer duracaoMinutos) {
+        return repositorio.buscarDisponiveisNaDataHora(dataHora, duracaoMinutos);
+    }
+
 
     public ProfissionalServico(ProfissionalRepositorio repositorio) {
         Validacoes.validarObjetoObrigatorio(repositorio, "O repositório");

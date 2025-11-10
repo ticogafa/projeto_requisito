@@ -11,6 +11,7 @@ import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepositorio;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 
 /**
@@ -90,6 +91,34 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
         if (p != null) {
             cachePorCpf.remove(p.getCpf().toString());
         }
+    }
+    
+    @Override
+    public List<Profissional> buscarQualificadosParaServico(ServicoOferecidoId servicoId) {
+        // Mock: retorna todos os profissionais
+        return listarTodos();
+    }
+
+    @Override
+    public List<Profissional> buscarDisponiveisNaDataHora(LocalDateTime dataHora, Integer duracaoMinutos) {
+        // Mock: retorna todos os profissionais
+        return listarTodos();
+    }
+
+    @Override
+    public void adicionarQualificacao(Integer profissionalId, Integer servicoId) {
+        // Mock implementation - não faz nada
+    }
+
+    @Override
+    public void removerQualificacao(Integer profissionalId, Integer servicoId) {
+        // Mock implementation - não faz nada
+    }
+
+    @Override
+    public boolean estaQualificado(Integer profissionalId, Integer servicoId) {
+        // Mock implementation - sempre retorna true
+        return true;
     }
     
     // Métodos Auxiliares para Teste

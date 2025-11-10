@@ -2,6 +2,7 @@
 import { useServicosOferecidos } from '@/hooks/UseFetch';
 import NewAppointmentModal from '@/views/Cliente/NewAppointmentModal';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 export default function ClientView() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -9,6 +10,7 @@ export default function ClientView() {
 
   useEffect(() => {
     document.title = 'Página do Cliente';
+    toast.success('Bem-vindo Miguel!');
   }, []);
 
   return (
