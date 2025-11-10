@@ -2,13 +2,12 @@ import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, Resp
 import axios from 'axios';
 // import AxiosInterceptor from './AxiosInterceptor';
 
-
 export const HttpVerb = {
   POST: 'POST',
   GET: 'GET',
   PUT: 'PUT',
   DELETE: 'DELETE'
-}
+};
 
 export default class HttpClient {
   client: AxiosInstance;

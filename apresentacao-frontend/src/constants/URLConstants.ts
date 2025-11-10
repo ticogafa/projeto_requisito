@@ -1,11 +1,11 @@
 export const URLS_PREFIX = {
   API: '/api',
   AUTHENTICATION: '/auth',
-  SERVICO_OFERECIDO: '/servico-oferecido',
+  SERVICO_OFERECIDO: '/servico-oferecido'
 } as const;
 
 export const SERVICO_OFERECIDO_URLS = {
-  GET_ALL_SERVICOS_OFERECIDOS: `${URLS_PREFIX.SERVICO_OFERECIDO}/listar/`,
+  GET_ALL_SERVICOS_OFERECIDOS: `${URLS_PREFIX.SERVICO_OFERECIDO}/listar/`
 };
 
 export const AUTHENTICATION_URLS = {

@@ -1,11 +1,9 @@
 package com.cesarschool.barbearia.dominio.principal.servico;
 
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.*;
+
 import java.math.BigDecimal;
 
-import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarInteiroPositivo;
-import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio;
-import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarStringObrigatoria;
-import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarValorPositivo;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 
 import lombok.Builder;

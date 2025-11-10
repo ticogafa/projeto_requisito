@@ -7,5 +7,5 @@ interface LoadingStore {
 
 export const useLoadingStore = create<LoadingStore>((set) => ({
   isLoading: false,
-  setLoading: (value) => set({ isLoading: value }),
+  setLoading: (value) => set({ isLoading: value })
 }));

@@ -11,8 +11,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stylistic/eslint-plugin": "^5.5.0",
     "@tailwindcss/vite": "^4.1.17",
     "axios": "^1.13.2",
+    "eslint-plugin-tsdoc": "^0.4.0",
     "lucide-react": "^0.553.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

@@ -1,7 +1,6 @@
-import type { AxiosError, AxiosResponse } from "axios";
-import { AUTHENTICATION_URLS, SERVICO_OFERECIDO_URLS, URLS_PREFIX } from "../constants/URLConstants";
-import HttpClient from "./httpClient";
-
+import type { AxiosError, AxiosResponse } from 'axios';
+import { AUTHENTICATION_URLS, SERVICO_OFERECIDO_URLS, URLS_PREFIX } from '@/constants/URLConstants';
+import HttpClient from '@/services/httpClient';
 
 export default class MainService {
   client: HttpClient;
@@ -40,8 +39,8 @@ export default class MainService {
       finallyCallback
     );
   }
-    //TODO IMplementar esse metodo
-   /**
+  //TODO IMplementar esse metodo
+  /**
    * Signs in a user.
    *
    * @param data - The user's data

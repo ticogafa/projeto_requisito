@@ -1,8 +1,8 @@
 
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { TheLoading } from "./components/common/TheLoading";
-import { useLoadingStore } from "./store/useLoadingStore";
+import { TheLoading } from '@/components/common/TheLoading';
+import { useLoadingStore } from '@/store/useLoadingStore';
 
 export default function App() {
   const { isLoading } = useLoadingStore();
@@ -23,5 +23,5 @@ export default function App() {
       />
       <Outlet />
     </div>
-  )
+  );
 }

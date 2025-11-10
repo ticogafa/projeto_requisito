@@ -1,7 +1,7 @@
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios, { HttpStatusCode } from 'axios';
-import { AUTHENTICATION_URLS, URLS_PREFIX, URLS_TO_BE_IGNORED } from '../constants/URLConstants';
-import AuthStorage from './AuthStorage';
+import { AUTHENTICATION_URLS, URLS_PREFIX, URLS_TO_BE_IGNORED } from '@/constants/URLConstants';
+import AuthStorage from '@/services/AuthStorage';
 
 /**
  * Handles token expiration by refreshing them and manages request's header.
@@ -61,7 +61,6 @@ export default class AxiosInterceptor {
     const tokenData = { refresh: token };
     return axios.post(`${URLS_PREFIX.API}${AUTHENTICATION_URLS.REFRESH_TOKEN}`, tokenData);
   }
-
 
   /**
    * Inserts access token into request header.

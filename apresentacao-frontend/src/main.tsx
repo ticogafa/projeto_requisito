@@ -1,14 +1,14 @@
 import '@/index.css';
-import { StrictMode } from 'react';
+import router from '@/routers';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import router from './routers';
 
 export const root = document.getElementById('root');
 
 createRoot(root!).render(
-  <StrictMode>
+  <React.StrictMode>
     <RouterProvider router={router}/>
-  </StrictMode>,
+  </React.StrictMode>
 );

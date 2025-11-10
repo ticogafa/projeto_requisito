@@ -1,7 +1,6 @@
-import type { AxiosError, AxiosResponse } from "axios";
-import AuthStorage from "./AuthStorage";
-import MainService from "./MainService";
-
+import type { AxiosError, AxiosResponse } from 'axios';
+import AuthStorage from '@/services/AuthStorage';
+import MainService from '@/services/MainService';
 
 const service = MainService.getInstance();
 
@@ -24,12 +23,12 @@ export default class AuthController {
     finallyCallback: () => void
   ): void {
     const authSuccessCallback = (response: AxiosResponse): void => {
-      if (successCallback){
+      if (successCallback) {
         successCallback(response);
         AuthStorage.setAccessToken(response.data.access);
         AuthStorage.setRefreshToken(response.data.refresh);
         AuthStorage.setIsLogged(true);
-      } 
+      }
     };
     service.signInUser(user, authSuccessCallback, errorCallback, finallyCallback);
   }

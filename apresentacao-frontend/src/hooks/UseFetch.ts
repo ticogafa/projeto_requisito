@@ -3,8 +3,8 @@ import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import MainService from '../services/MainService';
-import { useLoadingStore } from '../store/useLoadingStore';
+import MainService from '@/services/MainService';
+import { useLoadingStore } from '@/store/useLoadingStore';
 
 export function useServicosOferecidos(params: object = {}, headers: object = {}) {
   const [data, setData] = useState<AxiosResponse | null>(null);
@@ -26,7 +26,7 @@ export function useServicosOferecidos(params: object = {}, headers: object = {})
     };
 
     const finallyCallback = () => {
-    setLoading(false);
+      setLoading(false);
     };
 
     service.getServicosOferecidos(

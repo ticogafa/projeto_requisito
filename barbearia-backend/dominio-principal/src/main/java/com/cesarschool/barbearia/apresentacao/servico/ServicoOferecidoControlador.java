@@ -20,7 +20,7 @@ public class ServicoOferecidoControlador {
     public ResponseEntity<List<ServicoOferecido>> listarTodos() {
         
         return ResponseEntity
-        .()
+        .badRequest()
         .body(servico.listarTodos());
     }
 }

@@ -1,13 +1,14 @@
 // import { useState } from "react";
-import { useState } from "react";
-import { useServicosOferecidos } from "../../hooks/UseFetch";
-import NewAppointmentModal from "./NewAppointmentModal";
+import { useServicosOferecidos } from '@/hooks/UseFetch';
+import { useEffect, useState } from 'react';
+import NewAppointmentModal from '@/views/Cliente/NewAppointmentModal';
 
 export default function ClientView() {
   const [modalVisible, setModalVisible] = useState(false);
   const data = useServicosOferecidos();
   console.log(data);
-  
+  useEffect(() => {document.title = 'Página do Cliente';}, []);
+
   return (
     <div className="min-h-screen">
       <NewAppointmentModal
