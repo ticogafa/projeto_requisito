@@ -79,6 +79,11 @@ public final class Profissional {
         this.telefone = telefone;
     }
 
+    public void setAgenda(Agenda agenda) {
+        validarObjetoObrigatorio(agenda, "Agenda");
+        this.agenda = agenda;
+    }
+
     public void setSenioridade(Senioridade senioridade) {
         validarObjetoObrigatorio(senioridade, "Senioridade");
         this.senioridade = senioridade;

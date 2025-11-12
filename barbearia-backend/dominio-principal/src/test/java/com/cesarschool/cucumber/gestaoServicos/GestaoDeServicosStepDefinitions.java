@@ -186,8 +186,10 @@ public class GestaoDeServicosStepDefinitions {
 
     @Then("o sistema salva o intervalo corretamente")
     public void o_sistema_salva_o_intervalo_corretamente() {
-        // Não aplicável mais - servicos não têm intervaloLimpezaMinutos
-        // Funcionalidade removida do domínio
+        Assertions.assertNotNull(servicoExistente);
+        ServicoOferecido servicoPersistido = repositorioMock.buscarPorIdOptional(
+            servicoExistente.getId().getValor()).orElse(null);
+        Assertions.assertNotNull(servicoPersistido);
     }
 
     @Then("o sistema irá rejeitar a operação")

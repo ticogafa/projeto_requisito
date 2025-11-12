@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
+import com.cesarschool.barbearia.dominio.principal.profissional.Agenda;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
 import com.cesarschool.barbearia.dominio.principal.profissional.Senioridade;
@@ -26,14 +27,15 @@ public class GestaoDeProfissionaisStepDefinitions {
     private Map<String, Profissional> profissionalCache = new HashMap<>();
     private int indiceProfissional;
     
-    // Campo estático para compartilhar exceções entre classes de teste
+    private String tipoUsuarioLogado = "ADMIN"; 
+
     private static Exception excecaoCompartilhada;
     
     public static void setExcecaoCompartilhada(Exception excecao) {
         excecaoCompartilhada = excecao;
     }
 
-        @Before
+    @Before
     public void setup() {
         long timestamp = System.currentTimeMillis();
         long nanoTime = System.nanoTime();
@@ -45,6 +47,8 @@ public class GestaoDeProfissionaisStepDefinitions {
         this.excecaoCapturada = null;
         this.profissionalCache.clear();
         this.foiCadastradoComNivelEspecifico = false;
+        
+        this.tipoUsuarioLogado = "ADMIN";
     }
     
     private Cpf gerarCpfValido(int indice) {
@@ -80,7 +84,7 @@ public class GestaoDeProfissionaisStepDefinitions {
         Email email = new Email(nomeEmail + indice + "@barbearia.com");
         Telefone telefone = new Telefone("819" + String.format("%08d", indice));
         Profissional novo = new Profissional(nome, email, cpf, telefone);
-        return novo; // Retorna o profissional sem salvar
+        return novo; 
     }
 
     @Given("que eu cadastro um novo profissional chamado {string}")
@@ -99,17 +103,27 @@ public class GestaoDeProfissionaisStepDefinitions {
         int jornadaHoras = profissionalAtual.getAgenda().calcularJornadaHoras();
         Assertions.assertEquals(horasEsperadas.intValue(), jornadaHoras);
     }
-
    
     
     @Given("que sou um usuário não administrador")
     public void queSouUmUsuárioNãoAdministrador() {
+        this.tipoUsuarioLogado = "CLIENTE";
+        Profissional p = criarProfissionalGenerico("ProfissionalAlvoJornada");
+        this.profissionalAtual = profissionalServico.registrarNovo(p, Senioridade.JUNIOR);
     }
 
     @When("eu tento configurar a jornada de trabalho de um profissional")
     public void euTentoConfigurarAJornadaDeTrabalhoDeUmProfissional() {
         try {
-            throw new IllegalArgumentException("Acesso negado: apenas administradores podem configurar a jornada.");
+            Assertions.assertNotNull(profissionalAtual, "O profissional não foi criado no step Given");
+            Assertions.assertNotNull(profissionalAtual.getId(), "O profissional não foi salvo e não tem ID");
+            Agenda jornadaFicticia = new Agenda(); 
+            profissionalServico.configurarJornada(
+                profissionalAtual.getId(), 
+                jornadaFicticia, 
+                this.tipoUsuarioLogado
+            );
+
         } catch (Exception e) {
             excecaoCapturada = e;
         }
@@ -118,6 +132,7 @@ public class GestaoDeProfissionaisStepDefinitions {
 
     @Given("que sou um administrador logado")
     public void queSouUmAdministradorLogado() {
+        this.tipoUsuarioLogado = "ADMIN";
     }
 
     private boolean foiCadastradoComNivelEspecifico = false;
@@ -139,14 +154,13 @@ public class GestaoDeProfissionaisStepDefinitions {
     @Then("o sistema responde com sucesso")
     public void oSistemaRespondeComSucesso() {
         Assertions.assertNull(excecaoCapturada, "Nenhuma exceção deveria ter sido lançada.");
+        Assertions.assertNotNull(profissionalAtual, "Profissional não deveria ser nulo.");
         Assertions.assertNotNull(profissionalAtual.getId(), "O ID do profissional não deveria ser nulo.");
         
-        // Só verifica senioridade se foi cadastrado com nível específico
         if (foiCadastradoComNivelEspecifico) {
             Assertions.assertNotEquals(Senioridade.JUNIOR, profissionalAtual.getSenioridade(), "A senioridade JUNIOR deveria ter sido sobrescrita.");
         }
     }
-    
     
     @When("eu tento cadastrar um novo profissional com nível {string}")
     public void euTentoCadastrarUmNovoProfissionalComNível(String nivelSenioridade) {
@@ -164,15 +178,13 @@ public class GestaoDeProfissionaisStepDefinitions {
     @Given("que o profissional {string} possui o serviço {string} com agendamentos ativos")
     public void queOProfissionalPossuiOServiçoComAgendamentosAtivos(String nomeProfissional, String nomeServico) {
         repositorioMock.simularAgendamentoAtivo(nomeServico, true);
+        repositorioMock.salvarAssociacaoServico(nomeProfissional, nomeServico);
     }
     
     @When("eu tento remover o serviço {string}")
-    public void euTentoRemoverOServiço(String nomeServico) {
+    public void euTentoRemoverOServiço(String nomeServico, String nomeProfissional) {
         try {
-            if (repositorioMock.temAgendamentoAtivo(nomeServico)) {
-                throw new IllegalStateException("Não é possível remover serviço com agendamentos ativos.");
-            }
-            repositorioMock.removerAssociacaoServico(profissionalAtual.getNome(), nomeServico);
+            profissionalServico.removerServico(nomeProfissional, nomeServico);
         } catch (IllegalStateException e) {
             excecaoCapturada = e;
         }
@@ -180,7 +192,6 @@ public class GestaoDeProfissionaisStepDefinitions {
 
     @Then("o sistema vai rejeitar a operação")
     public void oSistemaVaiRejeitarAOperação() {
-        // Verificar primeiro a exceção local, depois a compartilhada
         Exception excecaoParaTeste = excecaoCapturada != null ? excecaoCapturada : excecaoCompartilhada;
         
         Assertions.assertNotNull(excecaoParaTeste, "Era esperada uma exceção para rejeitar a operação.");

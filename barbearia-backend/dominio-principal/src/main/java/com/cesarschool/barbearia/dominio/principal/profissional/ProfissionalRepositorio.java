@@ -49,4 +49,8 @@ public interface ProfissionalRepositorio extends Repositorio<Profissional, Integ
      * @return true se estiver qualificado
      */
     boolean estaQualificado(Integer profissionalId, Integer servicoId);
+
+    boolean temAgendamentoAtivo(String nomeServico);
+    boolean possuiAssociacaoServico(String nomeProfissional, String nomeServico);
+    void removerAssociacaoServico(String nomeProfissional, String nomeServico);
 }

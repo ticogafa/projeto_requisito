@@ -61,7 +61,11 @@ public class ProfissionalServico {
 
     public Profissional buscarPorId(ProfissionalId id) {
         Validacoes.validarObjetoObrigatorio(id, "O ID");
-        return repositorio.buscarPorId(id.getValor());
+        Profissional p = repositorio.buscarPorId(id.getValor());
+        if (p == null) {
+            throw new IllegalArgumentException("Profissional não encontrado com ID: " + id.getValor());
+        }
+        return p;
     }
 
     public Profissional buscarPorCpf(Cpf cpf) {
@@ -101,4 +105,33 @@ public class ProfissionalServico {
         return repositorio.salvar(profissional);
     }
 
+    public void removerServico(String nomeProfissional, String nomeServico) {
+        if (!repositorio.possuiAssociacaoServico(nomeProfissional, nomeServico)) {
+            return; 
+        }
+
+        boolean temAgendamento = this.repositorio.temAgendamentoAtivo(nomeServico);
+
+        if (temAgendamento) {
+            throw new IllegalStateException("Não é possível remover serviço com agendamentos ativos.");
+        }
+        
+        this.repositorio.removerAssociacaoServico(nomeProfissional, nomeServico);
+    }
+
+    /**
+     * Configura a jornada de trabalho de um profissional.
+     * Implementação completa.
+     * * @param profissionalId O ID do profissional a ser alterado.
+     * @param novaJornada O novo objeto de Agenda.
+     * @param tipoUsuarioLogado O tipo de usuário tentando a ação.
+     */
+    public void configurarJornada(ProfissionalId profissionalId, Agenda novaJornada, String tipoUsuarioLogado) {
+        if (tipoUsuarioLogado == null || !tipoUsuarioLogado.equals("ADMIN")) {
+            throw new IllegalArgumentException("Acesso negado: apenas administradores podem configurar a jornada.");
+        }
+        Profissional profissional = buscarPorId(profissionalId);
+        profissional.setAgenda(novaJornada);  
+        repositorio.salvar(profissional);
+    }
 }
