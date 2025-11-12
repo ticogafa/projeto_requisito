@@ -81,9 +81,11 @@ public class ServicoOferecidoMockRepositorio implements ServicoOferecidoReposito
 
     @Override
     public boolean isAtivo(Integer servicoId) {
-        // Repositório mock para testes de gestão de serviços
-        // Assume que todos os serviços cadastrados estão ativos
-        return dados.containsKey(servicoId);
+        ServicoOferecido servico = dados.get(servicoId);
+        if (servico == null) {
+            return false; 
+        }
+        return servico.isAtivo();
     }
 
     public void limpar() {

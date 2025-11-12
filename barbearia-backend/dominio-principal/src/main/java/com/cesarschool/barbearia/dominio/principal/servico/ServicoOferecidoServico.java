@@ -8,9 +8,6 @@ import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 /**
  * Domain Service para ServicoOferecido.
  * Contém regras de negócio relacionadas a serviços oferecidos pela barbearia.
- * 
- * IMPORTANTE: Sem anotações de infraestrutura (@Service, @Transactional).
- * A configuração de beans deve ser feita na camada de infraestrutura ou aplicação.
  */
 public class ServicoOferecidoServico {
     
@@ -118,5 +115,20 @@ public class ServicoOferecidoServico {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
         buscarPorId(id); 
         repositorio.remover(id);
+    }
+
+    public ServicoOferecido desativar(Integer id, String motivo) {
+        Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
+        Validacoes.validarStringObrigatoria(motivo, "Motivo da inatividade");
+        ServicoOferecido servico = buscarPorId(id);
+        servico.desativar(motivo);
+
+        return repositorio.salvar(servico);
+    }
+
+    public boolean isAtivo(Integer id) {
+        Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
+
+        return repositorio.isAtivo(id);
     }
 }

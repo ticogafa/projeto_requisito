@@ -1,21 +1,23 @@
 package com.cesarschool.barbearia.dominio.principal.servico;
 
-import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.*;
-
 import java.math.BigDecimal;
 
-import lombok.Builder;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarInteiroPositivo;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarStringObrigatoria;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarValorPositivo;
 
 /**
  * Entidade de domínio representando um serviço oferecido pela barbearia.
  */
-@Builder
 public final class ServicoOferecido {
     private ServicoOferecidoId id;
     private String nome;
     private BigDecimal preco;
     private String descricao;
     private Integer duracaoMinutos;
+    private boolean ativo;
+    private String motivoInatividade;    
 
     public ServicoOferecido(
             String nome,
@@ -26,6 +28,8 @@ public final class ServicoOferecido {
         setPreco(preco);
         setDescricao(descricao);
         setDuracaoMinutos(duracaoMinutos);
+        this.ativo = true;
+        this.motivoInatividade = null;
     }
     
     public ServicoOferecido(
@@ -38,7 +42,7 @@ public final class ServicoOferecido {
         setId(id);
     }
     
-    //Setters
+
     public void setId(ServicoOferecidoId id) {
         validarObjetoObrigatorio(id, "ID");
         this.id = id;
@@ -74,7 +78,7 @@ public final class ServicoOferecido {
         this.duracaoMinutos = duracaoMinutos;
     }
 
-    // Métodos de negócio
+    
     public void atualizarPreco(BigDecimal novoPreco) {
         setPreco(novoPreco);
     }
@@ -83,10 +87,22 @@ public final class ServicoOferecido {
         setDuracaoMinutos(novaDuracao);
     }
     
-    // Getters
+    public void desativar(String motivo) {
+        validarStringObrigatoria(motivo, "Motivo da inatividade");
+        this.ativo = false;
+        this.motivoInatividade = motivo;
+    }
+    
+    public void reativar() {
+        this.ativo = true;
+        this.motivoInatividade = null;
+    }
+
     public ServicoOferecidoId getId() { return id; }
     public String getNome() { return nome; }
     public BigDecimal getPreco() { return preco; }
     public String getDescricao() { return descricao; }
     public Integer getDuracaoMinutos() { return duracaoMinutos; }
+    public boolean isAtivo() { return ativo; }
+    public String getMotivoInatividade() { return motivoInatividade; }
 }

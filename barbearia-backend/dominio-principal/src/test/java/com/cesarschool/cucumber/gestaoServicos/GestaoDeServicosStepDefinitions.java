@@ -24,6 +24,12 @@ public class GestaoDeServicosStepDefinitions {
     private Exception excecaoCapturada; 
     private Map<String, ServicoOferecido> servicosCache = new HashMap<>();
 
+    private Integer duracaoAtual;
+    private BigDecimal precoAtual;
+    private String nomeProfissionalAtual;
+    private String nomeServicoAtual;
+
+
     @Before
     public void setup() {
         this.repositorioMock = new ServicoOferecidoMockRepositorio();
@@ -34,6 +40,10 @@ public class GestaoDeServicosStepDefinitions {
         this.servicoExistente = null; 
         this.excecaoCapturada = null;
         this.servicosCache.clear();
+        this.duracaoAtual = null;
+        this.precoAtual = null;
+        this.nomeProfissionalAtual = null;
+        this.nomeServicoAtual = null;
     }
 
     @Given("que não existe um serviço chamado {string}")
@@ -55,6 +65,7 @@ public class GestaoDeServicosStepDefinitions {
 
     @Then("o serviço é criado com sucesso")
     public void o_servico_e_criado_com_sucesso() {
+        Assertions.assertNull(excecaoCapturada, "Nenhuma exceção era esperada");
         Assertions.assertNotNull(servicoCriado);
         Assertions.assertNotNull(servicoCriado.getId());
         ServicoOferecido servicoPersistido = repositorioMock.buscarPorIdOptional(
@@ -90,13 +101,6 @@ public class GestaoDeServicosStepDefinitions {
         }
     }
 
-    @Then("o sistema salva a dependência corretamente")
-    public void o_sistema_salva_a_dependencia_corretamente() {
-        Assertions.assertNotNull(servicoCriado);
-        // Não aplicável mais - servico não tem servicoPrincipalId
-        // Relacionamento add-on deve ser modelado em entidade separada
-    }
-
     @Given("que existe um serviço chamado {string}")
     public void que_existe_um_servico_chamado(String nomeServico) {
         ServicoOferecido servicoParaAtualizar = new ServicoOferecido(
@@ -112,11 +116,12 @@ public class GestaoDeServicosStepDefinitions {
 
     @When("eu altero a duração para {string} e o preço para {string}")
     public void eu_altero_a_duracao_para_e_o_preco_para(String duracao, String preco) {
-        Integer novaDuracao = Integer.parseInt(duracao);
-        BigDecimal novoPreco = new BigDecimal(preco);
+        this.duracaoAtual = Integer.parseInt(duracao);
+        this.precoAtual = new BigDecimal(preco);
+        
         try {
-            servicoExistente = servicoOferecidoServico.atualizarDuracao(servicoExistente.getId().getValor(), novaDuracao);
-            servicoExistente = servicoOferecidoServico.atualizarPreco(servicoExistente.getId().getValor(), novoPreco);
+            servicoExistente = servicoOferecidoServico.atualizarDuracao(servicoExistente.getId().getValor(), this.duracaoAtual);
+            servicoExistente = servicoOferecidoServico.atualizarPreco(servicoExistente.getId().getValor(), this.precoAtual);
         } catch (Exception e) {
             excecaoCapturada = e;
         }
@@ -124,54 +129,13 @@ public class GestaoDeServicosStepDefinitions {
 
     @Then("o sistema salva as alterações com sucesso")
     public void o_sistema_salva_as_alteracoes_com_sucesso() {
+        Assertions.assertNull(excecaoCapturada, "Nenhuma exceção era esperada");
         Assertions.assertNotNull(servicoExistente);
         ServicoOferecido servicoPersistido = repositorioMock.buscarPorIdOptional(
             servicoExistente.getId().getValor()).orElse(null);
         Assertions.assertNotNull(servicoPersistido);
-        Assertions.assertEquals(60, servicoPersistido.getDuracaoMinutos());
-        Assertions.assertEquals(new BigDecimal("70.00"), servicoPersistido.getPreco());
-    }
-
-    @Given("que existe um serviço chamado {string} ativo")
-    public void que_existe_um_serviço_chamado_ativo(String nomeServico) {
-        servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
-            ServicoOferecido s = new ServicoOferecido(n, new BigDecimal("80.00"), "Serviço", 60);
-            return repositorioMock.salvar(s);
-        });
-        // isAtivo() não existe mais - servicos estão sempre ativos no catálogo
-        // Disponibilidade deve ser controlada de outra forma
-    }
-
-    @When("eu desativo o serviço por motivo de {string}")
-    public void eu_desativo_o_serviço_por_motivo_de(String motivo) {
-        // Não aplicável mais - servicos não têm flag de ativo/inativo
-        // Funcionalidade removida do domínio
-        excecaoCapturada = new UnsupportedOperationException("Desativação de serviços não é mais suportada");
-    }
-
-    @Then("o serviço aparece como {string} na lista de opções para agendamento")
-    public void o_serviço_aparece_como_na_lista_de_opções_para_agendamento(String statusEsperado) {
-        // Não aplicável mais - servicos não têm status ativo/inativo
-        // Teste precisa ser redesenhado para nova arquitetura
-    }
-
-    @Given("que o serviço {string} está inativo por {string}")
-    public void que_o_serviço_está_inativo_por(String nomeServico, String motivo) {
-        servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
-            ServicoOferecido s = new ServicoOferecido(n, new BigDecimal("80.00"), "Serviço", 60);
-            return repositorioMock.salvar(s);
-        });
-        // Não aplicável mais - servicos não têm status ativo/inativo
-        // Funcionalidade removida do domínio
-    }
-
-    @When("o cliente acessa as opções de agendamento")
-    public void o_cliente_acessa_as_opções_de_agendamento() {}
-
-    @Then("o sistema não exibe o serviço {string} na lista")
-    public void o_sistema_nao_exibe_o_serviço_na_lista(String nomeServicoInativo) {
-        // Não aplicável mais - servicos não têm status ativo/inativo
-        // Todos os servicos do catálogo são sempre listados
+        Assertions.assertEquals(this.duracaoAtual, servicoPersistido.getDuracaoMinutos());
+        Assertions.assertEquals(0, this.precoAtual.compareTo(servicoPersistido.getPreco()));
     }
 
     @When("eu tento alterar a duração para um valor negativo")
@@ -184,21 +148,74 @@ public class GestaoDeServicosStepDefinitions {
         }
     }
 
-    @Then("o sistema salva o intervalo corretamente")
-    public void o_sistema_salva_o_intervalo_corretamente() {
-        Assertions.assertNotNull(servicoExistente);
-        ServicoOferecido servicoPersistido = repositorioMock.buscarPorIdOptional(
-            servicoExistente.getId().getValor()).orElse(null);
-        Assertions.assertNotNull(servicoPersistido);
-    }
-
     @Then("o sistema irá rejeitar a operação")
     public void oSistemaIráRejeitarAOperação() {     
-        Assertions.assertNotNull(excecaoCapturada);
+        Assertions.assertNotNull(excecaoCapturada, "Uma exceção era esperada, mas nada foi capturado.");
         Assertions.assertTrue(excecaoCapturada instanceof IllegalArgumentException);
     }
 
-     @Given("que existe o profissional {string} qualificado para {string}")
+    @Given("que existe um serviço chamado {string} ativo")
+    public void que_existe_um_serviço_chamado_ativo(String nomeServico) {
+        servicoExistente = new ServicoOferecido(nomeServico, new BigDecimal("80.00"), "Serviço", 60);
+        servicoExistente = repositorioMock.salvar(servicoExistente);
+        servicosCache.put(nomeServico, servicoExistente);
+        
+        boolean estaAtivo = servicoOferecidoServico.isAtivo(servicoExistente.getId().getValor());
+        Assertions.assertTrue(estaAtivo, "O serviço deveria ter sido criado como ativo.");
+    }
+
+    @When("eu desativo o serviço por motivo de {string}")
+    public void eu_desativo_o_serviço_por_motivo_de(String motivo) {
+        try {
+            servicoExistente = servicoOferecidoServico.desativar(servicoExistente.getId().getValor(), motivo);
+        } catch (Exception e) {
+            excecaoCapturada = e;
+        }
+    }
+
+    @Then("o serviço aparece como {string} na lista de opções para agendamento")
+    public void o_serviço_aparece_como_na_lista_de_opções_para_agendamento(String statusEsperado) {
+        Assertions.assertNull(excecaoCapturada, "Nenhuma exceção era esperada ao desativar.");
+        boolean estaAtivo = servicoOferecidoServico.isAtivo(servicoExistente.getId().getValor());
+        if (statusEsperado.equalsIgnoreCase("Inativo")) {
+            Assertions.assertFalse(estaAtivo, "O serviço deveria estar Inativo.");
+        } else if (statusEsperado.equalsIgnoreCase("Ativo")) {
+            Assertions.assertTrue(estaAtivo, "O serviço deveria estar Ativo.");
+        } else {
+            Assertions.fail("Status esperado desconhecido: " + statusEsperado);
+        }
+        
+        ServicoOferecido servicoPersistido = repositorioMock.buscarPorId(servicoExistente.getId().getValor());
+        if (!estaAtivo) {
+            Assertions.assertNotNull(servicoPersistido.getMotivoInatividade());
+        }
+    }
+
+    @Given("que o serviço {string} está inativo por {string}")
+    public void que_o_serviço_está_inativo_por(String nomeServico, String motivo) {
+        servicoExistente = new ServicoOferecido(nomeServico, new BigDecimal("80.00"), "Serviço", 60);
+        servicoExistente = repositorioMock.salvar(servicoExistente);
+        servicoExistente = servicoOferecidoServico.desativar(servicoExistente.getId().getValor(), motivo);
+        servicosCache.put(nomeServico, servicoExistente);
+
+        boolean estaAtivo = servicoOferecidoServico.isAtivo(servicoExistente.getId().getValor());
+        Assertions.assertFalse(estaAtivo, "O serviço deveria estar inativo para este cenário.");
+    }
+
+    @When("o cliente acessa as opções de agendamento")
+    public void o_cliente_acessa_as_opções_de_agendamento() {
+        
+    }
+
+    @Then("o sistema não exibe o serviço {string} na lista")
+    public void o_sistema_nao_exibe_o_serviço_na_lista(String nomeServicoInativo) {
+        ServicoOferecido servico = repositorioMock.buscarPorNome(nomeServicoInativo);
+        Assertions.assertNotNull(servico, "Serviço deveria existir no mock.");
+        boolean estaAtivo = servicoOferecidoServico.isAtivo(servico.getId().getValor());
+        Assertions.assertFalse(estaAtivo, "O serviço inativo não deveria ser exibido (assumindo que a lista é filtrada).");
+    }
+
+    @Given("que existe o profissional {string} qualificado para {string}")
     public void que_existe_o_profissional_qualificado_para(String nomeProfissional, String nomeServico) {
         servicoExistente = servicosCache.computeIfAbsent(nomeServico, n -> {
             ServicoOferecido s = new ServicoOferecido(n, new BigDecimal("80.00"), "Serviço", 60);
@@ -211,6 +228,8 @@ public class GestaoDeServicosStepDefinitions {
 
     @When("eu associo o serviço {string} ao profissional {string}")
     public void eu_associo_o_serviço_ao_profissional(String nomeServico, String nomeProfissional) {
+        this.nomeServicoAtual = nomeServico;
+        this.nomeProfissionalAtual = nomeProfissional;
         try {
             servicoOferecidoServico.associarProfissional(nomeServico, nomeProfissional);
         } catch (Exception e) {
@@ -220,8 +239,8 @@ public class GestaoDeServicosStepDefinitions {
 
     @Then("o sistema salva a associação com sucesso")
     public void o_sistema_salva_a_associação_com_sucesso() {
-        Assertions.assertTrue(repositorioMock.estaQualificado("Corte Masculino", "João"));
-        Assertions.assertNull(excecaoCapturada);
+        Assertions.assertTrue(repositorioMock.estaQualificado(this.nomeServicoAtual, this.nomeProfissionalAtual));
+        Assertions.assertNull(excecaoCapturada, "Nenhuma exceção era esperada.");
     }
 
     @Given("que existe o profissional {string} sem qualificação para {string}")
