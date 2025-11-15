@@ -117,14 +117,14 @@ class ServicoOferecidoJpaRepositorioImpl implements ServicoOferecidoRepositorio,
 
     @Override
     public ServicoOferecido buscarPorId(Integer id) {
-        // TODO Auto-generated method stub
-        return null;
+        return servicoOferecidoJpaRepository.findById(id)
+            .map(jpa -> mapeador.map(jpa, ServicoOferecido.class))
+            .orElse(null);
     }
 
     @Override
     public void remover(Integer id) {
-        // TODO Auto-generated method stub
-        
+        servicoOferecidoJpaRepository.deleteById(id);
     }
 
     @Override

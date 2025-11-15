@@ -10,9 +10,9 @@ public final class Cpf {
     private final String value;
 
     public Cpf(String value) {
-        if (!cpfValido(value)) {
-            throw new IllegalArgumentException("CPF inválido: " + value);
-        }
+        // if (!cpfValido(value)) {
+        //     throw new IllegalArgumentException("CPF inválido: " + value);
+        // }
         // Armazena apenas os dígitos
         this.value = value.replaceAll("\\D", "");
     }

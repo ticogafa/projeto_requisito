@@ -1,27 +1,28 @@
+-- active: 1762782988513@@127.0.0.1@3306@barbearia_db
 -- ========================================
--- V2: Dados iniciais para testes
+-- v2: dados iniciais para testes
 -- ========================================
 
--- Produtos iniciais
-INSERT INTO PRODUTO (NOME, ESTOQUE, PRECO, ESTOQUE_MINIMO) VALUES
-('Shampoo Anticaspa', 100, 29.90, 20),
-('Gel Fixador', 50, 15.50, 10),
-('Pomada Modeladora', 25, 45.00, 5),
-('Pomada Forte', 30, 50.00, 10),
-('Cera Modeladora', 40, 35.00, 10),
-('Óleo para Barba', 60, 38.50, 15);
+-- produtos iniciais
+insert into produto (nome, estoque, preco, estoque_minimo) values
+('shampoo anticaspa', 100, 29.90, 20),
+('gel fixador', 50, 15.50, 10),
+('pomada modeladora', 25, 45.00, 5),
+('pomada forte', 30, 50.00, 10),
+('cera modeladora', 40, 35.00, 10),
+('óleo para barba', 60, 38.50, 15);
 
--- Movimentações iniciais (estoque inicial dos produtos)
-INSERT INTO MOVIMENTACAO_ESTOQUE 
-(PRODUTO_ID, NOME_PRODUTO, TIPO, QUANTIDADE, ESTOQUE_ANTERIOR, ESTOQUE_ATUAL, DATA_HORA, OBSERVACAO, USUARIO_RESPONSAVEL) 
-SELECT 
-    ID, 
-    NOME, 
-    'ESTOQUE_INICIAL', 
-    ESTOQUE, 
+-- movimentações iniciais (estoque inicial dos produtos)
+insert into movimentacao_estoque 
+(produto_id, nome_produto, tipo, quantidade, estoque_anterior, estoque_atual, data_hora, observacao, usuario_responsavel) 
+select 
+    id, 
+    nome, 
+    'estoque_inicial', 
+    estoque, 
     0, 
-    ESTOQUE, 
-    CURRENT_TIMESTAMP,
-    'Estoque inicial do produto',
-    'SISTEMA'
-FROM PRODUTO;
+    estoque, 
+    current_timestamp,
+    'estoque inicial do produto',
+    'sistema'
+from produto;

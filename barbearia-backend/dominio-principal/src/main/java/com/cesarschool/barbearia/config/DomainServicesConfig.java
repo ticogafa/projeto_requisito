@@ -3,6 +3,8 @@ package com.cesarschool.barbearia.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoRepositorioAplicacao;
+import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoServicoAplicacao;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico;
 import com.cesarschool.barbearia.dominio.principal.produto.ProdutoRepositorio;
@@ -13,8 +15,6 @@ import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepo
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoServico;
-import com.cesarschool.barbearia.dominio.principal.venda.VendaRepositorio;
-import com.cesarschool.barbearia.dominio.principal.venda.VendaServico;
 
 /**
  * Configuração de Beans para Domain Services.
@@ -99,16 +99,34 @@ public class DomainServicesConfig {
     }
 
     /**
-     * Configura o serviço de domínio de Venda.
+     * Configura o serviço da camada de aplicação para Agendamento.
+     * Segue padrão SGB-2025-01: orquestra domain services e repositórios de aplicação.
      * 
-     * @param vendaRepositorio Repositório de vendas
-     * @param produtoServico Serviço de produtos (para validar estoque)
-     * @return Instância configurada de VendaServico
+     * @param repositorioAplicacao Repositório para consultas com DTOs/projeções
+     * @param agendamentoServico Serviço de domínio para lógica de negócio
+     * @param servicoServico Serviço de domínio de serviços oferecidos
+     * @return Instância configurada de AgendamentoServicoAplicacao
      */
     @Bean
-    public VendaServico vendaServico(
-            VendaRepositorio vendaRepositorio,
-            ProdutoServico produtoServico) {
-        return new VendaServico(vendaRepositorio, produtoServico);
+    public AgendamentoServicoAplicacao agendamentoServicoAplicacao(
+            AgendamentoRepositorioAplicacao repositorioAplicacao,
+            AgendamentoServico agendamentoServico,
+            ServicoOferecidoServico servicoServico) {
+        return new AgendamentoServicoAplicacao(repositorioAplicacao, agendamentoServico, servicoServico);
     }
+
+    // TODO: Implementar VendaJpa antes de habilitar este bean
+    // /**
+    //  * Configura o serviço de domínio de Venda.
+    //  * 
+    //  * @param vendaRepositorio Repositório de vendas
+    //  * @param produtoServico Serviço de produtos (para validar estoque)
+    //  * @return Instância configurada de VendaServico
+    //  */
+    // @Bean
+    // public VendaServico vendaServico(
+    //         VendaRepositorio vendaRepositorio,
+    //         ProdutoServico produtoServico) {
+    //     return new VendaServico(vendaRepositorio, produtoServico);
+    // }
 }

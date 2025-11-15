@@ -20,6 +20,8 @@ import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -57,14 +59,13 @@ public final class ProfissionalJpa {
     private String telefone;
     
     @Column(name = "INICIO_JORNADA", nullable = false)
-    @Builder.Default
-    private LocalTime inicioJornada = LocalTime.of(9, 0);
+    private LocalTime inicioJornada;
 
     @Column(name = "FIM_JORNADA", nullable = false)
-    @Builder.Default
-    private LocalTime fimJornada = LocalTime.of(17, 0);
+    private LocalTime fimJornada;
   
-    @Column(name = "SENIORIDADE", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "SENIORIDADE", nullable = false, length = 20)
     private Senioridade senioridade; 
 
     @Column(name = "ATIVO", nullable = false)
@@ -163,18 +164,25 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
     public List<Profissional> buscarDisponiveisNaDataHora(java.time.LocalDateTime dataHora, Integer duracaoMinutos) {
         // Busca todos os profissionais ativos
         List<ProfissionalJpa> profissionaisAtivos = profissionalJpaRepository.findByAtivoTrue();
+        System.out.println("DEBUG: Total profissionais ativos encontrados: " + profissionaisAtivos.size());
         
         // Filtra por horário de trabalho
         LocalTime horaInicio = dataHora.toLocalTime();
         LocalTime horaFim = horaInicio.plusMinutes(duracaoMinutos);
+        System.out.println("DEBUG: Buscando disponibilidade para: " + horaInicio + " até " + horaFim);
         
         List<Profissional> disponiveis = new ArrayList<>();
         
         for (ProfissionalJpa jpa : profissionaisAtivos) {
+            System.out.println("DEBUG: Profissional " + jpa.getNome() + 
+                " - Jornada: " + jpa.getInicioJornada() + " até " + jpa.getFimJornada());
+            
             // Verifica se o horário solicitado está dentro da jornada do profissional
             boolean dentroDaJornada = 
                 !horaInicio.isBefore(jpa.getInicioJornada()) && 
                 !horaFim.isAfter(jpa.getFimJornada());
+            
+            System.out.println("DEBUG: Dentro da jornada? " + dentroDaJornada);
             
             if (dentroDaJornada) {
                 // TODO: Verificar agendamentos existentes para esse profissional nesse horário
@@ -183,6 +191,7 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
             }
         }
         
+        System.out.println("DEBUG: Total profissionais disponíveis: " + disponiveis.size());
         return disponiveis;
     }
 
@@ -222,5 +231,23 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
         
         return profissional.getServicosOferecidos().stream()
             .anyMatch(s -> s.getId().equals(servicoId));
+    }
+
+    @Override
+    public boolean possuiAssociacaoServico(String nomeProfissional, String nomeServico) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void removerAssociacaoServico(String nomeProfissional, String nomeServico) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public boolean temAgendamentoAtivo(String nomeServico) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

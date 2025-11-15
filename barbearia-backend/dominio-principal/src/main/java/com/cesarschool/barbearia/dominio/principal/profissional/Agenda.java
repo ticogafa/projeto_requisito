@@ -19,4 +19,12 @@ public final class Agenda {
     public boolean estaVazia() {
         return false; 
     }
+
+    public LocalTime getInicioJornada() {
+        return inicioJornada;
+    }
+
+    public LocalTime getFimJornada() {
+        return fimJornada;
+    }
 }

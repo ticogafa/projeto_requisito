@@ -1,7 +1,7 @@
 package com.cesarschool.barbearia.dominio.principal.profissional;
 
-import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio;
-import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarStringObrigatoria;
+import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.*;
+
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
@@ -118,4 +118,16 @@ public final class Profissional {
     public boolean isAtivo() { return ativo; }
     public String getMotivoInatividade() { return motivoInatividade; }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Profissional that = (Profissional) obj;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

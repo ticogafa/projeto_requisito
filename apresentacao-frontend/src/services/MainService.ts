@@ -1,6 +1,6 @@
-import type { AxiosError, AxiosResponse } from 'axios';
-import { AUTHENTICATION_URLS, SERVICO_OFERECIDO_URLS, URLS_PREFIX } from '@/constants/URLConstants';
+import { AGENDAMENTO_URLS, AUTHENTICATION_URLS, SERVICO_OFERECIDO_URLS, URLS_PREFIX } from '@/constants/URLConstants';
 import HttpClient from '@/services/httpClient';
+import type { AxiosError, AxiosResponse } from 'axios';
 
 export default class MainService {
   client: HttpClient;
@@ -41,15 +41,15 @@ export default class MainService {
   }
 
   /**
-  * Gets all works.
-  *
-  * @param params - Requests params object
-  * @param header - Axios header object
-  * @param successCallback - Success callback function
-  * @param errorCallback - Error callback function
-  * @param finallyCallback - Finally callback function
-  */
-  getDisponiveisNaDataHora(
+   * Gets professionals available for a service at a specific date/time.
+   *
+   * @param params - Request params object with servicoId and dataHora
+   * @param header - Axios header object
+   * @param successCallback - Success callback function
+   * @param errorCallback - Error callback function
+   * @param finallyCallback - Finally callback function
+   */
+  getProfissionaisDisponiveis(
     params: object,
     header: object,
     successCallback: (response: AxiosResponse) => void,
@@ -57,7 +57,7 @@ export default class MainService {
     finallyCallback: () => void
   ): void {
     this.client.get(
-      SERVICO_OFERECIDO_URLS.GET_ALL_SERVICOS_OFERECIDOS,
+      AGENDAMENTO_URLS.PROFISSIONAIS_DISPONIVEIS,
       params,
       header,
       successCallback,
@@ -66,7 +66,56 @@ export default class MainService {
     );
   }
 
-  //TODO IMplementar esse metodo
+  /**
+   * Creates a new appointment.
+   *
+   * @param data - The appointment data
+   * @param successCallback - Success callback function
+   * @param errorCallback - Error callback function
+   * @param finallyCallback - Finally callback function
+   */
+  criarAgendamento(
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.post(
+      AGENDAMENTO_URLS.CRIAR,
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  /**
+   * Gets appointments by client ID.
+   *
+   * @param params - Request params object with clienteId
+   * @param header - Axios header object
+   * @param successCallback - Success callback function
+   * @param errorCallback - Error callback function
+   * @param finallyCallback - Finally callback function
+   */
+  getAgendamentosPorCliente(
+    params: object,
+    header: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.get(
+      AGENDAMENTO_URLS.POR_CLIENTE,
+      params,
+      header,
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
   /**
    * Signs in a user.
    *

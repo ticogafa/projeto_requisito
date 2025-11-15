@@ -24,7 +24,6 @@ public final class Agendamento {
     private ServicoOferecidoId servicoId; // Referência ao dominio-profissionais
     private String observacoes;
 
-    @Builder
     public Agendamento(
             LocalDateTime dataHora,
             ClienteId clienteId,

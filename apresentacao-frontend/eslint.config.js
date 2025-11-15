@@ -1,18 +1,18 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import { defineConfig, globalIgnores } from 'eslint/config'
+import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
 import tsdoc from 'eslint-plugin-tsdoc';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 const plugins = {
   '@stylistic': stylistic,
   '@typescript-eslint': tsPlugin,
-  tsdoc,
+  tsdoc
 };
 
 const ignored = Object.fromEntries([
@@ -23,7 +23,7 @@ const rules = {
   ...ignored,
   // Core ESLint rules
   'camelcase': ['warn'],
-   'no-restricted-imports': ['error', {
+  'no-restricted-imports': ['error', {
     patterns: [{
       group: ['.*', '..*'],
       message: 'Please use absolute imports with "@"'
@@ -68,25 +68,25 @@ const rules = {
   }],
 
   // TSDoc rules
-  'tsdoc/syntax': 'warn',
-}
+  'tsdoc/syntax': 'warn'
+};
 
 export default defineConfig([
   globalIgnores(['dist']),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx,js}'],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
       reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
+      reactRefresh.configs.vite
     ],
     languageOptions: {
       ecmaVersion: 'latest',
       globals: globals.browser,
-      parser: tsParser,
+      parser: tsParser
     },
     rules,
     plugins
-  },
-])
+  }
+]);

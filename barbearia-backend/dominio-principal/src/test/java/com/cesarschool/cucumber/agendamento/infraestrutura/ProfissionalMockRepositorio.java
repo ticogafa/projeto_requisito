@@ -70,6 +70,21 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
         // Mock implementation - sempre retorna true
         return true;
     }
+
+    @Override
+    public boolean temAgendamentoAtivo(String nomeServico) {
+        return false;
+    }
+
+    @Override
+    public boolean possuiAssociacaoServico(String nomeProfissional, String nomeServico) {
+        return true;
+    }
+
+    @Override
+    public void removerAssociacaoServico(String nomeProfissional, String nomeServico) {
+        // Mock implementation - não faz nada
+    }
 }
 
 

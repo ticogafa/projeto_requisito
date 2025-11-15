@@ -1,67 +1,67 @@
 -- ========================================
--- V1: Criação das tabelas principais
--- Estoque e Agendamento
+-- v1: criação das tabelas principais
+-- estoque e agendamento
 -- ========================================
 
--- Tabela de Produtos
-CREATE TABLE PRODUTO (
-    ID INT GENERATED ALWAYS AS IDENTITY NOT NULL,
-    NOME VARCHAR(200) NOT NULL UNIQUE,
-    ESTOQUE INT NOT NULL DEFAULT 0,
-    PRECO DECIMAL(10, 2) NOT NULL,
-    ESTOQUE_MINIMO INT NOT NULL DEFAULT 0,
-    PRIMARY KEY (ID)
+-- tabela de produtos
+create table produto (
+    id int generated always as identity not null,
+    nome varchar(200) not null unique,
+    estoque int not null default 0,
+    preco decimal(10, 2) not null,
+    estoque_minimo int not null default 0,
+    primary key (id)
 );
 
--- Índices para Produto
-CREATE INDEX IDX_PRODUTO_NOME ON PRODUTO(NOME);
-CREATE INDEX IDX_PRODUTO_ESTOQUE ON PRODUTO(ESTOQUE);
+-- índices para produto
+create index idx_produto_nome on produto(nome);
+create index idx_produto_estoque on produto(estoque);
 
--- Tabela de Movimentação de Estoque
-CREATE TABLE MOVIMENTACAO_ESTOQUE (
-    ID INT GENERATED ALWAYS AS IDENTITY NOT NULL,
-    PRODUTO_ID INT NOT NULL,
-    NOME_PRODUTO VARCHAR(200) NOT NULL,
-    TIPO VARCHAR(50) NOT NULL,
-    QUANTIDADE INT NOT NULL,
-    ESTOQUE_ANTERIOR INT NOT NULL,
-    ESTOQUE_ATUAL INT NOT NULL,
-    DATA_HORA TIMESTAMP NOT NULL,
-    OBSERVACAO VARCHAR(500),
-    USUARIO_RESPONSAVEL VARCHAR(100),
-    PRIMARY KEY (ID),
-    FOREIGN KEY (PRODUTO_ID) REFERENCES PRODUTO(ID)
+-- tabela de movimentação de estoque
+create table movimentacao_estoque (
+    id int generated always as identity not null,
+    produto_id int not null,
+    nome_produto varchar(200) not null,
+    tipo varchar(50) not null,
+    quantidade int not null,
+    estoque_anterior int not null,
+    estoque_atual int not null,
+    data_hora timestamp not null,
+    observacao varchar(500),
+    usuario_responsavel varchar(100),
+    primary key (id),
+    foreign key (produto_id) references produto(id)
 );
 
--- Índices para Movimentação de Estoque
-CREATE INDEX IDX_MOVIMENTACAO_PRODUTO ON MOVIMENTACAO_ESTOQUE(PRODUTO_ID);
-CREATE INDEX IDX_MOVIMENTACAO_DATA ON MOVIMENTACAO_ESTOQUE(DATA_HORA);
-CREATE INDEX IDX_MOVIMENTACAO_TIPO ON MOVIMENTACAO_ESTOQUE(TIPO);
+-- índices para movimentação de estoque
+create index idx_movimentacao_produto on movimentacao_estoque(produto_id);
+create index idx_movimentacao_data on movimentacao_estoque(data_hora);
+create index idx_movimentacao_tipo on movimentacao_estoque(tipo);
 
--- Tabela de Agendamentos
-CREATE TABLE AGENDAMENTO (
-    ID INT GENERATED ALWAYS AS IDENTITY NOT NULL,
-    DATA_HORA TIMESTAMP NOT NULL,
-    STATUS VARCHAR(20) NOT NULL,
-    CLIENTE_ID INT NOT NULL,
-    PROFISSIONAL_ID INT,
-    SERVICO_ID INT NOT NULL,
-    OBSERVACOES VARCHAR(500),
-    PRIMARY KEY (ID)
+-- tabela de agendamentos
+create table agendamento (
+    id int generated always as identity not null,
+    data_hora timestamp not null,
+    status varchar(20) not null,
+    cliente_id int not null,
+    profissional_id int,
+    servico_id int not null,
+    observacoes varchar(500),
+    primary key (id)
 );
 
--- Índices para Agendamento
-CREATE INDEX IDX_AGENDAMENTO_DATA_HORA ON AGENDAMENTO(DATA_HORA);
-CREATE INDEX IDX_AGENDAMENTO_CLIENTE ON AGENDAMENTO(CLIENTE_ID);
-CREATE INDEX IDX_AGENDAMENTO_PROFISSIONAL ON AGENDAMENTO(PROFISSIONAL_ID);
-CREATE INDEX IDX_AGENDAMENTO_STATUS ON AGENDAMENTO(STATUS);
-CREATE INDEX IDX_AGENDAMENTO_CONFLITO ON AGENDAMENTO(PROFISSIONAL_ID, DATA_HORA, STATUS);
+-- índices para agendamento
+create index idx_agendamento_data_hora on agendamento(data_hora);
+create index idx_agendamento_cliente on agendamento(cliente_id);
+create index idx_agendamento_profissional on agendamento(profissional_id);
+create index idx_agendamento_status on agendamento(status);
+create index idx_agendamento_conflito on agendamento(profissional_id, data_hora, status);
 
--- Comentários nas tabelas
-COMMENT ON TABLE PRODUTO IS 'Cadastro de produtos disponíveis para venda';
-COMMENT ON TABLE MOVIMENTACAO_ESTOQUE IS 'Histórico de todas as movimentações de estoque';
-COMMENT ON TABLE AGENDAMENTO IS 'Registro de agendamentos de serviços';
+-- comentários nas tabelas
+comment on table produto is 'cadastro de produtos disponíveis para venda';
+comment on table movimentacao_estoque is 'histórico de todas as movimentações de estoque';
+comment on table agendamento is 'registro de agendamentos de serviços';
 
--- Comentários nas colunas
-COMMENT ON COLUMN MOVIMENTACAO_ESTOQUE.TIPO IS 'Tipo: ENTRADA, SAIDA, VENDA, AJUSTE, ESTOQUE_INICIAL, DESATIVACAO';
-COMMENT ON COLUMN AGENDAMENTO.STATUS IS 'Status: PENDENTE, CONFIRMADO, CANCELADO, CONCLUIDO';
+-- comentários nas colunas
+comment on column movimentacao_estoque.tipo is 'tipo: entrada, saida, venda, ajuste, estoque_inicial, desativacao';
+comment on column agendamento.status is 'status: pendente, confirmado, cancelado, concluido';

@@ -41,6 +41,7 @@ class JpaMapeador extends ModelMapper {
         configurarConversoresAgendamento();
         configurarConversoresProfissional();
         configurarConversoresServicos();
+        configurarConversoresCliente();
         configurarConversoresIds();
     }
     
@@ -242,6 +243,46 @@ class JpaMapeador extends ModelMapper {
                     .senioridade(source.getSenioridade())
                     .ativo(source.isAtivo())
                     .motivoInatividade(source.getMotivoInatividade())
+                    .build();
+            }
+        });
+    }
+
+    // ==================== CONVERSORES DE CLIENTE ====================
+    
+    private void configurarConversoresCliente() {
+        // ClienteJpa -> Cliente
+        addConverter(new AbstractConverter<ClienteJpa, com.cesarschool.barbearia.dominio.principal.cliente.Cliente>() {
+            @Override
+            protected com.cesarschool.barbearia.dominio.principal.cliente.Cliente convert(ClienteJpa source) {
+                var id = source.getId() != null ? new ClienteId(source.getId()) : null;
+                var email = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email(source.getEmail());
+                var cpf = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf(source.getCpf());
+                var telefone = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone(source.getTelefone());
+                
+                return new com.cesarschool.barbearia.dominio.principal.cliente.Cliente(
+                    id,
+                    source.getNome(),
+                    email,
+                    cpf,
+                    telefone,
+                    source.getPontos()
+                );
+            }
+        });
+        
+        // Cliente -> ClienteJpa
+        addConverter(new AbstractConverter<com.cesarschool.barbearia.dominio.principal.cliente.Cliente, ClienteJpa>() {
+            @Override
+            protected ClienteJpa convert(com.cesarschool.barbearia.dominio.principal.cliente.Cliente source) {
+                return ClienteJpa.builder()
+                    .id(source.getId() != null ? source.getId().getValor() : null)
+                    .nome(source.getNome())
+                    .email(source.getEmail().getValue())
+                    .cpf(source.getCpf().getValue())
+                    .telefone(source.getTelefone().getValue())
+                    .pontos(source.getPontos())
+                    .ativo(true)
                     .build();
             }
         });

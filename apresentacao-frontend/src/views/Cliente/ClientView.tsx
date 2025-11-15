@@ -1,5 +1,6 @@
-// import { useState } from "react";
-import { useServicosOferecidos } from '@/hooks/UseFetch';
+import { useAgendamentosPorCliente, useServicosOferecidos } from '@/hooks/UseFetch';
+import type { AgendamentoInterface } from '@/interfaces/AgendamentoInterface';
+import AppointmentsTable from '@/views/Cliente/AppointmentsTable';
 import NewAppointmentModal from '@/views/Cliente/NewAppointmentModal';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -8,10 +9,31 @@ export default function ClientView() {
   const [modalVisible, setModalVisible] = useState(false);
   const { data: servicos } = useServicosOferecidos();
 
+  // TODO: Pegar clienteId do contexto de autenticação
+  const clienteId = 1;
+  const { data: agendamentos, setData: setAgendamentos } = useAgendamentosPorCliente(clienteId);
+
   useEffect(() => {
     document.title = 'Página do Cliente';
-    toast.success('Bem-vindo Miguel!');
+    toast.success('Bem-vindo!');
   }, []);
+
+  const handleEdit = (id: number) => {
+    toast.info(`Editar agendamento ${id} - Em desenvolvimento`);
+  };
+
+  const handleCancel = (id: number) => {
+    toast.info(`Cancelar agendamento ${id} - Em desenvolvimento`);
+  };
+
+  const handleRate = (id: number) => {
+    toast.info(`Avaliar agendamento ${id} - Em desenvolvimento`);
+  };
+
+  const handleSuccess = (novoAgendamento: AgendamentoInterface) => {
+    // Adiciona o novo agendamento à lista
+    setAgendamentos([...agendamentos, novoAgendamento]);
+  };
 
   return (
     <div className="min-h-screen">
@@ -19,6 +41,7 @@ export default function ClientView() {
         servicos={servicos}
         visible={modalVisible}
         closeModal={() => setModalVisible(false)}
+        onSuccess={handleSuccess}
       />
 
       <header className="bg-dark-800 border-b border-dark-600 px-8 py-4">
@@ -110,122 +133,26 @@ export default function ClientView() {
         <main className="flex-1 p-8">
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Olá, João Pereira</h2>
+              <h2 className="text-3xl font-bold mb-2">Olá, Cliente</h2>
               <p className="text-gray-400">
                 Gerencie seus agendamentos e avaliações
               </p>
             </div>
             <button
-              onClick={setModalVisible.bind(null, true)}
-              className="bg-primary hover:bg-primary/90% text-white px-6 py-3 rounded-lg font-medium transition flex items-center gap-2" // <-- Corrigido
+              onClick={() => setModalVisible(true)}
+              className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-medium transition flex items-center gap-2"
             >
               <span className="material-icons">add</span>
               Novo Agendamento
             </button>
           </div>
 
-          <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-dark-700">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">
-                    Data
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">
-                    Profissional
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">
-                    Serviço
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">
-                    Ações
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-dark-600">
-                <tr className="hover:bg-dark-700">
-                  <td className="px-6 py-4 font-medium">09/10 09:00</td>
-                  <td className="px-6 py-4">Carlos Silva</td>
-                  <td className="px-6 py-4">Corte + Barba</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className="status-badge bg-blue-500/10% text-blue-400 px-3 py-1 rounded-full text-sm" // <-- Corrigido
-                    >
-                      <span className="material-icons text-xs">
-                        check_circle
-                      </span>
-                      Confirmado
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={
-                          () => {
-                            // openEditAppointmentModal(1, '09/10 09:00', 'Carlos Silva', 'Corte + Barba', 'Confirmado', '')
-                          }
-                        }
-                        className="bg-blue-500/10% text-blue-400 hover:bg-blue-500/20% px-3 py-2 rounded-lg text-sm font-medium transition" // <-- Corrigido (2x)
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={
-                          () => {
-                            // cancelAppointment(1)
-                          }
-                        }
-                        className="bg-red-500/10% text-red-400 hover:bg-red-500/20% px-3 py-2 rounded-lg text-sm font-medium transition" // <-- Corrigido
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr className="hover:bg-dark-700">
-                  <td className="px-6 py-4 font-medium">07/10 10:30</td>
-                  <td className="px-6 py-4">Lucas Lima</td>
-                  <td className="px-6 py-4">Corte Social</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className="status-badge bg-green-500/10% text-green-400 px-3 py-1 rounded-full text-sm" // <-- Corrigido
-                    >
-                      <span className="material-icons text-xs">done_all</span>
-                      Concluído
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={
-                        () => {}
-                        // openRatingModal('Lucas Lima', 'Corte Social')
-                      }
-                      className="bg-primary/10% text-primary hover:bg-primary/20% px-4 py-2 rounded-lg text-sm font-medium transition" // <-- Corrigido (2x)
-                    >
-                      Avaliar Profissional
-                    </button>
-                  </td>
-                </tr>
-                <tr className="hover:bg-dark-700">
-                  <td className="px-6 py-4 font-medium">05/10 15:00</td>
-                  <td className="px-6 py-4">João Pereira</td>
-                  <td className="px-6 py-4">Corte Infantil</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className="status-badge bg-red-500/10% text-red-400 px-3 py-1 rounded-full text-sm" // <-- Corrigido
-                    >
-                      <span className="material-icons text-xs">cancel</span>
-                      Cancelado
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-gray-500">—</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <AppointmentsTable
+            agendamentos={agendamentos}
+            onEdit={handleEdit}
+            onCancel={handleCancel}
+            onRate={handleRate}
+          />
         </main>
       </div>
     </div>
