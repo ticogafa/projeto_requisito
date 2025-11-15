@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cesarschool.barbearia.apresentacao.BackendMapeador;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
@@ -22,7 +21,6 @@ import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 @RequestMapping("/api/profissional")
 public class ProfissionalControlador {
 
-    private @Autowired BackendMapeador mapeador;
     private @Autowired ProfissionalServico servico;
     
     public ResponseEntity<Profissional> buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoServicoMinutos) {
@@ -39,8 +37,4 @@ public class ProfissionalControlador {
     public ResponseEntity<List<Profissional>> buscarDisponiveisNaDataHora(@PathVariable LocalDateTime dataHora, @PathVariable Integer duracaoMinutos) {
         return ResponseEntity.ok(servico.buscarDisponiveisNaDataHora(dataHora, duracaoMinutos));
     }
-
-    
-
-    
 }

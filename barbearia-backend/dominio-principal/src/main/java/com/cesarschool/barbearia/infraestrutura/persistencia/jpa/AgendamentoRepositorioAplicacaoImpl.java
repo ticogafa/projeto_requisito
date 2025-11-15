@@ -34,11 +34,23 @@ class AgendamentoRepositorioAplicacaoImpl implements AgendamentoRepositorioAplic
             LocalDateTime dataHora,
             Integer duracaoMinutos) {
         
-        return profissionalDisponivelRepo.buscarDisponiveis(
+        var horaInicio = dataHora.toLocalTime();
+        var horaFim = dataHora.toLocalTime().plusMinutes(duracaoMinutos);
+        
+        System.out.println("=== DEBUG REPOSITORIO APLICACAO ===");
+        System.out.println("servicoId: " + servicoId.getValor());
+        System.out.println("horaInicio: " + horaInicio);
+        System.out.println("horaFim: " + horaFim);
+        System.out.println("duracaoMinutos: " + duracaoMinutos);
+        
+        var resultado = profissionalDisponivelRepo.buscarDisponiveis(
             servicoId.getValor(),
-            dataHora.toLocalTime(),
-            dataHora.toLocalTime().plusMinutes(duracaoMinutos)
+            horaInicio,
+            horaFim
         );
+        
+        System.out.println("Resultado query: " + resultado.size() + " profissionais encontrados");
+        return resultado;
     }
 
     @Override

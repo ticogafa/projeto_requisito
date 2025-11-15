@@ -2,6 +2,9 @@ package com.cesarschool.barbearia.dominio.principal.profissional;
 
 import java.time.LocalTime;
 
+import lombok.Getter;
+
+@Getter
 public final class Agenda {
     private final int jornadaPadraoMinutos = 480;
     private LocalTime inicioJornada;
@@ -18,13 +21,5 @@ public final class Agenda {
 
     public boolean estaVazia() {
         return false; 
-    }
-
-    public LocalTime getInicioJornada() {
-        return inicioJornada;
-    }
-
-    public LocalTime getFimJornada() {
-        return fimJornada;
     }
 }

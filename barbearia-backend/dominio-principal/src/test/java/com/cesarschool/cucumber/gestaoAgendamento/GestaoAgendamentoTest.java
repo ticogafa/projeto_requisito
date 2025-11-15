@@ -206,7 +206,7 @@ public class GestaoAgendamentoTest {
     public void solicito_a_criação_do_agendamento_em_horário_livre_para_o_profissional() {
         try {
             LocalDateTime horarioLivre = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0);
-            Agendamento agendamento = Agendamento.builder()
+            Agendamento agendamento = Agendamento.builderCompleto()
                 .dataHora(horarioLivre)
                 .clienteId(clienteMariaId)
                 .profissionalId(profissionalJoaoId)
@@ -226,7 +226,7 @@ public class GestaoAgendamentoTest {
     @Given("que existe um agendamento para o profissional cadastrado em um horário determinado")
     public void que_existe_um_agendamento_para_o_profissional_cadastrado_em_um_horário_determinado() {
         LocalDateTime horario = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0);
-        Agendamento agendamentoExistente = Agendamento.builder()
+        Agendamento agendamentoExistente = Agendamento.builderCompleto()
             .dataHora(horario)
             .clienteId(clienteMariaId)
             .profissionalId(profissionalJoaoId)
@@ -243,7 +243,7 @@ public class GestaoAgendamentoTest {
             .withMinute(Integer.parseInt(horario.split(":")[1]))
             .withSecond(0).withNano(0);
         
-        Agendamento agendamentoExistente = Agendamento.builder()
+        Agendamento agendamentoExistente = Agendamento.builderCompleto()
             .dataHora(dataHora)
             .clienteId(clienteMariaId)
             .profissionalId(profissionalJoaoId)
@@ -258,7 +258,7 @@ public class GestaoAgendamentoTest {
         try {
             LocalDateTime horarioOcupado = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0);
             
-            Agendamento agendamento = Agendamento.builder()
+            Agendamento agendamento = Agendamento.builderCompleto()
                 .dataHora(horarioOcupado)
                 .clienteId(clienteMariaId)
                 .profissionalId(profissionalJoaoId)
@@ -284,7 +284,7 @@ public class GestaoAgendamentoTest {
             
             ProfissionalId profissionalEscolhido = obterProfissionalIdPorNome(nomeProfissional);
 
-            Agendamento agendamento = Agendamento.builder()
+            Agendamento agendamento = Agendamento.builderCompleto()
                 .dataHora(dataHora)
                 .clienteId(clienteMariaId)
                 .profissionalId(profissionalEscolhido)
@@ -315,7 +315,7 @@ public class GestaoAgendamentoTest {
 
             // As validações de serviço ativo e profissional qualificado agora são feitas pelo AgendamentoServico
             LocalDateTime horario = LocalDateTime.now().plusDays(1).withHour(14).withMinute(0);
-            Agendamento agendamento = Agendamento.builder()
+            Agendamento agendamento = Agendamento.builderCompleto()
                 .dataHora(horario)
                 .clienteId(clienteMariaId)
                 .profissionalId(profissionalEscolhido)
@@ -362,7 +362,7 @@ public class GestaoAgendamentoTest {
             .withHour(Integer.parseInt(horario.split(":")[0]))
             .withMinute(Integer.parseInt(horario.split(":")[1]));
         
-        Agendamento agendamento = Agendamento.builder()
+        Agendamento agendamento = Agendamento.builderCompleto()
             .dataHora(dataHora)
             .clienteId(clienteMariaId)
             .profissionalId(profissionalJoaoId)
@@ -405,7 +405,7 @@ public class GestaoAgendamentoTest {
     public void eu_tento_criar_um_agendamento_do_serviço(String nomeServico) {
         try {
             LocalDateTime horario = LocalDateTime.now().plusDays(1).withHour(15).withMinute(0);
-            Agendamento agendamento = Agendamento.builder()
+            Agendamento agendamento = Agendamento.builderCompleto()
                 .dataHora(horario)
                 .clienteId(clienteMariaId)
                 .profissionalId(profissionalJoaoId)

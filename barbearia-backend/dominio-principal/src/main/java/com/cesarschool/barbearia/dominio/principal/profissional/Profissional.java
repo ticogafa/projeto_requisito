@@ -7,7 +7,9 @@ import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
 
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 public final class Profissional {
     private ProfissionalId id;
     private String nome;
@@ -107,16 +109,6 @@ public final class Profissional {
         setAtivo(false);
         setMotivoInatividade(motivo);
     }
-
-    public ProfissionalId getId() { return id; }
-    public String getNome() { return nome; }
-    public Email getEmail() { return email; }
-    public Cpf getCpf() { return cpf; }
-    public Telefone getTelefone() { return telefone; }
-    public Agenda getAgenda() { return agenda; }
-    public Senioridade getSenioridade() { return senioridade; }
-    public boolean isAtivo() { return ativo; }
-    public String getMotivoInatividade() { return motivoInatividade; }
 
     @Override
     public boolean equals(Object obj) {

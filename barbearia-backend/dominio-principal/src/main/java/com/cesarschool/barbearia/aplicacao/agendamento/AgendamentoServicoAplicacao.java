@@ -14,29 +14,19 @@ import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoServico;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * Serviço da camada de aplicação para agendamentos.
  * Orquestra serviços de domínio e repositórios de aplicação.
  * Seguindo padrão SGB-2025-01.
  */
+@RequiredArgsConstructor
 public class AgendamentoServicoAplicacao {
     
     private final AgendamentoRepositorioAplicacao repositorioAplicacao;
     private final AgendamentoServico agendamentoServico;
     private final ServicoOferecidoServico servicoServico;
-
-    public AgendamentoServicoAplicacao(
-            AgendamentoRepositorioAplicacao repositorioAplicacao,
-            AgendamentoServico agendamentoServico,
-            ServicoOferecidoServico servicoServico) {
-        notNull(repositorioAplicacao, "AgendamentoRepositorioAplicacao não pode ser nulo");
-        notNull(agendamentoServico, "AgendamentoServico não pode ser nulo");
-        notNull(servicoServico, "ServicoOferecidoServico não pode ser nulo");
-        
-        this.repositorioAplicacao = repositorioAplicacao;
-        this.agendamentoServico = agendamentoServico;
-        this.servicoServico = servicoServico;
-    }
 
     /**
      * Busca profissionais disponíveis para um serviço em uma data/hora.
@@ -81,14 +71,14 @@ public class AgendamentoServicoAplicacao {
         ProfissionalId profId = request.getProfissionalId() != null ? 
                 new ProfissionalId(request.getProfissionalId()) : null;
         
-        // Criar agendamento usando Builder
-        Agendamento agendamento = Agendamento.builder()
-                .dataHora(request.getDataHora())
-                .clienteId(new ClienteId(request.getClienteId()))
-                .profissionalId(profId)
-                .servicoId(new ServicoOferecidoId(request.getServicoId()))
-                .observacoes(request.getObservacoes())
-                .build();
+        // Criar agendamento SEM ID (será gerado pelo banco)
+        Agendamento agendamento = new Agendamento(
+                request.getDataHora(),
+                new ClienteId(request.getClienteId()),
+                profId,
+                new ServicoOferecidoId(request.getServicoId()),
+                request.getObservacoes()
+        );
         
         // Salvar via serviço de domínio
         Agendamento criado = agendamentoServico.criar(agendamento, servico.getDuracaoMinutos());

@@ -9,7 +9,6 @@ import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
-import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoRepositorio;
 
@@ -117,14 +116,8 @@ public class AgendamentoServico {
      * @throws IllegalStateException se o profissional não estiver qualificado
      */
     private void validarProfissionalQualificado(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
-        Profissional profissional = profissionalServico.buscarPorId(profissionalId);
-        ServicoOferecido servico = servicoRepositorio.buscarPorId(servicoId.getValor());
-        
-        if (profissional == null || servico == null) {
-            throw new IllegalArgumentException("Profissional ou serviço não encontrado");
-        }
-        
-        boolean qualificado = servicoRepositorio.estaQualificado(servico.getNome(), profissional.getNome());
+        // Validar se profissional está qualificado usando IDs diretamente
+        boolean qualificado = profissionalServico.estaQualificado(profissionalId, servicoId);
         if (!qualificado) {
             throw new IllegalStateException(
                 "Profissional não está qualificado para este serviço"

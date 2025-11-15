@@ -74,7 +74,6 @@ public final class ProfissionalJpa {
     @Column(name = "MOTIVO_INATIVIDADE", length = 255)
     private String motivoInatividade; 
 
-    // Em ProfissionalJpa:
     @ManyToMany
     @JoinTable(
         name = "profissional_servico",
@@ -94,6 +93,13 @@ interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integ
      */
     @Query("SELECT DISTINCT p FROM ProfissionalJpa p JOIN p.servicosOferecidos s WHERE s.id = :servicoId AND p.ativo = true")
     List<ProfissionalJpa> findByServicoId(@Param("servicoId") Integer servicoId);
+    
+    /**
+     * Conta quantas associações existem entre profissional e serviço.
+     * Usa query nativa para garantir uso da coluna correta.
+     */
+    @Query(value = "SELECT COUNT(*) FROM profissional_servico WHERE profissional_id = :profissionalId AND servico_id = :servicoId", nativeQuery = true)
+    Long countQualificacao(@Param("profissionalId") Integer profissionalId, @Param("servicoId") Integer servicoId);
     
     /**
      * Busca todos os profissionais ativos.
@@ -226,11 +232,16 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
 
     @Override
     public boolean estaQualificado(Integer profissionalId, Integer servicoId) {
-        ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
-            .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
+        // Usar query nativa para garantir que usa a coluna correta
+        Long count = profissionalJpaRepository.countQualificacao(profissionalId, servicoId);
+        boolean qualificado = count > 0;
         
-        return profissional.getServicosOferecidos().stream()
-            .anyMatch(s -> s.getId().equals(servicoId));
+        System.out.println("DEBUG estaQualificado: profissionalId=" + profissionalId + 
+                         ", servicoId=" + servicoId + 
+                         ", count=" + count + 
+                         ", qualificado=" + qualificado);
+        
+        return qualificado;
     }
 
     @Override

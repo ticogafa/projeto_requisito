@@ -15,6 +15,7 @@ public class ExceptionResgistry {
     }
 
     // TODO - terminar isso aq dps
+    @SuppressWarnings("unused")
     private Optional<ExceptionAdapter> getExcactMatchAdapter(Exception exceptionInstance){
         Class<?> exceptionClass = exceptionInstance.getClass();
         if (registry.get(exceptionClass) != null){

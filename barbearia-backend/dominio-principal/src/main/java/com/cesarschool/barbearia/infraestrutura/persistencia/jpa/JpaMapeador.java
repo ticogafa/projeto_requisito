@@ -140,7 +140,7 @@ class JpaMapeador extends ModelMapper {
                 var profissionalId = source.profissionalId != null ? new ProfissionalId(source.profissionalId) : null;
                 var servicoId = new ServicoOferecidoId(source.servicoId);
                 
-                return Agendamento.builder()
+                return Agendamento.builderCompleto()
                     .id(id)
                     .dataHora(source.dataHora)
                     .status(source.status)

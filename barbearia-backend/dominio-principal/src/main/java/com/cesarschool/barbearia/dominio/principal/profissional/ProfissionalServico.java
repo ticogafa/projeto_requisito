@@ -7,6 +7,8 @@ import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * Domain Service para Profissional.
  * Contém lógica de negócio que não pertence naturalmente a uma entidade.
@@ -14,6 +16,7 @@ import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
  * IMPORTANTE: Sem anotações de infraestrutura (@Service, @Transactional, @Autowired).
  * A configuração de beans deve ser feita na camada de infraestrutura ou aplicação.
  */
+@RequiredArgsConstructor
 public class ProfissionalServico {
     
     private final ProfissionalRepositorio repositorio;
@@ -24,12 +27,6 @@ public class ProfissionalServico {
 
     public List<Profissional> buscarDisponiveisNaDataHora(LocalDateTime dataHora, Integer duracaoMinutos) {
         return repositorio.buscarDisponiveisNaDataHora(dataHora, duracaoMinutos);
-    }
-
-
-    public ProfissionalServico(ProfissionalRepositorio repositorio) {
-        Validacoes.validarObjetoObrigatorio(repositorio, "O repositório");
-        this.repositorio = repositorio;
     }
 
     public Profissional registrarNovo(Profissional profissional) {
@@ -133,5 +130,17 @@ public class ProfissionalServico {
         Profissional profissional = buscarPorId(profissionalId);
         profissional.setAgenda(novaJornada);  
         repositorio.salvar(profissional);
+    }
+
+    /**
+     * Verifica se um profissional está qualificado para executar um serviço.
+     * @param profissionalId ID do profissional
+     * @param servicoId ID do serviço
+     * @return true se o profissional está qualificado
+     */
+    public boolean estaQualificado(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
+        Validacoes.validarObjetoObrigatorio(profissionalId, "ID do profissional");
+        Validacoes.validarObjetoObrigatorio(servicoId, "ID do serviço");
+        return repositorio.estaQualificado(profissionalId.getValor(), servicoId.getValor());
     }
 }

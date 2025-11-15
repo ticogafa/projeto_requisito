@@ -13,7 +13,7 @@ public final class AgendamentoFactory {
 
     public static Agendamento criarPadrao() {
 
-        return Agendamento.builder()
+        return Agendamento.builderCompleto()
             .dataHora(LocalDateTime.now().plusHours(2))
             .clienteId(new ClienteId(1))
             .profissionalId(new ProfissionalId(1))

@@ -24,6 +24,10 @@ public final class Agendamento {
     private ServicoOferecidoId servicoId; // Referência ao dominio-profissionais
     private String observacoes;
 
+    /**
+     * Construtor para criar novo agendamento (sem ID).
+     * Usado ao criar agendamentos que ainda não foram persistidos.
+     */
     public Agendamento(
             LocalDateTime dataHora,
             ClienteId clienteId,
@@ -38,7 +42,11 @@ public final class Agendamento {
         this.status = StatusAgendamento.PENDENTE;
     }
 
-    @Builder
+    /**
+     * Construtor completo com ID e status.
+     * Usado ao reconstruir agendamentos já persistidos (ex: do banco de dados).
+     */
+    @Builder(builderMethodName = "builderCompleto")
     public Agendamento(
             AgendamentoId id,
             LocalDateTime dataHora,
