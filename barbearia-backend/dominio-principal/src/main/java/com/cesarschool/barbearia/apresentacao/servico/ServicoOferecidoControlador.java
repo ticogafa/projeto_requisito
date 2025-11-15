@@ -1,7 +1,6 @@
 package com.cesarschool.barbearia.apresentacao.servico;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,37 +9,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesarschool.barbearia.aplicacao.servico.ServicoOferecidoResumo;
-import com.cesarschool.barbearia.apresentacao.BackendMapeador;
-import com.cesarschool.barbearia.apresentacao.BackendMapeador.ServicoOferecidoResumoImpl;
-import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoServico;
+import com.cesarschool.barbearia.aplicacao.servico.ServicoOferecidolRepositorioAplicacao;
 
 /**
  * Controlador REST para operações com ServicoOferecido.
- * Seguindo o padrão do SGB, retorna DTOs (Resumos) ao invés de entidades de domínio.
+ * Seguindo o padrão do SGB, retorna DTOs (Resumos) diretamente do repositório de aplicação.
+ * Usa Interface-based Projection do Spring Data JPA para otimização de queries.
  */
 @RestController
 @RequestMapping("/api/servico-oferecido")
 public class ServicoOferecidoControlador {
 
     @Autowired 
-    private ServicoOferecidoServico servico;
-    
-    @Autowired 
-    private BackendMapeador mapeador;
+    private ServicoOferecidolRepositorioAplicacao repositorioAplicacao;
 
     /**
-     * Lista todos os serviços oferecidos.
+     * Lista todos os serviços oferecidos ordenados por nome.
+     * Usa projeção direta do JPA - o Spring Data cria automaticamente a implementação
+     * e otimiza a query SQL para buscar apenas os campos necessários.
+     * 
      * @return Lista de resumos de serviços oferecidos
      */
     @GetMapping("/listar/")
     public ResponseEntity<List<ServicoOferecidoResumo>> listarTodos() {
-        List<ServicoOferecidoResumo> resumos = servico.listarTodos()
-            .stream()
-            .map(s -> mapeador.map(s, ServicoOferecidoResumoImpl.class))
-            .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(resumos);
+        return ResponseEntity.ok(repositorioAplicacao.listarTodosResumos());
     }
-
-    
 }

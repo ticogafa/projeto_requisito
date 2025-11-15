@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.cesarschool.barbearia.aplicacao.servico.ServicoOferecidoResumo;
+import com.cesarschool.barbearia.aplicacao.servico.ServicoOferecidolRepositorioAplicacao;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoRepositorio;
 
@@ -61,16 +63,21 @@ class ServicoOferecidoJpa {
     }
 }
 
-interface ServicoOferecidoJpaRepository extends JpaRepository<ServicoOferecidoJpa, Integer> {    
+interface ServicoOferecidoJpaRepository extends JpaRepository<ServicoOferecidoJpa, Integer> {
+    /**
+     * Projeção direta do JPA - retorna apenas os campos da interface ServicoOferecidoResumo.
+     * O Spring Data JPA cria automaticamente a implementação e otimiza a query SQL.
+     */
+    List<ServicoOferecidoResumo> findServicoOferecidoResumoByOrderByNome();
 }
 
 @Repository
-class ServicoOferecidoJpaRepositorioImpl implements ServicoOferecidoRepositorio {
+class ServicoOferecidoJpaRepositorioImpl implements ServicoOferecidoRepositorio, ServicoOferecidolRepositorioAplicacao {
 
     @Autowired
     private ServicoOferecidoJpaRepository servicoOferecidoJpaRepository;
     
-    @Autowired 
+    @Autowired
     JpaMapeador mapeador;
 
     @Override
@@ -80,6 +87,14 @@ class ServicoOferecidoJpaRepositorioImpl implements ServicoOferecidoRepositorio 
         .stream()
         .map(jpa -> mapeador.map(jpa, ServicoOferecido.class))
         .toList();
+    }
+
+    @Override
+    public List<ServicoOferecidoResumo> listarTodosResumos() {
+        // Usando projeção direta do JPA - muito mais eficiente!
+        // O Spring Data JPA cria automaticamente a implementação
+        // e gera SQL otimizado: SELECT id, nome, preco, descricao, duracaoMinutos FROM servico_oferecido ORDER BY nome
+        return servicoOferecidoJpaRepository.findServicoOferecidoResumoByOrderByNome();
     }
 
     @Override

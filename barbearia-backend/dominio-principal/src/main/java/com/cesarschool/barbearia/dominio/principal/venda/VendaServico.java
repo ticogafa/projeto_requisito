@@ -2,10 +2,12 @@ package com.cesarschool.barbearia.dominio.principal.venda;
 
 import java.util.List;
 
+
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.principal.itemvenda.ItemVenda;
 import com.cesarschool.barbearia.dominio.principal.produto.Produto;
 import com.cesarschool.barbearia.dominio.principal.produto.ProdutoServico;
+
 
 public class VendaServico {
 
