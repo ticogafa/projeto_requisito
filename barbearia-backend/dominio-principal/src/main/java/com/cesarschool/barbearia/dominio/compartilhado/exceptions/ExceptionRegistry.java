@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExceptionRegistry {
 
-       private final Map<Class<? extends Exception>, ExceptionEntry> registry = new ConcurrentHashMap<>();
+    private final Map<Class<? extends Exception>, ExceptionEntry> registry = new ConcurrentHashMap<>();
 
     public void register(Class<? extends Exception> exceptionClass,
                          Class<? extends ExceptionAdapter> adapter,
@@ -18,9 +18,8 @@ public class ExceptionRegistry {
         registry.put(exceptionClass, new ExceptionEntry(adapter, status));
     }
 
-    public void register(Class<? extends Exception> exceptionClass,
-                         HttpStatus status) {
-        registry.put(exceptionClass, new ExceptionEntry(ExceptionAdapter.class, status));
+    public void register(Class<? extends Exception> exceptionClass, HttpStatus status) {
+        this.register(exceptionClass, ExceptionAdapter.class, status);
     }
 
     private Optional<ExceptionAdapter> getExactMatchAdapter(Exception ex) {

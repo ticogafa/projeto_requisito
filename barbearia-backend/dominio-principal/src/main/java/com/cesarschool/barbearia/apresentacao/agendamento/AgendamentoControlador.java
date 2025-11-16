@@ -17,6 +17,7 @@ import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoServicoAplicac
 import com.cesarschool.barbearia.aplicacao.agendamento.CriarAgendamentoRequest;
 import com.cesarschool.barbearia.aplicacao.agendamento.ProfissionalDisponivelResumo;
 import com.cesarschool.barbearia.dominio.compartilhado.exceptions.ExceptionHandler;
+import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
 
 /**
  * Controlador REST para operações de agendamento.
@@ -29,6 +30,8 @@ import com.cesarschool.barbearia.dominio.compartilhado.exceptions.ExceptionHandl
 @RestController
 @RequestMapping("/api/agendamentos")
 public class AgendamentoControlador {
+
+    private static final LoggerSingleton logger = LoggerSingleton.getInstance();
 
     @Autowired
     private AgendamentoServicoAplicacao servicoAplicacao;
@@ -48,10 +51,13 @@ public class AgendamentoControlador {
             @RequestParam String dataHora) {
         
         return exceptionHandler.withHandler(() -> {
+            logger.info("Buscando profissionais disponíveis - servicoId: " + servicoId + ", dataHora: " + dataHora);
+            
             LocalDateTime data = LocalDateTime.parse(dataHora);
             List<ProfissionalDisponivelResumo> disponiveis = 
                 servicoAplicacao.buscarProfissionaisDisponiveis(servicoId, data);
             
+            logger.success("Encontrados " + disponiveis.size() + " profissionais disponíveis");
             return ResponseEntity.ok(disponiveis);
         });
     }
@@ -64,7 +70,13 @@ public class AgendamentoControlador {
     @PostMapping("/criar")
     public ResponseEntity<AgendamentoResumo> criar(@RequestBody CriarAgendamentoRequest request) {
         return exceptionHandler.withHandler(() -> {
+            logger.info("Criando agendamento - clienteId: " + request.getClienteId() + 
+                       ", profissionalId: " + request.getProfissionalId() + 
+                       ", servicoId: " + request.getServicoId());
+            
             AgendamentoResumo agendamento = servicoAplicacao.criar(request);
+            
+            logger.success("Agendamento criado com sucesso - ID: " + agendamento.getId());
             return ResponseEntity.ok(agendamento);
         });
     }
@@ -77,7 +89,11 @@ public class AgendamentoControlador {
     @GetMapping("/por-cliente")
     public ResponseEntity<List<AgendamentoResumo>> listarPorCliente(@RequestParam Integer clienteId) {
         return exceptionHandler.withHandler(() -> {
+            logger.info("Listando agendamentos do cliente: " + clienteId);
+            
             List<AgendamentoResumo> agendamentos = servicoAplicacao.listarPorCliente(clienteId);
+            
+            logger.info("Encontrados " + agendamentos.size() + " agendamentos para o cliente " + clienteId);
             return ResponseEntity.ok(agendamentos);
         });
     }

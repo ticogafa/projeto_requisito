@@ -32,7 +32,7 @@ public class ExceptionHandler {
             return callable.get();
         } catch (Exception e) {
             ExceptionAdapter adapter = registry.getAdapter(e);
-            return (ResponseEntity<T>)(Object) adapter.toResponseEntity();
+            return (ResponseEntity<T>) adapter.toResponseEntity();
         }
     }
 }

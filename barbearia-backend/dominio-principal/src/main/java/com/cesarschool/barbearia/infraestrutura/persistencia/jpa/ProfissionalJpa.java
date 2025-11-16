@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepositorio;
@@ -111,6 +112,8 @@ interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integ
 @Repository
 class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
 
+    private static final LoggerSingleton logger = LoggerSingleton.getInstance();
+
     @Autowired
     private ProfissionalJpaRepository profissionalJpaRepository;
     
@@ -197,7 +200,7 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
             }
         }
         
-        System.out.println("DEBUG: Total profissionais disponíveis: " + disponiveis.size());
+        logger.success("Total profissionais disponíveis: " + disponiveis.size());
         return disponiveis;
     }
 

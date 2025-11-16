@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoRepositorioAplicacao;
 import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoResumo;
 import com.cesarschool.barbearia.aplicacao.agendamento.ProfissionalDisponivelResumo;
+import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
@@ -21,6 +23,8 @@ import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
  */
 @Repository
 class AgendamentoRepositorioAplicacaoImpl implements AgendamentoRepositorioAplicacao {
+
+    private static final LoggerSingleton logger = LoggerSingleton.getInstance();
 
     @Autowired
     private ProfissionalDisponivelQueryRepository profissionalDisponivelRepo;
@@ -37,11 +41,10 @@ class AgendamentoRepositorioAplicacaoImpl implements AgendamentoRepositorioAplic
         var horaInicio = dataHora.toLocalTime();
         var horaFim = dataHora.toLocalTime().plusMinutes(duracaoMinutos);
         
-        System.out.println("=== DEBUG REPOSITORIO APLICACAO ===");
-        System.out.println("servicoId: " + servicoId.getValor());
-        System.out.println("horaInicio: " + horaInicio);
-        System.out.println("horaFim: " + horaFim);
-        System.out.println("duracaoMinutos: " + duracaoMinutos);
+        logger.info("Buscando profissionais disponíveis - servicoId: " + servicoId.getValor() + 
+                   ", horaInicio: " + horaInicio + 
+                   ", horaFim: " + horaFim + 
+                   ", duração: " + duracaoMinutos + "min");
         
         var resultado = profissionalDisponivelRepo.buscarDisponiveis(
             servicoId.getValor(),
@@ -49,7 +52,7 @@ class AgendamentoRepositorioAplicacaoImpl implements AgendamentoRepositorioAplic
             horaFim
         );
         
-        System.out.println("Resultado query: " + resultado.size() + " profissionais encontrados");
+        logger.success("Query retornou " + resultado.size() + " profissionais encontrados");
         return resultado;
     }
 
@@ -64,7 +67,7 @@ class AgendamentoRepositorioAplicacaoImpl implements AgendamentoRepositorioAplic
  * Usa projeção de interface Spring Data JPA.
  */
 @Repository
-interface ProfissionalDisponivelQueryRepository extends org.springframework.data.jpa.repository.JpaRepository<ProfissionalJpa, Integer> {
+interface ProfissionalDisponivelQueryRepository extends JpaRepository<ProfissionalJpa, Integer> {
     
     /**
      * Busca profissionais disponíveis usando projeção.
@@ -95,7 +98,7 @@ interface ProfissionalDisponivelQueryRepository extends org.springframework.data
  * Usa projeção de interface Spring Data JPA.
  */
 @Repository
-interface AgendamentoResumoQueryRepository extends org.springframework.data.jpa.repository.JpaRepository<AgendamentoJpa, Integer> {
+interface AgendamentoResumoQueryRepository extends JpaRepository<AgendamentoJpa, Integer> {
     
     @Query("""
         SELECT a.id as id,

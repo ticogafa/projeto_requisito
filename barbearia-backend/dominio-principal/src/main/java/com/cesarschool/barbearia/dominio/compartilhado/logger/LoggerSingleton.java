@@ -1,7 +1,7 @@
 package com.cesarschool.barbearia.dominio.compartilhado.logger;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class Level{
     public static String INFO = "INFO";
@@ -13,6 +13,7 @@ class Level{
 public class LoggerSingleton {
     
     private static LoggerSingleton instance;
+    private static final Logger slf4jLogger = LoggerFactory.getLogger(LoggerSingleton.class);
 
     private LoggerSingleton(){}
 
@@ -21,7 +22,7 @@ public class LoggerSingleton {
             instance = new LoggerSingleton();
         }
         return instance;
-        }
+    }
     
     public void info(String message){
         getInstance().log(message, Level.INFO);
@@ -35,18 +36,33 @@ public class LoggerSingleton {
         getInstance().log(message, Level.ERROR);
     }
     
+    public void error(String message, Throwable throwable){
+        if(message == null) message = "";
+        slf4jLogger.error(message, throwable);
+    }
+    
     public void warn(String message){
         getInstance().log(message, Level.WARN);
     }
 
     public void log(String message, String level){
-    if(message == null) message = "";
+        if(message == null) message = "";
 
-    String timestamp = ZonedDateTime
-        .now()
-        .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-
-
-    System.out.printf("%s [%s] - %s%n", timestamp, level, message);
+        switch(level) {
+            case "INFO":
+                slf4jLogger.info(message);
+                break;
+            case "SUCCESS":
+                slf4jLogger.info("✓ {}", message);
+                break;
+            case "ERROR":
+                slf4jLogger.error(message);
+                break;
+            case "WARN":
+                slf4jLogger.warn(message);
+                break;
+            default:
+                slf4jLogger.info(message);
+        }
     }
 }

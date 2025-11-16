@@ -8,6 +8,9 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import lombok.Getter;
+
+@Getter
 public class ExceptionAdapter {
     private final HttpStatus statusCode;
     private final Exception originalException;
@@ -20,14 +23,6 @@ public class ExceptionAdapter {
     public ExceptionAdapter(Exception origException){
         this.originalException=origException;
         this.statusCode=HttpStatus.BAD_REQUEST;
-    }
-
-    public HttpStatus getStatusCode() {
-        return statusCode;
-    }
-
-    public Exception getOriginalException() {
-        return originalException;
     }
 
     public String getMessage(){

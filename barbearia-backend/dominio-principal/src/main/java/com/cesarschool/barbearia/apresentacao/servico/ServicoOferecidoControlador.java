@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cesarschool.barbearia.aplicacao.servico.ServicoOferecidoResumo;
 import com.cesarschool.barbearia.aplicacao.servico.ServicoOferecidolRepositorioAplicacao;
+import com.cesarschool.barbearia.dominio.compartilhado.exceptions.ExceptionHandler;
+import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
 
 /**
  * Controlador REST para operações com ServicoOferecido.
@@ -20,8 +22,13 @@ import com.cesarschool.barbearia.aplicacao.servico.ServicoOferecidolRepositorioA
 @RequestMapping("/api/servico-oferecido")
 public class ServicoOferecidoControlador {
 
+    private static final LoggerSingleton logger = LoggerSingleton.getInstance();
+
     @Autowired 
     private ServicoOferecidolRepositorioAplicacao repositorioAplicacao;
+    
+    @Autowired
+    private ExceptionHandler exceptionHandler;
 
     /**
      * Lista todos os serviços oferecidos ordenados por nome.
@@ -32,6 +39,13 @@ public class ServicoOferecidoControlador {
      */
     @GetMapping("/listar/")
     public ResponseEntity<List<ServicoOferecidoResumo>> listarTodos() {
-        return ResponseEntity.ok(repositorioAplicacao.listarTodosResumos());
+        return exceptionHandler.withHandler(() -> {
+            logger.info("Listando todos os serviços oferecidos");
+            
+            List<ServicoOferecidoResumo> servicos = repositorioAplicacao.listarTodosResumos();
+            
+            logger.success("Encontrados " + servicos.size() + " serviços oferecidos");
+            return ResponseEntity.ok(servicos);
+        });
     }
 }
