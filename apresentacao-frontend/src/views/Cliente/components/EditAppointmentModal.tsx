@@ -1,4 +1,4 @@
-import { useProfissionaisDisponiveis } from '@/hooks/UseFetch';
+import { useProfissionaisDisponiveis } from '@/hooks/useProfissionaisDisponiveis';
 import type { AgendamentoInterface } from '@/interfaces/AgendamentoInterface';
 import type { ServicosOferecidosResponse } from '@/interfaces/ServicoOferecidoInterface';
 import MainService from '@/services/MainService';

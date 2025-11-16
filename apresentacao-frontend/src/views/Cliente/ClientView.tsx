@@ -1,4 +1,5 @@
-import { useAgendamentosPorCliente, useServicosOferecidos } from '@/hooks/UseFetch';
+import { useAgendamentosPorCliente } from '@/hooks/useAgendamentosPorCliente';
+import { useServicosOferecidos } from '@/hooks/useServicosOferecidos';
 import type { AgendamentoInterface } from '@/interfaces/AgendamentoInterface';
 
 import { useAuth } from '@/auth/AuthContext';
@@ -7,7 +8,8 @@ import MainService from '@/services/MainService';
 import { useLoadingStore } from '@/store/useLoadingStore';
 
 import { AppointmentsTable, ClientHeader, ClientLayout, EditAppointmentModal, NewAppointmentModal } from '@/views/Cliente/components';
-import { useEffect, useState } from 'react';
+import { AxiosError, AxiosResponse } from 'axios';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -26,11 +28,6 @@ export default function ClientView() {
   const userName = user?.email?.split('@')[0] || 'Usuário';
   const { data: agendamentos, setData: setAgendamentos } = useAgendamentosPorCliente(clienteId);
 
-  useEffect(() => {
-    document.title = 'Página do Cliente';
-    toast.success('Bem-vindo!');
-  }, []);
-
   const handleEdit = (id: number) => {
     const agendamento = agendamentos.find(a => a.id === id);
     if (agendamento) {
@@ -46,24 +43,27 @@ export default function ClientView() {
 
     setLoading(true);
 
+    const successCallback = (response: AxiosResponse<AgendamentoInterface>) => {
+      toast.success('Agendamento cancelado com sucesso!');
+      setAgendamentos(
+        agendamentos.map(a => a.id === id ? response.data : a)
+      );
+    };
+
+    const errorCallback = (error: AxiosError) => {
+      const errorData = error.response?.data as { message?: string } | undefined;
+      const message = errorData?.message || 'Erro ao cancelar agendamento';
+      toast.error(message);
+    };
+
+    const finallyCallback = () => setLoading(false);
+
     mainService.cancelarAgendamento(
       id,
       clienteId,
-      (response) => {
-        toast.success('Agendamento cancelado com sucesso!');
-        // Atualizar lista localmente
-        setAgendamentos(
-          agendamentos.map(a => a.id === id ? response.data : a)
-        );
-      },
-      (error) => {
-        const errorData = error.response?.data as { message?: string } | undefined;
-        const message = errorData?.message || 'Erro ao cancelar agendamento';
-        toast.error(message);
-      },
-      () => {
-        setLoading(false);
-      }
+      successCallback,
+      errorCallback,
+      finallyCallback
     );
   };
 
@@ -91,11 +91,7 @@ export default function ClientView() {
       toast.error(error);
     };
 
-    const finallyCallback = () => {
-      // Pode adicionar lógica adicional aqui se necessário
-    };
-
-    AuthService.logout(successCallback, errorCallback, finallyCallback);
+    AuthService.logout(successCallback, errorCallback);
   };
 
   return (

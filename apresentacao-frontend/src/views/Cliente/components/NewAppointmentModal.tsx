@@ -1,4 +1,5 @@
-import { useCriarAgendamento, useProfissionaisDisponiveis } from '@/hooks/UseFetch';
+import { useCriarAgendamento } from '@/hooks/useCriarAgendamento';
+import { useProfissionaisDisponiveis } from '@/hooks/useProfissionaisDisponiveis';
 import type { AgendamentoInterface } from '@/interfaces/AgendamentoInterface';
 import type { ServicosOferecidosResponse } from '@/interfaces/ServicoOferecidoInterface';
 import { useEffect, useState } from 'react';

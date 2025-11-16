@@ -107,7 +107,7 @@ export default class AuthService {
   static async logout(
     successCallback: () => void,
     errorCallback: (error: string) => void,
-    finallyCallback: () => void
+    finallyCallback: () => void = () => { }
   ): Promise<void> {
     try {
       await firebaseLogout();
