@@ -97,4 +97,66 @@ public class AgendamentoServicoAplicacao {
     public List<AgendamentoResumo> listarPorCliente(Integer clienteId) {
         return repositorioAplicacao.buscarPorCliente(new ClienteId(clienteId));
     }
+
+    /**
+     * Edita um agendamento existente.
+     */
+    public AgendamentoResumo editar(Integer agendamentoId, EditarAgendamentoRequest request) {
+        notNull(request, "Request não pode ser nulo");
+        notNull(agendamentoId, "ID do agendamento não pode ser nulo");
+        
+        // Validar horário de funcionamento
+        LocalTime hora = request.getDataHora().toLocalTime();
+        if (hora.isBefore(LocalTime.of(8, 0)) || hora.isAfter(LocalTime.of(18, 0))) {
+            throw new IllegalStateException(
+                "Agendamentos só podem ser feitos entre 08:00 e 18:00"
+            );
+        }
+        
+        ProfissionalId profId = request.getProfissionalId() != null ? 
+                new ProfissionalId(request.getProfissionalId()) : null;
+        
+        // Editar via serviço de domínio
+        Agendamento editado = agendamentoServico.editar(
+            new com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId(agendamentoId),
+            request.getDataHora(),
+            profId,
+            request.getObservacoes()
+        );
+        
+        // Retornar com dados completos
+        return repositorioAplicacao.buscarPorCliente(editado.getClienteId())
+            .stream()
+            .filter(a -> a.getId().equals(editado.getId().getValor()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Erro ao buscar agendamento editado"));
+    }
+
+    /**
+     * Cancela um agendamento.
+     */
+    public AgendamentoResumo cancelar(Integer agendamentoId, Integer clienteId) {
+        notNull(agendamentoId, "ID do agendamento não pode ser nulo");
+        notNull(clienteId, "ID do cliente não pode ser nulo");
+        
+        // Criar usuario solicitante como cliente
+        com.cesarschool.barbearia.dominio.principal.agendamento.UsuarioSolicitante usuario = 
+            new com.cesarschool.barbearia.dominio.principal.agendamento.UsuarioSolicitante(
+                com.cesarschool.barbearia.dominio.compartilhado.enums.TipoUsuario.CLIENTE,
+                new ClienteId(clienteId)
+            );
+        
+        // Cancelar via serviço de domínio
+        Agendamento cancelado = agendamentoServico.cancelar(
+            new com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId(agendamentoId),
+            usuario
+        );
+        
+        // Retornar com dados completos
+        return repositorioAplicacao.buscarPorCliente(cancelado.getClienteId())
+            .stream()
+            .filter(a -> a.getId().equals(cancelado.getId().getValor()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Erro ao buscar agendamento cancelado"));
+    }
 }

@@ -1,7 +1,9 @@
 export interface AgendamentoInterface {
   id: number;
   dataHora: string;
+  profissionalId?: number;
   profissionalNome: string;
+  servicoId: number;
   servicoNome: string;
   status: string;
   observacoes?: string;

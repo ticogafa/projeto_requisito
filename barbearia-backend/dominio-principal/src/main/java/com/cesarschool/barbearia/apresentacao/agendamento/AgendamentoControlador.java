@@ -5,8 +5,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoResumo;
 import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoServicoAplicacao;
 import com.cesarschool.barbearia.aplicacao.agendamento.CriarAgendamentoRequest;
+import com.cesarschool.barbearia.aplicacao.agendamento.EditarAgendamentoRequest;
 import com.cesarschool.barbearia.aplicacao.agendamento.ProfissionalDisponivelResumo;
 import com.cesarschool.barbearia.dominio.compartilhado.exceptions.ExceptionHandler;
 import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
@@ -95,6 +99,49 @@ public class AgendamentoControlador {
             
             logger.info("Encontrados " + agendamentos.size() + " agendamentos para o cliente " + clienteId);
             return ResponseEntity.ok(agendamentos);
+        });
+    }
+
+    /**
+     * Edita um agendamento existente.
+     * @param id ID do agendamento
+     * @param request Novos dados do agendamento
+     * @return Agendamento atualizado
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<AgendamentoResumo> editar(
+            @PathVariable Integer id,
+            @RequestBody EditarAgendamentoRequest request) {
+        
+        return exceptionHandler.withHandler(() -> {
+            logger.info("Editando agendamento - ID: " + id + 
+                       ", nova dataHora: " + request.getDataHora());
+            
+            AgendamentoResumo agendamento = servicoAplicacao.editar(id, request);
+            
+            logger.success("Agendamento editado com sucesso - ID: " + id);
+            return ResponseEntity.ok(agendamento);
+        });
+    }
+
+    /**
+     * Cancela um agendamento.
+     * @param id ID do agendamento
+     * @param clienteId ID do cliente solicitante
+     * @return Agendamento cancelado
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<AgendamentoResumo> cancelar(
+            @PathVariable Integer id,
+            @RequestParam Integer clienteId) {
+        
+        return exceptionHandler.withHandler(() -> {
+            logger.info("Cancelando agendamento - ID: " + id + ", clienteId: " + clienteId);
+            
+            AgendamentoResumo agendamento = servicoAplicacao.cancelar(id, clienteId);
+            
+            logger.success("Agendamento cancelado com sucesso - ID: " + id);
+            return ResponseEntity.ok(agendamento);
         });
     }
 }

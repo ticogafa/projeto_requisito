@@ -150,6 +150,54 @@ public class AgendamentoServico {
         return repositorio.salvar(agendamento);
     }
 
+    /**
+     * Edita um agendamento existente.
+     * Permite alterar data/hora, profissional e observações.
+     * Valida se o novo horário está disponível e se o profissional está qualificado.
+     */
+    public Agendamento editar(
+            AgendamentoId id, 
+            LocalDateTime novaDataHora, 
+            ProfissionalId novoProfissionalId, 
+            String novasObservacoes) {
+        
+        Validacoes.validarObjetoObrigatorio(id, "ID do agendamento");
+        Validacoes.validarObjetoObrigatorio(novaDataHora, "Nova data e hora");
+        
+        Agendamento agendamento = buscarPorId(id);
+        
+        // Validar se profissional está qualificado para o serviço
+        if (novoProfissionalId != null && !novoProfissionalId.equals(agendamento.getProfissionalId())) {
+            validarProfissionalQualificado(novoProfissionalId, agendamento.getServicoId());
+        }
+        
+        // Verificar disponibilidade do novo horário
+        // Buscar duração do serviço
+        int duracaoServicoMinutos = servicoRepositorio
+            .buscarPorId(agendamento.getServicoId().getValor())
+            .getDuracaoMinutos();
+        
+        // Verificar conflitos (excluindo o próprio agendamento)
+        ProfissionalId profissionalParaVerificar = novoProfissionalId != null ? novoProfissionalId : agendamento.getProfissionalId();
+        
+        if (!novaDataHora.equals(agendamento.getDataHora()) || 
+            (novoProfissionalId != null && !novoProfissionalId.equals(agendamento.getProfissionalId()))) {
+            
+            if (repositorio.existeAgendamentoNoPeriodo(
+                    profissionalParaVerificar, 
+                    novaDataHora, 
+                    duracaoServicoMinutos)) {
+                throw new IllegalStateException(
+                    "Já existe um agendamento neste horário para o profissional"
+                );
+            }
+        }
+        
+        // Aplicar edição
+        agendamento.editar(novaDataHora, novoProfissionalId, novasObservacoes);
+        return repositorio.salvar(agendamento);
+    }
+
     public List<Agendamento> listarPorCliente(ClienteId clienteId) {
         Validacoes.validarObjetoObrigatorio(clienteId, "ID do cliente");
         return repositorio.buscarPorCliente(clienteId);

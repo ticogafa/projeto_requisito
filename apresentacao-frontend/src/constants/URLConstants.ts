@@ -10,6 +10,8 @@ export const SERVICO_OFERECIDO_URLS = {
 
 export const AGENDAMENTO_URLS = {
   CRIAR: '/agendamentos/criar',
+  EDITAR: '/agendamentos',
+  CANCELAR: '/agendamentos',
   PROFISSIONAIS_DISPONIVEIS: '/agendamentos/profissionais-disponiveis',
   POR_CLIENTE: '/agendamentos/por-cliente'
 };

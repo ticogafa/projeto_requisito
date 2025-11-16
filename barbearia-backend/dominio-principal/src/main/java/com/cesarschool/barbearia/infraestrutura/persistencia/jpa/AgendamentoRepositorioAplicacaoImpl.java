@@ -103,7 +103,9 @@ interface AgendamentoResumoQueryRepository extends JpaRepository<AgendamentoJpa,
     @Query("""
         SELECT a.id as id,
                a.dataHora as dataHora,
+               a.profissionalId as profissionalId,
                COALESCE(p.nome, 'Aguardando confirmação') as profissionalNome,
+               a.servicoId as servicoId,
                s.nome as servicoNome,
                a.status as status,
                a.observacoes as observacoes

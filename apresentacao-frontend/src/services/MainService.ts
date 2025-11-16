@@ -117,6 +117,58 @@ export default class MainService {
   }
 
   /**
+   * Edits an existing appointment.
+   *
+   * @param agendamentoId - The appointment ID
+   * @param data - The updated appointment data
+   * @param successCallback - Success callback function
+   * @param errorCallback - Error callback function
+   * @param finallyCallback - Finally callback function
+   */
+  editarAgendamento(
+    agendamentoId: number,
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.put(
+      `${AGENDAMENTO_URLS.EDITAR}/${agendamentoId}`,
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  /**
+   * Cancels an appointment.
+   *
+   * @param agendamentoId - The appointment ID
+   * @param clienteId - The client ID requesting cancellation
+   * @param successCallback - Success callback function
+   * @param errorCallback - Error callback function
+   * @param finallyCallback - Finally callback function
+   */
+  cancelarAgendamento(
+    agendamentoId: number,
+    clienteId: number,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.delete(
+      `${AGENDAMENTO_URLS.CANCELAR}/${agendamentoId}?clienteId=${clienteId}`,
+      {},
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  /**
    * Signs in a user.
    *
    * @param data - The user's data

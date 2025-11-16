@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 public interface AgendamentoResumo {
     Integer getId();
     LocalDateTime getDataHora();
+    Integer getProfissionalId();
     String getProfissionalNome();
+    Integer getServicoId();
     String getServicoNome();
     String getStatus();
     String getObservacoes();

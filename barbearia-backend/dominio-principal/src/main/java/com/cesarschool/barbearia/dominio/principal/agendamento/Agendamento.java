@@ -98,6 +98,19 @@ public final class Agendamento {
             throw new IllegalStateException("Cancelamentos só são permitidos com pelo menos duas horas de antecedência.");
     }
 
+    public void editar(LocalDateTime novaDataHora, ProfissionalId novoProfissionalId, String novasObservacoes) {
+        validarStatusEdicao();
+        setDataHora(novaDataHora);
+        setProfissional(novoProfissionalId);
+        setObservacoes(novasObservacoes);
+    }
+
+    private void validarStatusEdicao() {
+        if (status != StatusAgendamento.PENDENTE && status != StatusAgendamento.CONFIRMADO) {
+            throw new IllegalStateException("Apenas agendamentos pendentes ou confirmados podem ser editados");
+        }
+    }
+
     
     public void setId(AgendamentoId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do Agendamento");
