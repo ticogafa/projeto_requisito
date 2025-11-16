@@ -1,51 +1,76 @@
 /**
- * Handles local storage authentication data,
- * with centralized serialization/deserialization.
+ * Service for managing authentication tokens in localStorage.
  */
 export default class AuthStorage {
-  private static getItem<T>(key: string, fallback: T): T {
-    const raw = localStorage.getItem(key);
-    if (raw === null) return fallback;
+  private static readonly ACCESS_TOKEN_KEY = 'access_token';
+  private static readonly REFRESH_TOKEN_KEY = 'refresh_token';
+  private static readonly USER_KEY = 'user_data';
+  private static readonly IS_LOGGED_KEY = 'is_logged';
 
-    try {
-      return JSON.parse(raw);
-    } catch {
-      // fallback para dados antigos não serializados
-      return raw as unknown as T;
-    }
-  }
-
-  private static setItem<T>(key: string, value: T): void {
-    localStorage.setItem(key, JSON.stringify(value));
-  }
-
-  static clear(): void {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('is_logged');
-  }
-
-  static getAccessToken(): string {
-    return this.getItem('access_token', '');
-  }
-
-  static getRefreshToken(): string {
-    return this.getItem('refresh_token', '');
-  }
-
-  static getIsLogged(): boolean {
-    return this.getItem('is_logged', false);
-  }
-
+  /**
+   * Sets the access token in localStorage.
+   */
   static setAccessToken(token: string): void {
-    this.setItem('access_token', token);
+    localStorage.setItem(this.ACCESS_TOKEN_KEY, token);
   }
 
+  /**
+   * Gets the access token from localStorage.
+   */
+  static getAccessToken(): string | null {
+    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+  }
+
+  /**
+   * Sets the refresh token in localStorage.
+   */
   static setRefreshToken(token: string): void {
-    this.setItem('refresh_token', token);
+    localStorage.setItem(this.REFRESH_TOKEN_KEY, token);
   }
 
+  /**
+   * Gets the refresh token from localStorage.
+   */
+  static getRefreshToken(): string | null {
+    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+  }
+
+  /**
+   * Sets user data in localStorage.
+   */
+  static setUserData(user: object): void {
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+  }
+
+  /**
+   * Gets user data from localStorage.
+   */
+  static getUserData(): object | null {
+    const data = localStorage.getItem(this.USER_KEY);
+    return data ? JSON.parse(data) : null;
+  }
+
+  /**
+   * Sets the logged-in status.
+   */
   static setIsLogged(isLogged: boolean): void {
-    this.setItem('is_logged', isLogged);
+    localStorage.setItem(this.IS_LOGGED_KEY, String(isLogged));
+  }
+
+  /**
+   * Gets the logged-in status.
+   */
+  static getIsLogged(): boolean {
+    return localStorage.getItem(this.IS_LOGGED_KEY) === 'true';
+  }
+
+  /**
+   * Clears all authentication data from localStorage.
+   */
+  static clearAll(): void {
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem(this.IS_LOGGED_KEY);
   }
 }

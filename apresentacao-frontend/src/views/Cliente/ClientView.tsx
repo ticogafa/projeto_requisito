@@ -1,12 +1,15 @@
 import { useAgendamentosPorCliente, useServicosOferecidos } from '@/hooks/UseFetch';
 import type { AgendamentoInterface } from '@/interfaces/AgendamentoInterface';
 
+import { useAuth } from '@/auth/AuthContext';
+import AuthService from '@/services/AuthService';
 import MainService from '@/services/MainService';
 import { useLoadingStore } from '@/store/useLoadingStore';
 
+import { AppointmentsTable, ClientHeader, ClientLayout, EditAppointmentModal, NewAppointmentModal } from '@/views/Cliente/components';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ClientLayout, NewAppointmentModal, EditAppointmentModal, ClientHeader, AppointmentsTable } from '@/views/Cliente/components';
 
 export default function ClientView() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -15,10 +18,12 @@ export default function ClientView() {
   const { data: servicos } = useServicosOferecidos();
   const { setLoading } = useLoadingStore();
   const mainService = MainService.getInstance();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // TODO: Pegar clienteId e userName do contexto de autenticação
+  // TODO: Pegar clienteId do backend baseado no user.email
   const clienteId = 1;
-  const userName = 'João Pereira';
+  const userName = user?.email?.split('@')[0] || 'Usuário';
   const { data: agendamentos, setData: setAgendamentos } = useAgendamentosPorCliente(clienteId);
 
   useEffect(() => {
@@ -76,9 +81,21 @@ export default function ClientView() {
     );
   };
 
-  const handleLogout = () => {
-    // TODO: Implementar logout
-    toast.info('Logout - Em desenvolvimento');
+  const handleLogout = async () => {
+    const successCallback = () => {
+      toast.success('Logout realizado com sucesso!');
+      navigate('/');
+    };
+
+    const errorCallback = (error: string) => {
+      toast.error(error);
+    };
+
+    const finallyCallback = () => {
+      // Pode adicionar lógica adicional aqui se necessário
+    };
+
+    AuthService.logout(successCallback, errorCallback, finallyCallback);
   };
 
   return (

@@ -1,3 +1,4 @@
+import { AuthProvider } from '@/auth/AuthContext';
 import '@/index.css';
 import router from '@/routers';
 import React from 'react';
@@ -9,6 +10,8 @@ export const root = document.getElementById('root');
 
 createRoot(root!).render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
+    <AuthProvider>
+      <RouterProvider router={router}/>
+    </AuthProvider>
   </React.StrictMode>
 );

@@ -169,21 +169,21 @@ export default class MainService {
   }
 
   /**
-   * Signs in a user.
+   * Registers a new user in the backend.
    *
-   * @param data - The user's data
+   * @param data - User registration data (email, password, role)
    * @param successCallback - Success callback function
    * @param errorCallback - Error callback function
    * @param finallyCallback - Finally callback function
    */
-  signInUser(
+  registerUser(
     data: object,
     successCallback: (response: AxiosResponse) => void,
     errorCallback: (error: AxiosError) => void,
     finallyCallback: () => void
   ): void {
     this.client.post(
-      AUTHENTICATION_URLS.GET_TOKEN,
+      AUTHENTICATION_URLS.REGISTER,
       data,
       {},
       successCallback,
@@ -191,4 +191,29 @@ export default class MainService {
       finallyCallback
     );
   }
+
+  /**
+   * Authenticates user and gets JWT token.
+   *
+   * @param data - Login data (email, password)
+   * @param successCallback - Success callback function
+   * @param errorCallback - Error callback function
+   * @param finallyCallback - Finally callback function
+   */
+  loginUser(
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.post(
+      AUTHENTICATION_URLS.LOGIN,
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
 }
