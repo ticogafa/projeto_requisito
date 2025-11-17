@@ -31,7 +31,7 @@ public class ExceptionHandler {
         try {
             return callable.get();
         } catch (Exception e) {
-            ExceptionAdapter adapter = registry.getAdapter(e);
+            GenericExceptionHandlerStrategy adapter = registry.getStrategy(e);
             return (ResponseEntity<T>) adapter.toResponseEntity();
         }
     }

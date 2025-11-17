@@ -1,8 +1,8 @@
 package com.cesarschool.barbearia.dominio.compartilhado.exceptions;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -10,27 +10,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExceptionRegistry {
 
-    private final Map<Class<? extends Exception>, ExceptionEntry> registry = new ConcurrentHashMap<>();
+    private final Map<Class<? extends Exception>, ExceptionEntry> registry = new HashMap<>();
 
     public void register(Class<? extends Exception> exceptionClass,
-                         Class<? extends ExceptionAdapter> adapter,
+                         Class<? extends GenericExceptionHandlerStrategy> adapter,
                          HttpStatus status) {
         registry.put(exceptionClass, new ExceptionEntry(adapter, status));
     }
 
     public void register(Class<? extends Exception> exceptionClass, HttpStatus status) {
-        this.register(exceptionClass, ExceptionAdapter.class, status);
+        this.register(exceptionClass, GenericExceptionHandlerStrategy.class, status);
     }
 
-    private Optional<ExceptionAdapter> getExactMatchAdapter(Exception ex) {
+    private Optional<GenericExceptionHandlerStrategy> getExactMatchStrategy(Exception ex) {
         Class<?> cls = ex.getClass();
         ExceptionEntry entry = registry.get(cls);
         
         if (entry == null) return Optional.empty();
 
-        return Optional.of(new ExceptionAdapter(ex, entry.getStatus()));
+        return Optional.of(new GenericExceptionHandlerStrategy(ex, entry.getStatus()));
     }
-    private Optional<ExceptionAdapter> getInheritanceMatchAdapter(Exception ex) {
+    private Optional<GenericExceptionHandlerStrategy> getInheritanceMatchStrategy(Exception ex) {
         ExceptionEntry found = null;
 
         for (var e : registry.entrySet()) {
@@ -42,14 +42,14 @@ public class ExceptionRegistry {
 
         if (found == null) return Optional.empty();
 
-        return Optional.of(new ExceptionAdapter(ex, found.getStatus()));
+        return Optional.of(new GenericExceptionHandlerStrategy(ex, found.getStatus()));
     }
 
-    public ExceptionAdapter getAdapter(Exception ex) {
+    public GenericExceptionHandlerStrategy getStrategy(Exception ex) {
         return
-            getExactMatchAdapter(ex)
-                .or(() -> getInheritanceMatchAdapter(ex))
-                .orElse(new ExceptionAdapter(ex));
+            getExactMatchStrategy(ex)
+                .or(() -> getInheritanceMatchStrategy(ex))
+                .orElse(new GenericExceptionHandlerStrategy(ex));
     }
 
     /**

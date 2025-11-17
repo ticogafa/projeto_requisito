@@ -8,21 +8,27 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import lombok.Getter;
 
-@Getter
-public class ExceptionAdapter {
+public class GenericExceptionHandlerStrategy implements ExceptionHandlerStrategy {
     private final HttpStatus statusCode;
     private final Exception originalException;
 
-    public ExceptionAdapter(Exception origException, HttpStatus statusCode){
+    public GenericExceptionHandlerStrategy(Exception origException, HttpStatus statusCode){
         this.originalException=origException;
         this.statusCode=statusCode;
     }
 
-    public ExceptionAdapter(Exception origException){
+    public GenericExceptionHandlerStrategy(Exception origException){
         this.originalException=origException;
         this.statusCode=HttpStatus.BAD_REQUEST;
+    }
+
+    public HttpStatus getStatusCode(){
+        return this.statusCode;
+    }
+
+    public Exception getOriginalException(){
+        return this.originalException;
     }
 
     public String getMessage(){

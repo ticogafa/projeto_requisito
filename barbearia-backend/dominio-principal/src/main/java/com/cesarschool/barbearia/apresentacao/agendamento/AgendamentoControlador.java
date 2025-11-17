@@ -55,13 +55,11 @@ public class AgendamentoControlador {
             @RequestParam String dataHora) {
         
         return exceptionHandler.withHandler(() -> {
-            logger.info("Buscando profissionais disponíveis - servicoId: " + servicoId + ", dataHora: " + dataHora);
             
             LocalDateTime data = LocalDateTime.parse(dataHora);
             List<ProfissionalDisponivelResumo> disponiveis = 
                 servicoAplicacao.buscarProfissionaisDisponiveis(servicoId, data);
             
-            logger.success("Encontrados " + disponiveis.size() + " profissionais disponíveis");
             return ResponseEntity.ok(disponiveis);
         });
     }
