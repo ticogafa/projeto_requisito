@@ -6,10 +6,10 @@ import lombok.Getter;
 
 @Getter
 public class ExceptionEntry {
-    private final Class<? extends GenericExceptionHandlerStrategy> adapterClass;
+    private final Class<? extends ExceptionHandlerStrategy> adapterClass;
     private final HttpStatus status;
 
-    public ExceptionEntry(Class<? extends GenericExceptionHandlerStrategy> adapterClass, HttpStatus status) {
+    public ExceptionEntry(Class<? extends ExceptionHandlerStrategy> adapterClass, HttpStatus status) {
         this.adapterClass = adapterClass;
         this.status = status;
     }

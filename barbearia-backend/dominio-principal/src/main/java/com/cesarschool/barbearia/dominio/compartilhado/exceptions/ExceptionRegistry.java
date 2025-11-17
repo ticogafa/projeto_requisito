@@ -13,7 +13,7 @@ public class ExceptionRegistry {
     private final Map<Class<? extends Exception>, ExceptionEntry> registry = new HashMap<>();
 
     public void register(Class<? extends Exception> exceptionClass,
-                         Class<? extends GenericExceptionHandlerStrategy> adapter,
+                         Class<? extends ExceptionHandlerStrategy> adapter,
                          HttpStatus status) {
         registry.put(exceptionClass, new ExceptionEntry(adapter, status));
     }
@@ -22,7 +22,7 @@ public class ExceptionRegistry {
         this.register(exceptionClass, GenericExceptionHandlerStrategy.class, status);
     }
 
-    private Optional<GenericExceptionHandlerStrategy> getExactMatchStrategy(Exception ex) {
+    private Optional<ExceptionHandlerStrategy> getExactMatchStrategy(Exception ex) {
         Class<?> cls = ex.getClass();
         ExceptionEntry entry = registry.get(cls);
         
@@ -30,7 +30,7 @@ public class ExceptionRegistry {
 
         return Optional.of(new GenericExceptionHandlerStrategy(ex, entry.getStatus()));
     }
-    private Optional<GenericExceptionHandlerStrategy> getInheritanceMatchStrategy(Exception ex) {
+    private Optional<ExceptionHandlerStrategy> getInheritanceMatchStrategy(Exception ex) {
         ExceptionEntry found = null;
 
         for (var e : registry.entrySet()) {
@@ -45,7 +45,7 @@ public class ExceptionRegistry {
         return Optional.of(new GenericExceptionHandlerStrategy(ex, found.getStatus()));
     }
 
-    public GenericExceptionHandlerStrategy getStrategy(Exception ex) {
+    public ExceptionHandlerStrategy getStrategy(Exception ex) {
         return
             getExactMatchStrategy(ex)
                 .or(() -> getInheritanceMatchStrategy(ex))
