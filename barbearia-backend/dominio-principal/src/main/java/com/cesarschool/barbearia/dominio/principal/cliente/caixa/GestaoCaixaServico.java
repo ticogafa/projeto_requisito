@@ -39,10 +39,10 @@ public class GestaoCaixaServico implements IGestaoCaixa {
     public BigDecimal saldoAtual() {
         List<Lancamento> todos = repositorio.buscarTodos();
         BigDecimal entradas = todos.stream()
-                
                 .filter(l -> l.getStatus() == StatusLancamento.ENTRADA)
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         BigDecimal saidas = todos.stream()
                 .filter(l -> l.getStatus() == StatusLancamento.SAIDA)
                 .map(Lancamento::getValor)

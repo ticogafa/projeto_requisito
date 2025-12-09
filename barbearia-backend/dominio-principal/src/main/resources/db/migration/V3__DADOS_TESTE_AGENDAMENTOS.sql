@@ -16,11 +16,11 @@ INSERT INTO cliente (id, nome, cpf, email, telefone, data_nascimento, endereco) 
 -- ========================================
 -- 2. PROFISSIONAIS
 -- ========================================
-INSERT INTO profissional (id, nome, cpf, email, telefone, especialidade, senioridade, comissao_percentual, ativo) VALUES
-(1, 'Carlos Silva', '98765432101', 'carlos.silva@barbearia.com', '81988881111', 'Corte e Barba', 'SENIOR', 40.00, true),
-(2, 'Pedro Souza', '98765432102', 'pedro.souza@barbearia.com', '81988882222', 'Corte Masculino', 'PLENO', 30.00, true),
-(3, 'Lucas Lima', '98765432103', 'lucas.lima@barbearia.com', '81988883333', 'Barba e Acabamento', 'JUNIOR', 20.00, true),
-(4, 'Rafael Mendes', '98765432104', 'rafael.mendes@barbearia.com', '81988884444', 'Corte Premium', 'SENIOR', 45.00, true);
+INSERT INTO profissional (id, nome, cpf, email, telefone, especialidade, senioridade, comissao_percentual, inicio_jornada, fim_jornada, ativo) VALUES
+(1, 'Carlos Silva', '98765432101', 'carlos.silva@barbearia.com', '81988881111', 'Corte e Barba', 'SENIOR', 40.00, '08:00:00', '18:00:00', true),
+(2, 'Pedro Souza', '98765432102', 'pedro.souza@barbearia.com', '81988882222', 'Corte Masculino', 'PLENO', 30.00, '08:00:00', '18:00:00', true),
+(3, 'Lucas Lima', '98765432103', 'lucas.lima@barbearia.com', '81988883333', 'Barba e Acabamento', 'JUNIOR', 20.00, '08:00:00', '18:00:00', true),
+(4, 'Rafael Mendes', '98765432104', 'rafael.mendes@barbearia.com', '81988884444', 'Corte Premium', 'SENIOR', 45.00, '08:00:00', '18:00:00', true);
 
 -- ========================================
 -- 3. SERVIÇOS OFERECIDOS
@@ -130,45 +130,45 @@ INSERT INTO jornada_trabalho (profissional_id, dia_semana, hora_inicio, hora_fim
 -- ========================================
 
 -- AGENDAMENTOS PARA SEGUNDA-FEIRA 18/11/2025
-INSERT INTO agendamento (cliente_id, profissional_id, servico_oferecido_id, data_hora, status, observacoes, criado_em) VALUES
+INSERT INTO agendamento (cliente_id, profissional_id, servico_id, data_hora, status, observacoes, criado_em) VALUES
 (1, 1, 2, '2025-11-18 09:00:00', 'CONFIRMADO', 'Cliente preferencial', '2025-11-15 10:00:00'),
 (2, 2, 1, '2025-11-18 10:00:00', 'CONFIRMADO', NULL, '2025-11-15 11:30:00'),
 (3, 3, 1, '2025-11-18 14:00:00', 'PENDENTE', 'Primeira vez na barbearia', '2025-11-15 14:20:00'),
 (4, 4, 4, '2025-11-18 15:00:00', 'CONFIRMADO', 'Evento especial', '2025-11-15 15:45:00');
 
 -- AGENDAMENTOS PARA TERÇA-FEIRA 19/11/2025
-INSERT INTO agendamento (cliente_id, profissional_id, servico_oferecido_id, data_hora, status, observacoes, criado_em) VALUES
+INSERT INTO agendamento (cliente_id, profissional_id, servico_id, data_hora, status, observacoes, criado_em) VALUES
 (1, 2, 3, '2025-11-19 08:30:00', 'CONFIRMADO', 'Barba por fazer', '2025-11-15 16:00:00'),
 (2, 1, 2, '2025-11-19 10:30:00', 'PENDENTE', NULL, '2025-11-15 17:10:00'),
 (3, 4, 6, '2025-11-19 14:00:00', 'CONFIRMADO', 'Luzes californianas', '2025-11-15 18:00:00');
 
 -- AGENDAMENTOS PARA QUARTA-FEIRA 20/11/2025 (Dia da Consciência Negra)
-INSERT INTO agendamento (cliente_id, profissional_id, servico_oferecido_id, data_hora, status, observacoes, criado_em) VALUES
+INSERT INTO agendamento (cliente_id, profissional_id, servico_id, data_hora, status, observacoes, criado_em) VALUES
 (4, 1, 4, '2025-11-20 09:00:00', 'CONFIRMADO', 'Corte especial feriado', '2025-11-15 19:00:00'),
 (1, 3, 1, '2025-11-20 11:00:00', 'CONFIRMADO', NULL, '2025-11-15 19:30:00');
 
 -- AGENDAMENTOS PARA QUINTA-FEIRA 21/11/2025
-INSERT INTO agendamento (cliente_id, profissional_id, servico_oferecido_id, data_hora, status, observacoes, criado_em) VALUES
+INSERT INTO agendamento (cliente_id, profissional_id, servico_id, data_hora, status, observacoes, criado_em) VALUES
 (2, 4, 5, '2025-11-21 09:00:00', 'CONFIRMADO', 'Platinado completo', '2025-11-15 20:00:00'),
 (3, 2, 2, '2025-11-21 14:30:00', 'PENDENTE', NULL, '2025-11-15 20:30:00'),
 (4, 1, 3, '2025-11-21 16:00:00', 'CONFIRMADO', 'Manutenção barba', '2025-11-15 21:00:00');
 
 -- AGENDAMENTOS PARA SEXTA-FEIRA 22/11/2025
-INSERT INTO agendamento (cliente_id, profissional_id, servico_oferecido_id, data_hora, status, observacoes, criado_em) VALUES
+INSERT INTO agendamento (cliente_id, profissional_id, servico_id, data_hora, status, observacoes, criado_em) VALUES
 (1, 1, 2, '2025-11-22 08:00:00', 'CONFIRMADO', 'Preparação fim de semana', '2025-11-15 08:00:00'),
 (2, 3, 1, '2025-11-22 10:00:00', 'CONFIRMADO', NULL, '2025-11-15 09:00:00'),
 (3, 2, 4, '2025-11-22 14:00:00', 'PENDENTE', 'Evento sábado', '2025-11-15 10:00:00'),
 (4, 4, 6, '2025-11-22 15:30:00', 'CONFIRMADO', 'Retoque luzes', '2025-11-15 11:00:00');
 
 -- AGENDAMENTOS PARA SÁBADO 23/11/2025
-INSERT INTO agendamento (cliente_id, profissional_id, servico_oferecido_id, data_hora, status, observacoes, criado_em) VALUES
+INSERT INTO agendamento (cliente_id, profissional_id, servico_id, data_hora, status, observacoes, criado_em) VALUES
 (1, 2, 1, '2025-11-23 08:00:00', 'CONFIRMADO', NULL, '2025-11-15 12:00:00'),
 (2, 1, 2, '2025-11-23 09:00:00', 'CONFIRMADO', 'Pacote completo', '2025-11-15 13:00:00'),
 (3, 3, 3, '2025-11-23 10:30:00', 'CONFIRMADO', 'Barba sábado', '2025-11-15 14:00:00'),
 (4, 4, 4, '2025-11-23 11:00:00', 'PENDENTE', 'Último horário', '2025-11-15 15:00:00');
 
 -- AGENDAMENTOS MAIS DISTANTES (SEMANA SEGUINTE 25-29/11/2025)
-INSERT INTO agendamento (cliente_id, profissional_id, servico_oferecido_id, data_hora, status, observacoes, criado_em) VALUES
+INSERT INTO agendamento (cliente_id, profissional_id, servico_id, data_hora, status, observacoes, criado_em) VALUES
 (1, 1, 5, '2025-11-25 09:00:00', 'PENDENTE', 'Platinado agendado', '2025-11-15 16:00:00'),
 (2, 4, 4, '2025-11-26 14:00:00', 'CONFIRMADO', NULL, '2025-11-15 17:00:00'),
 (3, 2, 2, '2025-11-27 10:00:00', 'PENDENTE', 'Pacote completo', '2025-11-15 18:00:00'),
