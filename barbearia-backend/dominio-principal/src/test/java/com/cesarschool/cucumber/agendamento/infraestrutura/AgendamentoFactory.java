@@ -13,13 +13,13 @@ public final class AgendamentoFactory {
 
     public static Agendamento criarPadrao() {
 
-        return Agendamento.builderCompleto()
-            .dataHora(LocalDateTime.now().plusHours(2))
-            .clienteId(new ClienteId(1))
-            .profissionalId(new ProfissionalId(1))
-            .servicoId(new ServicoOferecidoId(1))
-            .observacoes("Agendamento padrão para testes")
-            .build();
+        return new Agendamento(
+            LocalDateTime.now().plusHours(2),
+            new ClienteId(1),
+            new ProfissionalId(1),
+            new ServicoOferecidoId(1),
+            "Agendamento padrão para testes"
+        );
     }
 
     public static Agendamento criarParaHorario(LocalDateTime dataHora) {

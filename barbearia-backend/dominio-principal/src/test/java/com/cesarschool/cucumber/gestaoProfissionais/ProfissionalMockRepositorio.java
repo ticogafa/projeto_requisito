@@ -105,20 +105,25 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
         return listarTodos();
     }
 
+    private final Map<Integer, List<Integer>> qualificacoes = new HashMap<>();
+
     @Override
     public void adicionarQualificacao(Integer profissionalId, Integer servicoId) {
-        // Mock implementation - não faz nada
+        qualificacoes.computeIfAbsent(profissionalId, k -> new ArrayList<>()).add(servicoId);
     }
 
     @Override
     public void removerQualificacao(Integer profissionalId, Integer servicoId) {
-        // Mock implementation - não faz nada
+        List<Integer> servicos = qualificacoes.get(profissionalId);
+        if (servicos != null) {
+            servicos.remove(servicoId);
+        }
     }
 
     @Override
     public boolean estaQualificado(Integer profissionalId, Integer servicoId) {
-        // Mock implementation - sempre retorna true
-        return true;
+        List<Integer> servicos = qualificacoes.get(profissionalId);
+        return servicos != null && servicos.contains(servicoId);
     }
     
     // Métodos Auxiliares para Teste
