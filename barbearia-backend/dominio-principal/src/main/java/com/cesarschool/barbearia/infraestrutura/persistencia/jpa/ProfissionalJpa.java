@@ -79,7 +79,7 @@ public final class ProfissionalJpa {
     @JoinTable(
         name = "profissional_servico",
         joinColumns = @JoinColumn(name = "profissional_id"),
-        inverseJoinColumns = @JoinColumn(name = "servico_id")
+        inverseJoinColumns = @JoinColumn(name = "servicos_oferecidos_id")
     )
     private List<ServicoOferecidoJpa> servicosOferecidos;
 }
@@ -99,7 +99,7 @@ interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integ
      * Conta quantas associações existem entre profissional e serviço.
      * Usa query nativa para garantir uso da coluna correta.
      */
-    @Query(value = "SELECT COUNT(*) FROM profissional_servico WHERE profissional_id = :profissionalId AND servico_id = :servicoId", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM profissional_servico WHERE profissional_id = :profissionalId AND servicos_oferecidos_id = :servicoId", nativeQuery = true)
     Long countQualificacao(@Param("profissionalId") Integer profissionalId, @Param("servicoId") Integer servicoId);
     
     /**

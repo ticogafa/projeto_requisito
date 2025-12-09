@@ -37,6 +37,8 @@ CREATE TABLE IF NOT EXISTS profissional (
     especialidade VARCHAR(100),
     senioridade VARCHAR(20) NOT NULL,
     comissao_percentual DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    inicio_jornada TIME NOT NULL DEFAULT '08:00:00',
+    fim_jornada TIME NOT NULL DEFAULT '18:00:00',
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -107,16 +109,13 @@ CREATE INDEX idx_jornada_ativo ON jornada_trabalho(ativo);
 -- ATUALIZAR TABELA AGENDAMENTO
 -- Adicionar foreign keys e campos faltantes
 -- ========================================
-ALTER TABLE agendamento 
-    ADD COLUMN IF NOT EXISTS criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ADD COLUMN IF NOT EXISTS atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
--- Adicionar foreign keys (se não existirem)
--- Nota: Em MySQL você não pode adicionar FK se ela já existe, então usamos DROP IF EXISTS primeiro
-ALTER TABLE agendamento DROP FOREIGN KEY IF EXISTS fk_agendamento_cliente;
-ALTER TABLE agendamento DROP FOREIGN KEY IF EXISTS fk_agendamento_profissional;
-ALTER TABLE agendamento DROP FOREIGN KEY IF EXISTS fk_agendamento_servico;
+-- Adicionar colunas (sem IF NOT EXISTS para compatibilidade)
+ALTER TABLE agendamento ADD COLUMN criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE agendamento ADD COLUMN atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
+-- Adicionar foreign keys
+-- Removido DROP FOREIGN KEY pois estamos criando do zero e V1 não tem constraints
 ALTER TABLE agendamento 
     ADD CONSTRAINT fk_agendamento_cliente 
         FOREIGN KEY (cliente_id) REFERENCES cliente(id),
