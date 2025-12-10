@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoRepositorioAplicacao;
 import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoServicoAplicacao;
+import com.cesarschool.barbearia.dominio.compartilhado.eventos.PublicadorEventos;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico;
 import com.cesarschool.barbearia.dominio.principal.produto.ProdutoRepositorio;
@@ -18,16 +19,13 @@ import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoServi
 
 /**
  * Configuração de Beans para Domain Services.
- * 
  * Seguindo o padrão do sgb-2025-01, os Domain Services são configurados
  * como @Bean na camada de infraestrutura/apresentação, NÃO com @Service
  * no domínio. Isso mantém o domínio livre de dependências de framework.
- * 
  * Esta classe é responsável por:
  * - Instanciar Domain Services com suas dependências
  * - Conectar interfaces de repositório com implementações JPA
  * - Manter a pureza do domínio (sem anotações Spring)
- * 
  * @see dev.sauloaraujo.sgb.BackendAplicacao (sgb-2025-01)
  */
 @Configuration
@@ -35,7 +33,6 @@ public class DomainServicesConfig {
 
     /**
      * Configura o serviço de domínio de Agendamento.
-     * 
      * @param agendamentoRepositorio Interface do repositório (implementada na infraestrutura)
      * @param profissionalServico Serviço de profissionais (necessário para validações)
      * @param servicoRepositorio Repositório de serviços (para validar serviços ativos)
@@ -50,31 +47,8 @@ public class DomainServicesConfig {
     }
 
     /**
-     * Configura o serviço de domínio de Profissional.
-     * 
-     * @param profissionalRepositorio Interface do repositório (implementada na infraestrutura)
-     * @return Instância configurada de ProfissionalServico
-     */
-    @Bean
-    public ProfissionalServico profissionalServico(ProfissionalRepositorio profissionalRepositorio) {
-        return new ProfissionalServico(profissionalRepositorio);
-    }
-
-    /**
-     * Configura o serviço de domínio de ServicoOferecido.
-     * 
-     * @param servicoRepositorio Interface do repositório (implementada na infraestrutura)
-     * @return Instância configurada de ServicoOferecidoServico
-     */
-    @Bean
-    public ServicoOferecidoServico servicoOferecidoServico(ServicoOferecidoRepositorio servicoRepositorio) {
-        return new ServicoOferecidoServico(servicoRepositorio);
-    }
-
-    /**
      * Configura o serviço de domínio de Produto.
-     * 
-     * @param produtoRepositorio Interface do repositório (implementada na infraestrutura)
+     * * @param produtoRepositorio Interface do repositório (implementada na infraestrutura)
      * @return Instância configurada de ProdutoServico
      */
     @Bean
@@ -86,8 +60,7 @@ public class DomainServicesConfig {
      * Configura o serviço de domínio de Gestão de Estoque.
      * Este é um serviço mais complexo que orquestra operações de estoque
      * e mantém histórico de movimentações.
-     * 
-     * @param produtoRepositorio Repositório de produtos
+     * * @param produtoRepositorio Repositório de produtos
      * @param movimentacaoRepositorio Repositório de movimentações (para rastreabilidade)
      * @return Instância configurada de GestaoEstoqueServico
      */
@@ -101,8 +74,7 @@ public class DomainServicesConfig {
     /**
      * Configura o serviço da camada de aplicação para Agendamento.
      * Segue padrão SGB-2025-01: orquestra domain services e repositórios de aplicação.
-     * 
-     * @param repositorioAplicacao Repositório para consultas com DTOs/projeções
+     * * @param repositorioAplicacao Repositório para consultas com DTOs/projeções
      * @param agendamentoServico Serviço de domínio para lógica de negócio
      * @param servicoServico Serviço de domínio de serviços oferecidos
      * @return Instância configurada de AgendamentoServicoAplicacao

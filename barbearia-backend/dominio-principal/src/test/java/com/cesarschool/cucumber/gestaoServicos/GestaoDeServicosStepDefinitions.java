@@ -33,7 +33,7 @@ public class GestaoDeServicosStepDefinitions {
     @Before
     public void setup() {
         this.repositorioMock = new ServicoOferecidoMockRepositorio();
-        this.servicoOferecidoServico = new ServicoOferecidoServico(repositorioMock);
+        this.servicoOferecidoServico = new ServicoOferecidoServico(repositorioMock, null);
         this.repositorioMock.limpar();
         this.servicoAInserir = null;
         this.servicoCriado = null;

@@ -33,7 +33,7 @@ private Agendamento agendamento;
 private Agendamento agendamentoSalvo;
 private UsuarioSolicitante clienteSolicitante;
 private ProfissionalRepositorio repositorioProfissional = new ProfissionalMockRepositorio();
-private ProfissionalServico profissionalServico = new ProfissionalServico(repositorioProfissional);
+private ProfissionalServico profissionalServico = new ProfissionalServico(repositorioProfissional, null);
 private AgendamentoRepositorio repositorio = new AgendamentoMockRepositorio();
 boolean lancou = false;
 Cliente cliente;
@@ -208,7 +208,7 @@ public void sistemaAtribuiPrimeiroProfissionalDisponivel() {
 public void queOClienteNãoInformouNenhumProfissionalAoCriarOAgendamentoENãoExistieProfissionalDisponívelNoHorário() {
     // Configura repositório que não retorna profissional disponível
     repositorioProfissional = new ProfissionalSemDisponivelRepositorio();
-    profissionalServico = new ProfissionalServico(repositorioProfissional);
+    profissionalServico = new ProfissionalServico(repositorioProfissional, null);
     servico = new AgendamentoServico(repositorio, profissionalServico);
     
     // Garante horário dentro do horário comercial

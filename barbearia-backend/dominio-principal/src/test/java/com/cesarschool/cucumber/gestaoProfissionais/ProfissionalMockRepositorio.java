@@ -13,7 +13,6 @@ import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepositorio;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
-
 /**
  * Mock (Fake) Repositório para a entidade Profissional, utilizando memória (HashMap)
  */
@@ -26,14 +25,12 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
     private final Map<String, List<String>> associacoesServico = new HashMap<>(); 
     private final Map<String, Boolean> servicoTemAgendamentoAtivo = new HashMap<>(); 
 
-
     @Override
     public Profissional salvar(Profissional profissional) {
         if (profissional.getId() == null) {
             Integer novoId = sequenciadorId.getAndIncrement();
             ProfissionalId idGerado = new ProfissionalId(novoId);
             
-            // Construtor completo (9 argumentos)
             Profissional profissionalSalvo = new Profissional(
                 idGerado,
                 profissional.getNome(),
@@ -41,6 +38,7 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
                 profissional.getCpf(),
                 profissional.getTelefone(),
                 profissional.getAgenda(),
+                profissional.getServicoOferecidoIds() != null ? profissional.getServicoOferecidoIds() : new ArrayList<>(),
                 profissional.getSenioridade(),
                 profissional.isAtivo(),
                 profissional.getMotivoInatividade()
@@ -56,13 +54,10 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
         }
     }
     
-    // [ADIÇÃO] IMPLEMENTAÇÃO DO MÉTODO FALTANTE (Simulação de Disponibilidade)
     @Override
     public Profissional buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoServicoMinutos) {
-        // Simulação: Retorna o primeiro profissional encontrado, assumindo que ele está disponível.
         return dados.values().stream().findFirst().orElse(null);
     }
-
 
     @Override
     public Profissional buscarPorCpf(Cpf cpf) {
@@ -73,7 +68,6 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
     public Profissional buscarPorId(Integer id) {
         return dados.get(id);
     }
-
 
     @Override
     public boolean existePorCpf(Cpf cpf) {
@@ -95,13 +89,11 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
     
     @Override
     public List<Profissional> buscarQualificadosParaServico(ServicoOferecidoId servicoId) {
-        // Mock: retorna todos os profissionais
         return listarTodos();
     }
 
     @Override
     public List<Profissional> buscarDisponiveisNaDataHora(LocalDateTime dataHora, Integer duracaoMinutos) {
-        // Mock: retorna todos os profissionais
         return listarTodos();
     }
 
@@ -126,7 +118,6 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
         return servicos != null && servicos.contains(servicoId);
     }
     
-    // Métodos Auxiliares para Teste
     public void salvarAssociacaoServico(String nomeProfissional, String nomeServico) {
         associacoesServico.computeIfAbsent(nomeProfissional, k -> new ArrayList<>()).add(nomeServico);
     }

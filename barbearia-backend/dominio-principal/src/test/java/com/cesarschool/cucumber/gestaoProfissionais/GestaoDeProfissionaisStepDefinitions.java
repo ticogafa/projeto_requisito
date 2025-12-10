@@ -42,7 +42,7 @@ public class GestaoDeProfissionaisStepDefinitions {
         this.indiceProfissional = (int) ((timestamp + nanoTime) % 100000);
         
         this.repositorioMock = new ProfissionalMockRepositorio();
-        this.profissionalServico = new ProfissionalServico(repositorioMock);
+        this.profissionalServico = new ProfissionalServico(repositorioMock, null);
         this.profissionalAtual = null;
         this.excecaoCapturada = null;
         this.profissionalCache.clear();

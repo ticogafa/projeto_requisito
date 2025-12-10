@@ -1,10 +1,12 @@
 import { AGENDAMENTO_URLS, AUTHENTICATION_URLS, SERVICO_OFERECIDO_URLS, URLS_PREFIX } from '@/constants/URLConstants';
 import HttpClient from '@/services/httpClient';
-import type { AxiosError, AxiosResponse } from 'axios';
+import { ProfissionaisResponse } from '@/interfaces/ProfissionaisInterfaces';
+import type { AxiosError, AxiosResponse, AxiosInstance } from 'axios';
 
 export default class MainService {
   client: HttpClient;
   static instance: MainService;
+  private api: AxiosInstance;
 
   private constructor() {
     this.client = new HttpClient(URLS_PREFIX.API);
@@ -214,6 +216,20 @@ export default class MainService {
       errorCallback,
       finallyCallback
     );
+  }
+
+  public getProfissionais(
+    params: object,
+    headers: object,
+    successCallback: (response: AxiosResponse<ProfissionaisResponse>) => void,
+    errorCallback: (err: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.api
+      .get('/api/profissional', { params, headers }) // <--- Endpoint do seu Backend
+      .then(successCallback)
+      .catch(errorCallback)
+      .finally(finallyCallback);
   }
 
 }

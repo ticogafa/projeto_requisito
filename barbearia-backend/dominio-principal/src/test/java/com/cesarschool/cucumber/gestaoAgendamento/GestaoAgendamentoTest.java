@@ -83,7 +83,7 @@ public class GestaoAgendamentoTest {
         clienteRepositorio = new ClienteMockRepositorio();
         
         // Inicializar serviços reais - agora com servicoRepositorio para validações
-        profissionalServico = new ProfissionalServico(profissionalRepositorio);
+        profissionalServico = new ProfissionalServico(profissionalRepositorio, null);
         agendamentoServico = new AgendamentoServico(agendamentoRepositorio, profissionalServico, servicoRepositorio);
         
         mensagemRetorno = "";

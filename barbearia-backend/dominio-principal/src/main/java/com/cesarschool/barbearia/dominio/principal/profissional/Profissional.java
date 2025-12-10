@@ -1,22 +1,32 @@
 package com.cesarschool.barbearia.dominio.principal.profissional;
 
+import java.util.List;
+
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.*;
 
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public final class Profissional {
     private ProfissionalId id;
     private String nome;
     private Email email;
     private Cpf cpf;
     private Telefone telefone;
-    private Agenda agenda; 
+    private Agenda agenda = new Agenda();
+    private List<ServicoOferecidoId> servicoOferecidoIds;
     private Senioridade senioridade; 
     private boolean ativo; 
     private String motivoInatividade; 
@@ -43,16 +53,7 @@ public final class Profissional {
         this(id, nome, email, cpf, telefone);
         this.agenda = agenda; 
     }
-
-    public Profissional(ProfissionalId id, String nome, Email email, Cpf cpf, Telefone telefone, Agenda agenda, Senioridade senioridade, boolean ativo, String motivoInatividade) {
-        this(id, nome, email, cpf, telefone, agenda); 
-        setSenioridade(senioridade);
-        this.ativo = ativo;
-        this.motivoInatividade = motivoInatividade;
-    }
-    
     public void setId(ProfissionalId id) {
-        validarObjetoObrigatorio(id, "Id");
         this.id = id;
     }
     
@@ -64,40 +65,42 @@ public final class Profissional {
         this.nome = nome;
     }
     
-    
-    public void setEmail(Email email) {
-        validarObjetoObrigatorio(email, "Email");
-        this.email = email;
-    }
-    
-    
-    public void setCpf(Cpf cpf) {
-        validarObjetoObrigatorio(cpf, "Cpf");
-        this.cpf = cpf;
-    }
-    
-    public void setTelefone(Telefone telefone) {
-        validarObjetoObrigatorio(telefone, "Telefone");
-        this.telefone = telefone;
-    }
+    // comentei aqui os Setters, pois se botei o @Setter do Lombok
+    // queria deixar comentado pra caso eu tenha que botar alguma
+    // validação tipo o do setNome
 
-    public void setAgenda(Agenda agenda) {
-        validarObjetoObrigatorio(agenda, "Agenda");
-        this.agenda = agenda;
-    }
+    // public void setEmail(Email email) {
+    //     this.email = email;
+    // }
+    
+    
+    // public void setCpf(Cpf cpf) {
+    //     this.cpf = cpf;
+    // }
+    
+    // public void setTelefone(Telefone telefone) {
+    //     this.telefone = telefone;
+    // }
 
-    public void setSenioridade(Senioridade senioridade) {
-        validarObjetoObrigatorio(senioridade, "Senioridade");
-        this.senioridade = senioridade;
-    }
+    // public void setAgenda(Agenda agenda) {
+    //     this.agenda = agenda;
+    // }
 
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
-    }
+    // public void setSenioridade(Senioridade senioridade) {
+    //     this.senioridade = senioridade;
+    // }
 
-    public void setMotivoInatividade(String motivoInatividade) {
-        this.motivoInatividade = motivoInatividade;
-    }
+    // public void setAtivo(boolean ativo) {
+    //     this.ativo = ativo;
+    // }
+
+    // public void setMotivoInatividade(String motivoInatividade) {
+    //     this.motivoInatividade = motivoInatividade;
+    // }
+
+    // public void setServicosOferecidosIds(List<ServicoOferecidoId> servicoOferecido) {
+    //     this.servicoOferecido = servicoOferecido;
+    // }
     
     public void atualizarContato(Email novoEmail, Telefone novoTelefone) {
         setEmail(novoEmail);

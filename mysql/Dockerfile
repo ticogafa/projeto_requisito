@@ -1,6 +1,6 @@
 FROM mysql:8.0
 
-ENV MYSQL_DATABASE="arbearia_db"
+ENV MYSQL_DATABASE="barbearia_db"
 ENV MYSQL_ROOT_PASSWORD="root"
 
 # docker build -t barbearia-mysql:mysql .
