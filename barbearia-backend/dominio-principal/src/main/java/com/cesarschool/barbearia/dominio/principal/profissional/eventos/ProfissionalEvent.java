@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class ProfissionalEvent extends ApplicationEvent {
-    
+     
     public enum TipoAcao {
         CRIADO,
         ATUALIZADO,

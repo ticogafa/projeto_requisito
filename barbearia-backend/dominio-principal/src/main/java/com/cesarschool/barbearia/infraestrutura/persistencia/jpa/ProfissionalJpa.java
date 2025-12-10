@@ -40,7 +40,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// 1. A ENTIDADE JPA
 @Data
 @AllArgsConstructor
 @Builder
@@ -91,7 +90,6 @@ public final class ProfissionalJpa {
     private List<ServicoOferecidoJpa> servicosOferecidos;
 }
 
-// 2. A INTERFACE DO REPOSITÓRIO
 interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integer> {
     ProfissionalJpa findByCpf(String cpf);
     boolean existsByCpf(String cpf);
@@ -105,7 +103,6 @@ interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integ
     List<ProfissionalJpa> findByAtivoTrue();
 }
 
-// 3. A IMPLEMENTAÇÃO DO REPOSITÓRIO
 @Repository
 class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
 
@@ -114,7 +111,6 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
     @Autowired
     private ProfissionalJpaRepository profissionalJpaRepository;
     
-    // --- CONVERSÃO DOMÍNIO -> ENTIDADE JPA (MANUAL) ---
     private ProfissionalJpa toEntity(Profissional dominio) {
         Agenda agenda = dominio.getAgenda() != null ? dominio.getAgenda() : new Agenda();
         
@@ -138,14 +134,12 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
             .senioridade(dominio.getSenioridade())
             .ativo(dominio.isAtivo())
             .motivoInatividade(dominio.getMotivoInatividade())
-            // AQUI ESTÁ A CORREÇÃO: Pegamos do objeto Agenda e jogamos na coluna JPA
             .inicioJornada(agenda.getInicioJornada() != null ? agenda.getInicioJornada() : LocalTime.of(9, 0))
             .fimJornada(agenda.getFimJornada() != null ? agenda.getFimJornada() : LocalTime.of(18, 0))
             .servicosOferecidos(servicosJpa)
             .build();
     }
 
-    // --- CONVERSÃO ENTIDADE JPA -> DOMÍNIO (MANUAL) ---
     private Profissional toDomain(ProfissionalJpa entity) {
         Agenda agenda = new Agenda();
         agenda.setInicioJornada(entity.getInicioJornada());
@@ -174,10 +168,8 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
 
     @Override
     public Profissional salvar(Profissional entity) {
-        // CORREÇÃO: Usar toEntity em vez de mapeador
         ProfissionalJpa jpa = toEntity(entity);
         ProfissionalJpa saved = profissionalJpaRepository.save(jpa);
-        // CORREÇÃO: Usar toDomain em vez de mapeador
         return toDomain(saved);
     }
 

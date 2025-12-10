@@ -226,7 +226,7 @@ export default class MainService {
     finallyCallback: () => void
   ) {
     this.api
-      .get('/api/profissional', { params, headers }) // <--- Endpoint do seu Backend
+      .get('/api/profissional', { params, headers })
       .then(successCallback)
       .catch(errorCallback)
       .finally(finallyCallback);

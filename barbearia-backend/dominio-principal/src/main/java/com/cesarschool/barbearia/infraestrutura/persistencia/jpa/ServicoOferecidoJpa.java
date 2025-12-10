@@ -28,7 +28,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// --- 1. ENTIDADE JPA ---
 @Data
 @AllArgsConstructor
 @Builder
@@ -61,14 +60,10 @@ class ServicoOferecidoJpa {
     private String motivoInatividade;
 }
 
-// --- 2. INTERFACE REPOSITÓRIO SPRING DATA ---
 interface ServicoOferecidoJpaRepository extends JpaRepository<ServicoOferecidoJpa, Integer> {
     
     ServicoOferecidoJpa findByNome(String nome);
     
-    /**
-     * Projeção otimizada para listagem rápida
-     */
     List<ServicoOferecidoResumo> findServicoOferecidoResumoByOrderByNome();
 
     @Query(value = "SELECT COUNT(*) > 0 FROM profissional_servico ps " +
@@ -81,14 +76,12 @@ interface ServicoOferecidoJpaRepository extends JpaRepository<ServicoOferecidoJp
     );
 }
 
-// --- 3. IMPLEMENTAÇÃO (CORRIGIDA) ---
 @Repository
 class ServicoOferecidoJpaRepositorioImpl implements ServicoOferecidoRepositorio, ServicoOferecidolRepositorioAplicacao {
 
     @Autowired
     private ServicoOferecidoJpaRepository jpaRepository;
     
-    // --- CONVERSÃO MANUAL (Mais segura para VOs) ---
     private ServicoOferecidoJpa toEntity(ServicoOferecido dominio) {
         return ServicoOferecidoJpa.builder()
             .id(dominio.getId() != null ? dominio.getId().getValor() : null)
@@ -122,8 +115,8 @@ class ServicoOferecidoJpaRepositorioImpl implements ServicoOferecidoRepositorio,
     @Override
     public ServicoOferecido salvar(ServicoOferecido entity) {
         ServicoOferecidoJpa jpa = toEntity(entity);
-        ServicoOferecidoJpa salvo = jpaRepository.save(jpa); // Salva no banco
-        return toDomain(salvo); // Retorna o objeto salvo (NUNCA NULL)
+        ServicoOferecidoJpa salvo = jpaRepository.save(jpa);
+        return toDomain(salvo);
     }
 
     @Override
@@ -160,7 +153,6 @@ class ServicoOferecidoJpaRepositorioImpl implements ServicoOferecidoRepositorio,
 
     @Override
     public void salvarAssociacao(String nomeServico, String nomeProfissional) {
-        // Implementado via módulo Profissional (Many-to-Many)
     }
 
     @Override

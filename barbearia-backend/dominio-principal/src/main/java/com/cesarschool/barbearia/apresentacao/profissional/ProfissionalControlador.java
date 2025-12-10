@@ -23,7 +23,7 @@ import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServ
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 @RestController
-@RequestMapping("/api/profissional") // ROTA CORRETA MANTIDA
+@RequestMapping("/api/profissional")
 public class ProfissionalControlador {
 
     private static final LoggerSingleton logger = LoggerSingleton.getInstance();
@@ -34,7 +34,6 @@ public class ProfissionalControlador {
     @Autowired
     private ExceptionHandler exceptionHandler;
 
-    // 1. CRIAR (Já existia)
     @PostMapping
     public ResponseEntity<Profissional> criar(@RequestBody Profissional profissional) {
         return exceptionHandler.withHandler(() -> {
@@ -52,7 +51,6 @@ public class ProfissionalControlador {
         });
     }
 
-    // 2. LISTAR TODOS (Já existia)
     @GetMapping
     public ResponseEntity<List<Profissional>> listarTodos() {
         return exceptionHandler.withHandler(() -> {
@@ -61,7 +59,6 @@ public class ProfissionalControlador {
         });
     }
 
-    // 3. BUSCAR POR ID (Novo - Necessário para ver detalhes)
     @GetMapping("/{id}")
     public ResponseEntity<Profissional> buscarPorId(@PathVariable Integer id) {
         return exceptionHandler.withHandler(() -> {
@@ -69,7 +66,6 @@ public class ProfissionalControlador {
         });
     }
 
-    // 4. ATUALIZAR (Novo - Dispara evento ATUALIZADO)
     @PutMapping("/{id}")
     public ResponseEntity<Profissional> atualizar(@PathVariable Integer id, @RequestBody Profissional profissional) {
         return exceptionHandler.withHandler(() -> {
@@ -78,7 +74,6 @@ public class ProfissionalControlador {
         });
     }
 
-    // 5. DESLIGAR (Novo - Dispara evento DESLIGADO)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         return exceptionHandler.withHandler(() -> {
@@ -88,8 +83,6 @@ public class ProfissionalControlador {
         });
     }
     
-    // --- MÉTODOS ESPECÍFICOS (Mantidos) ---
-
     @GetMapping("/disponivel/primeiro") 
     public ResponseEntity<Profissional> buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoServicoMinutos) {
         return exceptionHandler.withHandler(() -> {

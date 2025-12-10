@@ -27,12 +27,11 @@ public class ServicoOferecidoControlador {
     private static final LoggerSingleton logger = LoggerSingleton.getInstance();
 
     @Autowired
-    private ServicoOferecidoServico servico; // Usa o Domain Service que criamos
+    private ServicoOferecidoServico servico;
     
     @Autowired
     private ExceptionHandler exceptionHandler;
 
-    // --- 1. CRIAR (POST) ---
     @PostMapping
     public ResponseEntity<ServicoOferecido> criar(@RequestBody ServicoOferecido novoServico) {
         return exceptionHandler.withHandler(() -> {
@@ -48,7 +47,6 @@ public class ServicoOferecidoControlador {
         });
     }
 
-    // --- 2. LISTAR TODOS (GET) ---
     @GetMapping
     public ResponseEntity<List<ServicoOferecido>> listarTodos() {
         return exceptionHandler.withHandler(() -> {
@@ -56,7 +54,6 @@ public class ServicoOferecidoControlador {
         });
     }
 
-    // --- 3. BUSCAR POR ID (GET) ---
     @GetMapping("/{id}")
     public ResponseEntity<ServicoOferecido> buscarPorId(@PathVariable Integer id) {
         return exceptionHandler.withHandler(() -> {
@@ -64,7 +61,6 @@ public class ServicoOferecidoControlador {
         });
     }
 
-    // --- 4. ATUALIZAR (PUT) ---
     @PutMapping("/{id}")
     public ResponseEntity<ServicoOferecido> atualizar(@PathVariable Integer id, @RequestBody ServicoOferecido dados) {
         return exceptionHandler.withHandler(() -> {
@@ -73,7 +69,6 @@ public class ServicoOferecidoControlador {
         });
     }
 
-    // --- 5. DELETAR (DELETE) ---
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         return exceptionHandler.withHandler(() -> {

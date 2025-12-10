@@ -15,18 +15,12 @@ import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 import lombok.RequiredArgsConstructor;
 
-/**
- * Domain Service para Profissional.
- * Integrado com Spring Boot e Padrão Observer.
- */
 @Service
 @RequiredArgsConstructor
 public class ProfissionalServico {
     
     private final ProfissionalRepositorio repositorio;
-    private final ApplicationEventPublisher publicadorEventos; // Spring Observer
-
-    // --- MÉTODOS DE LEITURA (Delegates para o Repositório) ---
+    private final ApplicationEventPublisher publicadorEventos;
 
     public List<Profissional> buscarQualificadosParaServico(ServicoOferecidoId servicoId) {
         return repositorio.buscarQualificadosParaServico(servicoId);
@@ -45,7 +39,6 @@ public class ProfissionalServico {
         return p;
     }
     
-    // Sobrecarga para facilitar uso pelo Controller (recebe Integer)
     public Profissional buscarPorId(Integer id) {
         if (id == null) return null;
         return buscarPorId(new ProfissionalId(id));
@@ -70,8 +63,6 @@ public class ProfissionalServico {
         return repositorio.estaQualificado(profissionalId.getValor(), servicoId.getValor());
     }
 
-    // --- MÉTODOS DE ESCRITA (Com Regras e Eventos) ---
-
     @Transactional
     public Profissional registrarNovo(Profissional profissional) {
         Validacoes.validarObjetoObrigatorio(profissional, "O profissional");
@@ -84,7 +75,6 @@ public class ProfissionalServico {
         
         Profissional salvo = repositorio.salvar(profissional);
 
-        // OBSERVER: Evento Unificado CRIADO
         if (publicadorEventos != null) {
             publicadorEventos.publishEvent(new ProfissionalEvent(this, salvo, TipoAcao.CRIADO));
         }
@@ -97,7 +87,6 @@ public class ProfissionalServico {
         Validacoes.validarObjetoObrigatorio(profissional, "O profissional");
         Validacoes.validarObjetoObrigatorio(senioridade, "Senioridade");
 
-        // Aproveita a validação do método principal
         profissional.setSenioridade(senioridade);
         return registrarNovo(profissional);
     }
@@ -107,12 +96,10 @@ public class ProfissionalServico {
         Validacoes.validarObjetoObrigatorio(profissional, "O profissional");
         Validacoes.validarObjetoObrigatorio(profissional.getId(), "O ID do profissional");
         
-        // Garante que existe antes de atualizar
         buscarPorId(profissional.getId());
         
         Profissional salvo = repositorio.salvar(profissional);
 
-        // OBSERVER: Evento Unificado ATUALIZADO
         if (publicadorEventos != null) {
             publicadorEventos.publishEvent(new ProfissionalEvent(this, salvo, TipoAcao.ATUALIZADO));
         }
@@ -120,12 +107,10 @@ public class ProfissionalServico {
         return salvo;
     }
     
-    // Sobrecarga para facilitar o Controller (PUT /profissionais/{id})
     @Transactional
     public Profissional atualizar(Integer id, Profissional dadosAtualizados) {
         Profissional existente = buscarPorId(new ProfissionalId(id));
         
-        // Atualiza os dados permitidos
         existente.setNome(dadosAtualizados.getNome());
         existente.setTelefone(dadosAtualizados.getTelefone());
         existente.setEmail(dadosAtualizados.getEmail());
@@ -140,16 +125,14 @@ public class ProfissionalServico {
 
     @Transactional
     public void remover(ProfissionalId id) {
-        Profissional p = buscarPorId(id); // Valida existência
+        Profissional p = buscarPorId(id);
         repositorio.remover(id.getValor());
         
-        // OBSERVER: Evento Unificado DESLIGADO (para limpar auditoria/agendas)
         if (publicadorEventos != null) {
             publicadorEventos.publishEvent(new ProfissionalEvent(this, p, TipoAcao.DESLIGADO));
         }
     }
     
-    // Sobrecarga para Controller (DELETE /profissionais/{id})
     public void desligarProfissional(Integer id) {
         desativar(new ProfissionalId(id), "Desligamento solicitado via API");
     }
@@ -164,7 +147,6 @@ public class ProfissionalServico {
         
         Profissional salvo = repositorio.salvar(profissional);
         
-        // OBSERVER: Evento Unificado DESLIGADO
         if (publicadorEventos != null) {
             publicadorEventos.publishEvent(new ProfissionalEvent(this, salvo, TipoAcao.DESLIGADO));
         }
@@ -186,7 +168,6 @@ public class ProfissionalServico {
         
         this.repositorio.removerAssociacaoServico(nomeProfissional, nomeServico);
         
-        // Não dispara evento aqui pois é uma alteração interna de associação
     }
 
     @Transactional
@@ -199,7 +180,6 @@ public class ProfissionalServico {
         
         Profissional salvo = repositorio.salvar(profissional);
         
-        // OBSERVER: Evento Unificado ATUALIZADO
         if (publicadorEventos != null) {
             publicadorEventos.publishEvent(new ProfissionalEvent(this, salvo, TipoAcao.ATUALIZADO));
         }

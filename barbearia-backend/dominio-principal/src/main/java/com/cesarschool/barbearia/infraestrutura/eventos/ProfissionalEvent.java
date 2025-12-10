@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 public class ProfissionalEvent extends ApplicationEvent {
     
-    // Define os tipos possíveis de ação
     public enum TipoAcao {
         CRIADO,
         ATUALIZADO,

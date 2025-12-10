@@ -6,9 +6,6 @@ import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.v
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarStringObrigatoria;
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarValorPositivo;
 
-/**
- * Entidade de domínio representando um serviço oferecido pela barbearia.
- */
 public final class ServicoOferecido {
     private ServicoOferecidoId id;
     private String nome;
@@ -18,9 +15,7 @@ public final class ServicoOferecido {
     private boolean ativo;
     private String motivoInatividade;    
 
-    // --- CONSTRUTOR VAZIO (Adicionado para o JSON/Jackson funcionar) ---
     public ServicoOferecido() {
-        // Inicializa valores padrão se necessário
         this.ativo = true;
     }
 
@@ -44,20 +39,15 @@ public final class ServicoOferecido {
             String descricao,
             Integer duracaoMinutos) {
         this(nome, preco, descricao, duracaoMinutos);
-        // Aqui usamos o this.id direto para evitar a validação no construtor se necessário
         this.id = id;
     }
     
 
     public void setId(ServicoOferecidoId id) {
-        // Removemos a validação "validarObjetoObrigatorio" aqui.
-        // Motivo: O Jackson pode tentar chamar isso ou instanciar sem ID primeiro.
-        // A validação de ID obrigatório deve ocorrer nas operações de atualização/busca, não na entidade crua.
         this.id = id;
     }
     
     public void setNome(String nome) {
-        // O Jackson pode passar null temporariamente, então protegemos
         if (nome != null) {
             if (nome.length() < 3 || nome.length() > 100) {
                 throw new IllegalArgumentException("Nome deve ter entre 3 e 100 caracteres");

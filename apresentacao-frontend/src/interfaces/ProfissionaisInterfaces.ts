@@ -1,13 +1,8 @@
-// ProfissionalInterface.ts
-// import { ServicoOferecidoId } from "./ServicoOferecidoInterface"; // Você pode ter que criar ServicoOferecidoId mais tarde
-
-// Definição da Agenda (Jornada de Trabalho)
 export interface AgendaInterface {
-  inicioJornada: string; // Ex: "09:00:00"
-  fimJornada: string;   // Ex: "18:00:00"
+  inicioJornada: string;
+  fimJornada: string;
 }
 
-// O Objeto Completo do Profissional
 export interface ProfissionalInterface {
   id: {
     valor: number;
@@ -28,7 +23,7 @@ export interface ProfissionalInterface {
   agenda: AgendaInterface;
   servicoOferecidoIds: {
     valor: number;
-  }[]; // Lista de IDs de serviços que ele oferece
+  }[];
 }
 
 export type ProfissionaisResponse = ProfissionalInterface[];
