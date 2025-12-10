@@ -1,5 +1,7 @@
 package com.cesarschool.barbearia.infraestrutura.persistencia.jpa;
 
+import java.util.ArrayList;
+
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration.AccessLevel;
@@ -223,6 +225,7 @@ class JpaMapeador extends ModelMapper {
                     cpf,
                     telefone,
                     agenda,
+                    new ArrayList<>(),
                     source.getSenioridade(),
                     source.isAtivo(),
                     source.getMotivoInatividade()

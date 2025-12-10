@@ -3,8 +3,10 @@ package com.cesarschool.barbearia.dominio.principal.profissional;
 import java.time.LocalTime;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public final class Agenda {
     private final int jornadaPadraoMinutos = 480;
     private LocalTime inicioJornada;

@@ -1,51 +1,85 @@
 package com.cesarschool.barbearia.apresentacao.servico;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.cesarschool.barbearia.aplicacao.servico.ServicoOferecidoResumo;
-import com.cesarschool.barbearia.aplicacao.servico.ServicoOferecidolRepositorioAplicacao;
 import com.cesarschool.barbearia.dominio.compartilhado.exceptions.ExceptionHandler;
 import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoServico;
 
-/**
- * Controlador REST para operações com ServicoOferecido.
- * Seguindo o padrão do SGB, retorna DTOs (Resumos) diretamente do repositório de aplicação.
- * Usa Interface-based Projection do Spring Data JPA para otimização de queries.
- */
 @RestController
-@RequestMapping("/api/servico-oferecido")
+@RequestMapping("/api/servico") 
 public class ServicoOferecidoControlador {
 
     private static final LoggerSingleton logger = LoggerSingleton.getInstance();
 
-    @Autowired 
-    private ServicoOferecidolRepositorioAplicacao repositorioAplicacao;
+    @Autowired
+    private ServicoOferecidoServico servico; // Usa o Domain Service que criamos
     
     @Autowired
     private ExceptionHandler exceptionHandler;
 
-    /**
-     * Lista todos os serviços oferecidos ordenados por nome.
-     * Usa projeção direta do JPA - o Spring Data cria automaticamente a implementação
-     * e otimiza a query SQL para buscar apenas os campos necessários.
-     * 
-     * @return Lista de resumos de serviços oferecidos
-     */
-    @GetMapping("/listar/")
-    public ResponseEntity<List<ServicoOferecidoResumo>> listarTodos() {
+    // --- 1. CRIAR (POST) ---
+    @PostMapping
+    public ResponseEntity<ServicoOferecido> criar(@RequestBody ServicoOferecido novoServico) {
         return exceptionHandler.withHandler(() -> {
-            logger.info("Listando todos os serviços oferecidos");
+            logger.info("Criando novo serviço: " + novoServico.getNome());
+            ServicoOferecido salvo = servico.registrar(novoServico);
             
-            List<ServicoOferecidoResumo> servicos = repositorioAplicacao.listarTodosResumos();
-            
-            logger.success("Encontrados " + servicos.size() + " serviços oferecidos");
-            return ResponseEntity.ok(servicos);
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(salvo.getId().getValor())
+                    .toUri();
+                    
+            return ResponseEntity.created(uri).body(salvo);
+        });
+    }
+
+    // --- 2. LISTAR TODOS (GET) ---
+    @GetMapping
+    public ResponseEntity<List<ServicoOferecido>> listarTodos() {
+        return exceptionHandler.withHandler(() -> {
+            return ResponseEntity.ok(servico.listarTodos());
+        });
+    }
+
+    // --- 3. BUSCAR POR ID (GET) ---
+    @GetMapping("/{id}")
+    public ResponseEntity<ServicoOferecido> buscarPorId(@PathVariable Integer id) {
+        return exceptionHandler.withHandler(() -> {
+            return ResponseEntity.ok(servico.buscarPorId(id));
+        });
+    }
+
+    // --- 4. ATUALIZAR (PUT) ---
+    @PutMapping("/{id}")
+    public ResponseEntity<ServicoOferecido> atualizar(@PathVariable Integer id, @RequestBody ServicoOferecido dados) {
+        return exceptionHandler.withHandler(() -> {
+            logger.info("Atualizando serviço ID: " + id);
+            return ResponseEntity.ok(servico.atualizar(id, dados));
+        });
+    }
+
+    // --- 5. DELETAR (DELETE) ---
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+        return exceptionHandler.withHandler(() -> {
+            logger.info("Desativando serviço ID: " + id);
+            servico.desativar(id, "Removido via API");
+            return ResponseEntity.noContent().build();
         });
     }
 }

@@ -3,7 +3,6 @@ package com.cesarschool.barbearia.dominio.principal.servico;
 import java.math.BigDecimal;
 
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarInteiroPositivo;
-import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarObjetoObrigatorio;
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarStringObrigatoria;
 import static com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes.validarValorPositivo;
 
@@ -18,6 +17,12 @@ public final class ServicoOferecido {
     private Integer duracaoMinutos;
     private boolean ativo;
     private String motivoInatividade;    
+
+    // --- CONSTRUTOR VAZIO (Adicionado para o JSON/Jackson funcionar) ---
+    public ServicoOferecido() {
+        // Inicializa valores padrão se necessário
+        this.ativo = true;
+    }
 
     public ServicoOferecido(
             String nome,
@@ -39,41 +44,50 @@ public final class ServicoOferecido {
             String descricao,
             Integer duracaoMinutos) {
         this(nome, preco, descricao, duracaoMinutos);
-        setId(id);
+        // Aqui usamos o this.id direto para evitar a validação no construtor se necessário
+        this.id = id;
     }
     
 
     public void setId(ServicoOferecidoId id) {
-        validarObjetoObrigatorio(id, "ID");
+        // Removemos a validação "validarObjetoObrigatorio" aqui.
+        // Motivo: O Jackson pode tentar chamar isso ou instanciar sem ID primeiro.
+        // A validação de ID obrigatório deve ocorrer nas operações de atualização/busca, não na entidade crua.
         this.id = id;
     }
     
     public void setNome(String nome) {
-        validarStringObrigatoria(nome, "Nome");
-        if (nome.length() < 3 || nome.length() > 100) {
-            throw new IllegalArgumentException("Nome deve ter entre 3 e 100 caracteres");
+        // O Jackson pode passar null temporariamente, então protegemos
+        if (nome != null) {
+            if (nome.length() < 3 || nome.length() > 100) {
+                throw new IllegalArgumentException("Nome deve ter entre 3 e 100 caracteres");
+            }
         }
         this.nome = nome;
     }
     
     public void setPreco(BigDecimal preco) {
-        validarValorPositivo(preco, "Preço");
+        if (preco != null) {
+            validarValorPositivo(preco, "Preço");
+        }
         this.preco = preco;
     }
     
     public void setDescricao(String descricao) {
-        validarStringObrigatoria(descricao, "Descrição");
-        if (descricao.length() > 255) {
-            throw new IllegalArgumentException("Descrição deve ter no máximo 255 caracteres");
+        if (descricao != null) {
+             if (descricao.length() > 255) {
+                throw new IllegalArgumentException("Descrição deve ter no máximo 255 caracteres");
+            }
         }
         this.descricao = descricao;
     }
 
     public void setDuracaoMinutos(Integer duracaoMinutos) {
-        validarObjetoObrigatorio(duracaoMinutos, "Duração");
-        validarInteiroPositivo(duracaoMinutos, "Duração");
-        if (duracaoMinutos > 480) {
-            throw new IllegalArgumentException("Duração não pode exceder 480 minutos (8 horas)");
+        if (duracaoMinutos != null) {
+            validarInteiroPositivo(duracaoMinutos, "Duração");
+            if (duracaoMinutos > 480) {
+                throw new IllegalArgumentException("Duração não pode exceder 480 minutos (8 horas)");
+            }
         }
         this.duracaoMinutos = duracaoMinutos;
     }
@@ -98,6 +112,7 @@ public final class ServicoOferecido {
         this.motivoInatividade = null;
     }
 
+    // Getters
     public ServicoOferecidoId getId() { return id; }
     public String getNome() { return nome; }
     public BigDecimal getPreco() { return preco; }
