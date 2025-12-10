@@ -81,11 +81,21 @@ interface ProdutoJpaRepository extends JpaRepository<ProdutoJpa, Integer> {
 }
 
 /**
- * Implementação do repositório de domínio para Produto.
- * Realiza a conversão entre entidades JPA e entidades de domínio.
+ * Real Subject do Padrão PROXY.
+ * 
+ * <p>Implementação real do repositório de domínio para Produto.
+ * Realiza a conversão entre entidades JPA e entidades de domínio,
+ * acessando diretamente o banco de dados.</p>
+ * 
+ * <p><b>Padrão Proxy:</b> Esta classe é o Real Subject que contém a lógica
+ * real de acesso ao banco de dados. O Proxy (ProdutoRepositorioCacheProxy)
+ * delega as chamadas para esta classe.</p>
+ * 
+ * @author Tiago
+ * @version 3.0 - Implementação do Padrão Proxy
  */
-@Repository
-class ProdutoRepositorioImpl implements ProdutoRepositorio {
+@Repository("produtoRepositorioJpa")
+class ProdutoRepositorioJpa implements ProdutoRepositorio {
     
     @Autowired
     ProdutoJpaRepository repositorio;
@@ -95,21 +105,31 @@ class ProdutoRepositorioImpl implements ProdutoRepositorio {
     
     @Override
     public Produto salvar(Produto produto) {
+        System.out.println("🔵 [REAL SUBJECT] salvar() - Acessando BD");
         var produtoJpa = mapeador.map(produto, ProdutoJpa.class);
         var salvo = repositorio.save(produtoJpa);
+        System.out.println("🔵 [REAL SUBJECT] Produto salvo: " + salvo.nome);
         return mapeador.map(salvo, Produto.class);
     }
     
     @Override
     public Produto buscarPorId(Integer id) {
+        System.out.println("🔵 [REAL SUBJECT] buscarPorId(" + id + ") - Acessando BD");
         var produtoJpa = repositorio.findById(id)
             .orElse(null);
+        if (produtoJpa != null) {
+            System.out.println("🔵 [REAL SUBJECT] Produto encontrado: " + produtoJpa.nome);
+        } else {
+            System.out.println("🔵 [REAL SUBJECT] Produto não encontrado");
+        }
         return produtoJpa != null ? mapeador.map(produtoJpa, Produto.class) : null;
     }
     
     @Override
     public List<Produto> listarTodos() {
+        System.out.println("🔵 [REAL SUBJECT] listarTodos() - Acessando BD");
         var produtosJpa = repositorio.findAll();
+        System.out.println("🔵 [REAL SUBJECT] Encontrados " + produtosJpa.size() + " produtos");
         return produtosJpa.stream()
             .map(pj -> mapeador.map(pj, Produto.class))
             .toList();
@@ -117,12 +137,16 @@ class ProdutoRepositorioImpl implements ProdutoRepositorio {
     
     @Override
     public void remover(Integer id) {
+        System.out.println("🔵 [REAL SUBJECT] remover(" + id + ") - Acessando BD");
         repositorio.deleteById(id);
+        System.out.println("🔵 [REAL SUBJECT] Produto removido");
     }
     
     @Override
     public List<Produto> findProdutosComEstoqueBaixo() {
+        System.out.println("🔵 [REAL SUBJECT] findProdutosComEstoqueBaixo() - Acessando BD");
         var produtosJpa = repositorio.findProdutosAbaixoEstoqueMinimo();
+        System.out.println("🔵 [REAL SUBJECT] Encontrados " + produtosJpa.size() + " produtos com estoque baixo");
         return produtosJpa.stream()
             .map(pj -> mapeador.map(pj, Produto.class))
             .toList();
