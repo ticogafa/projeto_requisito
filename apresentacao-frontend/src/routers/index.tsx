@@ -1,18 +1,18 @@
-import { createBrowserRouter } from 'react-router-dom';
 import App from '@/App';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
-
 import LoginView from '@/views/Auth/LoginView';
 import ProfileSelection from '@/views/Auth/ProfileSelection';
 import RegisterView from '@/views/Auth/RegisterView';
+import { createBrowserRouter } from 'react-router-dom';
 
 import ClientView from '@/views/Cliente/ClientView';
+import ProfessionalView from '@/views/Profissional/ProfessionalView';
 
 import AdminDashboardView from '@/views/Administrador/AdminDashboardView';
-import { AdminLayout } from '@/views/Administrador/components';
-import ProfissionaisView from '@/views/ProfissioinalView';
-import EstoqueView from '@/views/Administrador/EstoqueView';
 import AgendamentoView from '@/views/Administrador/AgendamentoView';
+import { AdminLayout } from '@/views/Administrador/components';
+import EstoqueView from '@/views/Administrador/EstoqueView';
+import ProfissionaisView from '@/views/ProfissioinalView';
 import ServicosView from '@/views/ServicoView';
 
 export const router = createBrowserRouter([
@@ -41,7 +41,14 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         )
       },
-
+      {
+        path: '/profissional',
+        element: (
+          <ProtectedRoute>
+            <ProfessionalView />
+          </ProtectedRoute>
+        )
+      },
       {
         path: '/admin',
         element: (

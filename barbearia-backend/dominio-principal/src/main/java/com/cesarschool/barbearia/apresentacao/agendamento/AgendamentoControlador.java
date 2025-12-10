@@ -20,6 +20,7 @@ import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoServicoAplicac
 import com.cesarschool.barbearia.aplicacao.agendamento.CriarAgendamentoRequest;
 import com.cesarschool.barbearia.aplicacao.agendamento.EditarAgendamentoRequest;
 import com.cesarschool.barbearia.aplicacao.agendamento.ProfissionalDisponivelResumo;
+import com.cesarschool.barbearia.dominio.compartilhado.enums.TipoUsuario;
 import com.cesarschool.barbearia.dominio.compartilhado.exceptions.ExceptionHandler;
 import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
 
@@ -117,6 +118,23 @@ public class AgendamentoControlador {
     }
 
     /**
+     * Lista todos os agendamentos de um profissional.
+     * @param profissionalId ID do profissional
+     * @return Lista de agendamentos
+     */
+    @GetMapping("/por-profissional")
+    public ResponseEntity<List<AgendamentoResumo>> listarPorProfissional(@RequestParam Integer profissionalId) {
+        return exceptionHandler.withHandler(() -> {
+            logger.info("Listando agendamentos do profissional: " + profissionalId);
+            
+            List<AgendamentoResumo> agendamentos = servicoAplicacao.listarPorProfissional(profissionalId);
+            
+            logger.info("Encontrados " + agendamentos.size() + " agendamentos para o profissional " + profissionalId);
+            return ResponseEntity.ok(agendamentos);
+        });
+    }
+
+    /**
      * Edita um agendamento existente.
      * @param id ID do agendamento
      * @param request Novos dados do agendamento
@@ -127,35 +145,47 @@ public class AgendamentoControlador {
             @PathVariable Integer id,
             @RequestBody EditarAgendamentoRequest request) {
         
-        return exceptionHandler.withHandler(() -> {
-            logger.info("Editando agendamento - ID: " + id + 
-                       ", nova dataHora: " + request.getDataHora());
-            
-            AgendamentoResumo agendamento = servicoAplicacao.editar(id, request);
-            
-            logger.success("Agendamento editado com sucesso - ID: " + id);
-            return ResponseEntity.ok(agendamento);
-        });
-    }
+    return exceptionHandler.withHandler(() -> {
+        logger.info("Editando agendamento - ID: " + id + 
+                   ", nova dataHora: " + request.getDataHora());
+        
+        AgendamentoResumo agendamento = servicoAplicacao.editar(id, request);
+        
+        logger.success("Agendamento editado com sucesso - ID: " + id);
+        return ResponseEntity.ok(agendamento);
+    });
+}
 
+/**
     /**
      * Cancela um agendamento.
      * @param id ID do agendamento
-     * @param clienteId ID do cliente solicitante
+     * @param clienteId ID do cliente solicitante (opcional)
+     * @param profissionalId ID do profissional solicitante (opcional)
      * @return Agendamento cancelado
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<AgendamentoResumo> cancelar(
             @PathVariable Integer id,
-            @RequestParam Integer clienteId) {
+            @RequestParam(required = false) Integer clienteId,
+            @RequestParam(required = false) Integer profissionalId) {
         
         return exceptionHandler.withHandler(() -> {
-            logger.info("Cancelando agendamento - ID: " + id + ", clienteId: " + clienteId);
+            logger.info("Cancelando agendamento - ID: " + id + ", clienteId: " + clienteId + ", profissionalId: " + profissionalId);
             
-            AgendamentoResumo agendamento = servicoAplicacao.cancelar(id, clienteId);
+            if (clienteId != null) {
+                AgendamentoResumo agendamento = servicoAplicacao.cancelar(id, clienteId, TipoUsuario.CLIENTE);
+                logger.success("Agendamento cancelado com sucesso - ID: " + id);
+                return ResponseEntity.ok(agendamento);
+            } 
             
-            logger.success("Agendamento cancelado com sucesso - ID: " + id);
-            return ResponseEntity.ok(agendamento);
+            if (profissionalId != null) {
+                AgendamentoResumo agendamento = servicoAplicacao.cancelar(id, profissionalId, TipoUsuario.PROFISSIONAL);
+                logger.success("Agendamento cancelado com sucesso - ID: " + id);
+                return ResponseEntity.ok(agendamento);
+            }
+            
+            throw new IllegalArgumentException("É necessário informar clienteId ou profissionalId para cancelar.");
         });
     }
 }

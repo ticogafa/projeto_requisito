@@ -1,4 +1,5 @@
 import AuthService from '@/services/AuthService';
+import MainService from '@/services/MainService';
 import { useLoadingStore } from '@/store/useLoadingStore';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +28,10 @@ export default function LoginView() {
     const successCallback = () => {
       toast.success('Login realizado com sucesso!');
 
-      switch (selectedRole) {
+      // Obter a role real do usuário autenticado (vinda do backend/storage)
+      const currentRole = AuthService.getCurrentUserRole();
+
+      switch (currentRole) {
         case 'cliente':
           navigate('/cliente');
           break;
@@ -47,6 +51,15 @@ export default function LoginView() {
     const finallyCallback = () => setLoading(false);
 
     AuthService.login(email, password, successCallback, errorCallback, finallyCallback);
+  };
+
+  const handleResetData = () => {
+    setLoading(true);
+    MainService.getInstance().resetarDadosTeste(
+      () => toast.success('Dados de agendamento recriados com sucesso!'),
+      () => toast.error('Erro ao recriar dados'),
+      () => setLoading(false)
+    );
   };
 
   const handleBackToProfiles = () => {
@@ -121,6 +134,54 @@ export default function LoginView() {
             Entrar
           </button>
         </form>
+
+        {/* Seção de Contas Demo */}
+        <div className="mt-8 pt-6 border-t border-dark-600">
+          <div className="flex justify-between items-center mb-3">
+             <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+              Contas de Demonstração
+            </h3>
+            <button 
+              onClick={handleResetData}
+              className="text-xs text-primary hover:text-orange-400 underline"
+              title="Recria agendamentos baseados na hora atual"
+            >
+              🔄 Resetar Dados
+            </button>
+          </div>
+          
+          <p className="text-xs text-center text-gray-500 mb-4">
+            Clique para preencher. Se não conseguir entrar, use o botão "Cadastre-se" com estes dados.
+          </p>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              { role: 'Admin', email: 'admin@barbearia.com', pass: 'senha123', icon: 'admin_panel_settings', color: 'text-red-400' },
+              { role: 'Profissional', email: 'profissional@barbearia.com', pass: 'senha123', icon: 'content_cut', color: 'text-blue-400' },
+              { role: 'Cliente', email: 'cliente@barbearia.com', pass: 'senha123', icon: 'person', color: 'text-green-400' }
+            ].map((user) => (
+              <button
+                key={user.role}
+                type="button"
+                onClick={() => {
+                  setEmail(user.email);
+                  setPassword(user.pass);
+                }}
+                className="flex items-center p-3 bg-dark-700 hover:bg-dark-600 rounded-lg transition group border border-dark-600 hover:border-primary/50"
+              >
+                <div className={`p-2 rounded-full bg-dark-800 ${user.color} group-hover:scale-110 transition`}>
+                  <span className="material-icons text-xl">{user.icon}</span>
+                </div>
+                <div className="ml-3 text-left">
+                  <p className="text-sm font-bold text-white">{user.role}</p>
+                  <p className="text-xs text-gray-400">{user.email}</p>
+                </div>
+                <span className="material-icons ml-auto text-gray-500 group-hover:text-primary">
+                  touch_app
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="mt-6 text-center space-y-3">
           <button

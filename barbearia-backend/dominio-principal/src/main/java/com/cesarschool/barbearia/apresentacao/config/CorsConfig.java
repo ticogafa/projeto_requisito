@@ -21,7 +21,7 @@ public class CorsConfig {
         config.setAllowCredentials(true);
         
         // Permite requisições do frontend (Vite roda na porta 5173 por padrão)
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
         
         // Permite todos os headers
         config.setAllowedHeaders(Arrays.asList("*"));

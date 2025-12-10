@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
+import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 /**
@@ -30,6 +31,11 @@ public interface AgendamentoRepositorioAplicacao {
      * Lista agendamentos de um cliente.
      */
     List<AgendamentoResumo> buscarPorCliente(ClienteId clienteId);
+
+    /**
+     * Lista agendamentos de um profissional.
+     */
+    List<AgendamentoResumo> buscarPorProfissional(ProfissionalId profissionalId);
 
     /**
      * Lista todos os agendamentos do sistema.

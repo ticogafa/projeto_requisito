@@ -1,6 +1,6 @@
 import { AGENDAMENTO_URLS, AUTHENTICATION_URLS, PRODUTO_URLS, SERVICO_OFERECIDO_URLS, URLS_PREFIX } from '@/constants/URLConstants';
-import HttpClient from '@/services/httpClient';
 import { ProfissionaisResponse } from '@/interfaces/ProfissionaisInterfaces';
+import HttpClient from '@/services/httpClient';
 import type { AxiosError, AxiosResponse } from 'axios';
 
 export default class MainService {
@@ -97,6 +97,41 @@ export default class MainService {
     );
   }
 
+  /**
+   * Gets appointments by professional ID.
+   *
+   * @param params - Request params object with profissionalId
+   * @param header - Axios header object
+   * @param successCallback - Success callback function
+   * @param errorCallback - Error callback function
+   * @param finallyCallback - Finally callback function
+   */
+  getAgendamentosPorProfissional(
+    params: object,
+    header: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.get(
+      AGENDAMENTO_URLS.POR_PROFISSIONAL,
+      params,
+      header,
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  /**
+   * Edits an existing appointment.
+   *
+   * @param agendamentoId - The appointment ID
+   * @param data - The updated appointment data
+   * @param successCallback - Success callback function
+   * @param errorCallback - Error callback function
+   * @param finallyCallback - Finally callback function
+   */
   editarAgendamento(
     agendamentoId: number,
     data: object,
@@ -131,6 +166,34 @@ export default class MainService {
     );
   }
 
+  /**
+   * Cancela an appointment by professional.
+   */
+  cancelarAgendamentoPorProfissional(
+    agendamentoId: number,
+    profissionalId: number,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.delete(
+      `${AGENDAMENTO_URLS.CANCELAR}/${agendamentoId}?profissionalId=${profissionalId}`,
+      {},
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  /**
+   * Registers a new user in the backend.
+   *
+   * @param data - User registration data (email, password, role)
+   * @param successCallback - Success callback function
+   * @param errorCallback - Error callback function
+   * @param finallyCallback - Finally callback function
+   */
   registerUser(
     data: object,
     successCallback: (response: AxiosResponse) => void,
@@ -406,6 +469,24 @@ export default class MainService {
   ): void {
     this.client.get(
       PRODUTO_URLS.HISTORICO.replace(':id', id.toString()),
+      {},
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  /**
+   * Resets test data for appointments.
+   */
+  public resetarDadosTeste(
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.post(
+      '/dev/seed-agendamentos',
       {},
       {},
       successCallback,

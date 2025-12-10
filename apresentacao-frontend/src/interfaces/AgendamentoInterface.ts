@@ -3,6 +3,7 @@ export interface AgendamentoInterface {
   dataHora: string;
   profissionalId?: number;
   profissionalNome: string;
+  clienteNome?: string;
   servicoId: number;
   servicoNome: string;
   servicoPreco?: number;

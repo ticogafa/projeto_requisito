@@ -13,7 +13,8 @@ export const AGENDAMENTO_URLS = {
   EDITAR: '/agendamentos',
   CANCELAR: '/agendamentos',
   PROFISSIONAIS_DISPONIVEIS: '/agendamentos/profissionais-disponiveis',
-  POR_CLIENTE: '/agendamentos/por-cliente'
+  POR_CLIENTE: '/agendamentos/por-cliente',
+  POR_PROFISSIONAL: '/agendamentos/por-profissional'
 };
 
 export const PRODUTO_URLS = {

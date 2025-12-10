@@ -14,6 +14,7 @@ import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoResumo;
 import com.cesarschool.barbearia.aplicacao.agendamento.ProfissionalDisponivelResumo;
 import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
+import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
 /**
@@ -59,6 +60,11 @@ class AgendamentoRepositorioAplicacaoImpl implements AgendamentoRepositorioAplic
     @Override
     public List<AgendamentoResumo> buscarPorCliente(ClienteId clienteId) {
         return agendamentoResumoRepo.buscarPorCliente(clienteId.getValor());
+    }
+
+    @Override
+    public List<AgendamentoResumo> buscarPorProfissional(ProfissionalId profissionalId) {
+        return agendamentoResumoRepo.buscarPorProfissional(profissionalId.getValor());
     }
 
     @Override
@@ -110,20 +116,41 @@ interface AgendamentoResumoQueryRepository extends JpaRepository<AgendamentoJpa,
                a.dataHora as dataHora,
                a.profissionalId as profissionalId,
                COALESCE(p.nome, 'Aguardando confirmação') as profissionalNome,
+               a.clienteId as clienteId,
+               c.nome as clienteNome,
                a.servicoId as servicoId,
                s.nome as servicoNome,
                s.preco as servicoPreco,
                a.status as status,
-               a.observacoes as observacoes,
-               c.nome as clienteNome
+               a.observacoes as observacoes
         FROM AgendamentoJpa a
         LEFT JOIN ProfissionalJpa p ON p.id = a.profissionalId
         INNER JOIN ServicoOferecidoJpa s ON s.id = a.servicoId
-        LEFT JOIN ClienteJpa c ON c.id = a.clienteId
+        INNER JOIN ClienteJpa c ON c.id = a.clienteId
         WHERE a.clienteId = :clienteId
         ORDER BY a.dataHora DESC
         """)
     List<AgendamentoResumo> buscarPorCliente(@Param("clienteId") Integer clienteId);
+
+    @Query("""
+        SELECT a.id as id,
+               a.dataHora as dataHora,
+               a.profissionalId as profissionalId,
+               p.nome as profissionalNome,
+               a.servicoId as servicoId,
+               s.nome as servicoNome,
+               a.clienteId as clienteId,
+               c.nome as clienteNome,
+               a.status as status,
+               a.observacoes as observacoes
+        FROM AgendamentoJpa a
+        JOIN ProfissionalJpa p ON p.id = a.profissionalId
+        JOIN ServicoOferecidoJpa s ON s.id = a.servicoId
+        JOIN ClienteJpa c ON c.id = a.clienteId
+        WHERE a.profissionalId = :profissionalId
+        ORDER BY a.dataHora DESC
+        """)
+    List<AgendamentoResumo> buscarPorProfissional(@Param("profissionalId") Integer profissionalId);
 
     @Query("""
         SELECT a.id as id,

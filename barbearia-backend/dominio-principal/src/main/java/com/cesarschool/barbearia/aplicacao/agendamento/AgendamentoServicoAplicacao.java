@@ -1,10 +1,10 @@
 package com.cesarschool.barbearia.aplicacao.agendamento;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
-import static org.apache.commons.lang3.Validate.notNull;
 
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico;
@@ -100,6 +100,13 @@ public class AgendamentoServicoAplicacao {
     }
 
     /**
+     * Lista agendamentos de um profissional.
+     */
+    public List<AgendamentoResumo> listarPorProfissional(Integer profissionalId) {
+        return repositorioAplicacao.buscarPorProfissional(new ProfissionalId(profissionalId));
+    }
+
+    /**
      * Lista todos os agendamentos do sistema.
      */
     public List<AgendamentoResumo> listarTodos() {
@@ -155,17 +162,29 @@ public class AgendamentoServicoAplicacao {
     }
 
     /**
-     * Cancela um agendamento.
+     * Cancela um agendamento com tipo de usuário explícito.
      */
-    public AgendamentoResumo cancelar(Integer agendamentoId, Integer clienteId) {
+    public AgendamentoResumo cancelar(Integer agendamentoId, Integer solicitanteId, com.cesarschool.barbearia.dominio.compartilhado.enums.TipoUsuario tipoSolicitante) {
         notNull(agendamentoId, "ID do agendamento não pode ser nulo");
-        notNull(clienteId, "ID do cliente não pode ser nulo");
+        notNull(solicitanteId, "ID do solicitante não pode ser nulo");
+        notNull(tipoSolicitante, "Tipo do solicitante não pode ser nulo");
         
-        // Criar usuario solicitante como cliente
+        // Criar usuario solicitante com o tipo correto de ID para passar na validação equals()
+        com.cesarschool.barbearia.dominio.compartilhado.valueobjects.ValueObjectId<?> idObj;
+        
+        if (tipoSolicitante == com.cesarschool.barbearia.dominio.compartilhado.enums.TipoUsuario.PROFISSIONAL) {
+            idObj = new ProfissionalId(solicitanteId);
+        } else if (tipoSolicitante == com.cesarschool.barbearia.dominio.compartilhado.enums.TipoUsuario.CLIENTE) {
+            idObj = new ClienteId(solicitanteId);
+        } else {
+            // Fallback para genérico (admin ou outros)
+            idObj = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.ValueObjectId<Integer>(solicitanteId) {};
+        }
+
         com.cesarschool.barbearia.dominio.principal.agendamento.UsuarioSolicitante usuario = 
             new com.cesarschool.barbearia.dominio.principal.agendamento.UsuarioSolicitante(
-                com.cesarschool.barbearia.dominio.compartilhado.enums.TipoUsuario.CLIENTE,
-                new ClienteId(clienteId)
+                tipoSolicitante,
+                idObj
             );
         
         // Cancelar via serviço de domínio
