@@ -129,4 +129,31 @@ public class DomainServicesConfig {
     //         ProdutoServico produtoServico) {
     //     return new VendaServico(vendaRepositorio, produtoServico);
     // }
+
+
+    /**
+     * Configura o serviço de domínio de Gestão de Caixa com Decorators.
+     * 
+     * Este bean demonstra o padrão Decorator. A implementação base
+     * (GestaoCaixaServico) é envolvida por múltiplos decoradores, cada um
+     * adicionando uma nova responsabilidade (validação de saldo, logging).
+     * 
+     * O Spring injetará a implementação JPA de LancamentoRepositorio.
+     * 
+     * @param lancamentoRepositorio Interface do repositório de lançamentos.
+     * @return Uma instância de IGestaoCaixa decorada e pronta para uso.
+     */
+    @Bean
+    public IGestaoCaixa gestaoCaixaServico(LancamentoRepositorio lancamentoRepositorio) {
+        // 1. Começa com a implementação base
+        IGestaoCaixa servicoBase = new GestaoCaixaServico(lancamentoRepositorio);
+
+        // 2. Envolve com o decorador de validação de saldo
+        IGestaoCaixa comValidador = new ValidadorSaldoDecorator(servicoBase);
+
+        // 3. Envolve com o decorador de log e retorna
+        IGestaoCaixa comLog = new LoggerDecorator(comValidador);
+
+        return comLog;
+    }
 }

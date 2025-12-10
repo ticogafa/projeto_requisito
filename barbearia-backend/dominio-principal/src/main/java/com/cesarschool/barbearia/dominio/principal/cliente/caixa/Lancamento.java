@@ -36,6 +36,18 @@ public class Lancamento {
             this.clienteId = clienteId;
     }
 
+    // Adicione este construtor para o JPA/Mapeador poder recriar o objeto vindo do banco
+    public Lancamento(LancamentoId id, ClienteId clienteId, StatusLancamento status, 
+                      String descricao, BigDecimal valor, MeioPagamento meioPagamento, LocalDateTime quando) {
+        this.id = id;
+        this.clienteId = clienteId;
+        this.status = status;
+        this.descricao = descricao;
+        this.valor = valor;
+        this.meioPagamento = meioPagamento;
+        this.quando = quando;
+    }
+
     public static Lancamento novoRecibemento(String descricao, BigDecimal valor, MeioPagamento meioPagamento) {
         return new Lancamento(LancamentoId.novo(), null, StatusLancamento.ENTRADA, meioPagamento, descricao, valor, LocalDateTime.now());
     }

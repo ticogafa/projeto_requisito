@@ -12,7 +12,7 @@ import com.cesarschool.barbearia.dominio.principal.profissional.atendimento.Exec
 import com.cesarschool.barbearia.dominio.principal.profissional.avaliacao.Avaliacao;
 import com.cesarschool.barbearia.dominio.principal.profissional.avaliacao.AvaliacaoRepositorio;
 
-public class RelatorioDesempenhoServico {
+public class RelatorioDesempenhoServico implements IGeradorRelatorio {
 
     private final ExecucaoAtendimentoRepositorio execucoes;
     private final AvaliacaoRepositorio avaliacoes;
