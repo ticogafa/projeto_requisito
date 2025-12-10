@@ -19,19 +19,19 @@ public class GeradorRelatorioLoggingDecorator extends GeradorRelatorioDecorator 
     @Override
     public RelatorioDesempenho gerarParaDia(ProfissionalId profissionalId, LocalDate dia) {
         
-        LoggerSingleton.info(
+        LoggerSingleton.getInstance().info(
             String.format("[LOG] Iniciando geração de relatório para o profissional %s no dia %s.", 
-            profissionalId.uuid(), 
+            profissionalId.toString(), // CORREÇÃO: Use toString() em vez de uuid()
             dia.toString()
         ));
 
         // Delega a chamada para o próximo componente na cadeia
         RelatorioDesempenho relatorio = super.gerarParaDia(profissionalId, dia);
 
-        LoggerSingleton.info(
+        LoggerSingleton.getInstance().info(
             String.format("[LOG] Relatório gerado com sucesso: %d atendimentos, R$ %.2f de receita.",
-            relatorio.getAtendimentos(),
-            relatorio.getReceitaTotal()
+            relatorio.getNumeroClientesAtendidos(), // Verifique se o getter é este mesmo
+            relatorio.getReceitaGerada()            // Verifique se o getter é este mesmo
         ));
 
         return relatorio;

@@ -6,11 +6,11 @@ import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.ValueObjectI
  * Value Object representando o identificador único de um Profissional.
  * Imutável e com validação.
  */
-public final class ProfissionalId extends ValueObjectId<Integer> {
+// CORREÇÃO: Alterado de <Integer> para <String>
+public final class ProfissionalId extends ValueObjectId<String> {
 
-    public ProfissionalId(Integer valor) {
-        super(valor);
+    public ProfissionalId(String profissionalId) {
+        super(profissionalId);
     }
-
 
 }

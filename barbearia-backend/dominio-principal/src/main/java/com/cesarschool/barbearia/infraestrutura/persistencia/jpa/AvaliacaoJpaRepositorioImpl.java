@@ -25,14 +25,18 @@ public class AvaliacaoJpaRepositorioImpl implements AvaliacaoRepositorio {
     private JpaMapeador mapeador;
 
     @Override
-    public void salvar(Avaliacao avaliacao) {
+    public Avaliacao salvar(Avaliacao avaliacao) { // CORREÇÃO: Alterado de void para Avaliacao
         AvaliacaoJpa jpa = AvaliacaoJpa.builder()
             .id(avaliacao.getId().toString())
             .profissionalId(avaliacao.getProfissionalId().toString())
-            .nota(avaliacao.getNota().getValue()) // Extrai o int da Nota
+            .nota(avaliacao.getNota().getValue())
             .data(avaliacao.getData())
             .build();
-        springRepo.save(jpa);
+            
+        AvaliacaoJpa salvo = springRepo.save(jpa);
+        
+        // Retorna o objeto de domínio mapeado de volta (importante se o banco gerou algum dado)
+        return mapeador.map(salvo, Avaliacao.class);
     }
 
     @Override
