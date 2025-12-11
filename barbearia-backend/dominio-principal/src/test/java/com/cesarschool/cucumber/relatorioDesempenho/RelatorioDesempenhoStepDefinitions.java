@@ -74,7 +74,7 @@ public class RelatorioDesempenhoStepDefinitions {
             Nota nota = new Nota(notaInt);
             var quando = this.dia.atTime(12, 0).plusMinutes(5L * i);
             avaliacaoRepo.salvar(new Avaliacao(
-                this.profissionalId, null, nota, quando
+                null, this.profissionalId, nota, quando
             ));
         }
     }

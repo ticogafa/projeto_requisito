@@ -24,7 +24,7 @@ public class RelatorioController {
 
     @GetMapping("/{profissionalId}")
     public ResponseEntity<RelatorioDesempenho> gerarRelatorio(
-            @PathVariable String profissionalId,
+            @PathVariable Integer profissionalId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
 
         

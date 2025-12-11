@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.Lancamento;
+import com.cesarschool.barbearia.dominio.principal.cliente.caixa.LancamentoId;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.LancamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.StatusLancamento;
 
@@ -46,6 +47,12 @@ public class LancamentoJpaRepositorioImpl implements LancamentoRepositorio {
     }
 
     @Override
+    public Optional<Lancamento> buscarPorId(LancamentoId id) {
+        return springRepo.findById(id.toString())
+                .map(this::converterParaDominio);
+    }
+
+    @Override
     public List<Lancamento> buscarTodos() {
         return springRepo.findAll().stream()
                 .map(this::converterParaDominio)
@@ -55,13 +62,6 @@ public class LancamentoJpaRepositorioImpl implements LancamentoRepositorio {
     @Override
     public List<Lancamento> buscarPendentesPorCliente(ClienteId clienteId) {
         return springRepo.findByClienteIdAndStatus(clienteId.toString(), StatusLancamento.PENDENTE).stream()
-                .map(this::converterParaDominio)
-                .toList();
-    }
-
-    @Override
-    public List<Lancamento> buscarTodosPorCliente(ClienteId clienteId) {
-        return springRepo.findByClienteId(clienteId.toString()).stream()
                 .map(this::converterParaDominio)
                 .toList();
     }

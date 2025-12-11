@@ -41,11 +41,10 @@ class AgendamentoJpa {
     StatusAgendamento status;
     
     @Column(name = "CLIENTE_ID", nullable = false)
-    Integer clienteId; // Se ClienteId também virou String/UUID, mude aqui também!
+    Integer clienteId;
     
-    // CORREÇÃO: Mudado de Integer para String para aceitar UUIDs
-    @Column(name = "PROFISSIONAL_ID", length = 36)
-    String profissionalId;
+    @Column(name = "PROFISSIONAL_ID")
+    Integer profissionalId;
     
     @Column(name = "SERVICO_ID", nullable = false)
     Integer servicoId;
@@ -63,8 +62,7 @@ interface AgendamentoJpaRepository extends JpaRepository<AgendamentoJpa, Integer
     
     List<AgendamentoJpa> findByClienteId(@Param("clienteId") Integer clienteId);
     
-    // CORREÇÃO: Mudado o parâmetro de Integer para String
-    List<AgendamentoJpa> findByProfissionalIdOrderByDataHoraDesc(@Param("profissionalId") String profissionalId);
+    List<AgendamentoJpa> findByProfissionalIdOrderByDataHoraDesc(@Param("profissionalId") Integer profissionalId);
     
     List<AgendamentoJpa> findByStatusOrderByDataHoraDesc(@Param("status") StatusAgendamento status);
     
@@ -79,7 +77,7 @@ interface AgendamentoJpaRepository extends JpaRepository<AgendamentoJpa, Integer
            "AND a.dataHora = :dataHora " +
            "AND a.status IN ('PENDENTE', 'CONFIRMADO')")
     boolean existeAgendamentoConflitante(
-        @Param("profissionalId") String profissionalId, // CORREÇÃO: Mudado para String
+        @Param("profissionalId") Integer profissionalId,
         @Param("dataHora") LocalDateTime dataHora
     );
     
@@ -89,7 +87,7 @@ interface AgendamentoJpaRepository extends JpaRepository<AgendamentoJpa, Integer
            "AND a.status IN ('PENDENTE', 'CONFIRMADO') " +
            "ORDER BY a.dataHora")
     List<AgendamentoJpa> findAgendamentosDoDia(
-        @Param("profissionalId") String profissionalId, // CORREÇÃO: Mudado para String
+        @Param("profissionalId") Integer profissionalId,
         @Param("data") LocalDateTime data
     );
     

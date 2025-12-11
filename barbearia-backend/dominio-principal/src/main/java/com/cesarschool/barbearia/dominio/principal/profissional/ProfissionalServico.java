@@ -60,7 +60,7 @@ public class ProfissionalServico {
     public boolean estaQualificado(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
         Validacoes.validarObjetoObrigatorio(profissionalId, "ID do profissional");
         Validacoes.validarObjetoObrigatorio(servicoId, "ID do serviço");
-        return repositorio.estaQualificado(profissionalId.getValor(), servicoId.getValor());
+        return repositorio.estaQualificado(profissionalId, servicoId);
     }
 
     @Transactional

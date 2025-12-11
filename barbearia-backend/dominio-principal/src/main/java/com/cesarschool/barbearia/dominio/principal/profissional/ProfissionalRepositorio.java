@@ -33,14 +33,14 @@ public interface ProfissionalRepositorio extends Repositorio<Profissional, Integ
      * @param profissionalId ID do profissional
      * @param servicoId ID do serviço
      */
-    void adicionarQualificacao(Integer profissionalId, Integer servicoId);
+    void adicionarQualificacao(ProfissionalId profissionalId, ServicoOferecidoId servicoId);
     
     /**
      * Remove qualificação de um serviço de um profissional.
      * @param profissionalId ID do profissional
      * @param servicoId ID do serviço
      */
-    void removerQualificacao(Integer profissionalId, Integer servicoId);
+    void removerQualificacao(ProfissionalId profissionalId, ServicoOferecidoId servicoId);
     
     /**
      * Verifica se um profissional está qualificado para um serviço.
@@ -48,7 +48,7 @@ public interface ProfissionalRepositorio extends Repositorio<Profissional, Integ
      * @param servicoId ID do serviço
      * @return true se estiver qualificado
      */
-    boolean estaQualificado(Integer profissionalId, Integer servicoId);
+    boolean estaQualificado(ProfissionalId profissionalId, ServicoOferecidoId servicoId);
 
     boolean temAgendamentoAtivo(String nomeServico);
     boolean possuiAssociacaoServico(String nomeProfissional, String nomeServico);

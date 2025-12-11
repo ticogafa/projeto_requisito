@@ -152,10 +152,10 @@ public class GestaoAgendamentoTest {
         servicoRepositorio.salvarAssociacao("Maquiagem", "Paulo Reis");
         
         // Registrar qualificações também no repositório de profissionais (usado pelo AgendamentoServico)
-        profissionalRepositorio.adicionarQualificacao(profissionalJoaoId.getValor(), corteId.getValor());
-        profissionalRepositorio.adicionarQualificacao(profissionalJoaoId.getValor(), hidratacaoId.getValor());
-        profissionalRepositorio.adicionarQualificacao(profissionalPauloId.getValor(), manicureId.getValor());
-        profissionalRepositorio.adicionarQualificacao(profissionalPauloId.getValor(), maquiagemId.getValor());
+        profissionalRepositorio.adicionarQualificacao(profissionalJoaoId, corteId);
+        profissionalRepositorio.adicionarQualificacao(profissionalJoaoId, hidratacaoId);
+        profissionalRepositorio.adicionarQualificacao(profissionalPauloId, manicureId);
+        profissionalRepositorio.adicionarQualificacao(profissionalPauloId, maquiagemId);
     }
 
     private ServicoOferecidoId obterServicoIdPorNome(String nomeServico) {

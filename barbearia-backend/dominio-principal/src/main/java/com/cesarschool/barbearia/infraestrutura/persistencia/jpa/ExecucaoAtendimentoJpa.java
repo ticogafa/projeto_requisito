@@ -17,8 +17,8 @@ public class ExecucaoAtendimentoJpa {
     @Column(length = 36)
     private String id;
 
-    @Column(name = "profissional_id", nullable = false, length = 36)
-    private String profissionalId;
+    @Column(name = "profissional_id", nullable = false)
+    private Integer profissionalId;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal valor;

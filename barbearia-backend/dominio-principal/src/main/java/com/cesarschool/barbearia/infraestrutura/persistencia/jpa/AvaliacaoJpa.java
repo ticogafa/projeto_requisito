@@ -16,8 +16,8 @@ public class AvaliacaoJpa {
     @Column(length = 36)
     private String id;
 
-    @Column(name = "profissional_id", nullable = false, length = 36)
-    private String profissionalId;
+    @Column(name = "profissional_id", nullable = false)
+    private Integer profissionalId;
 
     @Column(nullable = false)
     private int nota; // Salvamos o valor inteiro da Nota

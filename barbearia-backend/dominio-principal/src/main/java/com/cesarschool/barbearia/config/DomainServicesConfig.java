@@ -16,6 +16,10 @@ import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepo
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoServico;
+import com.cesarschool.barbearia.dominio.principal.cliente.caixa.GestaoCaixaServico;
+import com.cesarschool.barbearia.dominio.principal.cliente.caixa.IGestaoCaixa;
+import com.cesarschool.barbearia.dominio.principal.cliente.caixa.LancamentoRepositorio;
+import com.cesarschool.barbearia.dominio.principal.cliente.caixa.ValidadorSaldoDecorator;
 
 /**
  * Configuração de Beans para Domain Services.
@@ -124,8 +128,8 @@ public class DomainServicesConfig {
         IGestaoCaixa comValidador = new ValidadorSaldoDecorator(servicoBase);
 
         // 3. Envolve com o decorador de log e retorna
-        IGestaoCaixa comLog = new LoggerDecorator(comValidador);
+        // IGestaoCaixa comLog = new LoggerDecorator(comValidador);
 
-        return comLog;
+        return comValidador;
     }
 }

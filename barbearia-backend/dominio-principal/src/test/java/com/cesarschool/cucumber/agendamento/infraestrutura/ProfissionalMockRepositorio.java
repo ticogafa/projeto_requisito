@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
+import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepositorio;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
@@ -56,17 +57,17 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
     }
     
     @Override
-    public void adicionarQualificacao(Integer profissionalId, Integer servicoId) {
+    public void adicionarQualificacao(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
         // Mock implementation - não faz nada
     }
 
     @Override
-    public void removerQualificacao(Integer profissionalId, Integer servicoId) {
+    public void removerQualificacao(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
         // Mock implementation - não faz nada
     }
 
     @Override
-    public boolean estaQualificado(Integer profissionalId, Integer servicoId) {
+    public boolean estaQualificado(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
         // Mock implementation - sempre retorna true
         return true;
     }

@@ -100,22 +100,22 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
     private final Map<Integer, List<Integer>> qualificacoes = new HashMap<>();
 
     @Override
-    public void adicionarQualificacao(Integer profissionalId, Integer servicoId) {
-        qualificacoes.computeIfAbsent(profissionalId, k -> new ArrayList<>()).add(servicoId);
+    public void adicionarQualificacao(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
+        qualificacoes.computeIfAbsent(profissionalId.getValor(), k -> new ArrayList<>()).add(servicoId.getValor());
     }
 
     @Override
-    public void removerQualificacao(Integer profissionalId, Integer servicoId) {
-        List<Integer> servicos = qualificacoes.get(profissionalId);
+    public void removerQualificacao(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
+        List<Integer> servicos = qualificacoes.get(profissionalId.getValor());
         if (servicos != null) {
-            servicos.remove(servicoId);
+            servicos.remove(servicoId.getValor());
         }
     }
 
     @Override
-    public boolean estaQualificado(Integer profissionalId, Integer servicoId) {
-        List<Integer> servicos = qualificacoes.get(profissionalId);
-        return servicos != null && servicos.contains(servicoId);
+    public boolean estaQualificado(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
+        List<Integer> servicos = qualificacoes.get(profissionalId.getValor());
+        return servicos != null && servicos.contains(servicoId.getValor());
     }
     
     public void salvarAssociacaoServico(String nomeProfissional, String nomeServico) {

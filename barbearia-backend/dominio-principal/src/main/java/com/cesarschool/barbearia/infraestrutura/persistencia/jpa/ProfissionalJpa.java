@@ -231,12 +231,12 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
         return disponiveis.isEmpty() ? null : disponiveis.get(0);
     }
 
-    @Override public void adicionarQualificacao(Integer profissionalId, Integer servicoId) {}
-    @Override public void removerQualificacao(Integer profissionalId, Integer servicoId) {}
+    @Override public void adicionarQualificacao(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {}
+    @Override public void removerQualificacao(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {}
     
     @Override
-    public boolean estaQualificado(Integer profissionalId, Integer servicoId) {
-        Long count = profissionalJpaRepository.countQualificacao(profissionalId, servicoId);
+    public boolean estaQualificado(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
+        Long count = profissionalJpaRepository.countQualificacao(profissionalId.getValor(), servicoId.getValor());
         return count > 0;
     }
 

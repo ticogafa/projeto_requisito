@@ -53,7 +53,7 @@ class JpaMapeador extends ModelMapper {
         // ProdutoJpa -> Produto
         addConverter(new AbstractConverter<ProdutoJpa, Produto>() {
             @Override
-            protected Produto convert(ProdutoJpa source) {
+            public Produto convert(ProdutoJpa source) {
                 return new Produto(
                     source.id,
                     source.nome,
@@ -67,7 +67,7 @@ class JpaMapeador extends ModelMapper {
         // Produto -> ProdutoJpa
         addConverter(new AbstractConverter<Produto, ProdutoJpa>() {
             @Override
-            protected ProdutoJpa convert(Produto source) {
+            public ProdutoJpa convert(Produto source) {
                 var produtoJpa = new ProdutoJpa();
                 produtoJpa.id = source.getId();
                 produtoJpa.nome = source.getNome();
@@ -85,7 +85,7 @@ class JpaMapeador extends ModelMapper {
         // MovimentacaoEstoqueJpa -> MovimentacaoEstoque
         addConverter(new AbstractConverter<MovimentacaoEstoqueJpa, MovimentacaoEstoque>() {
             @Override
-            protected MovimentacaoEstoque convert(MovimentacaoEstoqueJpa source) {
+            public MovimentacaoEstoque convert(MovimentacaoEstoqueJpa source) {
                 var id = source.id != null ? new MovimentacaoEstoqueId(source.id) : null;
                 var produtoId = new ProdutoId(source.produto.id);
                 
@@ -107,7 +107,7 @@ class JpaMapeador extends ModelMapper {
         // MovimentacaoEstoque -> MovimentacaoEstoqueJpa
         addConverter(new AbstractConverter<MovimentacaoEstoque, MovimentacaoEstoqueJpa>() {
             @Override
-            protected MovimentacaoEstoqueJpa convert(MovimentacaoEstoque source) {
+            public MovimentacaoEstoqueJpa convert(MovimentacaoEstoque source) {
                 var movimentacaoJpa = new MovimentacaoEstoqueJpa();
                 movimentacaoJpa.id = source.getId() != null ? source.getId().getValor() : null;
                 
@@ -136,7 +136,7 @@ class JpaMapeador extends ModelMapper {
         // AgendamentoJpa -> Agendamento
         addConverter(new AbstractConverter<AgendamentoJpa, Agendamento>() {
             @Override
-            protected Agendamento convert(AgendamentoJpa source) {
+            public Agendamento convert(AgendamentoJpa source) {
                 var id = source.id != null ? new AgendamentoId(source.id) : null;
                 var clienteId = new ClienteId(source.clienteId);
                 var profissionalId = source.profissionalId != null ? new ProfissionalId(source.profissionalId) : null;
@@ -157,7 +157,7 @@ class JpaMapeador extends ModelMapper {
         // Agendamento -> AgendamentoJpa
         addConverter(new AbstractConverter<Agendamento, AgendamentoJpa>() {
             @Override
-            protected AgendamentoJpa convert(Agendamento source) {
+            public AgendamentoJpa convert(Agendamento source) {
                 var agendamentoJpa = new AgendamentoJpa();
                 agendamentoJpa.id = source.getId() != null ? source.getId().getValor() : null;
                 agendamentoJpa.dataHora = source.getDataHora();
@@ -178,7 +178,7 @@ class JpaMapeador extends ModelMapper {
         
         addConverter(new AbstractConverter<ServicoOferecidoJpa, ServicoOferecido>() {
             @Override
-            protected ServicoOferecido convert(ServicoOferecidoJpa source) {
+            public ServicoOferecido convert(ServicoOferecidoJpa source) {
                 var id = source.getId() != null ? new ServicoOferecidoId(source.getId()) : null;
                 
                 return new ServicoOferecido(
@@ -193,7 +193,7 @@ class JpaMapeador extends ModelMapper {
         
         addConverter(new AbstractConverter<ServicoOferecido, ServicoOferecidoJpa>() {
             @Override
-            protected ServicoOferecidoJpa convert(ServicoOferecido source) {
+            public ServicoOferecidoJpa convert(ServicoOferecido source) {
                 var servicoJpa = new ServicoOferecidoJpa();
                 servicoJpa.setId(source.getId() != null ? source.getId().getValor() : null);
                 servicoJpa.setNome(source.getNome());
@@ -211,7 +211,7 @@ class JpaMapeador extends ModelMapper {
         // ProfissionalJpa -> Profissional
         addConverter(new AbstractConverter<ProfissionalJpa, com.cesarschool.barbearia.dominio.principal.profissional.Profissional>() {
             @Override
-            protected com.cesarschool.barbearia.dominio.principal.profissional.Profissional convert(ProfissionalJpa source) {
+            public com.cesarschool.barbearia.dominio.principal.profissional.Profissional convert(ProfissionalJpa source) {
                 var id = source.getId() != null ? new ProfissionalId(source.getId()) : null;
                 var email = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email(source.getEmail());
                 var cpf = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf(source.getCpf());
@@ -236,7 +236,7 @@ class JpaMapeador extends ModelMapper {
         // Profissional -> ProfissionalJpa
         addConverter(new AbstractConverter<com.cesarschool.barbearia.dominio.principal.profissional.Profissional, ProfissionalJpa>() {
             @Override
-            protected ProfissionalJpa convert(com.cesarschool.barbearia.dominio.principal.profissional.Profissional source) {
+            public ProfissionalJpa convert(com.cesarschool.barbearia.dominio.principal.profissional.Profissional source) {
                 return ProfissionalJpa.builder()
                     .id(source.getId() != null ? source.getId().getValor() : null)
                     .nome(source.getNome())
@@ -257,7 +257,7 @@ class JpaMapeador extends ModelMapper {
         // ClienteJpa -> Cliente
         addConverter(new AbstractConverter<ClienteJpa, com.cesarschool.barbearia.dominio.principal.cliente.Cliente>() {
             @Override
-            protected com.cesarschool.barbearia.dominio.principal.cliente.Cliente convert(ClienteJpa source) {
+            public com.cesarschool.barbearia.dominio.principal.cliente.Cliente convert(ClienteJpa source) {
                 var id = source.getId() != null ? new ClienteId(source.getId()) : null;
                 var email = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email(source.getEmail());
                 var cpf = new com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf(source.getCpf());
@@ -277,7 +277,7 @@ class JpaMapeador extends ModelMapper {
         // Cliente -> ClienteJpa
         addConverter(new AbstractConverter<com.cesarschool.barbearia.dominio.principal.cliente.Cliente, ClienteJpa>() {
             @Override
-            protected ClienteJpa convert(com.cesarschool.barbearia.dominio.principal.cliente.Cliente source) {
+            public ClienteJpa convert(com.cesarschool.barbearia.dominio.principal.cliente.Cliente source) {
                 return ClienteJpa.builder()
                     .id(source.getId() != null ? source.getId().getValor() : null)
                     .nome(source.getNome())
@@ -297,7 +297,7 @@ class JpaMapeador extends ModelMapper {
         // Integer -> ProdutoId
         addConverter(new AbstractConverter<Integer, ProdutoId>() {
             @Override
-            protected ProdutoId convert(Integer source) {
+            public ProdutoId convert(Integer source) {
                 return new ProdutoId(source);
             }
         });
@@ -305,7 +305,7 @@ class JpaMapeador extends ModelMapper {
         // Integer -> MovimentacaoEstoqueId
         addConverter(new AbstractConverter<Integer, MovimentacaoEstoqueId>() {
             @Override
-            protected MovimentacaoEstoqueId convert(Integer source) {
+            public MovimentacaoEstoqueId convert(Integer source) {
                 return new MovimentacaoEstoqueId(source);
             }
         });
@@ -313,7 +313,7 @@ class JpaMapeador extends ModelMapper {
         // Integer -> AgendamentoId
         addConverter(new AbstractConverter<Integer, AgendamentoId>() {
             @Override
-            protected AgendamentoId convert(Integer source) {
+            public AgendamentoId convert(Integer source) {
                 return new AgendamentoId(source);
             }
         });
@@ -321,7 +321,7 @@ class JpaMapeador extends ModelMapper {
         // Integer -> ClienteId
         addConverter(new AbstractConverter<Integer, ClienteId>() {
             @Override
-            protected ClienteId convert(Integer source) {
+            public ClienteId convert(Integer source) {
                 return new ClienteId(source);
             }
         });
@@ -329,7 +329,7 @@ class JpaMapeador extends ModelMapper {
         // Integer -> ProfissionalId
         addConverter(new AbstractConverter<Integer, ProfissionalId>() {
             @Override
-            protected ProfissionalId convert(Integer source) {
+            public ProfissionalId convert(Integer source) {
                 return new ProfissionalId(source);
             }
         });
@@ -337,7 +337,7 @@ class JpaMapeador extends ModelMapper {
         // Integer -> ServicoOferecidoId
         addConverter(new AbstractConverter<Integer, ServicoOferecidoId>() {
             @Override
-            protected ServicoOferecidoId convert(Integer source) {
+            public ServicoOferecidoId convert(Integer source) {
                 return new ServicoOferecidoId(source);
             }
         });
