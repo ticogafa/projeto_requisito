@@ -170,4 +170,12 @@ public class ProdutoServicoAplicacao {
         notNull(id, "ID não pode ser nulo");
         return gestaoEstoque.isEstoqueBaixo(new ProdutoId(id));
     }
+
+    /**
+     * Deleta um produto do sistema.
+     */
+    public void deletar(Integer id) {
+        notNull(id, "ID não pode ser nulo");
+        gestaoEstoque.deletarProduto(new ProdutoId(id));
+    }
 }

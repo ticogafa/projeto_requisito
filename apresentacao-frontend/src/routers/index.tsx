@@ -11,6 +11,7 @@ import ClientView from '@/views/Cliente/ClientView';
 import AdminDashboardView from '@/views/Administrador/AdminDashboardView';
 import { AdminLayout } from '@/views/Administrador/components';
 import ProfissionaisView from '@/views/ProfissioinalView';
+import EstoqueView from '@/views/Administrador/EstoqueView';
 
 export const router = createBrowserRouter([
   {
@@ -80,7 +81,7 @@ export const router = createBrowserRouter([
         path: '/admin/estoque',
         element: (
           <ProtectedRoute>
-            <AdminDashboardView />
+            <EstoqueView />
           </ProtectedRoute>
         )
       },

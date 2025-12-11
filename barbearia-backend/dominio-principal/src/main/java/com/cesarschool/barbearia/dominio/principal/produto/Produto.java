@@ -21,7 +21,7 @@ public final class Produto {
     }
 
     public void setId(Integer id) {
-        Validacoes.validarObjetoObrigatorio(id, "Id do Produto");
+        // ID pode ser nulo ao cadastrar um novo produto (será gerado pelo banco)
         this.id = id;
     }
 

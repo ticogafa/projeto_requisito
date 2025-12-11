@@ -16,6 +16,17 @@ export const AGENDAMENTO_URLS = {
   POR_CLIENTE: '/agendamentos/por-cliente'
 };
 
+export const PRODUTO_URLS = {
+  GET_ALL: '/produtos',
+  GET_ESTOQUE_BAIXO: '/produtos/estoque-baixo',
+  CADASTRAR: '/produtos',
+  ATUALIZAR: '/produtos',
+  ADICIONAR_ESTOQUE: '/produtos/:id/adicionar-estoque',
+  REMOVER_ESTOQUE: '/produtos/:id/remover-estoque',
+  REGISTRAR_VENDA: '/produtos/:id/registrar-venda',
+  HISTORICO: '/produtos/:id/movimentacoes'
+};
+
 export const AUTHENTICATION_URLS = {
   GET_TOKEN: `${URLS_PREFIX.AUTHENTICATION}/token/`,
   REFRESH_TOKEN: `${URLS_PREFIX.AUTHENTICATION}/token/refresh/`,

@@ -460,4 +460,30 @@ public class GestaoEstoqueServico {
         
         movimentacaoRepositorio.salvar(movimentacao);
     }
+
+    // ==================== OPERAÇÕES DE EXCLUSÃO ====================
+
+    /**
+     * Deleta um produto do sistema.
+     * Verifica se o produto existe antes de deletar.
+     * Remove todas as movimentações de estoque associadas antes de deletar o produto.
+     * 
+     * @param produtoId ID do produto a ser deletado
+     * @throws IllegalArgumentException se produto não existir
+     */
+    public void deletarProduto(ProdutoId produtoId) {
+        Validacoes.validarObjetoObrigatorio(produtoId, "ID do Produto");
+        
+        // Verifica se produto existe (lançará exceção se não existir)
+        buscarProduto(produtoId);
+        
+        // Busca e deleta todas as movimentações do produto
+        List<MovimentacaoEstoque> movimentacoes = movimentacaoRepositorio.buscarPorProduto(produtoId);
+        for (MovimentacaoEstoque movimentacao : movimentacoes) {
+            movimentacaoRepositorio.remover(movimentacao.getId().getValor());
+        }
+        
+        // Deleta o produto
+        produtoRepositorio.remover(produtoId.getValor());
+    }
 }
