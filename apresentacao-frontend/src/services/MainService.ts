@@ -1,29 +1,25 @@
 import { AGENDAMENTO_URLS, AUTHENTICATION_URLS, SERVICO_OFERECIDO_URLS, URLS_PREFIX } from '@/constants/URLConstants';
 import HttpClient from '@/services/httpClient';
 import { ProfissionaisResponse } from '@/interfaces/ProfissionaisInterfaces';
-import type { AxiosError, AxiosResponse, AxiosInstance } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 
 export default class MainService {
   client: HttpClient;
   static instance: MainService;
-  private api: AxiosInstance;
 
   private constructor() {
     this.client = new HttpClient(URLS_PREFIX.API);
   }
 
   public static getInstance(): MainService {
-    return !this.instance ? new MainService() : this.instance;
+    if (!this.instance) {
+      this.instance = new MainService();
+    }
+    return this.instance;
   }
 
   /**
   * Gets all works.
-  *
-  * @param params - Requests params object
-  * @param header - Axios header object
-  * @param successCallback - Success callback function
-  * @param errorCallback - Error callback function
-  * @param finallyCallback - Finally callback function
   */
   getServicosOferecidos(
     params: object,
@@ -43,13 +39,7 @@ export default class MainService {
   }
 
   /**
-   * Gets professionals available for a service at a specific date/time.
-   *
-   * @param params - Request params object with servicoId and dataHora
-   * @param header - Axios header object
-   * @param successCallback - Success callback function
-   * @param errorCallback - Error callback function
-   * @param finallyCallback - Finally callback function
+   * Gets professionals available.
    */
   getProfissionaisDisponiveis(
     params: object,
@@ -70,11 +60,6 @@ export default class MainService {
 
   /**
    * Creates a new appointment.
-   *
-   * @param data - The appointment data
-   * @param successCallback - Success callback function
-   * @param errorCallback - Error callback function
-   * @param finallyCallback - Finally callback function
    */
   criarAgendamento(
     data: object,
@@ -94,12 +79,6 @@ export default class MainService {
 
   /**
    * Gets appointments by client ID.
-   *
-   * @param params - Request params object with clienteId
-   * @param header - Axios header object
-   * @param successCallback - Success callback function
-   * @param errorCallback - Error callback function
-   * @param finallyCallback - Finally callback function
    */
   getAgendamentosPorCliente(
     params: object,
@@ -118,15 +97,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Edits an existing appointment.
-   *
-   * @param agendamentoId - The appointment ID
-   * @param data - The updated appointment data
-   * @param successCallback - Success callback function
-   * @param errorCallback - Error callback function
-   * @param finallyCallback - Finally callback function
-   */
   editarAgendamento(
     agendamentoId: number,
     data: object,
@@ -144,15 +114,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Cancels an appointment.
-   *
-   * @param agendamentoId - The appointment ID
-   * @param clienteId - The client ID requesting cancellation
-   * @param successCallback - Success callback function
-   * @param errorCallback - Error callback function
-   * @param finallyCallback - Finally callback function
-   */
   cancelarAgendamento(
     agendamentoId: number,
     clienteId: number,
@@ -170,14 +131,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Registers a new user in the backend.
-   *
-   * @param data - User registration data (email, password, role)
-   * @param successCallback - Success callback function
-   * @param errorCallback - Error callback function
-   * @param finallyCallback - Finally callback function
-   */
   registerUser(
     data: object,
     successCallback: (response: AxiosResponse) => void,
@@ -194,14 +147,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Authenticates user and gets JWT token.
-   *
-   * @param data - Login data (email, password)
-   * @param successCallback - Success callback function
-   * @param errorCallback - Error callback function
-   * @param finallyCallback - Finally callback function
-   */
   loginUser(
     data: object,
     successCallback: (response: AxiosResponse) => void,
@@ -225,11 +170,62 @@ export default class MainService {
     errorCallback: (err: AxiosError) => void,
     finallyCallback: () => void
   ) {
-    this.api
-      .get('/api/profissional', { params, headers })
-      .then(successCallback)
-      .catch(errorCallback)
-      .finally(finallyCallback);
+
+    this.client.get(
+      '/profissional',
+      params,
+      headers,
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
   }
 
+  public criarProfissional(
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.post(
+      '/profissional',
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+  public atualizarProfissional(
+    id: number,
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.put(
+      `/profissional/${id}`,
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  public desativarProfissional(
+    id: number,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.delete(
+      `/profissional/${id}`,
+      {},
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
 }
