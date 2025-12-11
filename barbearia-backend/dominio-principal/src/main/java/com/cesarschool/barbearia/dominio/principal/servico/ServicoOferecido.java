@@ -102,6 +102,10 @@ public final class ServicoOferecido {
         this.motivoInatividade = null;
     }
 
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     // Getters
     public ServicoOferecidoId getId() { return id; }
     public String getNome() { return nome; }

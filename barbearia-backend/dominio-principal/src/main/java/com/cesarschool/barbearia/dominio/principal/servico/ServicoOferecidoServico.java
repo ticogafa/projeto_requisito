@@ -55,11 +55,6 @@ public class ServicoOferecidoServico {
         return salvo;
     }
 
-    /**
-     * Valida a associação entre serviço e profissional.
-     * Para o teste "Impedir associação... (NEGATIVO)", este método deve lançar erro
-     * se o profissional NÃO estiver qualificado.
-     */
     @Transactional
     public void associarProfissional(String nomeServico, String nomeProfissional) {
         Validacoes.validarStringObrigatoria(nomeServico, "Nome do serviço");
@@ -70,10 +65,6 @@ public class ServicoOferecidoServico {
         if (!estaQualificado) {
              throw new IllegalArgumentException("O profissional " + nomeProfissional + " não está qualificado para o serviço " + nomeServico);
         }
-        
-        // Se chegou aqui, está qualificado.
-        // Se a intenção for criar o vínculo caso não exista, a lógica seria inversa,
-        // mas para passar no teste atual do Cucumber, a lógica de validação é esta.
     }
 
     public List<ServicoOferecido> listarTodos() {
@@ -102,6 +93,7 @@ public class ServicoOferecidoServico {
         existente.setPreco(servico.getPreco());
         existente.setDescricao(servico.getDescricao());
         existente.setDuracaoMinutos(servico.getDuracaoMinutos());
+        existente.setAtivo(servico.isAtivo()); 
         
         ServicoOferecido salvo = repositorio.salvar(existente);
 
@@ -133,7 +125,6 @@ public class ServicoOferecidoServico {
     public ServicoOferecido atualizarDuracao(Integer id, Integer novaDuracao) {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
         
-        // Validação explícita para garantir que o teste de valor negativo passe
         if (novaDuracao == null || novaDuracao <= 0) {
             throw new IllegalArgumentException("A duração deve ser um número positivo.");
         }

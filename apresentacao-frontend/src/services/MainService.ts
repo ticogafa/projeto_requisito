@@ -196,6 +196,7 @@ export default class MainService {
       finallyCallback
     );
   }
+
   public atualizarProfissional(
     id: number,
     data: object,
@@ -227,6 +228,34 @@ export default class MainService {
       errorCallback,
       finallyCallback
     );
+  }
+
+  public criarServico(
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.post('/servico', data, {}, successCallback, errorCallback, finallyCallback);
+  }
+
+  public atualizarServico(
+    id: number,
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.put(`/servico/${id}`, data, {}, successCallback, errorCallback, finallyCallback);
+  }
+
+  public desativarServico(
+    id: number,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.delete(`/servico/${id}`, {}, {}, successCallback, errorCallback, finallyCallback);
   }
 
   // ==================== PRODUTO ENDPOINTS ====================

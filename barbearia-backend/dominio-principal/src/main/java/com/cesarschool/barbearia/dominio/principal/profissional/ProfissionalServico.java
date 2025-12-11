@@ -109,18 +109,26 @@ public class ProfissionalServico {
     
     @Transactional
     public Profissional atualizar(Integer id, Profissional dadosAtualizados) {
-        Profissional existente = buscarPorId(new ProfissionalId(id));
+        ProfissionalId idVo = new ProfissionalId(id);
+        Profissional existente = buscarPorId(idVo);
         
         existente.setNome(dadosAtualizados.getNome());
         existente.setTelefone(dadosAtualizados.getTelefone());
         existente.setEmail(dadosAtualizados.getEmail());
         existente.setAgenda(dadosAtualizados.getAgenda());
         
-        if (dadosAtualizados.getServicoOferecidoIds() != null && !dadosAtualizados.getServicoOferecidoIds().isEmpty()) {
+        existente.setAtivo(dadosAtualizados.isAtivo()); 
+
+        if (dadosAtualizados.getServicoOferecidoIds() != null) {
             existente.setServicoOferecidoIds(dadosAtualizados.getServicoOferecidoIds());
         }
 
-        return atualizar(existente);
+        Profissional salvo = repositorio.salvar(existente);
+
+        if (publicadorEventos != null) {
+            publicadorEventos.publishEvent(new ProfissionalEvent(this, salvo, TipoAcao.ATUALIZADO));
+        }
+        return salvo;
     }
 
     @Transactional

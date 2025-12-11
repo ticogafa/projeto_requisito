@@ -13,13 +13,13 @@ import { AdminLayout } from '@/views/Administrador/components';
 import ProfissionaisView from '@/views/ProfissioinalView';
 import EstoqueView from '@/views/Administrador/EstoqueView';
 import AgendamentoView from '@/views/Administrador/AgendamentoView';
+import ServicosView from '@/views/ServicoView';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
     children: [
-
       {
         path: '/',
         element: <ProfileSelection />
@@ -50,13 +50,24 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         )
       },
+
       {
         path: '/admin/profissionais',
         element: (
           <ProtectedRoute>
-            {/* Reaproveita a view de profissionais DENTRO do layout do admin */}
             <AdminLayout>
               <ProfissionaisView />
+            </AdminLayout>
+          </ProtectedRoute>
+        )
+      },
+
+      {
+        path: '/admin/servicos',
+        element: (
+          <ProtectedRoute>
+            <AdminLayout>
+              <ServicosView />
             </AdminLayout>
           </ProtectedRoute>
         )
@@ -66,15 +77,15 @@ export const router = createBrowserRouter([
         path: '/admin/agendamentos',
         element: (
           <ProtectedRoute>
-            <AgendamentoView />
+            <AdminDashboardView />
           </ProtectedRoute>
         )
       },
       {
-        path: '/admin/servicos',
+        path: '/admin/agendamentos',
         element: (
           <ProtectedRoute>
-            <AdminDashboardView />
+            <AgendamentoView />
           </ProtectedRoute>
         )
       },

@@ -34,7 +34,13 @@ export default function EditProfessionalModal({ visible, profissional, closeModa
       setFimJornada(profissional.agenda?.fimJornada || '18:00:00');
 
       if (profissional.servicoOferecidoIds) {
-        setServicosSelecionados(profissional.servicoOferecidoIds.map(s => s.valor));
+        const idsNumericos = profissional.servicoOferecidoIds.map((s: any) => {
+          const valor = (typeof s === 'object' && s !== null && 'valor' in s) ? s.valor : s;
+          return Number(valor);
+        });
+        setServicosSelecionados(idsNumericos);
+      } else {
+        setServicosSelecionados([]);
       }
     }
   }, [visible, profissional]);
@@ -52,7 +58,10 @@ export default function EditProfessionalModal({ visible, profissional, closeModa
       cpf: profissional.cpf.value,
       senioridade: profissional.senioridade,
       ativo: profissional.ativo,
-      agenda: { inicioJornada, fimJornada },
+      agenda: {
+        inicioJornada: inicioJornada.length === 5 ? inicioJornada + ':00' : inicioJornada,
+        fimJornada: fimJornada.length === 5 ? fimJornada + ':00' : fimJornada
+      },
       servicoOferecidoIds: servicosSelecionados.map(id => ({ valor: id }))
     };
 
@@ -124,12 +133,22 @@ export default function EditProfessionalModal({ visible, profissional, closeModa
           <div>
             <label className="block text-sm font-medium mb-2">Serviços que realiza:</label>
             <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-dark-700 rounded-lg">
-              {servicos.map(servico => (
-                <label key={servico.id} className="flex items-center gap-2 cursor-pointer hover:bg-dark-600 p-1 rounded">
-                  <input type="checkbox" checked={servicosSelecionados.includes(servico.id)} onChange={() => toggleServico(servico.id)} className="accent-primary" />
-                  <span className="text-sm">{servico.nome}</span>
-                </label>
-              ))}
+              {servicos.map((servico: any) => {
+                const rawId = servico.id?.valor ?? servico.id;
+                const servicoId = Number(rawId);
+
+                return (
+                  <label key={servicoId} className="flex items-center gap-2 cursor-pointer hover:bg-dark-600 p-1 rounded">
+                    <input
+                      type="checkbox"
+                      checked={servicosSelecionados.includes(servicoId)}
+                      onChange={() => toggleServico(servicoId)}
+                      className="accent-primary"
+                    />
+                    <span className="text-sm">{servico.nome}</span>
+                  </label>
+                );
+              })}
             </div>
           </div>
           <button type="submit" className="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3 rounded-lg mt-4 transition">Salvar Alterações</button>

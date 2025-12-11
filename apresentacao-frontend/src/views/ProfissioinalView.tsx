@@ -34,25 +34,62 @@ export default function ProfissionaisView() {
     }
   };
 
-  const handleToggleStatus = (id: number, statusAtual: boolean) => {
-    if (!window.confirm(`Tem certeza que deseja ${statusAtual ? 'desativar' : 'reativar'} este profissional?`)) return;
+  const handleToggleStatus = (prof: ProfissionalInterface) => {
+    const novoStatus = !prof.ativo;
+    const acao = novoStatus ? 'reativar' : 'desativar';
+
+    if (!window.confirm(`Tem certeza que deseja ${acao} este profissional?`)) return;
 
     setLoading(true);
 
-    mainService.desativarProfissional(
-      id,
-      () => {
-        toast.success('Status alterado com sucesso!');
-        window.location.reload();
-      },
-      (error) => toast.error('Erro ao alterar status'),
-      () => setLoading(false)
-    );
+    if (novoStatus === false) {
+      mainService.desativarProfissional(
+        prof.id.valor,
+        () => {
+          toast.success('Profissional desativado com sucesso!');
+          window.location.reload();
+        },
+        (error) => {
+          const errorData = error.response?.data as { message?: string } | undefined;
+          const message = errorData?.message || 'Erro ao desativar profissional';
+          toast.error(message);
+          setLoading(false);
+        },
+        () => {}
+      );
+    } else {
+      const payload = {
+        id: prof.id.valor,
+        nome: prof.nome,
+        email: prof.email.value,
+        cpf: prof.cpf.value,
+        telefone: prof.telefone.value,
+        senioridade: prof.senioridade,
+        agenda: prof.agenda,
+        servicoOferecidoIds: prof.servicoOferecidoIds,
+        ativo: true
+      };
+
+      mainService.atualizarProfissional(
+        prof.id.valor,
+        payload,
+        () => {
+          toast.success('Profissional reativado com sucesso!');
+          window.location.reload();
+        },
+        (error) => {
+          const errorData = error.response?.data as { message?: string } | undefined;
+          const message = errorData?.message || 'Erro ao reativar profissional';
+          toast.error(message);
+          setLoading(false);
+        },
+        () => {}
+      );
+    }
   };
 
   return (
     <div>
-      {/* Modais */}
       <NewProfessionalModal
         visible={newModalVisible}
         closeModal={() => setNewModalVisible(false)}
@@ -69,7 +106,6 @@ export default function ProfissionaisView() {
         onSuccess={handleSuccess}
       />
 
-      {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-3">
           <span className="material-icons text-primary text-4xl">people</span>
@@ -95,7 +131,6 @@ export default function ProfissionaisView() {
         </div>
       </div>
 
-      {/* Tabela */}
       <div className="bg-dark-700 rounded-xl overflow-hidden border border-dark-600">
         <table className="w-full">
           <thead className="bg-dark-600">
@@ -124,15 +159,26 @@ export default function ProfissionaisView() {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
-                    <button onClick={() => handleEdit(prof.id.valor)} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">
-                      Jornada
-                    </button>
-                    <button onClick={() => handleEdit(prof.id.valor)} className="bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">
-                      Editar
-                    </button>
-                    <button onClick={() => handleToggleStatus(prof.id.valor, prof.ativo)} className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">
-                      {prof.ativo ? 'Desativar' : 'Reativar'}
-                    </button>
+                    {!prof.ativo ? (
+                      <button
+                        onClick={() => handleToggleStatus(prof)}
+                        className="bg-green-500/10 text-green-400 hover:bg-green-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition"
+                      >
+                        Reativar
+                      </button>
+                    ) : (
+                      <>
+                        <button onClick={() => handleEdit(prof.id.valor)} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                          Jornada
+                        </button>
+                        <button onClick={() => handleEdit(prof.id.valor)} className="bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                          Editar
+                        </button>
+                        <button onClick={() => handleToggleStatus(prof)} className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                          Desativar
+                        </button>
+                      </>
+                    )}
                   </div>
                 </td>
               </tr>
