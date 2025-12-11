@@ -30,4 +30,9 @@ public interface AgendamentoRepositorioAplicacao {
      * Lista agendamentos de um cliente.
      */
     List<AgendamentoResumo> buscarPorCliente(ClienteId clienteId);
+
+    /**
+     * Lista todos os agendamentos do sistema.
+     */
+    List<AgendamentoResumo> listarTodos();
 }

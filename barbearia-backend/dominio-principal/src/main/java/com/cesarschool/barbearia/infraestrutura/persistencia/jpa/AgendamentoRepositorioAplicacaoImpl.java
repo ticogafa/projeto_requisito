@@ -60,6 +60,11 @@ class AgendamentoRepositorioAplicacaoImpl implements AgendamentoRepositorioAplic
     public List<AgendamentoResumo> buscarPorCliente(ClienteId clienteId) {
         return agendamentoResumoRepo.buscarPorCliente(clienteId.getValor());
     }
+
+    @Override
+    public List<AgendamentoResumo> listarTodos() {
+        return agendamentoResumoRepo.listarTodos();
+    }
 }
 
 /**
@@ -107,13 +112,35 @@ interface AgendamentoResumoQueryRepository extends JpaRepository<AgendamentoJpa,
                COALESCE(p.nome, 'Aguardando confirmação') as profissionalNome,
                a.servicoId as servicoId,
                s.nome as servicoNome,
+               s.preco as servicoPreco,
                a.status as status,
-               a.observacoes as observacoes
+               a.observacoes as observacoes,
+               c.nome as clienteNome
         FROM AgendamentoJpa a
         LEFT JOIN ProfissionalJpa p ON p.id = a.profissionalId
         INNER JOIN ServicoOferecidoJpa s ON s.id = a.servicoId
+        LEFT JOIN ClienteJpa c ON c.id = a.clienteId
         WHERE a.clienteId = :clienteId
         ORDER BY a.dataHora DESC
         """)
     List<AgendamentoResumo> buscarPorCliente(@Param("clienteId") Integer clienteId);
+
+    @Query("""
+        SELECT a.id as id,
+               a.dataHora as dataHora,
+               a.profissionalId as profissionalId,
+               COALESCE(p.nome, 'Aguardando confirmação') as profissionalNome,
+               a.servicoId as servicoId,
+               s.nome as servicoNome,
+               s.preco as servicoPreco,
+               a.status as status,
+               a.observacoes as observacoes,
+               c.nome as clienteNome
+        FROM AgendamentoJpa a
+        LEFT JOIN ProfissionalJpa p ON p.id = a.profissionalId
+        INNER JOIN ServicoOferecidoJpa s ON s.id = a.servicoId
+        LEFT JOIN ClienteJpa c ON c.id = a.clienteId
+        ORDER BY a.dataHora DESC
+        """)
+    List<AgendamentoResumo> listarTodos();
 }

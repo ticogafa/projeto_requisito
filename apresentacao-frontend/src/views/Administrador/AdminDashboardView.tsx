@@ -1,15 +1,93 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AdminLayout } from '@/views/Administrador/components/index';
 import { useNavigate } from 'react-router-dom';
 
+interface Agendamento {
+  id: number;
+  dataHora: string;
+  status: string;
+  clienteNome?: string;
+  profissionalNome?: string;
+  servicoNome?: string;
+  servicoPreco?: number;
+}
+
+interface Profissional {
+  id: number;
+  nome: string;
+  ativo: boolean;
+}
+
+interface Produto {
+  id: number;
+  nome: string;
+  quantidadeEstoque: number;
+  estoqueMinimo: number;
+}
+
 export default function AdminDashboardView() {
   const navigate = useNavigate();
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [profissionais, setProfissionais] = useState<Profissional[]>([]);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Buscar todos os agendamentos
+      const agendamentosResponse = await fetch('http://localhost:8080/api/agendamentos');
+      const agendamentosData = await agendamentosResponse.json();
+      setAgendamentos(Array.isArray(agendamentosData) ? agendamentosData : []);
+
+      // Buscar profissionais
+      const profissionaisResponse = await fetch('http://localhost:8080/api/profissionais');
+      const profissionaisData = await profissionaisResponse.json();
+      setProfissionais(Array.isArray(profissionaisData) ? profissionaisData : []);
+
+      // Buscar produtos do estoque
+      const produtosResponse = await fetch('http://localhost:8080/api/produto');
+      const produtosData = await produtosResponse.json();
+      setProdutos(Array.isArray(produtosData) ? produtosData : []);
+    } catch (error) {
+      console.error('Erro ao carregar dados da dashboard:', error);
+      setAgendamentos([]);
+      setProfissionais([]);
+      setProdutos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filtrar agendamentos de hoje
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const amanha = new Date(hoje);
+  amanha.setDate(amanha.getDate() + 1);
+
+  const agendamentosHoje = Array.isArray(agendamentos) ? agendamentos.filter(ag => {
+    const dataAg = new Date(ag.dataHora);
+    return dataAg >= hoje && dataAg < amanha;
+  }) : [];
+
+  const profissionaisAtivos = Array.isArray(profissionais) ? profissionais.filter(p => p.ativo).length : 0;
+  
+  const faturamentoHoje = agendamentosHoje
+    .filter(ag => ag.status === 'CONCLUIDO')
+    .reduce((total, ag) => total + (ag.servicoPreco || 0), 0);
+
+  const produtosBaixoEstoque = Array.isArray(produtos) ? produtos.filter(p => p.quantidadeEstoque <= p.estoqueMinimo).length : 0;
 
   const stats = [
-    { label: 'Agendamentos Hoje', value: '24', icon: 'event', color: 'text-primary', bg: 'bg-primary/10' },
-    { label: 'Profissionais Ativos', value: '8', icon: 'people', color: 'text-green-400', bg: 'bg-green-500/10' },
-    { label: 'Faturamento Hoje', value: 'R$ 1.850', icon: 'attach_money', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { label: 'Média Avaliação', value: '4.8', icon: 'star', color: 'text-yellow-400', bg: 'bg-yellow-500/10' }
+    { label: 'Agendamentos Hoje', value: agendamentosHoje.length.toString(), icon: 'event', color: 'text-primary', bg: 'bg-primary/10' },
+    { label: 'Profissionais Ativos', value: profissionaisAtivos.toString(), icon: 'people', color: 'text-green-400', bg: 'bg-green-500/10' },
+    { label: 'Faturamento Hoje', value: `R$ ${faturamentoHoje.toFixed(2)}`, icon: 'attach_money', color: 'text-blue-400', bg: 'bg-blue-500/10' },
+    { label: 'Estoque Baixo', value: produtosBaixoEstoque.toString(), icon: 'inventory_2', color: 'text-yellow-400', bg: 'bg-yellow-500/10' }
   ];
 
   return (
@@ -79,28 +157,46 @@ export default function AdminDashboardView() {
             </tr>
           </thead>
           <tbody className="divide-y divide-dark-600">
-            <tr className="hover:bg-dark-700">
-              <td className="px-6 py-3 text-sm text-gray-300">19/10 09:00</td>
-              <td className="px-6 py-3 text-sm text-gray-300">João Pereira</td>
-              <td className="px-6 py-3 text-sm text-gray-300">Carlos Silva</td>
-              <td className="px-6 py-3 text-sm text-gray-300">Corte + Barba</td>
-              <td className="px-6 py-3 text-center">
-                <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">
-                  Em andamento
-                </span>
-              </td>
-            </tr>
-            <tr className="hover:bg-dark-700">
-              <td className="px-6 py-3 text-sm text-gray-300">19/10 10:30</td>
-              <td className="px-6 py-3 text-sm text-gray-300">Lucas Lima</td>
-              <td className="px-6 py-3 text-sm text-gray-300">Pedro Souza</td>
-              <td className="px-6 py-3 text-sm text-gray-300">Corte Social</td>
-              <td className="px-6 py-3 text-center">
-                <span className="bg-blue-500/10 text-blue-400 px-2 py-1 rounded-full text-xs">
-                  Agendado
-                </span>
-              </td>
-            </tr>
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-8 text-center text-gray-400">
+                  Carregando...
+                </td>
+              </tr>
+            ) : agendamentos.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-8 text-center text-gray-400">
+                  Nenhum agendamento encontrado
+                </td>
+              </tr>
+            ) : (
+              agendamentos.slice(0, 5).map((ag) => {
+                const data = new Date(ag.dataHora);
+                const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
+                  PENDENTE: { bg: 'bg-yellow-500/10', text: 'text-yellow-400', label: 'Pendente' },
+                  CONFIRMADO: { bg: 'bg-primary/10', text: 'text-primary', label: 'Confirmado' },
+                  CONCLUIDO: { bg: 'bg-blue-500/10', text: 'text-blue-400', label: 'Concluído' },
+                  CANCELADO: { bg: 'bg-red-500/10', text: 'text-red-400', label: 'Cancelado' },
+                };
+                const config = statusConfig[ag.status] || statusConfig.PENDENTE;
+
+                return (
+                  <tr key={ag.id} className="hover:bg-dark-700">
+                    <td className="px-6 py-3 text-sm text-gray-300">
+                      {data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} {data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-300">{ag.clienteNome || '-'}</td>
+                    <td className="px-6 py-3 text-sm text-gray-300">{ag.profissionalNome || '-'}</td>
+                    <td className="px-6 py-3 text-sm text-gray-300">{ag.servicoNome || '-'}</td>
+                    <td className="px-6 py-3 text-center">
+                      <span className={`${config.bg} ${config.text} px-2 py-1 rounded-full text-xs`}>
+                        {config.label}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>

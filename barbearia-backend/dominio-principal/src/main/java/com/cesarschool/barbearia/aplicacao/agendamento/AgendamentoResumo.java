@@ -1,5 +1,6 @@
 package com.cesarschool.barbearia.aplicacao.agendamento;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -13,6 +14,8 @@ public interface AgendamentoResumo {
     String getProfissionalNome();
     Integer getServicoId();
     String getServicoNome();
+    BigDecimal getServicoPreco();
     String getStatus();
     String getObservacoes();
+    String getClienteNome();
 }

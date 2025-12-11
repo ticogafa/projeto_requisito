@@ -100,6 +100,13 @@ public class AgendamentoServicoAplicacao {
     }
 
     /**
+     * Lista todos os agendamentos do sistema.
+     */
+    public List<AgendamentoResumo> listarTodos() {
+        return repositorioAplicacao.listarTodos();
+    }
+
+    /**
      * Edita um agendamento existente.
      */
     public AgendamentoResumo editar(Integer agendamentoId, EditarAgendamentoRequest request) {

@@ -84,6 +84,22 @@ public class AgendamentoControlador {
     }
 
     /**
+     * Lista todos os agendamentos do sistema.
+     * @return Lista de todos os agendamentos
+     */
+    @GetMapping
+    public ResponseEntity<List<AgendamentoResumo>> listarTodos() {
+        return exceptionHandler.withHandler(() -> {
+            logger.info("Listando todos os agendamentos");
+            
+            List<AgendamentoResumo> agendamentos = servicoAplicacao.listarTodos();
+            
+            logger.info("Encontrados " + agendamentos.size() + " agendamentos");
+            return ResponseEntity.ok(agendamentos);
+        });
+    }
+
+    /**
      * Lista todos os agendamentos de um cliente.
      * @param clienteId ID do cliente
      * @return Lista de agendamentos

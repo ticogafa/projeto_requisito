@@ -5,8 +5,10 @@ export interface AgendamentoInterface {
   profissionalNome: string;
   servicoId: number;
   servicoNome: string;
+  servicoPreco?: number;
   status: string;
   observacoes?: string;
+  clienteNome?: string;
 }
 
 export interface ProfissionalDisponivelInterface {
