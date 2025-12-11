@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoRepositorioAplicacao;
 import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoServicoAplicacao;
+import com.cesarschool.barbearia.aplicacao.estoque.ProdutoRepositorioAplicacao;
+import com.cesarschool.barbearia.aplicacao.estoque.ProdutoServicoAplicacao;
 import com.cesarschool.barbearia.dominio.compartilhado.eventos.PublicadorEventos;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico;
@@ -89,6 +91,20 @@ public class DomainServicesConfig {
             AgendamentoServico agendamentoServico,
             ServicoOferecidoServico servicoServico) {
         return new AgendamentoServicoAplicacao(repositorioAplicacao, agendamentoServico, servicoServico);
+    }
+
+    /**
+     * Configura o serviço da camada de aplicação para Produto/Estoque.
+     * Segue padrão SGB-2025-01: orquestra domain services e repositórios de aplicação.
+     * * @param repositorioAplicacao Repositório para consultas com DTOs/projeções
+     * @param gestaoEstoque Serviço de domínio para lógica de negócio de estoque
+     * @return Instância configurada de ProdutoServicoAplicacao
+     */
+    @Bean
+    public ProdutoServicoAplicacao produtoServicoAplicacao(
+            ProdutoRepositorioAplicacao repositorioAplicacao,
+            GestaoEstoqueServico gestaoEstoque) {
+        return new ProdutoServicoAplicacao(repositorioAplicacao, gestaoEstoque);
     }
 
     // TODO: Implementar VendaJpa antes de habilitar este bean
