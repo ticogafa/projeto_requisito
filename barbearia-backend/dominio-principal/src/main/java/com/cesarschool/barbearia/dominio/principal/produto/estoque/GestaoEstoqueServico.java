@@ -248,6 +248,7 @@ public class GestaoEstoqueServico {
      * 
      * @param produtoId ID do produto vendido
      * @param quantidade Quantidade vendida
+     * @param observacao Observação sobre a venda
      * @param usuarioResponsavel Usuário que realizou a venda
      * @return Produto com estoque atualizado
      * @throws IllegalStateException se estoque for insuficiente
@@ -255,6 +256,7 @@ public class GestaoEstoqueServico {
     public Produto registrarVendaPDV(
             ProdutoId produtoId, 
             int quantidade,
+            String observacao,
             String usuarioResponsavel) {
         
         Validacoes.validarObjetoObrigatorio(produtoId, "ID do Produto");
@@ -289,7 +291,7 @@ public class GestaoEstoqueServico {
             quantidade,
             estoqueAnterior,
             estoqueNovo,
-            "Venda PDV",
+            observacao != null ? observacao : "Venda PDV",
             usuarioResponsavel
         );
         

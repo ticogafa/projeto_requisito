@@ -1,8 +1,12 @@
 package com.cesarschool.cucumber.estoque;
 
-import static org.junit.Assert.*;
-
 import java.math.BigDecimal;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import com.cesarschool.barbearia.dominio.principal.produto.Produto;
 import com.cesarschool.barbearia.dominio.principal.produto.ProdutoId;
@@ -246,6 +250,7 @@ public class EstoqueTest {
             produtoAtual = gestaoEstoqueServico.registrarVendaPDV(
                 produtoId,
                 quantidade,
+                null, // observacao
                 USUARIO_TESTE
             );
             

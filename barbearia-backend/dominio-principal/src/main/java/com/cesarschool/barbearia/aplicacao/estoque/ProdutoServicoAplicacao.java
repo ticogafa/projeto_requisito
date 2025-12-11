@@ -148,6 +148,7 @@ public class ProdutoServicoAplicacao {
         Produto atualizado = gestaoEstoque.registrarVendaPDV(
             new ProdutoId(id),
             request.getQuantidade(),
+            request.getObservacao(),
             request.getUsuarioResponsavel()
         );
         

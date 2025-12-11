@@ -3,6 +3,7 @@ import AdminLayout from '@/views/Administrador/components/AdminLayout';
 import NewProductModal from '@/components/Administrador/NewProductModal';
 import EditProductModal from '@/components/Administrador/EditProductModal';
 import StockMovementModal from '@/components/Administrador/StockMovementModal';
+import ProductHistoryModal from '@/components/Administrador/ProductHistoryModal';
 
 interface Produto {
   id: number;
@@ -18,6 +19,7 @@ export default function EstoqueView() {
   const [showNewModal, setShowNewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showMovementModal, setShowMovementModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Produto | null>(null);
   const [movementType, setMovementType] = useState<'add' | 'remove' | 'sell'>('add');
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,6 +52,11 @@ export default function EstoqueView() {
     setSelectedProduct(produto);
     setMovementType(type);
     setShowMovementModal(true);
+  };
+
+  const handleHistory = (produto: Produto) => {
+    setSelectedProduct(produto);
+    setShowHistoryModal(true);
   };
 
   const handleDelete = async (produto: Produto) => {
@@ -229,6 +236,15 @@ export default function EstoqueView() {
                         <td className="px-6 py-4">
                           <div className="flex justify-end gap-2">
                             <button
+                              onClick={() => handleHistory(produto)}
+                              className="p-2 hover:bg-purple-500/10 rounded-lg transition-all group"
+                              title="Histórico de Movimentações"
+                            >
+                              <span className="material-icons text-purple-400 group-hover:scale-110 transition-transform">
+                                history
+                              </span>
+                            </button>
+                            <button
                               onClick={() => handleEdit(produto)}
                               className="p-2 hover:bg-blue-500/10 rounded-lg transition-all group"
                               title="Editar"
@@ -322,6 +338,16 @@ export default function EstoqueView() {
           onSuccess={() => {
             loadProdutos();
             setShowMovementModal(false);
+            setSelectedProduct(null);
+          }}
+        />
+      )}
+
+      {showHistoryModal && selectedProduct && (
+        <ProductHistoryModal
+          produto={selectedProduct}
+          onClose={() => {
+            setShowHistoryModal(false);
             setSelectedProduct(null);
           }}
         />
