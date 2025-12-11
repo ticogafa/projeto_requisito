@@ -141,6 +141,16 @@ public class AgendamentoServico {
     }
 
     /**
+     * Conclui um agendamento.
+     */
+    public Agendamento concluir(AgendamentoId id) {
+        Validacoes.validarObjetoObrigatorio(id, "ID do agendamento");
+        Agendamento agendamento = buscarPorId(id);
+        agendamento.concluir();
+        return repositorio.salvar(agendamento);
+    }
+
+    /**
      * Cancela um agendamento.
      */
     public Agendamento cancelar(AgendamentoId id, UsuarioSolicitante usuario) {

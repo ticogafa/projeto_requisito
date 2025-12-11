@@ -12,6 +12,7 @@ import AdminDashboardView from '@/views/Administrador/AdminDashboardView';
 import { AdminLayout } from '@/views/Administrador/components';
 import ProfissionaisView from '@/views/ProfissioinalView';
 import EstoqueView from '@/views/Administrador/EstoqueView';
+import AgendamentoView from '@/views/Administrador/AgendamentoView';
 
 export const router = createBrowserRouter([
   {
@@ -65,7 +66,7 @@ export const router = createBrowserRouter([
         path: '/admin/agendamentos',
         element: (
           <ProtectedRoute>
-            <AdminDashboardView />
+            <AgendamentoView />
           </ProtectedRoute>
         )
       },

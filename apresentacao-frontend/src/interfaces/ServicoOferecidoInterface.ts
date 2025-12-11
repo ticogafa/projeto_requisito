@@ -8,6 +8,8 @@ export interface ServicoOferecido {
   preco: number;
   descricao: string;
   duracaoMinutos: number;
+  ativo?: boolean;
+  motivoInatividade?: string | null;
 }
 
 /**

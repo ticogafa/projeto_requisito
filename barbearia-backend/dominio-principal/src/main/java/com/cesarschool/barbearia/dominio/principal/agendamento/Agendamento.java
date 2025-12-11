@@ -68,6 +68,13 @@ public final class Agendamento {
         this.status = StatusAgendamento.CONFIRMADO;
     }
 
+    public void concluir() {
+        if (status != StatusAgendamento.CONFIRMADO) {
+            throw new IllegalStateException("Apenas agendamentos confirmados podem ser concluídos");
+        }
+        this.status = StatusAgendamento.CONCLUIDO;
+    }
+
     public void cancelar(UsuarioSolicitante usuario) {
         validarStatusCancelamento();
         validarPermissaoDeCancelamento(usuario);

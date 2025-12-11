@@ -1,13 +1,14 @@
 package com.cesarschool.barbearia.aplicacao.agendamento;
 
-import static org.apache.commons.lang3.Validate.*;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico;
+import com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
@@ -104,6 +105,20 @@ public class AgendamentoServicoAplicacao {
     public AgendamentoResumo editar(Integer agendamentoId, EditarAgendamentoRequest request) {
         notNull(request, "Request não pode ser nulo");
         notNull(agendamentoId, "ID do agendamento não pode ser nulo");
+        
+        // Se estiver apenas mudando o status para CONCLUIDO, não validar horário
+        if (request.getStatus() != null && request.getStatus() == StatusAgendamento.CONCLUIDO) {
+            // Apenas concluir o agendamento
+            Agendamento concluido = agendamentoServico.concluir(
+                new com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId(agendamentoId)
+            );
+            
+            return repositorioAplicacao.buscarPorCliente(concluido.getClienteId())
+                .stream()
+                .filter(a -> a.getId().equals(concluido.getId().getValor()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado"));
+        }
         
         // Validar horário de funcionamento
         LocalTime hora = request.getDataHora().toLocalTime();
