@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.cesarschool.barbearia.dominio.principal.produto.Produto;
 import com.cesarschool.barbearia.dominio.principal.produto.ProdutoRepositorio;
-import com.cesarschool.barbearia.infraestrutura.proxy.ProdutoRepositorioCacheProxy;
+import com.cesarschool.barbearia.infraestrutura.proxy.ProdutoRepositorioVirtualProxy;
 
 /**
  * Demonstrador do Padrão PROXY com Cache.
@@ -274,20 +274,21 @@ public class DemonstradorProxy implements CommandLineRunner {
     
     private void exibirEstatisticasFinais() {
         imprimirSeparador();
-        System.out.println("ESTATÍSTICAS FINAIS DO CACHE");
+        System.out.println("ESTATÍSTICAS FINAIS DO VIRTUAL PROXY (LAZY LOADING)");
         imprimirSeparador();
         System.out.println();
         
-        if (produtoRepositorio instanceof ProdutoRepositorioCacheProxy) {
-            ProdutoRepositorioCacheProxy proxy = (ProdutoRepositorioCacheProxy) produtoRepositorio;
+        if (produtoRepositorio instanceof ProdutoRepositorioVirtualProxy) {
+            ProdutoRepositorioVirtualProxy proxy = (ProdutoRepositorioVirtualProxy) produtoRepositorio;
             System.out.println(proxy.getEstatisticas());
             
             // Análise
             System.out.println("📈 ANÁLISE:");
-            System.out.println("   • Múltiplas buscas ao mesmo produto = cache hits");
-            System.out.println("   • Hit rate > 50% = cache está funcionando bem");
-            System.out.println("   • Operações de escrita invalidam cache (garantem consistência)");
-            System.out.println("   • Próximas buscas repovoam o cache automaticamente");
+            System.out.println("   • Primeira busca = LAZY LOAD (carrega do banco)");
+            System.out.println("   • Buscas subsequentes = REUSO (já carregado)");
+            System.out.println("   • Taxa de reuso > 50% = lazy loading efetivo");
+            System.out.println("   • Operações de escrita invalidam dados (garantem consistência)");
+            System.out.println("   • Próximas buscas recarregam sob demanda (lazy)");
         }
         
         System.out.println();

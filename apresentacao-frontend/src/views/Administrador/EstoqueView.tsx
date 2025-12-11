@@ -4,6 +4,7 @@ import NewProductModal from '@/components/Administrador/NewProductModal';
 import EditProductModal from '@/components/Administrador/EditProductModal';
 import StockMovementModal from '@/components/Administrador/StockMovementModal';
 import ProductHistoryModal from '@/components/Administrador/ProductHistoryModal';
+import CacheMonitorModal from '@/components/Administrador/CacheMonitorModal';
 
 interface Produto {
   id: number;
@@ -20,6 +21,7 @@ export default function EstoqueView() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showMovementModal, setShowMovementModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [showCacheMonitor, setShowCacheMonitor] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Produto | null>(null);
   const [movementType, setMovementType] = useState<'add' | 'remove' | 'sell'>('add');
   const [searchTerm, setSearchTerm] = useState('');
@@ -126,13 +128,23 @@ export default function EstoqueView() {
               )}
             </div>
           </div>
-          <button
-            onClick={() => setShowNewModal(true)}
-            className="bg-primary hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 shadow-lg hover:shadow-primary/50 whitespace-nowrap"
-          >
-            <span className="material-icons">add_circle</span>
-            Novo Produto
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowCacheMonitor(true)}
+              className="bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-600/30 px-4 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 whitespace-nowrap"
+              title="Monitor de Cache Proxy"
+            >
+              <span className="material-icons">memory</span>
+              <span className="hidden sm:inline">Cache Monitor</span>
+            </button>
+            <button
+              onClick={() => setShowNewModal(true)}
+              className="bg-primary hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 shadow-lg hover:shadow-primary/50 whitespace-nowrap"
+            >
+              <span className="material-icons">add_circle</span>
+              Novo Produto
+            </button>
+          </div>
         </div>
 
         {/* Products Table */}
@@ -350,6 +362,12 @@ export default function EstoqueView() {
             setShowHistoryModal(false);
             setSelectedProduct(null);
           }}
+        />
+      )}
+
+      {showCacheMonitor && (
+        <CacheMonitorModal
+          onClose={() => setShowCacheMonitor(false)}
         />
       )}
     </AdminLayout>
