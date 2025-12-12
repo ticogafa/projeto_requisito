@@ -5,15 +5,22 @@ import static org.apache.commons.lang3.Validate.notNull;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico;
 import com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento;
+import com.cesarschool.barbearia.dominio.principal.cliente.Cliente;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
+import com.cesarschool.barbearia.dominio.principal.cliente.ClienteRepositorio;
+import com.cesarschool.barbearia.dominio.principal.cliente.ClienteServico;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecido;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoServico;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +35,8 @@ public class AgendamentoServicoAplicacao {
     private final AgendamentoRepositorioAplicacao repositorioAplicacao;
     private final AgendamentoServico agendamentoServico;
     private final ServicoOferecidoServico servicoServico;
+    private final ClienteRepositorio clienteRepositorio;
+    private final ClienteServico clienteServico;
 
     /**
      * Busca profissionais disponíveis para um serviço em uma data/hora.
@@ -53,7 +62,37 @@ public class AgendamentoServicoAplicacao {
      */
     public AgendamentoResumo criar(CriarAgendamentoRequest request) {
         notNull(request, "Request não pode ser nulo");
-        notNull(request.getClienteId(), "ID do cliente não pode ser nulo");
+        
+        Integer clienteId = request.getClienteId();
+        
+        if (clienteId == null) {
+            if (request.getEmailCliente() == null || request.getEmailCliente().trim().isEmpty()) {
+                 throw new IllegalArgumentException("ID do cliente ou Email deve ser fornecido");
+            }
+            
+            String emailStr = request.getEmailCliente();
+            
+            Optional<Cliente> clienteOpt = clienteRepositorio.buscarPorEmail(emailStr);
+            if (clienteOpt.isPresent()) {
+                clienteId = clienteOpt.get().getId().getValor();
+            } else {
+                // Criar novo cliente
+                notNull(request.getNomeCliente(), "Nome do cliente é obrigatório para novo cadastro");
+                notNull(request.getCpfCliente(), "CPF do cliente é obrigatório para novo cadastro");
+                notNull(request.getTelefoneCliente(), "Telefone do cliente é obrigatório para novo cadastro");
+                
+                Cliente novoCliente = new Cliente(
+                    request.getNomeCliente(),
+                    new Email(emailStr),
+                    new Cpf(request.getCpfCliente()),
+                    new Telefone(request.getTelefoneCliente())
+                );
+                
+                Cliente salvo = clienteServico.criarCliente(novoCliente);
+                clienteId = salvo.getId().getValor();
+            }
+        }
+        
         notNull(request.getServicoId(), "ID do serviço não pode ser nulo");
         notNull(request.getDataHora(), "Data/hora não pode ser nula");
         
@@ -78,7 +117,7 @@ public class AgendamentoServicoAplicacao {
         // Criar agendamento SEM ID (será gerado pelo banco)
         Agendamento agendamento = new Agendamento(
                 request.getDataHora(),
-                new ClienteId(request.getClienteId()),
+                new ClienteId(clienteId),
                 profId,
                 new ServicoOferecidoId(request.getServicoId()),
                 request.getObservacoes()
@@ -88,7 +127,7 @@ public class AgendamentoServicoAplicacao {
         Agendamento criado = agendamentoServico.criar(agendamento, servico.getDuracaoMinutos());
         
         // Buscar e retornar com dados completos via repositório de aplicação
-        return repositorioAplicacao.buscarPorCliente(new ClienteId(request.getClienteId()))
+        return repositorioAplicacao.buscarPorCliente(new ClienteId(clienteId))
             .stream()
             .filter(a -> a.getId().equals(criado.getId().getValor()))
             .findFirst()

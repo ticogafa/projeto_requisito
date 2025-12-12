@@ -19,9 +19,13 @@ export interface ProfissionalDisponivelInterface {
 }
 
 export interface CriarAgendamentoRequest {
-  clienteId: number;
+  clienteId?: number;
   servicoId: number;
   dataHora: string;
   profissionalId?: number;
   observacoes?: string;
+  emailCliente?: string;
+  nomeCliente?: string;
+  cpfCliente?: string;
+  telefoneCliente?: string;
 }

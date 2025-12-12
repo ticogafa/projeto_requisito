@@ -33,10 +33,20 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 // Firestore helper functions for user data
-export const saveUserRole = async (userId: string, email: string, role: UserRole): Promise<void> => {
+export const saveUserRole = async (
+  userId: string, 
+  email: string, 
+  role: UserRole,
+  name?: string,
+  cpf?: string,
+  phone?: string
+): Promise<void> => {
   await setDoc(doc(db, 'users', userId), {
     email,
     role,
+    name: name || '',
+    cpf: cpf || '',
+    phone: phone || '',
     createdAt: new Date().toISOString()
   });
 };
@@ -49,10 +59,24 @@ export const getUserRole = async (userId: string): Promise<UserRole | null> => {
   return null;
 };
 
-export const getUserData = async (userId: string): Promise<{ email: string; role: UserRole; createdAt: string } | null> => {
+export const getUserData = async (userId: string): Promise<{ 
+  email: string; 
+  role: UserRole; 
+  createdAt: string;
+  name?: string;
+  cpf?: string;
+  phone?: string;
+} | null> => {
   const userDoc = await getDoc(doc(db, 'users', userId));
   if (userDoc.exists()) {
-    return userDoc.data() as { email: string; role: UserRole; createdAt: string };
+    return userDoc.data() as { 
+      email: string; 
+      role: UserRole; 
+      createdAt: string;
+      name?: string;
+      cpf?: string;
+      phone?: string;
+    };
   }
   return null;
 };

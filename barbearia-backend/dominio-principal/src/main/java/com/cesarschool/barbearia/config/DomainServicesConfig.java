@@ -22,6 +22,8 @@ import com.cesarschool.barbearia.dominio.principal.cliente.caixa.GestaoCaixaServ
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.IGestaoCaixa;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.LancamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.ValidadorSaldoDecorator;
+import com.cesarschool.barbearia.dominio.principal.cliente.ClienteRepositorio;
+import com.cesarschool.barbearia.dominio.principal.cliente.ClienteServico;
 
 /**
  * Configuração de Beans para Domain Services.
@@ -63,6 +65,16 @@ public class DomainServicesConfig {
     }
 
     /**
+     * Configura o serviço de domínio de Cliente.
+     * @param clienteRepositorio Interface do repositório
+     * @return Instância configurada de ClienteServico
+     */
+    @Bean
+    public ClienteServico clienteServico(ClienteRepositorio clienteRepositorio) {
+        return new ClienteServico(clienteRepositorio);
+    }
+
+    /**
      * Configura o serviço de domínio de Gestão de Estoque.
      * Este é um serviço mais complexo que orquestra operações de estoque
      * e mantém histórico de movimentações.
@@ -83,14 +95,18 @@ public class DomainServicesConfig {
      * * @param repositorioAplicacao Repositório para consultas com DTOs/projeções
      * @param agendamentoServico Serviço de domínio para lógica de negócio
      * @param servicoServico Serviço de domínio de serviços oferecidos
+     * @param clienteRepositorio Repositório de clientes para busca
+     * @param clienteServico Serviço de domínio de clientes para criação
      * @return Instância configurada de AgendamentoServicoAplicacao
      */
     @Bean
     public AgendamentoServicoAplicacao agendamentoServicoAplicacao(
             AgendamentoRepositorioAplicacao repositorioAplicacao,
             AgendamentoServico agendamentoServico,
-            ServicoOferecidoServico servicoServico) {
-        return new AgendamentoServicoAplicacao(repositorioAplicacao, agendamentoServico, servicoServico);
+            ServicoOferecidoServico servicoServico,
+            ClienteRepositorio clienteRepositorio,
+            ClienteServico clienteServico) {
+        return new AgendamentoServicoAplicacao(repositorioAplicacao, agendamentoServico, servicoServico, clienteRepositorio, clienteServico);
     }
 
     /**

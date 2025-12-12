@@ -8,6 +8,9 @@ import { toast } from 'react-toastify';
 export default function RegisterView() {
   const navigate = useNavigate();
   const { setLoading } = useLoadingStore();
+  const [name, setName] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,6 +20,11 @@ export default function RegisterView() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!name || !cpf || !phone) {
+      toast.error('Por favor, preencha todos os campos obrigatórios (Nome, CPF, Telefone)');
+      return;
+    }
 
     const validation = AuthService.validateLoginData(email, password);
     if (!validation.valid) {
@@ -53,7 +61,7 @@ export default function RegisterView() {
 
     const finallyCallback = () => setLoading(false);
 
-    AuthService.register(email, password, role, successCallback, errorCallback, finallyCallback);
+    AuthService.register(email, password, role, name, cpf, phone, successCallback, errorCallback, finallyCallback);
   };
 
   const handleBackToLogin = () => {
@@ -86,6 +94,57 @@ export default function RegisterView() {
               <option value="admin">Administrador</option>
             </select>
             <p className="text-xs text-gray-500 mt-1">Selecione o tipo de conta que deseja criar</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Nome Completo</label>
+            <div className="relative">
+              <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                person
+              </span>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Seu Nome"
+                className="w-full bg-dark-700 border border-dark-600 rounded-lg pl-12 pr-4 py-3 text-white focus:border-primary focus:outline-none"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">CPF</label>
+            <div className="relative">
+              <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                badge
+              </span>
+              <input
+                type="text"
+                value={cpf}
+                onChange={(e) => setCpf(e.target.value)}
+                placeholder="000.000.000-00"
+                className="w-full bg-dark-700 border border-dark-600 rounded-lg pl-12 pr-4 py-3 text-white focus:border-primary focus:outline-none"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Telefone</label>
+            <div className="relative">
+              <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                phone
+              </span>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="(00) 00000-0000"
+                className="w-full bg-dark-700 border border-dark-600 rounded-lg pl-12 pr-4 py-3 text-white focus:border-primary focus:outline-none"
+                required
+              />
+            </div>
           </div>
 
           <div>
@@ -176,3 +235,4 @@ export default function RegisterView() {
     </div>
   );
 }
+

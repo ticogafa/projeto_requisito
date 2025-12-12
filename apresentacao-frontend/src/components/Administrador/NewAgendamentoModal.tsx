@@ -22,13 +22,22 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [servicos, setServicos] = useState<ServicoOferecido[]>([]);
   const [profissionaisDisponiveis, setProfissionaisDisponiveis] = useState<ProfissionalDisponivelInterface[]>([]);
+  
+  const [isNewClientMode, setIsNewClientMode] = useState(false);
+
   const [formData, setFormData] = useState({
     clienteId: clienteId?.toString() || '',
     servicoId: '',
     dataHora: '',
     profissionalId: '',
     observacoes: '',
+    // Novos campos
+    emailCliente: '',
+    nomeCliente: '',
+    cpfCliente: '',
+    telefoneCliente: ''
   });
+  
   const [loading, setLoading] = useState(false);
   const [loadingServicos, setLoadingServicos] = useState(true);
   const [loadingClientes, setLoadingClientes] = useState(!clienteId); // Só carrega se não foi fornecido
@@ -74,12 +83,8 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
       {},
       (response: AxiosResponse) => {
         const data = response.data;
-        console.log('Serviços carregados (raw):', data);
-        // Normalizar IDs e filtrar apenas serviços ativos
         const normalized = normalizeIds(data) as ServicoOferecido[];
-        console.log('Serviços após normalização:', normalized);
         const servicosAtivos = normalized.filter((s) => s.ativo === true || s.ativo === undefined);
-        console.log('Serviços ativos:', servicosAtivos);
         setServicos(servicosAtivos);
       },
       (error: AxiosError) => {
@@ -94,26 +99,18 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
 
   const loadProfissionaisDisponiveis = () => {
     if (!formData.servicoId || !formData.dataHora) {
-      console.log('servicoId ou dataHora não preenchidos, pulando busca de profissionais');
       setProfissionaisDisponiveis([]);
       return;
     }
 
     setLoadingProfissionais(true);
     
-    // Converter servicoId para número e validar
     const servicoIdNum = parseInt(formData.servicoId);
     if (isNaN(servicoIdNum) || servicoIdNum <= 0) {
-      console.error('servicoId inválido:', formData.servicoId);
       setProfissionaisDisponiveis([]);
       setLoadingProfissionais(false);
       return;
     }
-
-    console.log('Buscando profissionais disponíveis:', {
-      servicoId: servicoIdNum,
-      dataHora: formData.dataHora
-    });
 
     MainService.getInstance().getProfissionaisDisponiveis(
       {
@@ -123,7 +120,6 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
       {},
       (response: AxiosResponse) => {
         const data = response.data;
-        console.log('Profissionais disponíveis recebidos:', data);
         setProfissionaisDisponiveis(data);
       },
       (error: AxiosError) => {
@@ -142,37 +138,70 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
     setError('');
 
     // Validações básicas
-    if (!formData.clienteId || !formData.servicoId || !formData.dataHora) {
-      setError('Cliente, serviço e data/hora são obrigatórios');
+    if (!formData.servicoId || !formData.dataHora) {
+      setError('Serviço e data/hora são obrigatórios');
       setLoading(false);
       return;
     }
 
-    const clienteIdNum = parseInt(formData.clienteId);
-    if (isNaN(clienteIdNum) || clienteIdNum <= 0) {
-      setError('Cliente inválido selecionado');
-      setLoading(false);
-      return;
-    }
-
+    let requestData: CriarAgendamentoRequest;
+    
+    // Converter servico e data
     const servicoIdNum = parseInt(formData.servicoId);
     if (isNaN(servicoIdNum) || servicoIdNum <= 0) {
       setError('Serviço inválido selecionado');
       setLoading(false);
       return;
     }
-
-    // Enviar a data/hora local como está, garantindo formato compatível com LocalDateTime no backend
-    // Evita conversão para UTC que causava erro de fuso horário
     const dataHoraISO = `${formData.dataHora}:00`;
 
-    const requestData: CriarAgendamentoRequest = {
-      clienteId: clienteIdNum,
-      servicoId: servicoIdNum,
-      dataHora: dataHoraISO,
-      profissionalId: formData.profissionalId ? parseInt(formData.profissionalId) : undefined,
-      observacoes: formData.observacoes || undefined,
-    };
+    if (isNewClientMode) {
+        if (!formData.emailCliente) {
+            setError('Email do cliente é obrigatório');
+            setLoading(false);
+            return;
+        }
+        // Se estiver criando novo, precisa dos outros dados caso não exista
+        // Mas a lógica do backend é: se não achar email, tenta criar.
+        // Então devemos enviar nome, cpf, telefone se o usuário preencheu.
+        // Vamos exigir preenchimento se for novo cliente esperado
+        if (!formData.nomeCliente || !formData.cpfCliente || !formData.telefoneCliente) {
+             setError('Preencha Nome, CPF e Telefone para garantir o cadastro caso o cliente não exista.');
+             setLoading(false);
+             return;
+        }
+
+        requestData = {
+          servicoId: servicoIdNum,
+          dataHora: dataHoraISO,
+          profissionalId: formData.profissionalId ? parseInt(formData.profissionalId) : undefined,
+          observacoes: formData.observacoes || undefined,
+          emailCliente: formData.emailCliente,
+          nomeCliente: formData.nomeCliente,
+          cpfCliente: formData.cpfCliente,
+          telefoneCliente: formData.telefoneCliente
+        };
+    } else {
+        if (!formData.clienteId) {
+            setError('Selecione um cliente ou mude para busca por email');
+            setLoading(false);
+            return;
+        }
+        const clienteIdNum = parseInt(formData.clienteId);
+        if (isNaN(clienteIdNum) || clienteIdNum <= 0) {
+            setError('Cliente inválido selecionado');
+            setLoading(false);
+            return;
+        }
+        
+        requestData = {
+          clienteId: clienteIdNum,
+          servicoId: servicoIdNum,
+          dataHora: dataHoraISO,
+          profissionalId: formData.profissionalId ? parseInt(formData.profissionalId) : undefined,
+          observacoes: formData.observacoes || undefined,
+        };
+    }
 
     console.log('Enviando requisição de criação:', requestData);
 
@@ -194,7 +223,6 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    console.log(`Campo ${e.target.name} alterado para: ${e.target.value}`);
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -236,8 +264,28 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
             </div>
           )}
 
-          {/* Cliente (apenas para admin) */}
+          {/* Seletor de Modo de Cliente (apenas para admin e se clienteId não foi passado) */}
           {!clienteId && (
+            <div className="flex gap-4 mb-4">
+                <button
+                    type="button"
+                    onClick={() => setIsNewClientMode(false)}
+                    className={`flex-1 py-2 px-4 rounded-lg border transition-colors ${!isNewClientMode ? 'bg-primary text-white border-primary' : 'bg-dark-700 text-gray-400 border-dark-600 hover:bg-dark-600'}`}
+                >
+                    Selecionar Existente
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setIsNewClientMode(true)}
+                    className={`flex-1 py-2 px-4 rounded-lg border transition-colors ${isNewClientMode ? 'bg-primary text-white border-primary' : 'bg-dark-700 text-gray-400 border-dark-600 hover:bg-dark-600'}`}
+                >
+                    Buscar/Criar por Email
+                </button>
+            </div>
+          )}
+
+          {/* Cliente (Modo Seleção) */}
+          {!clienteId && !isNewClientMode && (
             <div>
               <label className="block text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
                 <span className="material-icons text-lg">person</span>
@@ -265,14 +313,65 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
                       </option>
                     ))}
                   </select>
-                  {clientes.length === 0 && !loadingClientes && (
-                    <p className="text-xs text-yellow-400 mt-1 flex items-center gap-1">
-                      <span className="material-icons text-sm">warning</span>
-                      Nenhum cliente cadastrado. Cadastre clientes antes de criar agendamentos.
-                    </p>
-                  )}
                 </>
               )}
+            </div>
+          )}
+          
+          {/* Cliente (Modo Email/Criação) */}
+          {!clienteId && isNewClientMode && (
+            <div className="space-y-4 border border-dark-600 p-4 rounded-lg bg-dark-700/30">
+                <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">Email do Cliente *</label>
+                    <input
+                        type="email"
+                        name="emailCliente"
+                        value={formData.emailCliente}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="cliente@email.com"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Se o email não existir, um novo cliente será criado com os dados abaixo.</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-300 mb-2">Nome Completo *</label>
+                        <input
+                            type="text"
+                            name="nomeCliente"
+                            value={formData.nomeCliente}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="Nome do Cliente"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-300 mb-2">CPF *</label>
+                        <input
+                            type="text"
+                            name="cpfCliente"
+                            value={formData.cpfCliente}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="000.000.000-00"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">Telefone *</label>
+                    <input
+                        type="text"
+                        name="telefoneCliente"
+                        value={formData.telefoneCliente}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="(00) 00000-0000"
+                    />
+                </div>
             </div>
           )}
 

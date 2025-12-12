@@ -9,7 +9,7 @@ import { useLoadingStore } from '@/store/useLoadingStore';
 
 import { AppointmentsTable, ClientHeader, ClientLayout, EditAppointmentModal, NewAppointmentModal } from '@/views/Cliente/components';
 import { AxiosError, AxiosResponse } from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -23,10 +23,27 @@ export default function ClientView() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // TODO: Pegar clienteId do backend baseado no user.email
-  const clienteId = 1;
+  const [clienteId, setClienteId] = useState<number | null>(null);
   const userName = user?.email?.split('@')[0] || 'Usuário';
-  const { data: agendamentos, setData: setAgendamentos } = useAgendamentosPorCliente(clienteId);
+
+  useEffect(() => {
+    if (user?.email) {
+      setLoading(true);
+      mainService.getClientePorEmail(
+        user.email,
+        (response) => {
+          setClienteId(response.data.id);
+        },
+        (error) => {
+           console.error('Erro ao buscar cliente:', error);
+           toast.error('Não foi possível carregar os dados do cliente.');
+        },
+        () => setLoading(false)
+      );
+    }
+  }, [user]);
+
+  const { data: agendamentos, setData: setAgendamentos } = useAgendamentosPorCliente(clienteId || 0);
 
   const handleEdit = (id: number) => {
     const agendamento = agendamentos.find(a => a.id === id);
@@ -37,6 +54,11 @@ export default function ClientView() {
   };
 
   const handleCancel = (id: number) => {
+    if (!clienteId) {
+        toast.error('Erro de identificação do cliente.');
+        return;
+    }
+
     if (!window.confirm('Tem certeza que deseja cancelar este agendamento?')) {
       return;
     }

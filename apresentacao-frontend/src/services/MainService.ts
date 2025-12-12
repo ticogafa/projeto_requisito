@@ -116,6 +116,38 @@ export default class MainService {
     );
   }
 
+  public criarCliente(
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.post(
+      '/clientes',
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  public getClientePorEmail(
+    email: string,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.get(
+      '/clientes/buscar',
+      { email },
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
   public getProfissionais(
     params: object,
     headers: object,

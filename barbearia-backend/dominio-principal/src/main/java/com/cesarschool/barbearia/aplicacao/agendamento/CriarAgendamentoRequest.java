@@ -12,6 +12,12 @@ public class CriarAgendamentoRequest {
     private Integer profissionalId; // Opcional - se null, sistema escolhe automaticamente
     private String observacoes;
 
+    // Campos para criação/busca de cliente por email
+    private String emailCliente;
+    private String nomeCliente;
+    private String cpfCliente;
+    private String telefoneCliente;
+
     // Getters e Setters
     public Integer getClienteId() {
         return clienteId;
@@ -51,5 +57,37 @@ public class CriarAgendamentoRequest {
 
     public void setObservacoes(String observacoes) {
         this.observacoes = observacoes;
+    }
+
+    public String getEmailCliente() {
+        return emailCliente;
+    }
+
+    public void setEmailCliente(String emailCliente) {
+        this.emailCliente = emailCliente;
+    }
+
+    public String getNomeCliente() {
+        return nomeCliente;
+    }
+
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
+
+    public String getCpfCliente() {
+        return cpfCliente;
+    }
+
+    public void setCpfCliente(String cpfCliente) {
+        this.cpfCliente = cpfCliente;
+    }
+
+    public String getTelefoneCliente() {
+        return telefoneCliente;
+    }
+
+    public void setTelefoneCliente(String telefoneCliente) {
+        this.telefoneCliente = telefoneCliente;
     }
 }

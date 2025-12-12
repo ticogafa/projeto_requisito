@@ -44,6 +44,11 @@ public class ClienteServico {
         return repository.buscarPorId(id.getValor());
     }
 
+    public java.util.Optional<Cliente> buscarPorEmail(String email) {
+        Validacoes.validarStringObrigatoria(email, "Email");
+        return repository.buscarPorEmail(email);
+    }
+
     /**
      * Atualiza um cliente existente.
      */
