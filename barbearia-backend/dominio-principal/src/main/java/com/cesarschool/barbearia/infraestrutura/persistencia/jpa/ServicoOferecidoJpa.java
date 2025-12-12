@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "SERVICO_OFERECIDO")
-class ServicoOferecidoJpa {
+public class ServicoOferecidoJpa { 
     
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -58,6 +58,16 @@ class ServicoOferecidoJpa {
 
     @Column(name = "MOTIVO_INATIVIDADE")
     private String motivoInatividade;
+
+    
+    @Column(name = "CATEGORIA", length = 50)
+    private String categoria;
+
+    @Column(name = "SERVICO_DEPENDENTE")
+    private Boolean servicoDependente;
+
+    @Column(name = "DESTAQUE", length = 20)
+    private String destaque;
 }
 
 interface ServicoOferecidoJpaRepository extends JpaRepository<ServicoOferecidoJpa, Integer> {
@@ -91,18 +101,27 @@ class ServicoOferecidoJpaRepositorioImpl implements ServicoOferecidoRepositorio,
             .duracaoMinutos(dominio.getDuracaoMinutos())
             .ativo(dominio.isAtivo())
             .motivoInatividade(dominio.getMotivoInatividade())
+            .categoria(dominio.getCategoria())
+            .servicoDependente(dominio.isServicoDependente())
+            .destaque(dominio.getDestaque())
             .build();
     }
 
     private ServicoOferecido toDomain(ServicoOferecidoJpa entity) {
         if (entity == null) return null;
         
+        
+        boolean isDependente = Boolean.TRUE.equals(entity.getServicoDependente());
+
         ServicoOferecido dominio = new ServicoOferecido(
             new ServicoOferecidoId(entity.getId()),
             entity.getNome(),
             entity.getPreco(),
             entity.getDescricao(),
-            entity.getDuracaoMinutos()
+            entity.getDuracaoMinutos(),
+            entity.getCategoria(),
+            isDependente, 
+            entity.getDestaque()
         );
         
         if (!entity.isAtivo()) {

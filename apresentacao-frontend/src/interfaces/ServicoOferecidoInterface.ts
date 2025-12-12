@@ -1,11 +1,13 @@
 export interface ServicoOferecido {
-  id: { valor: number };
+  id: { valor: number } | number;
   nome: string;
   preco: number;
   descricao: string;
   duracaoMinutos: number;
-  motivoInatividade?: string | null;
   ativo?: boolean;
+  categoria?: string;
+  servicoDependente?: boolean;
+  destaque?: string;
 }
 
 export type ServicosOferecidosResponse = ServicoOferecido[];

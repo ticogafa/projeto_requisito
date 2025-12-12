@@ -1,9 +1,11 @@
 package com.cesarschool.cucumber.gestaoAgendamento;
 
-import static org.junit.Assert.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import com.cesarschool.barbearia.dominio.compartilhado.enums.TipoUsuario;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
@@ -40,13 +42,13 @@ public class GestaoAgendamentoTest {
         excecaoCompartilhada = excecao;
     }
     
-    // Repositórios mock
+    
     private AgendamentoMockRepositorio agendamentoRepositorio;
     private ProfissionalMockRepositorio profissionalRepositorio;
     private ServicoOferecidoMockRepositorio servicoRepositorio;
     private ClienteMockRepositorio clienteRepositorio;
     
-    // Serviços reais do domínio
+    
     private AgendamentoServico agendamentoServico;
     private ProfissionalServico profissionalServico;
     
@@ -76,14 +78,14 @@ public class GestaoAgendamentoTest {
     
     @Before
     public void setUp() {
-        // Inicializar repositórios mock
+        
         agendamentoRepositorio = new AgendamentoMockRepositorio();
         profissionalRepositorio = new ProfissionalMockRepositorio();
         servicoRepositorio = new ServicoOferecidoMockRepositorio();
         clienteRepositorio = new ClienteMockRepositorio();
         
-        // Inicializar serviços reais - agora com servicoRepositorio para validações
-        profissionalServico = new ProfissionalServico(profissionalRepositorio, null);
+        
+        profissionalServico = new ProfissionalServico(profissionalRepositorio);
         agendamentoServico = new AgendamentoServico(agendamentoRepositorio, profissionalServico, servicoRepositorio);
         
         mensagemRetorno = "";
@@ -91,10 +93,10 @@ public class GestaoAgendamentoTest {
         agendamentoCriado = null;
         excecaoLancada = null;
         
-        // Criar usuário solicitante admin
+        
         adminSolicitante = new UsuarioSolicitante(TipoUsuario.ADMIN, new ValueObjectId<Integer>(1) {});
 
-        // Garante dados básicos disponíveis em todos os cenários
+        
         agendamentoRepositorio.limparDados();
         clienteRepositorio.limparDados();
         servicoRepositorio.limparDados();
@@ -151,7 +153,7 @@ public class GestaoAgendamentoTest {
         servicoRepositorio.salvarAssociacao("Manicure", "Paulo Reis");
         servicoRepositorio.salvarAssociacao("Maquiagem", "Paulo Reis");
         
-        // Registrar qualificações também no repositório de profissionais (usado pelo AgendamentoServico)
+        
         profissionalRepositorio.adicionarQualificacao(profissionalJoaoId, corteId);
         profissionalRepositorio.adicionarQualificacao(profissionalJoaoId, hidratacaoId);
         profissionalRepositorio.adicionarQualificacao(profissionalPauloId, manicureId);
@@ -319,7 +321,7 @@ public class GestaoAgendamentoTest {
             ServicoOferecidoId servicoEscolhido = obterServicoIdPorNome(nomeServico);
             ProfissionalId profissionalEscolhido = obterProfissionalIdPorNome(nomeProfissional);
 
-            // As validações de serviço ativo e profissional qualificado agora são feitas pelo AgendamentoServico
+            
             LocalDateTime horario = LocalDateTime.now().plusDays(1).withHour(14).withMinute(0);
             Agendamento agendamento = new Agendamento(
                 horario,
@@ -382,7 +384,7 @@ public class GestaoAgendamentoTest {
     @When("eu cancelo o agendamento")
     public void eu_cancelo_o_agendamento() {
         try {
-            // Verificar se o agendamento foi criado
+            
             if (agendamentoCriado == null) {
                 throw new IllegalStateException("Nenhum agendamento foi criado para cancelar");
             }
@@ -390,7 +392,7 @@ public class GestaoAgendamentoTest {
                 throw new IllegalStateException("Agendamento criado não possui ID");
             }
             
-            // Chama o método de cancelamento do serviço de domínio
+            
             agendamentoServico.cancelar(agendamentoCriado.getId(), adminSolicitante);
             operacaoSucesso = true;
             mensagemRetorno = "Agendamento cancelado com sucesso";
@@ -419,7 +421,7 @@ public class GestaoAgendamentoTest {
                 "Agendamento serviço inativo"
             );
             
-            // A validação de serviço ativo agora é feita pelo AgendamentoServico
+            
             agendamentoCriado = agendamentoServico.criar(agendamento, 60);
             operacaoSucesso = true;
         } catch (IllegalStateException e) {

@@ -1,173 +1,214 @@
-import React, { useState } from 'react';
-import { useServicos } from '@/hooks/useServico';
-import ServicoModal from '@/views/Administrador/components/ServicoModal';
+import { useEffect, useState } from 'react';
 import MainService from '@/services/MainService';
-import { toast } from 'react-toastify';
 import { useLoadingStore } from '@/store/useLoadingStore';
+import ServicoModal from '@/views/Administrador/components/ServicoModal';
 import { ServicoOferecido } from '@/interfaces/ServicoOferecidoInterface';
+import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
 
 export default function ServicosView() {
-  const { data: servicos } = useServicos();
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [servicoEdit, setServicoEdit] = useState<ServicoOferecido | null>(null);
-
+  const [servicos, setServicos] = useState<ServicoOferecido[]>([]);
   const { setLoading } = useLoadingStore();
   const mainService = MainService.getInstance();
 
-  const filteredServicos = servicos.filter(s =>
-    s.nome.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [modalVisible, setModalVisible] = useState(false);
+  const [servicoParaEditar, setServicoParaEditar] = useState<ServicoOferecido | null>(null);
 
-  const handleSuccess = () => window.location.reload();
+  const [filtroCategoria, setFiltroCategoria] = useState('');
+  const [filtroDestaque, setFiltroDestaque] = useState('');
 
-  const openNew = () => {
-    setServicoEdit(null);
-    setModalVisible(true);
-  };
-
-  const openEdit = (servico: ServicoOferecido) => {
-    setServicoEdit(servico);
-    setModalVisible(true);
-  };
-
-  const handleToggleStatus = (servico: ServicoOferecido) => {
-    const idNumerico = typeof servico.id === 'object' ? (servico.id as any).valor : servico.id;
-
-    const estaAtivo = servico.ativo !== false;
-
-    const acao = estaAtivo ? 'desativar' : 'reativar';
-    if (!window.confirm(`Deseja realmente ${acao} este serviço?`)) return;
-
+  const fetchServicos = () => {
     setLoading(true);
+    mainService.listarServicos(
+      (data) => {
+        setServicos(data);
+        setLoading(false);
+      },
+      (error) => {
+        console.error(error);
+        toast.error('Erro ao carregar serviços.');
+        setLoading(false);
+      }
+    );
+  };
 
-    if (estaAtivo) {
-      mainService.desativarServico(
-        idNumerico,
+  useEffect(() => {
+    fetchServicos();
+  }, []);
+
+  const handleEdit = (servico: ServicoOferecido) => {
+    setServicoParaEditar(servico);
+    setModalVisible(true);
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm('Tem certeza que deseja desativar este serviço?')) {
+      setLoading(true);
+      mainService.deletarServico(
+        id,
         () => {
           toast.success('Serviço desativado com sucesso!');
-          window.location.reload();
+          fetchServicos();
         },
         (error: AxiosError) => {
-          if (error.response?.status === 500) {
-            toast.error('Não é possível desativar: Existem agendamentos vinculados a este serviço.');
-          } else {
-            toast.error('Erro ao desativar serviço.');
-          }
+          toast.error('Erro ao desativar serviço.');
           setLoading(false);
         },
-        () => {}
-      );
-    } else {
-      const payload = {
-        id: { valor: idNumerico },
-        nome: servico.nome,
-        preco: servico.preco,
-        duracaoMinutos: servico.duracaoMinutos,
-        descricao: servico.descricao,
-        ativo: true
-      };
-
-      mainService.atualizarServico(
-        idNumerico,
-        payload,
-        () => {
-          toast.success('Serviço reativado com sucesso!');
-          window.location.reload();
-        },
-        (error) => {
-          toast.error('Erro ao reativar serviço.');
-          setLoading(false);
-        },
-        () => {}
+        () => setLoading(false)
       );
     }
   };
 
-  return (
-    <div>
-      <ServicoModal
-        visible={modalVisible}
-        servicoParaEditar={servicoEdit}
-        closeModal={() => setModalVisible(false)}
-        onSuccess={handleSuccess}
-      />
+  const openNewModal = () => {
+    setServicoParaEditar(null);
+    setModalVisible(true);
+  };
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-        <div className="flex items-center gap-3">
-          <span className="material-icons text-blue-400 text-4xl">content_cut</span>
-          <h2 className="text-2xl font-bold text-white">Gestão de Serviços</h2>
+  const servicosFiltrados = servicos.filter(s => {
+    const matchCategoria = filtroCategoria ? s.categoria === filtroCategoria : true;
+    const matchDestaque = filtroDestaque ? s.destaque === filtroDestaque : true;
+    return matchCategoria && matchDestaque;
+  });
+
+  const categoriasDisponiveis = Array.from(new Set(servicos.map(s => s.categoria).filter(Boolean)));
+
+  return (
+    <div className="p-6">
+      {/* HEADER DA PÁGINA */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <span className="material-icons text-primary">content_cut</span>
+            Gestão de Serviços
+          </h1>
         </div>
 
-        <div className="flex gap-3">
+        {/* BARRA DE PESQUISA E BOTÃO (Layout padrão) */}
+        <div className="flex items-center gap-4">
           <div className="relative">
+            <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">search</span>
             <input
-              type="text" placeholder="Buscar serviço..." value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-dark-700 border border-dark-600 text-gray-200 rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:border-primary transition"
+              type="text"
+              placeholder="Buscar serviço..."
+              className="bg-dark-800 border border-dark-600 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-primary w-64"
             />
-            <span className="material-icons absolute right-3 top-2 text-gray-500">search</span>
           </div>
 
           <button
-            className="bg-primary hover:bg-orange-600 text-white font-medium px-5 py-2 rounded-lg transition flex items-center gap-2"
-            onClick={openNew}
+            onClick={openNewModal}
+            className="bg-primary hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition text-sm"
           >
-            <span className="material-icons">add</span> Novo Serviço
+            <span className="material-icons text-sm">add</span>
+            Cadastrar Novo
           </button>
         </div>
       </div>
 
-      <div className="bg-dark-700 rounded-xl overflow-hidden border border-dark-600">
-        <table className="w-full">
-          <thead className="bg-dark-600">
+      {/* --- BARRA DE FILTROS (Estilo Clean) --- */}
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <select
+            value={filtroCategoria}
+            onChange={e => setFiltroCategoria(e.target.value)}
+            className="w-full bg-dark-800 border border-dark-600 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-primary cursor-pointer"
+          >
+            <option value="">Todas as Categorias</option>
+            {categoriasDisponiveis.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <select
+            value={filtroDestaque}
+            onChange={e => setFiltroDestaque(e.target.value)}
+            className="w-full bg-dark-800 border border-dark-600 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-primary cursor-pointer"
+          >
+            <option value="">Todos os Destaques</option>
+            <option value="POPULAR">Populares</option>
+            <option value="NOVO">Novos</option>
+          </select>
+        </div>
+      </div>
+
+      {/* --- TABELA PADRÃO --- */}
+      <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-dark-900 text-gray-400 text-xs uppercase font-semibold">
             <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Serviço</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Descrição</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Duração</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Preço</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Status</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Ações</th>
+              <th className="px-6 py-4">Serviço</th>
+              <th className="px-6 py-4">Categoria</th>
+              <th className="px-6 py-4">Duração</th>
+              <th className="px-6 py-4">Preço</th>
+              <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4 text-right">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-dark-600">
-            {filteredServicos.length === 0 ? (
-              <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">Nenhum serviço encontrado.</td></tr>
+          <tbody className="divide-y divide-dark-600 text-sm">
+            {servicosFiltrados.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  Nenhum serviço encontrado.
+                </td>
+              </tr>
             ) : (
-              filteredServicos.map((s) => {
-                const isAtivo = s.ativo !== false;
-                const key = typeof s.id === 'object' ? (s.id as any).valor : s.id;
-
-                return (
-                  <tr key={key} className={`hover:bg-dark-800 transition ${!isAtivo ? 'opacity-60' : ''}`}>
-                    <td className="px-6 py-4 font-medium text-white">{s.nome}</td>
-                    <td className="px-6 py-4 text-gray-300 text-sm">{s.descricao || '-'}</td>
-                    <td className="px-6 py-4 text-gray-300">{s.duracaoMinutos} min</td>
-                    <td className="px-6 py-4 text-gray-300">R$ {s.preco.toFixed(2)}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-sm ${isAtivo ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-                        {isAtivo ? 'Ativo' : 'Inativo'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <button onClick={() => openEdit(s)} className="bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 px-3 py-1.5 rounded-lg text-sm font-medium transition">
-                          Editar
-                        </button>
-                        <button onClick={() => handleToggleStatus(s)} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${isAtivo ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20'}`}>
-                          {isAtivo ? 'Desativar' : 'Reativar'}
-                        </button>
+              servicosFiltrados.map((s) => (
+                <tr key={typeof s.id === 'object' ? s.id.valor : s.id} className="hover:bg-dark-700/50 transition group">
+                  <td className="px-6 py-4 font-medium text-white">
+                    <div className="flex flex-col">
+                      <span className="text-base">{s.nome}</span>
+                      {/* Badges Pequenos e Discretos */}
+                      <div className="flex gap-1 mt-1">
+                        {s.destaque === 'POPULAR' && <span className="text-[10px] bg-orange-500/20 text-orange-400 px-1.5 rounded border border-orange-500/30">Popular</span>}
+                        {s.destaque === 'NOVO' && <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 rounded border border-blue-500/30">Novo</span>}
+                        {s.servicoDependente && <span className="text-[10px] bg-purple-500/20 text-purple-400 px-1.5 rounded border border-purple-500/30">Add-on</span>}
                       </div>
-                    </td>
-                  </tr>
-                );
-              })
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-gray-400">
+                    {s.categoria || '-'}
+                  </td>
+                  <td className="px-6 py-4 text-gray-300">
+                    {s.duracaoMinutos} min
+                  </td>
+                  <td className="px-6 py-4 text-white font-medium">
+                    {s.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${s.ativo ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
+                      {s.ativo ? 'Ativo' : 'Inativo'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => handleEdit(s)}
+                        className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold px-3 py-1.5 rounded transition border border-blue-600/30"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(typeof s.id === 'object' ? s.id.valor : s.id)}
+                        className="bg-red-600/20 hover:bg-red-600/30 text-red-400 text-xs font-bold px-3 py-1.5 rounded transition border border-red-600/30"
+                      >
+                        Desativar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>
       </div>
+
+      <ServicoModal
+        visible={modalVisible}
+        servicoParaEditar={servicoParaEditar}
+        closeModal={() => setModalVisible(false)}
+        onSuccess={fetchServicos}
+      />
     </div>
   );
 }

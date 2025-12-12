@@ -9,9 +9,10 @@ interface NewProfessionalModalProps {
   visible: boolean;
   closeModal: () => void;
   onSuccess: () => void;
+  profissionalParaEditar?: any;
 }
 
-export default function NewProfessionalModal({ visible, closeModal, onSuccess }: NewProfessionalModalProps) {
+export default function NewProfessionalModal({ visible, closeModal, onSuccess, profissionalParaEditar }: NewProfessionalModalProps) {
   const { data: servicos } = useServicosOferecidos();
   const { setLoading } = useLoadingStore();
   const mainService = MainService.getInstance();
@@ -23,18 +24,47 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess }:
   const [senioridade, setSenioridade] = useState('JUNIOR');
   const [inicioJornada, setInicioJornada] = useState('08:00:00');
   const [fimJornada, setFimJornada] = useState('18:00:00');
+
   const [servicosSelecionados, setServicosSelecionados] = useState<number[]>([]);
 
   useEffect(() => {
     if (visible) {
-      setNome('');
-      setEmail('');
-      setCpf('');
-      setTelefone('');
-      setSenioridade('JUNIOR');
-      setServicosSelecionados([]);
+      if (profissionalParaEditar) {
+
+        setNome(profissionalParaEditar.nome);
+
+        const emailVal = typeof profissionalParaEditar.email === 'object' ? profissionalParaEditar.email.value : profissionalParaEditar.email;
+        const cpfVal = typeof profissionalParaEditar.cpf === 'object' ? profissionalParaEditar.cpf.value : profissionalParaEditar.cpf;
+        const telVal = typeof profissionalParaEditar.telefone === 'object' ? profissionalParaEditar.telefone.value : profissionalParaEditar.telefone;
+
+        setEmail(emailVal || '');
+        setCpf(cpfVal || '');
+        setTelefone(telVal || '');
+
+        setSenioridade(profissionalParaEditar.senioridade || 'JUNIOR');
+
+        if (profissionalParaEditar.agenda) {
+          setInicioJornada(profissionalParaEditar.agenda.inicioJornada || '08:00:00');
+          setFimJornada(profissionalParaEditar.agenda.fimJornada || '18:00:00');
+        }
+
+        if (profissionalParaEditar.servicoOferecidoIds) {
+          const ids = profissionalParaEditar.servicoOferecidoIds.map((s: any) => s.valor || s);
+          setServicosSelecionados(ids);
+        }
+      } else {
+
+        setNome('');
+        setEmail('');
+        setCpf('');
+        setTelefone('');
+        setSenioridade('JUNIOR');
+        setInicioJornada('08:00:00');
+        setFimJornada('18:00:00');
+        setServicosSelecionados([]);
+      }
     }
-  }, [visible]);
+  }, [visible, profissionalParaEditar]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,20 +84,27 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess }:
       servicoOferecidoIds: servicosSelecionados.map(id => ({ valor: id }))
     };
 
-    mainService.criarProfissional(
-      payload,
-      () => {
-        toast.success('Profissional cadastrado com sucesso!');
-        onSuccess();
-        closeModal();
-      },
-      (error: AxiosError) => {
-        const errorData = error.response?.data as { message?: string } | undefined;
-        const message = errorData?.message || 'Erro ao cadastrar profissional';
-        toast.error(message);
-      },
-      () => setLoading(false)
-    );
+    const successAction = () => {
+      toast.success(`Profissional ${profissionalParaEditar ? 'atualizado' : 'cadastrado'} com sucesso!`);
+      onSuccess();
+      closeModal();
+    };
+
+    const errorAction = (error: AxiosError) => {
+      const errorData = error.response?.data as { message?: string } | undefined;
+      toast.error(errorData?.message || 'Erro ao salvar profissional');
+    };
+
+    const doneAction = () => setLoading(false);
+
+    if (profissionalParaEditar) {
+
+      const id = profissionalParaEditar.id?.valor || profissionalParaEditar.id;
+      mainService.atualizarProfissional(id, payload, successAction, errorAction, doneAction);
+    } else {
+
+      mainService.criarProfissional(payload, successAction, errorAction, doneAction);
+    }
   };
 
   const toggleServico = (id: number) => {
@@ -83,8 +120,8 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess }:
       <div className="bg-dark-800 rounded-2xl p-8 max-w-2xl w-full border border-dark-600 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold flex items-center gap-2">
-            <span className="material-icons text-primary">person_add</span>
-            Novo Profissional
+            <span className="material-icons text-primary">{profissionalParaEditar ? 'edit' : 'person_add'}</span>
+            {profissionalParaEditar ? 'Editar Profissional' : 'Novo Profissional'}
           </h3>
           <button onClick={closeModal} className="text-gray-400 hover:text-white">
             <span className="material-icons">close</span>
@@ -98,12 +135,25 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess }:
               <input required type="text" value={nome} onChange={e => setNome(e.target.value)}
                 className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none" />
             </div>
+
+            {/* --- CAMPO CPF --- */}
             <div>
               <label className="block text-sm font-medium mb-1">CPF *</label>
-              <input required type="text" value={cpf} onChange={e => setCpf(e.target.value)} placeholder="000.000.000-00"
-                className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none" />
+              <input
+                required
+                type="text"
+                value={cpf}
+                onChange={e => setCpf(e.target.value)}
+                placeholder="000.000.000-00"
+
+                disabled={!!profissionalParaEditar}
+
+                className={`w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none ${profissionalParaEditar ? 'opacity-50 cursor-not-allowed text-gray-400' : ''}`}
+              />
             </div>
+            {/* ---------------- */}
           </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Email *</label>
@@ -116,6 +166,7 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess }:
                 className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none" />
             </div>
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Senioridade *</label>
             <select value={senioridade} onChange={e => setSenioridade(e.target.value)}
@@ -125,18 +176,20 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess }:
               <option value="SENIOR">Sênior</option>
             </select>
           </div>
+
           <div className="grid grid-cols-2 gap-4 bg-dark-700 p-3 rounded-lg border border-dark-600">
             <div>
               <label className="block text-xs text-gray-400 mb-1">Início Jornada</label>
               <input type="time" value={inicioJornada} onChange={e => setInicioJornada(e.target.value)}
-                className="bg-transparent text-white font-mono focus:outline-none" />
+                className="bg-transparent text-white font-mono focus:outline-none w-full" />
             </div>
             <div>
               <label className="block text-xs text-gray-400 mb-1">Fim Jornada</label>
               <input type="time" value={fimJornada} onChange={e => setFimJornada(e.target.value)}
-                className="bg-transparent text-white font-mono focus:outline-none" />
+                className="bg-transparent text-white font-mono focus:outline-none w-full" />
             </div>
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-2">Serviços que realiza:</label>
             <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-dark-700 rounded-lg">
@@ -157,8 +210,9 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess }:
               })}
             </div>
           </div>
+
           <button type="submit" className="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3 rounded-lg mt-4 transition">
-            Salvar Profissional
+            {profissionalParaEditar ? 'Salvar Alterações' : 'Salvar Profissional'}
           </button>
         </form>
       </div>

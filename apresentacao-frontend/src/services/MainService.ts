@@ -2,6 +2,7 @@ import { AGENDAMENTO_URLS, AUTHENTICATION_URLS, PRODUTO_URLS, SERVICO_OFERECIDO_
 import { ProfissionaisResponse } from '@/interfaces/ProfissionaisInterfaces';
 import HttpClient from '@/services/httpClient';
 import type { AxiosError, AxiosResponse } from 'axios';
+import { ServicoOferecido } from '@/interfaces/ServicoOferecidoInterface';
 
 export default class MainService {
   client: HttpClient;
@@ -18,9 +19,48 @@ export default class MainService {
     return this.instance;
   }
 
-  /**
-  * Gets all works.
-  */
+  public listarServicos(
+    successCallback: (data: ServicoOferecido[]) => void,
+    errorCallback: (error: AxiosError) => void
+  ): void {
+    this.client.get(
+      SERVICO_OFERECIDO_URLS.GET_ALL_SERVICOS_OFERECIDOS || '/servico',
+      {},
+      {},
+      (response) => successCallback(response.data),
+      errorCallback,
+      () => {}
+    );
+  }
+
+  public criarServico(
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.post('/servico', data, {}, successCallback, errorCallback, finallyCallback);
+  }
+
+  public atualizarServico(
+    id: number,
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.put(`/servico/${id}`, data, {}, successCallback, errorCallback, finallyCallback);
+  }
+
+  public deletarServico(
+    id: number,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.delete(`/servico/${id}`, {}, {}, successCallback, errorCallback, finallyCallback);
+  }
+
   getServicosOferecidos(
     params: object,
     header: object,
@@ -32,6 +72,72 @@ export default class MainService {
       SERVICO_OFERECIDO_URLS.GET_ALL_SERVICOS_OFERECIDOS,
       params,
       header,
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  public getProfissionais(
+    params: object,
+    headers: object,
+    successCallback: (response: AxiosResponse<ProfissionaisResponse>) => void,
+    errorCallback: (err: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.get(
+      '/profissional',
+      params,
+      headers,
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  public criarProfissional(
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.post(
+      '/profissional',
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  public atualizarProfissional(
+    id: number,
+    data: object,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.put(
+      `/profissional/${id}`,
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  public desativarProfissional(
+    id: number,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.delete(
+      `/profissional/${id}`,
+      {},
+      {},
       successCallback,
       errorCallback,
       finallyCallback
@@ -99,12 +205,6 @@ export default class MainService {
 
   /**
    * Gets appointments by professional ID.
-   *
-   * @param params - Request params object with profissionalId
-   * @param header - Axios header object
-   * @param successCallback - Success callback function
-   * @param errorCallback - Error callback function
-   * @param finallyCallback - Finally callback function
    */
   getAgendamentosPorProfissional(
     params: object,
@@ -125,12 +225,6 @@ export default class MainService {
 
   /**
    * Edits an existing appointment.
-   *
-   * @param agendamentoId - The appointment ID
-   * @param data - The updated appointment data
-   * @param successCallback - Success callback function
-   * @param errorCallback - Error callback function
-   * @param finallyCallback - Finally callback function
    */
   editarAgendamento(
     agendamentoId: number,
@@ -166,9 +260,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Cancela an appointment by professional.
-   */
   cancelarAgendamentoPorProfissional(
     agendamentoId: number,
     profissionalId: number,
@@ -186,14 +277,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Registers a new user in the backend.
-   *
-   * @param data - User registration data (email, password, role)
-   * @param successCallback - Success callback function
-   * @param errorCallback - Error callback function
-   * @param finallyCallback - Finally callback function
-   */
   registerUser(
     data: object,
     successCallback: (response: AxiosResponse) => void,
@@ -226,106 +309,6 @@ export default class MainService {
     );
   }
 
-  public getProfissionais(
-    params: object,
-    headers: object,
-    successCallback: (response: AxiosResponse<ProfissionaisResponse>) => void,
-    errorCallback: (err: AxiosError) => void,
-    finallyCallback: () => void
-  ) {
-
-    this.client.get(
-      '/profissional',
-      params,
-      headers,
-      successCallback,
-      errorCallback,
-      finallyCallback
-    );
-  }
-
-  public criarProfissional(
-    data: object,
-    successCallback: (response: AxiosResponse) => void,
-    errorCallback: (error: AxiosError) => void,
-    finallyCallback: () => void
-  ) {
-    this.client.post(
-      '/profissional',
-      data,
-      {},
-      successCallback,
-      errorCallback,
-      finallyCallback
-    );
-  }
-
-  public atualizarProfissional(
-    id: number,
-    data: object,
-    successCallback: (response: AxiosResponse) => void,
-    errorCallback: (error: AxiosError) => void,
-    finallyCallback: () => void
-  ) {
-    this.client.put(
-      `/profissional/${id}`,
-      data,
-      {},
-      successCallback,
-      errorCallback,
-      finallyCallback
-    );
-  }
-
-  public desativarProfissional(
-    id: number,
-    successCallback: (response: AxiosResponse) => void,
-    errorCallback: (error: AxiosError) => void,
-    finallyCallback: () => void
-  ) {
-    this.client.delete(
-      `/profissional/${id}`,
-      {},
-      {},
-      successCallback,
-      errorCallback,
-      finallyCallback
-    );
-  }
-
-  public criarServico(
-    data: object,
-    successCallback: (response: AxiosResponse) => void,
-    errorCallback: (error: AxiosError) => void,
-    finallyCallback: () => void
-  ) {
-    this.client.post('/servico', data, {}, successCallback, errorCallback, finallyCallback);
-  }
-
-  public atualizarServico(
-    id: number,
-    data: object,
-    successCallback: (response: AxiosResponse) => void,
-    errorCallback: (error: AxiosError) => void,
-    finallyCallback: () => void
-  ) {
-    this.client.put(`/servico/${id}`, data, {}, successCallback, errorCallback, finallyCallback);
-  }
-
-  public desativarServico(
-    id: number,
-    successCallback: (response: AxiosResponse) => void,
-    errorCallback: (error: AxiosError) => void,
-    finallyCallback: () => void
-  ) {
-    this.client.delete(`/servico/${id}`, {}, {}, successCallback, errorCallback, finallyCallback);
-  }
-
-  // ==================== PRODUTO ENDPOINTS ====================
-
-  /**
-   * Gets all produtos.
-   */
   getProdutos(
     successCallback: (response: AxiosResponse) => void,
     errorCallback: (error: AxiosError) => void,
@@ -341,9 +324,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Gets produtos com estoque baixo.
-   */
   getProdutosEstoqueBaixo(
     successCallback: (response: AxiosResponse) => void,
     errorCallback: (error: AxiosError) => void,
@@ -359,9 +339,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Cadastra um novo produto.
-   */
   cadastrarProduto(
     data: object,
     successCallback: (response: AxiosResponse) => void,
@@ -378,9 +355,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Atualiza um produto.
-   */
   atualizarProduto(
     id: number,
     data: object,
@@ -398,9 +372,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Adiciona estoque a um produto.
-   */
   adicionarEstoque(
     id: number,
     data: object,
@@ -418,9 +389,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Remove estoque de um produto.
-   */
   removerEstoque(
     id: number,
     data: object,
@@ -438,9 +406,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Registra uma venda (PDV).
-   */
   registrarVenda(
     id: number,
     data: object,
@@ -458,9 +423,6 @@ export default class MainService {
     );
   }
 
-  /**
-   * Busca histórico de movimentações de um produto.
-   */
   getHistoricoMovimentacoes(
     id: number,
     successCallback: (response: AxiosResponse) => void,

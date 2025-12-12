@@ -21,6 +21,10 @@ export default function ServicoModal({ visible, servicoParaEditar, closeModal, o
   const [duracao, setDuracao] = useState('');
   const [descricao, setDescricao] = useState('');
 
+  const [categoria, setCategoria] = useState('');
+  const [destaque, setDestaque] = useState('');
+  const [servicoDependente, setServicoDependente] = useState(false);
+
   useEffect(() => {
     if (visible) {
       if (servicoParaEditar) {
@@ -28,11 +32,19 @@ export default function ServicoModal({ visible, servicoParaEditar, closeModal, o
         setPreco(servicoParaEditar.preco.toString());
         setDuracao(servicoParaEditar.duracaoMinutos.toString());
         setDescricao(servicoParaEditar.descricao || '');
+
+        setCategoria(servicoParaEditar.categoria || '');
+        setDestaque(servicoParaEditar.destaque || '');
+        setServicoDependente(servicoParaEditar.servicoDependente || false);
       } else {
+
         setNome('');
         setPreco('');
         setDuracao('');
         setDescricao('');
+        setCategoria('');
+        setDestaque('');
+        setServicoDependente(false);
       }
     }
   }, [visible, servicoParaEditar]);
@@ -49,7 +61,10 @@ export default function ServicoModal({ visible, servicoParaEditar, closeModal, o
       preco: precoNum,
       duracaoMinutos: duracaoNum,
       descricao,
-      ativo: true
+      ativo: true,
+      categoria,
+      destaque,
+      servicoDependente
     };
 
     const successCallback = () => {
@@ -67,9 +82,7 @@ export default function ServicoModal({ visible, servicoParaEditar, closeModal, o
 
     if (servicoParaEditar) {
       const idNumerico = typeof servicoParaEditar.id === 'object' ? (servicoParaEditar.id as any).valor : servicoParaEditar.id;
-
       payload.id = { valor: idNumerico };
-
       mainService.atualizarServico(idNumerico, payload, successCallback, errorCallback, doneCallback);
     } else {
       mainService.criarServico(payload, successCallback, errorCallback, doneCallback);
@@ -106,9 +119,42 @@ export default function ServicoModal({ visible, servicoParaEditar, closeModal, o
             </div>
           </div>
 
+          {/* --- 4. NOVOS INPUTS VISUAIS --- */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Categoria</label>
+              <input type="text" list="categorias" value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none" placeholder="Ex: Cabelo" />
+              <datalist id="categorias">
+                <option value="Cabelo" />
+                <option value="Barba" />
+                <option value="Tratamento" />
+                <option value="Estética" />
+              </datalist>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Destaque</label>
+              <select value={destaque} onChange={e => setDestaque(e.target.value)} className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none">
+                <option value="">Nenhum</option>
+                <option value="POPULAR">🔥 Popular</option>
+                <option value="NOVO">✨ Novo</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="flex items-center gap-3 cursor-pointer bg-dark-700 p-3 rounded-lg border border-dark-600 hover:bg-dark-600 transition">
+              <input type="checkbox" checked={servicoDependente} onChange={e => setServicoDependente(e.target.checked)} className="accent-primary w-5 h-5" />
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-white">Serviço Adicional (Add-on)</span>
+                <span className="text-xs text-gray-400">Marque se este serviço só pode ser agendado junto com outro.</span>
+              </div>
+            </label>
+          </div>
+          {/* ------------------------------- */}
+
           <div>
             <label className="block text-sm font-medium mb-1">Descrição</label>
-            <input type="text" value={descricao} onChange={e => setDescricao(e.target.value)} className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none" placeholder="Ex: Categoria Cortes" />
+            <input type="text" value={descricao} onChange={e => setDescricao(e.target.value)} className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none" placeholder="Detalhes do serviço" />
           </div>
 
           <button type="submit" className="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3 rounded-lg mt-4 transition">

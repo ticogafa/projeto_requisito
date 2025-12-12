@@ -1,34 +1,30 @@
 package com.cesarschool.barbearia.dominio.compartilhado.valueobjects;
 
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonCreator; 
+import com.fasterxml.jackson.annotation.JsonValue;
 
-/**
- * Value Object representando um CPF válido.
- * Imutável e com validação completa.
- */
 public final class Cpf {
     private final String value;
 
+    @JsonCreator 
     public Cpf(String value) {
-        // if (!cpfValido(value)) {
-        //     throw new IllegalArgumentException("CPF inválido: " + value);
-        // }
-        // Armazena apenas os dígitos
-        this.value = value.replaceAll("\\D", "");
+        if (value == null) {
+             this.value = "";
+        } else {
+             this.value = value.replaceAll("\\D", "");
+        }
     }
 
+    @JsonValue
     public String getValue() {
         return value;
     }
-
-    /**
-     * Retorna o CPF formatado: 000.000.000-00
-     */
+    
+    
     public String getFormatado() {
-        return value.substring(0, 3) + "." +
-               value.substring(3, 6) + "." +
-               value.substring(6, 9) + "-" +
-               value.substring(9, 11);
+        if (value == null || value.length() != 11) return value; 
+        return value.substring(0, 3) + "." + value.substring(3, 6) + "." + value.substring(6, 9) + "-" + value.substring(9, 11);
     }
 
     public static boolean cpfValido(String cpf) {
@@ -36,19 +32,17 @@ public final class Cpf {
             return false;
         }
 
-        // Remove caracteres não numéricos
         String digitos = cpf.replaceAll("\\D", "");
         if (digitos.length() != 11) {
             return false;
         }
 
-        // Rejeita CPFs com todos os dígitos iguais
         boolean todosDigitosIguais = digitos.chars().distinct().count() == 1;
         if (todosDigitosIguais) {
             return false;
         }
 
-        // Calcula o primeiro dígito verificador (DV1)
+
         int somaDV1 = 0;
         for (int i = 0; i < 9; i++) {
             int num = digitos.charAt(i) - '0';
@@ -57,7 +51,7 @@ public final class Cpf {
         int restoDV1 = somaDV1 % 11;
         int dv1 = (restoDV1 < 2) ? 0 : 11 - restoDV1;
 
-        // Calcula o segundo dígito verificador (DV2)
+        
         int somaDV2 = 0;
         for (int i = 0; i < 9; i++) {
             int num = digitos.charAt(i) - '0';
@@ -67,7 +61,7 @@ public final class Cpf {
         int restoDV2 = somaDV2 % 11;
         int dv2 = (restoDV2 < 2) ? 0 : 11 - restoDV2;
 
-        // Verifica se os dígitos calculados coincidem com os informados
+        
         boolean dv1Valido = dv1 == (digitos.charAt(9) - '0');
         boolean dv2Valido = dv2 == (digitos.charAt(10) - '0');
 
@@ -79,16 +73,12 @@ public final class Cpf {
         if (this == o) return true;
         if (!(o instanceof Cpf)) return false;
         Cpf cpf = (Cpf) o;
-        return value.equals(cpf.value);
+        return Objects.equals(value, cpf.value);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
+    public int hashCode() { return Objects.hash(value); }
 
     @Override
-    public String toString() {
-        return getFormatado();
-    }
+    public String toString() { return getValue(); }
 }

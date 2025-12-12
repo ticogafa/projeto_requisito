@@ -1,22 +1,19 @@
 package com.cesarschool.barbearia.dominio.compartilhado.valueobjects;
 
-/**
- * Value Object representando um Telefone válido.
- * Imutável e com validação de formato.
- * Suporta telefones fixos (10 dígitos) e celulares (11 dígitos).
- */
+import com.fasterxml.jackson.annotation.JsonCreator; 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public final class Telefone {
     private final String value;
 
+    @JsonCreator 
     public Telefone(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Telefone não pode ser nulo");
         }
-        
-        // Remove caracteres não numéricos
         String digitos = value.replaceAll("\\D", "");
         
-        // Valida: deve ter 10 (fixo) ou 11 (celular) dígitos
+        
         if (digitos.length() != 10 && digitos.length() != 11) {
             throw new IllegalArgumentException(
                 "Telefone deve ter 10 (fixo) ou 11 (celular) dígitos. Recebido: " + digitos.length()
@@ -26,6 +23,7 @@ public final class Telefone {
         this.value = digitos;
     }
 
+    @JsonValue
     public String getValue() { return value; }
 
     /**
@@ -35,12 +33,12 @@ public final class Telefone {
      */
     public String getFormatado() {
         if (value.length() == 10) {
-            // Fixo: (00) 0000-0000
+            
             return "(" + value.substring(0, 2) + ") " +
                    value.substring(2, 6) + "-" +
                    value.substring(6, 10);
         } else {
-            // Celular: (00) 00000-0000
+            
             return "(" + value.substring(0, 2) + ") " +
                    value.substring(2, 7) + "-" +
                    value.substring(7, 11);

@@ -1,12 +1,13 @@
 package com.cesarschool.barbearia.dominio.principal.servico;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cesarschool.barbearia.dominio.compartilhado.observer.Observador;
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.principal.servico.eventos.ServicoOferecidoEvent;
 import com.cesarschool.barbearia.dominio.principal.servico.eventos.ServicoOferecidoEvent.TipoAcao;
@@ -15,14 +16,27 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Domain Service para ServicoOferecido.
- * Responsável pelas regras de negócio de serviços, validações e disparo de eventos.
+ * Responsável pelas regras de negócio de serviços, validações e disparo de eventos (Observer Manual).
  */
 @Service
 @RequiredArgsConstructor
 public class ServicoOferecidoServico {
     
     private final ServicoOferecidoRepositorio repositorio;
-    private final ApplicationEventPublisher publicadorEventos;
+
+    
+    private final List<Observador<ServicoOferecidoEvent>> observadores = new ArrayList<>();
+
+    public void adicionarObservador(Observador<ServicoOferecidoEvent> observador) {
+        this.observadores.add(observador);
+    }
+
+    private void notificarObservadores(ServicoOferecidoEvent evento) {
+        for (Observador<ServicoOferecidoEvent> obs : observadores) {
+            obs.atualizar(evento);
+        }
+    }
+    
 
     public ServicoOferecido buscarPorId(Integer id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do serviço");
@@ -48,9 +62,8 @@ public class ServicoOferecidoServico {
         
         ServicoOferecido salvo = repositorio.salvar(servico);
         
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ServicoOferecidoEvent(this, salvo, TipoAcao.CRIADO));
-        }
+        
+        notificarObservadores(new ServicoOferecidoEvent(this, salvo, TipoAcao.CRIADO));
         
         return salvo;
     }
@@ -93,13 +106,18 @@ public class ServicoOferecidoServico {
         existente.setPreco(servico.getPreco());
         existente.setDescricao(servico.getDescricao());
         existente.setDuracaoMinutos(servico.getDuracaoMinutos());
-        existente.setAtivo(servico.isAtivo()); 
+        existente.setAtivo(servico.isAtivo());
+        
+        
+        existente.setCategoria(servico.getCategoria());
+        existente.setServicoDependente(servico.isServicoDependente());
+        existente.setDestaque(servico.getDestaque());
+        
         
         ServicoOferecido salvo = repositorio.salvar(existente);
 
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ServicoOferecidoEvent(this, salvo, TipoAcao.ATUALIZADO));
-        }
+        
+        notificarObservadores(new ServicoOferecidoEvent(this, salvo, TipoAcao.ATUALIZADO));
         
         return salvo;
     }
@@ -114,9 +132,8 @@ public class ServicoOferecidoServico {
         
         ServicoOferecido salvo = repositorio.salvar(servico);
         
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ServicoOferecidoEvent(this, salvo, TipoAcao.ATUALIZADO));
-        }
+        
+        notificarObservadores(new ServicoOferecidoEvent(this, salvo, TipoAcao.ATUALIZADO));
         
         return salvo;
     }
@@ -137,9 +154,9 @@ public class ServicoOferecidoServico {
         servico.atualizarDuracao(novaDuracao);
         ServicoOferecido salvo = repositorio.salvar(servico);
         
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ServicoOferecidoEvent(this, salvo, TipoAcao.ATUALIZADO));
-        }
+        
+        notificarObservadores(new ServicoOferecidoEvent(this, salvo, TipoAcao.ATUALIZADO));
+        
         return salvo;
     }
 
@@ -149,9 +166,8 @@ public class ServicoOferecidoServico {
         ServicoOferecido s = buscarPorId(id);
         repositorio.remover(id);
         
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ServicoOferecidoEvent(this, s, TipoAcao.REMOVIDO));
-        }
+        
+        notificarObservadores(new ServicoOferecidoEvent(this, s, TipoAcao.REMOVIDO));
     }
 
     @Transactional
@@ -164,9 +180,8 @@ public class ServicoOferecidoServico {
 
         ServicoOferecido salvo = repositorio.salvar(servico);
         
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ServicoOferecidoEvent(this, salvo, TipoAcao.DESATIVADO));
-        }
+        
+        notificarObservadores(new ServicoOferecidoEvent(this, salvo, TipoAcao.DESATIVADO));
         
         return salvo;
     }

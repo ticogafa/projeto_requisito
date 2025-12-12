@@ -42,7 +42,7 @@ public class GestaoDeProfissionaisStepDefinitions {
         this.indiceProfissional = (int) ((timestamp + nanoTime) % 100000);
         
         this.repositorioMock = new ProfissionalMockRepositorio();
-        this.profissionalServico = new ProfissionalServico(repositorioMock, null);
+        this.profissionalServico = new ProfissionalServico(repositorioMock);
         this.profissionalAtual = null;
         this.excecaoCapturada = null;
         this.profissionalCache.clear();
@@ -70,7 +70,7 @@ public class GestaoDeProfissionaisStepDefinitions {
     private Profissional criarProfissionalGenerico(String nome) {
         int indice = this.indiceProfissional++;
         Cpf cpf = gerarCpfValido(indice);
-        // Remove acentos e espaços para criar um email válido
+        
         String nomeEmail = nome.replaceAll("\\s+", "")
                                .toLowerCase()
                                .replaceAll("ã", "a")

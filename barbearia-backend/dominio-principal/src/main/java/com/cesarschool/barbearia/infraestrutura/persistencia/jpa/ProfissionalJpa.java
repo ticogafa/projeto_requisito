@@ -2,10 +2,10 @@ package com.cesarschool.barbearia.infraestrutura.persistencia.jpa;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "PROFISSIONAL")
-public final class ProfissionalJpa {
+public class ProfissionalJpa {
     
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID")
@@ -57,13 +57,13 @@ public final class ProfissionalJpa {
     @Column(name = "NOME", nullable = false, length = 100)
     private String nome;
 
-    @Column(name = "EMAIL", nullable = false, length = 100)
+    @Column(name = "EMAIL", length = 100) 
     private String email;
 
-    @Column(name = "CPF", nullable = false, length = 14)
+    @Column(name = "CPF", length = 14)
     private String cpf;
 
-    @Column(name = "TELEFONE", nullable = false, length = 15)
+    @Column(name = "TELEFONE", length = 15)
     private String telefone;
     
     @Column(name = "INICIO_JORNADA", nullable = false)
@@ -82,16 +82,13 @@ public final class ProfissionalJpa {
     @Column(name = "MOTIVO_INATIVIDADE", length = 255)
     private String motivoInatividade; 
 
-    @ManyToMany
+    @ManyToMany(fetch = jakarta.persistence.FetchType.EAGER)
     @JoinTable(
         name = "profissional_servico",
         joinColumns = @JoinColumn(name = "profissional_id"),
-        inverseJoinColumns = @JoinColumn(name = "servicos_oferecidos_id")
+        inverseJoinColumns = @JoinColumn(name = "servico_id")
     )
     private List<ServicoOferecidoJpa> servicosOferecidos;
-
-    @jakarta.persistence.OneToMany(mappedBy = "profissionalId", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)
-    private List<JornadaTrabalhoJpa> jornadas = new ArrayList<>();
 }
 
 interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integer> {
@@ -101,7 +98,7 @@ interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integ
     @Query("SELECT DISTINCT p FROM ProfissionalJpa p JOIN p.servicosOferecidos s WHERE s.id = :servicoId AND p.ativo = true")
     List<ProfissionalJpa> findByServicoId(@Param("servicoId") Integer servicoId);
     
-    @Query(value = "SELECT COUNT(*) FROM profissional_servico WHERE profissional_id = :profissionalId AND servicos_oferecidos_id = :servicoId", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM profissional_servico WHERE profissional_id = :profissionalId AND servico_id = :servicoId", nativeQuery = true)
     Long countQualificacao(@Param("profissionalId") Integer profissionalId, @Param("servicoId") Integer servicoId);
     
     List<ProfissionalJpa> findByAtivoTrue();
@@ -114,6 +111,7 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
 
     @Autowired
     private ProfissionalJpaRepository profissionalJpaRepository;
+    
     
     private ProfissionalJpa toEntity(Profissional dominio) {
         Agenda agenda = dominio.getAgenda() != null ? dominio.getAgenda() : new Agenda();
@@ -132,9 +130,11 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
         return ProfissionalJpa.builder()
             .id(dominio.getId() != null ? dominio.getId().getValor() : null)
             .nome(dominio.getNome())
-            .email(dominio.getEmail().getValue()) 
-            .cpf(dominio.getCpf().getValue())
-            .telefone(dominio.getTelefone().getValue())
+            
+            .email(dominio.getEmail() != null ? dominio.getEmail().getValue() : null) 
+            .cpf(dominio.getCpf() != null ? dominio.getCpf().getValue() : null)
+            .telefone(dominio.getTelefone() != null ? dominio.getTelefone().getValue() : null)
+            
             .senioridade(dominio.getSenioridade())
             .ativo(dominio.isAtivo())
             .motivoInatividade(dominio.getMotivoInatividade())
@@ -156,12 +156,17 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
                 .collect(Collectors.toList());
         }
 
+        
+        Email emailDomain = entity.getEmail() != null ? new Email(entity.getEmail()) : null;
+        Cpf cpfDomain = entity.getCpf() != null ? new Cpf(entity.getCpf()) : null;
+        Telefone telDomain = entity.getTelefone() != null ? new Telefone(entity.getTelefone()) : null;
+
         return new Profissional(
             new ProfissionalId(entity.getId()),
             entity.getNome(),
-            new Email(entity.getEmail()),
-            new Cpf(entity.getCpf()),
-            new Telefone(entity.getTelefone()),
+            emailDomain,
+            cpfDomain,
+            telDomain,
             agenda,
             idsServicos,
             entity.getSenioridade(),
@@ -250,44 +255,11 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
     @Override public boolean temAgendamentoAtivo(String nomeServico) { return false; }
 
     @Override
-    public void atualizarJornadas(Integer profissionalId, List<JornadaResumo> jornadas) {
-        ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
-            .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
-        
-        profissional.getJornadas().clear();
-        
-        if (jornadas != null) {
-            for (com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo dto : jornadas) {
-                JornadaTrabalhoJpa jornada = JornadaTrabalhoJpa.builder()
-                    .profissionalId(profissionalId)
-                    .diaSemana(dto.getDiaSemana())
-                    .horaInicio(dto.getHoraInicio())
-                    .horaFim(dto.getHoraFim())
-                    .intervaloInicio(dto.getIntervaloInicio())
-                    .intervaloFim(dto.getIntervaloFim())
-                    .ativo(dto.isAtivo())
-                    .build();
-                profissional.getJornadas().add(jornada);
-            }
-        }
-        
-        profissionalJpaRepository.save(profissional);
+    public List<JornadaResumo> listarJornadas(Integer profissionalId) {
+        return new ArrayList<>(); 
     }
 
     @Override
-    public List<com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo> listarJornadas(Integer profissionalId) {
-        ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
-            .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
-            
-        return profissional.getJornadas().stream()
-            .map(j -> com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo.builder()
-                .diaSemana(j.getDiaSemana())
-                .horaInicio(j.getHoraInicio())
-                .horaFim(j.getHoraFim())
-                .intervaloInicio(j.getIntervaloInicio())
-                .intervaloFim(j.getIntervaloFim())
-                .ativo(j.isAtivo())
-                .build())
-            .collect(Collectors.toList());
+    public void atualizarJornadas(Integer profissionalId, List<JornadaResumo> jornadas) {
     }
 }

@@ -21,15 +21,41 @@ export default function EditProfessionalModal({ visible, profissional, closeModa
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [telefone, setTelefone] = useState('');
+  const [cpfDisplay, setCpfDisplay] = useState('');
   const [inicioJornada, setInicioJornada] = useState('08:00:00');
   const [fimJornada, setFimJornada] = useState('18:00:00');
   const [servicosSelecionados, setServicosSelecionados] = useState<number[]>([]);
 
+  const formatarCPF = (valor: string) => {
+    const v = valor.replace(/\D/g, '');
+    return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  };
+
+  const formatarTelefone = (valor: string) => {
+    const v = valor.replace(/\D/g, '');
+    if (v.length > 10) return v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+    if (v.length > 5) return v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    if (v.length > 2) return v.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
+    return v;
+  };
+
+  const limparFormatacao = (valor: string) => valor.replace(/\D/g, '');
+
+  const extractValue = (field: any): string => {
+    if (!field) return '';
+    if (typeof field === 'string') return field;
+    if (typeof field === 'object' && field.value) return field.value;
+    return String(field);
+  };
+
   useEffect(() => {
     if (visible && profissional) {
-      setNome(profissional.nome);
-      setEmail(profissional.email.value);
-      setTelefone(profissional.telefone.value);
+      setNome(profissional.nome || '');
+
+      setEmail(extractValue(profissional.email));
+      setTelefone(formatarTelefone(extractValue(profissional.telefone)));
+      setCpfDisplay(formatarCPF(extractValue(profissional.cpf)));
+
       setInicioJornada(profissional.agenda?.inicioJornada || '08:00:00');
       setFimJornada(profissional.agenda?.fimJornada || '18:00:00');
 
@@ -51,11 +77,14 @@ export default function EditProfessionalModal({ visible, profissional, closeModa
     setLoading(true);
 
     const payload = {
-      id: profissional.id.valor,
+      id: (typeof profissional.id === 'object' ? (profissional.id as any).valor : profissional.id),
       nome,
-      email,
-      telefone,
-      cpf: profissional.cpf.value,
+
+      email: extractValue(profissional.email),
+      cpf: limparFormatacao(extractValue(profissional.cpf)),
+
+      telefone: limparFormatacao(telefone),
+
       senioridade: profissional.senioridade,
       ativo: profissional.ativo,
       agenda: {
@@ -65,8 +94,10 @@ export default function EditProfessionalModal({ visible, profissional, closeModa
       servicoOferecidoIds: servicosSelecionados.map(id => ({ valor: id }))
     };
 
+    const idUrl = (typeof profissional.id === 'object' ? (profissional.id as any).valor : profissional.id);
+
     mainService.atualizarProfissional(
-      profissional.id.valor,
+      idUrl,
       payload,
       () => {
         toast.success('Profissional atualizado com sucesso!');
@@ -108,12 +139,39 @@ export default function EditProfessionalModal({ visible, profissional, closeModa
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Telefone</label>
-              <input required type="tel" value={telefone} onChange={e => setTelefone(e.target.value)} className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none" />
+              <input
+                required
+                type="tel"
+                value={telefone}
+                onChange={e => setTelefone(formatarTelefone(e.target.value))}
+                maxLength={15}
+                className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none"
+              />
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none" />
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* CAMPO EMAIL BLOQUEADO */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input
+                type="email"
+                value={email}
+                disabled
+                className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-gray-400 cursor-not-allowed focus:outline-none opacity-60"
+              />
+            </div>
+
+            {/* CAMPO CPF BLOQUEADO */}
+            <div>
+              <label className="block text-sm font-medium mb-1">CPF</label>
+              <input
+                type="text"
+                value={cpfDisplay}
+                disabled
+                className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-gray-400 cursor-not-allowed focus:outline-none opacity-60"
+              />
+            </div>
           </div>
 
           <div className="bg-blue-900/20 p-3 rounded-lg border border-blue-900/50">

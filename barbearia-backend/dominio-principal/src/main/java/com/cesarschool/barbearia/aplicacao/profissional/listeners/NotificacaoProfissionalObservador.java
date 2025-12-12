@@ -1,44 +1,57 @@
 package com.cesarschool.barbearia.aplicacao.profissional.listeners;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
+import com.cesarschool.barbearia.dominio.compartilhado.observer.Observador;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.eventos.ProfissionalEvent;
 
 @Component
-public class NotificacaoProfissionalListener {
+public class NotificacaoProfissionalObservador implements Observador<ProfissionalEvent> {
 
     private static final LoggerSingleton logger = LoggerSingleton.getInstance();
 
     @Autowired
     private JavaMailSender mailSender;
 
-    @Async
-    @EventListener
-    public void processarEventoProfissional(ProfissionalEvent evento) {
+    @Override
+    public void atualizar(ProfissionalEvent evento) {
+        new Thread(() -> processarEnvio(evento)).start();
+    }
+
+    private void processarEnvio(ProfissionalEvent evento) {
         Profissional profissional = evento.getProfissional();
         
-        switch (evento.getTipoAcao()) {
-            case CRIADO:
-                logger.info("Novo cadastro. Enviando boas-vindas...");
-                enviarEmailBoasVindas(profissional);
-                break;
-                
-            case ATUALIZADO:
-                logger.info("Dados atualizados. Notificando profissional...");
-                enviarEmailAtualizacao(profissional);
-                break;
-                
-            case DESLIGADO:
-                logger.info("Profissional desligado. Enviando aviso de encerramento...");
-                enviarEmailDesligamento(profissional);
-                break;
+        if (profissional.getEmail() == null || profissional.getEmail().getValue() == null) {
+            logger.error("[OBSERVER EMAIL] Erro: O profissional " + profissional.getNome() + " não possui e-mail cadastrado/válido. Notificação cancelada.");
+            return; 
+        }
+        
+        try {
+            switch (evento.getTipoAcao()) {
+                case CRIADO:
+                    logger.info("[OBSERVER EMAIL] Novo cadastro. Enviando boas-vindas...");
+                    enviarEmailBoasVindas(profissional);
+                    break;
+                    
+                case ATUALIZADO: 
+                    logger.info("[OBSERVER EMAIL] Dados atualizados/Reativado. Notificando profissional...");
+                    enviarEmailAtualizacao(profissional);
+                    break;
+                    
+                case DESLIGADO:
+                    logger.info("[OBSERVER EMAIL] Profissional desligado. Enviando aviso...");
+                    enviarEmailDesligamento(profissional);
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            logger.error("Erro ao processar envio de e-mail: " + e.getMessage());
         }
     }
 
@@ -48,7 +61,7 @@ public class NotificacaoProfissionalListener {
             String.format("""
                 Olá, %s!
                 
-                Seu cadastro foi realizado com sucesso.
+                Seu cadastro foi realizado com sucesso na Barbearia.
                 Cargo: %s
                 Telefone Registrado: %s
                 
@@ -63,7 +76,7 @@ public class NotificacaoProfissionalListener {
             String.format("""
                 Olá, %s.
                 
-                Informamos que seus dados cadastrais foram atualizados recentemente em nosso sistema.
+                Informamos que seus dados cadastrais ou status foram atualizados recentemente em nosso sistema.
                 
                 Se não foi você que solicitou, entre em contato com a gerência imediatamente.
                 """, profissional.getNome())
@@ -77,10 +90,9 @@ public class NotificacaoProfissionalListener {
                 Olá, %s.
                 
                 Sua conta de profissional foi desativada no sistema.
-                Motivo registrado: %s
                 
                 Agradecemos pelos serviços prestados.
-                """, profissional.getNome(), profissional.getMotivoInatividade())
+                """, profissional.getNome())
         );
     }
 
@@ -93,7 +105,7 @@ public class NotificacaoProfissionalListener {
             message.setText(corpo);
 
             mailSender.send(message);
-            logger.success("E-mail enviado para: " + destinatario);
+            logger.success("[EMAIL ENVIADO] Para: " + destinatario);
         } catch (Exception e) {
             System.err.println("[ERRO EMAIL] Falha ao enviar para " + destinatario + ": " + e.getMessage());
         }

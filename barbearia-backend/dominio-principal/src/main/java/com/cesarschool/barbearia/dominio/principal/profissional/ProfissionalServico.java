@@ -1,12 +1,13 @@
 package com.cesarschool.barbearia.dominio.principal.profissional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cesarschool.barbearia.dominio.compartilhado.observer.Observador;
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.profissional.eventos.ProfissionalEvent;
@@ -20,7 +21,20 @@ import lombok.RequiredArgsConstructor;
 public class ProfissionalServico {
     
     private final ProfissionalRepositorio repositorio;
-    private final ApplicationEventPublisher publicadorEventos;
+
+    
+    private final List<Observador<ProfissionalEvent>> observadores = new ArrayList<>();
+
+    public void adicionarObservador(Observador<ProfissionalEvent> observador) {
+        this.observadores.add(observador);
+    }
+
+    private void notificarObservadores(ProfissionalEvent evento) {
+        for (Observador<ProfissionalEvent> obs : observadores) {
+            obs.atualizar(evento);
+        }
+    }
+    
 
     public List<Profissional> buscarQualificadosParaServico(ServicoOferecidoId servicoId) {
         return repositorio.buscarQualificadosParaServico(servicoId);
@@ -74,10 +88,7 @@ public class ProfissionalServico {
         }
         
         Profissional salvo = repositorio.salvar(profissional);
-
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ProfissionalEvent(this, salvo, TipoAcao.CRIADO));
-        }
+        notificarObservadores(new ProfissionalEvent(this, salvo, TipoAcao.CRIADO));
         
         return salvo;
     }
@@ -93,18 +104,7 @@ public class ProfissionalServico {
 
     @Transactional
     public Profissional atualizar(Profissional profissional) {
-        Validacoes.validarObjetoObrigatorio(profissional, "O profissional");
-        Validacoes.validarObjetoObrigatorio(profissional.getId(), "O ID do profissional");
-        
-        buscarPorId(profissional.getId());
-        
-        Profissional salvo = repositorio.salvar(profissional);
-
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ProfissionalEvent(this, salvo, TipoAcao.ATUALIZADO));
-        }
-
-        return salvo;
+        return atualizar(profissional.getId().getValor(), profissional);
     }
     
     @Transactional
@@ -112,10 +112,26 @@ public class ProfissionalServico {
         ProfissionalId idVo = new ProfissionalId(id);
         Profissional existente = buscarPorId(idVo);
         
-        existente.setNome(dadosAtualizados.getNome());
-        existente.setTelefone(dadosAtualizados.getTelefone());
-        existente.setEmail(dadosAtualizados.getEmail());
-        existente.setAgenda(dadosAtualizados.getAgenda());
+        
+        
+        
+        
+        if (dadosAtualizados.getNome() != null) {
+            existente.setNome(dadosAtualizados.getNome());
+        }
+        if (dadosAtualizados.getTelefone() != null) {
+            existente.setTelefone(dadosAtualizados.getTelefone());
+        }
+        if (dadosAtualizados.getEmail() != null) {
+            existente.setEmail(dadosAtualizados.getEmail());
+        }
+        if (dadosAtualizados.getCpf() != null) {
+            existente.setCpf(dadosAtualizados.getCpf());
+        }
+        if (dadosAtualizados.getAgenda() != null) {
+            existente.setAgenda(dadosAtualizados.getAgenda());
+        }
+        
         
         existente.setAtivo(dadosAtualizados.isAtivo()); 
 
@@ -125,9 +141,8 @@ public class ProfissionalServico {
 
         Profissional salvo = repositorio.salvar(existente);
 
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ProfissionalEvent(this, salvo, TipoAcao.ATUALIZADO));
-        }
+        notificarObservadores(new ProfissionalEvent(this, salvo, TipoAcao.ATUALIZADO));
+        
         return salvo;
     }
 
@@ -135,10 +150,7 @@ public class ProfissionalServico {
     public void remover(ProfissionalId id) {
         Profissional p = buscarPorId(id);
         repositorio.remover(id.getValor());
-        
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ProfissionalEvent(this, p, TipoAcao.DESLIGADO));
-        }
+        notificarObservadores(new ProfissionalEvent(this, p, TipoAcao.DESLIGADO));
     }
     
     public void desligarProfissional(Integer id) {
@@ -154,10 +166,7 @@ public class ProfissionalServico {
         profissional.desativar(motivo);
         
         Profissional salvo = repositorio.salvar(profissional);
-        
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ProfissionalEvent(this, salvo, TipoAcao.DESLIGADO));
-        }
+        notificarObservadores(new ProfissionalEvent(this, salvo, TipoAcao.DESLIGADO));
         
         return salvo;
     }
@@ -175,7 +184,6 @@ public class ProfissionalServico {
         }
         
         this.repositorio.removerAssociacaoServico(nomeProfissional, nomeServico);
-        
     }
 
     @Transactional
@@ -188,8 +196,6 @@ public class ProfissionalServico {
         
         Profissional salvo = repositorio.salvar(profissional);
         
-        if (publicadorEventos != null) {
-            publicadorEventos.publishEvent(new ProfissionalEvent(this, salvo, TipoAcao.ATUALIZADO));
-        }
+        notificarObservadores(new ProfissionalEvent(this, salvo, TipoAcao.ATUALIZADO));
     }
 }

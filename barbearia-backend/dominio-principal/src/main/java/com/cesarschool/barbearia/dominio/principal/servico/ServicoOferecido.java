@@ -13,7 +13,10 @@ public final class ServicoOferecido {
     private String descricao;
     private Integer duracaoMinutos;
     private boolean ativo;
-    private String motivoInatividade;    
+    private String motivoInatividade;
+    private String categoria;
+    private boolean servicoDependente;
+    private String destaque;       
 
     public ServicoOferecido() {
         this.ativo = true;
@@ -40,6 +43,19 @@ public final class ServicoOferecido {
             Integer duracaoMinutos) {
         this(nome, preco, descricao, duracaoMinutos);
         this.id = id;
+    }
+
+    public ServicoOferecido(ServicoOferecidoId id, String nome, BigDecimal preco, String descricao, Integer duracaoMinutos, String categoria, boolean servicoDependente, String destaque) {
+        this.id = id;
+        this.nome = nome;
+        this.preco = preco;
+        this.descricao = descricao;
+        this.duracaoMinutos = duracaoMinutos;
+        this.categoria = categoria;
+        this.servicoDependente = servicoDependente;
+        this.destaque = destaque;
+        
+        this.ativo = true;
     }
     
 
@@ -82,6 +98,18 @@ public final class ServicoOferecido {
         this.duracaoMinutos = duracaoMinutos;
     }
 
+    public void setCategoria(String categoria) {
+        this.categoria = categoria; 
+    }
+
+    public void setServicoDependente(boolean servicoDependente) {
+        this.servicoDependente = servicoDependente; 
+    }
+    
+    public void setDestaque(String destaque) {
+        this.destaque = destaque; 
+    }
+
     
     public void atualizarPreco(BigDecimal novoPreco) {
         setPreco(novoPreco);
@@ -106,7 +134,6 @@ public final class ServicoOferecido {
         this.ativo = ativo;
     }
 
-    // Getters
     public ServicoOferecidoId getId() { return id; }
     public String getNome() { return nome; }
     public BigDecimal getPreco() { return preco; }
@@ -114,4 +141,7 @@ public final class ServicoOferecido {
     public Integer getDuracaoMinutos() { return duracaoMinutos; }
     public boolean isAtivo() { return ativo; }
     public String getMotivoInatividade() { return motivoInatividade; }
+    public String getCategoria() { return categoria; }
+    public boolean isServicoDependente() { return servicoDependente; }
+    public String getDestaque() { return destaque; }
 }

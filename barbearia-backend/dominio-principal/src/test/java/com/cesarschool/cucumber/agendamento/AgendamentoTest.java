@@ -33,7 +33,7 @@ private Agendamento agendamento;
 private Agendamento agendamentoSalvo;
 private UsuarioSolicitante clienteSolicitante;
 private ProfissionalRepositorio repositorioProfissional = new ProfissionalMockRepositorio();
-private ProfissionalServico profissionalServico = new ProfissionalServico(repositorioProfissional, null);
+private ProfissionalServico profissionalServico = new ProfissionalServico(repositorioProfissional);
 private AgendamentoRepositorio repositorio = new AgendamentoMockRepositorio();
 boolean lancou = false;
 Cliente cliente;
@@ -41,13 +41,9 @@ Cliente cliente;
 private AgendamentoServico servico = new AgendamentoServico(repositorio, profissionalServico);
 private StatusAgendamento statusAgendamento;
 
-// --------------------------------------------------------------------------
-// Cenário: Criar agendamento em horário livre (sucesso)
-// --------------------------------------------------------------------------
-
 @Given("que o cliente selecionou um horário futuro livre para o profissional")
 public void clienteSelecionaHorarioFuturoLivre() {
-    // Garante que o horário está dentro do horário comercial (8h-18h)
+    
     LocalDateTime agora = LocalDateTime.now();
     if (agora.getHour() < 8) {
         horario = agora.withHour(10).withMinute(0).plusDays(0);
@@ -71,15 +67,15 @@ public void sistemaConfirmaCriacaoComSucesso() {
     assertTrue(agendamentoSalvo.getDataHora().isAfter(LocalDateTime.now()));
 }
 
-// --------------------------------------------------------------------------
-// Cenário: Impedir criação de agendamento quando horário está ocupado
-// --------------------------------------------------------------------------
+
+
+
 
 @Given("que já existe um agendamento ativo para o profissional {string} no mesmo horário")
 public void existeAgendamentoAtivoMesmoHorario(String nomeProfissional) {
-    repositorio = new AgendamentoConflitoRepositorio(); // mock configurado para conflito
+    repositorio = new AgendamentoConflitoRepositorio(); 
     servico = new AgendamentoServico(repositorio, profissionalServico);
-    // Garante horário dentro do horário comercial
+    
     LocalDateTime agora = LocalDateTime.now();
     if (agora.getHour() < 8) {
         horario = agora.withHour(10).withMinute(0).plusDays(0);
@@ -106,9 +102,9 @@ public void sistemaRecusaCriacaoPorConflito() {
     assertTrue("Deveria recusar a criação por conflito de horário", lancou);
 }
 
-// --------------------------------------------------------------------------
-// Cenário: Bloquear agendamento fora da jornada
-// --------------------------------------------------------------------------
+
+
+
 
 @Given("que o sistema funciona das 8h às 18h")
 public void queOSistemaFuncionaDas8hÀs18h() {
@@ -133,9 +129,9 @@ public void oSistemaNegaOAgendamentoPorNãoEstarEntre8hE18h() {
     assertTrue("Deveria recusar a criação por estar fora do horário permitido", lancou);
 }
 
-// --------------------------------------------------------------------------
-// Cenário: Impedir cancelamento com menos de 2 horas
-// --------------------------------------------------------------------------
+
+
+
 
 @Given("que existe um agendamento marcado para ocorrer em menos de duas horas e com status {string}")
 public void existeAgendamentoMenosDeDuasHoras(String status) {
@@ -145,7 +141,7 @@ public void existeAgendamentoMenosDeDuasHoras(String status) {
     cliente = ClienteFactory.criarPadrao();
     clienteSolicitante = new UsuarioSolicitante(TipoUsuario.CLIENTE, cliente.getId());
     
-    // Cria e salva o agendamento no repositório
+    
     agendamento = AgendamentoFactory.criarComStatus(statusAgendamento);
     agendamentoSalvo = repositorio.salvar(agendamento);
 }
@@ -166,13 +162,13 @@ public void sistemaRecusaCancelamentoPrazoMinimo() {
     assertTrue("Deveria recusar o cancelamento por descumprir o prazo mínimo", lancou);
 }
 
-// --------------------------------------------------------------------------
-// Cenário: Atribuição automática de profissional (simples)
-// --------------------------------------------------------------------------
+
+
+
 
 @Given("que o cliente não informou nenhum profissional ao criar o agendamento")
 public void clienteNaoInformouProfissional() {
-    // Garante que o horário está dentro do horário comercial (8h-18h)
+    
     LocalDateTime agora = LocalDateTime.now();
     if (agora.getHour() < 8) {
         horario = agora.withHour(10).withMinute(0).plusDays(0);
@@ -189,7 +185,7 @@ public void clienteNaoInformouProfissional() {
 public void solicitacaoAgendamentoProcessada() {
     lancou = false;
     try {
-        agendamento.setProfissional(null); // garante que não há profissional
+        agendamento.setProfissional(null); 
         agendamentoSalvo = servico.criar(agendamento, 30);
     } catch (IllegalStateException e) {
         lancou = true;
@@ -200,18 +196,18 @@ public void solicitacaoAgendamentoProcessada() {
 public void sistemaAtribuiPrimeiroProfissionalDisponivel() {
     assertTrue("Deveria haver um profissional disponível para o horário", !lancou);
 }
-// --------------------------------------------------------------------------
-// Cenário: Atribuição automática de profissional (com mensagem)
-// --------------------------------------------------------------------------
+
+
+
 
 @Given("que o cliente não informou nenhum profissional ao criar o agendamento e não existie profissional disponível no horário")
 public void queOClienteNãoInformouNenhumProfissionalAoCriarOAgendamentoENãoExistieProfissionalDisponívelNoHorário() {
-    // Configura repositório que não retorna profissional disponível
+    
     repositorioProfissional = new ProfissionalSemDisponivelRepositorio();
-    profissionalServico = new ProfissionalServico(repositorioProfissional, null);
+    profissionalServico = new ProfissionalServico(repositorioProfissional);
     servico = new AgendamentoServico(repositorio, profissionalServico);
     
-    // Garante horário dentro do horário comercial
+    
     LocalDateTime agora = LocalDateTime.now();
     if (agora.getHour() < 8) {
         horario = agora.withHour(10).withMinute(0).plusDays(0);
@@ -222,7 +218,7 @@ public void queOClienteNãoInformouNenhumProfissionalAoCriarOAgendamentoENãoExi
     }
     
     agendamento = AgendamentoFactory.criarParaHorario(horario);
-    agendamento.setProfissional(null); // garante que não há profissional
+    agendamento.setProfissional(null); 
 }
 
 @Then("o sistema deve recusar a criação do agendamento informando que não há profissionais disponíveis")
