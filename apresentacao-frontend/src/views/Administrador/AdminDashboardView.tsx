@@ -21,7 +21,7 @@ interface Profissional {
 interface Produto {
   id: number;
   nome: string;
-  quantidadeEstoque: number;
+  estoque: number;
   estoqueMinimo: number;
 }
 
@@ -50,8 +50,8 @@ export default function AdminDashboardView() {
       const profissionaisData = await profissionaisResponse.json();
       setProfissionais(Array.isArray(profissionaisData) ? profissionaisData : []);
 
-      // Buscar produtos do estoque
-      const produtosResponse = await fetch('http://localhost:8080/api/produto');
+      // Buscar produtos com estoque baixo
+      const produtosResponse = await fetch('http://localhost:8080/api/produtos/estoque-baixo');
       const produtosData = await produtosResponse.json();
       setProdutos(Array.isArray(produtosData) ? produtosData : []);
     } catch (error) {
@@ -81,7 +81,7 @@ export default function AdminDashboardView() {
     .filter(ag => ag.status === 'CONCLUIDO')
     .reduce((total, ag) => total + (ag.servicoPreco || 0), 0);
 
-  const produtosBaixoEstoque = Array.isArray(produtos) ? produtos.filter(p => p.quantidadeEstoque <= p.estoqueMinimo).length : 0;
+  const produtosBaixoEstoque = Array.isArray(produtos) ? produtos.length : 0;
 
   const stats = [
     { label: 'Agendamentos Hoje', value: agendamentosHoje.length.toString(), icon: 'event', color: 'text-primary', bg: 'bg-primary/10' },
