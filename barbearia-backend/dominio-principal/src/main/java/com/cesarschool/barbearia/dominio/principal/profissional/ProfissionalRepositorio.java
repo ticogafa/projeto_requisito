@@ -7,10 +7,15 @@ import com.cesarschool.barbearia.dominio.compartilhado.base.Repositorio;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoId;
 
+import com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo;
+
 public interface ProfissionalRepositorio extends Repositorio<Profissional, Integer>{
     Profissional buscarPorCpf(Cpf cpf);
     boolean existePorCpf(Cpf cpf);
     Profissional buscarPrimeiroProfissionalDisponivel(LocalDateTime dataHora, int duracaoServicoMinutos);
+    
+    void atualizarJornadas(Integer profissionalId, List<JornadaResumo> jornadas);
+    List<JornadaResumo> listarJornadas(Integer profissionalId);
 
     /**
      * Busca profissionais qualificados para ofertar um serviço específico.

@@ -2,11 +2,13 @@ package com.cesarschool.cucumber.gestaoProfissionais;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
@@ -148,5 +150,14 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
         sequenciadorId.set(1);
         associacoesServico.clear();
         servicoTemAgendamentoAtivo.clear();
+    }
+
+    @Override
+    public void atualizarJornadas(Integer profissionalId, List<JornadaResumo> jornadas) {
+    }
+
+    @Override
+    public List<JornadaResumo> listarJornadas(Integer profissionalId) {
+        return Collections.emptyList();
     }
 }

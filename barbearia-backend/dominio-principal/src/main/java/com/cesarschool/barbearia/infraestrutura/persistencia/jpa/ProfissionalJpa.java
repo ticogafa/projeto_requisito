@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo;
 import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
@@ -249,7 +250,7 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
     @Override public boolean temAgendamentoAtivo(String nomeServico) { return false; }
 
     @Override
-    public void atualizarJornadas(Integer profissionalId, List<com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo> jornadas) {
+    public void atualizarJornadas(Integer profissionalId, List<JornadaResumo> jornadas) {
         ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
             .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
         

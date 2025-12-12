@@ -1,8 +1,10 @@
 package com.cesarschool.cucumber.agendamento.infraestrutura;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
+import com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.profissional.Profissional;
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
@@ -58,17 +60,14 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
     
     @Override
     public void adicionarQualificacao(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
-        // Mock implementation - não faz nada
     }
 
     @Override
     public void removerQualificacao(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
-        // Mock implementation - não faz nada
     }
 
     @Override
     public boolean estaQualificado(ProfissionalId profissionalId, ServicoOferecidoId servicoId) {
-        // Mock implementation - sempre retorna true
         return true;
     }
 
@@ -84,8 +83,14 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
 
     @Override
     public void removerAssociacaoServico(String nomeProfissional, String nomeServico) {
-        // Mock implementation - não faz nada
+    }
+
+    @Override
+    public void atualizarJornadas(Integer profissionalId, List<JornadaResumo> jornadas) {
+    }
+
+    @Override
+    public List<JornadaResumo> listarJornadas(Integer profissionalId) {
+        return Collections.emptyList();
     }
 }
-
-
