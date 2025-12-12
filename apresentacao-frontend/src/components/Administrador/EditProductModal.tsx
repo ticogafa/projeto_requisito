@@ -38,6 +38,7 @@ export default function EditProductModal({ produto, onClose, onSuccess }: EditPr
           nome: formData.nome,
           preco: parseFloat(formData.preco),
           estoqueMinimo: parseInt(formData.estoqueMinimo),
+          usuarioResponsavel: 'admin', // TODO: pegar do contexto de autenticação
         }),
       });
 
