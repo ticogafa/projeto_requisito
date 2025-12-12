@@ -1,4 +1,5 @@
 import { AGENDAMENTO_URLS, AUTHENTICATION_URLS, PRODUTO_URLS, SERVICO_OFERECIDO_URLS, URLS_PREFIX } from '@/constants/URLConstants';
+import { JornadaDto } from '@/interfaces/JornadaInterface';
 import { ProfissionaisResponse } from '@/interfaces/ProfissionaisInterfaces';
 import HttpClient from '@/services/httpClient';
 import type { AxiosError, AxiosResponse } from 'axios';
@@ -17,6 +18,43 @@ export default class MainService {
       this.instance = new MainService();
     }
     return this.instance;
+  }
+
+  public getJornada(
+    profissionalId: number,
+    successCallback: (data: JornadaDto[]) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    console.warn('getJornada method not yet implemented in MainService.');
+    // Placeholder for actual implementation
+    this.client.get(
+      `/jornada/${profissionalId}`,
+      {},
+      {},
+      (response) => successCallback(response.data),
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  public atualizarJornada(
+    profissionalId: number,
+    data: JornadaDto[],
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    console.warn('atualizarJornada method not yet implemented in MainService.');
+    // Placeholder for actual implementation
+    this.client.put(
+      `/jornada/${profissionalId}`,
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
   }
 
   public listarServicos(

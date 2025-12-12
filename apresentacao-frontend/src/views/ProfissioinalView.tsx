@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useProfissionais } from '@/hooks/useProfissionais';
 import NewProfessionalModal from '@/views/Administrador/components/NewProfessionalModal';
 import EditProfessionalModal from '@/views/Administrador/components/EditProfissionalModal';

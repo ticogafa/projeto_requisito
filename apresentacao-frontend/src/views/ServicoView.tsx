@@ -50,7 +50,7 @@ export default function ServicosView() {
           toast.success('Serviço desativado com sucesso!');
           fetchServicos();
         },
-        (error: AxiosError) => {
+        (_error: AxiosError) => {
           toast.error('Erro ao desativar serviço.');
           setLoading(false);
         },

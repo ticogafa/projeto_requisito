@@ -42,7 +42,7 @@ export default class AxiosInterceptor {
             await this._tryRefreshToken();
             value = axiosInstance(config); // Retries the connection
           } catch {
-            if (!this.hasDoneLogout) AuthStorage.clear();
+            if (!this.hasDoneLogout) AuthStorage.clearAll();
           } finally {
             this.refreshToken = null;
           }
@@ -57,7 +57,7 @@ export default class AxiosInterceptor {
    * Makes the refresh token request and returns the request promise.
    */
   private static async _refreshAccessToken() {
-    const token: string = AuthStorage.getRefreshToken();
+    const token: string | null = AuthStorage.getRefreshToken();
     const tokenData = { refresh: token };
     return axios.post(`${URLS_PREFIX.API}${AUTHENTICATION_URLS.REFRESH_TOKEN}`, tokenData);
   }
@@ -68,7 +68,7 @@ export default class AxiosInterceptor {
    * @param request - Request from axios
    */
   private static _addAuthenticationHeaderOnRequest(request: AxiosRequestConfig): void {
-    const accessToken: string = AuthStorage.getAccessToken();
+    const accessToken: string | null = AuthStorage.getAccessToken();
     if (request.headers) request.headers.Authorization = `Bearer ${accessToken}`;
   }
 

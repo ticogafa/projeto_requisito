@@ -7,18 +7,20 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
-import com.cesarschool.barbearia.dominio.principal.profissional.relatorio.IRelatorioDesempenhoServico;
+import com.cesarschool.barbearia.dominio.principal.profissional.relatorio.IGeradorRelatorio;
 import com.cesarschool.barbearia.dominio.principal.profissional.relatorio.RelatorioDesempenho;
 
-// @RestController
-// @RequestMapping("/api/relatorios")
+@RestController
+@RequestMapping("/api/relatorios")
 public class RelatorioController {
 
     @Autowired
-    private IRelatorioDesempenhoServico servico;
+    private IGeradorRelatorio servico;
 
     @GetMapping("/{profissionalId}")
     public ResponseEntity<RelatorioDesempenho> gerarRelatorio(

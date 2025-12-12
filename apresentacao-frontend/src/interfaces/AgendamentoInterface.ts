@@ -9,7 +9,6 @@ export interface AgendamentoInterface {
   servicoPreco?: number;
   status: string;
   observacoes?: string;
-  clienteNome?: string;
 }
 
 export interface ProfissionalDisponivelInterface {

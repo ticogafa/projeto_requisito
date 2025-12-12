@@ -1,6 +1,6 @@
 import { DIAS_SEMANA, type JornadaDto } from '@/interfaces/JornadaInterface';
 import MainService from '@/services/MainService';
-import type { AxiosError, AxiosResponse } from 'axios';
+import type { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -23,8 +23,7 @@ export default function JornadaManager({ profissionalId }: JornadaManagerProps) 
     setLoading(true);
     MainService.getInstance().getJornada(
       profissionalId,
-      (response: AxiosResponse) => {
-        const data = response.data as JornadaDto[];
+      (data: JornadaDto[]) => {
         // Merge with defaults to ensure all days are present
         const merged = DIAS_SEMANA.map(dia => {
           const existing = data.find(j => j.diaSemana === dia.value);
@@ -59,7 +58,7 @@ export default function JornadaManager({ profissionalId }: JornadaManagerProps) 
   const validateJornada = (currentJornadas: JornadaDto[]) => {
     const newErrors: { [key: string]: string } = {};
   
-    currentJornadas.forEach((jornada, index) => {
+    currentJornadas.forEach((jornada, _index) => {
       if (jornada.ativo && (!jornada.horaInicio || !jornada.horaFim)) {
         newErrors[jornada.diaSemana] = 'Horário de início e fim são obrigatórios para dias ativos.';
       } else if (jornada.ativo && jornada.horaInicio >= jornada.horaFim) {

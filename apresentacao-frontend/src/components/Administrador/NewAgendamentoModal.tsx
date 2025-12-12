@@ -103,7 +103,7 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
 
     MainService.getInstance().criarAgendamento(
       requestData,
-      (response: AxiosResponse) => {
+      (_response: AxiosResponse) => {
         onSuccess();
       },
       (error: AxiosError) => {
@@ -184,8 +184,7 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
                 >
                   <option value="">{servicos.length === 0 ? 'Nenhum serviço disponível' : 'Selecione um serviço'}</option>
                   {servicos.map((servico, index) => (
-                    <option key={servico.id.valor + index} value={servico.id.valor}>
-                      {servico.nome} - R$ {servico.preco.toFixed(2)} ({servico.duracaoMinutos} min)
+                                         <option key={(typeof servico.id === 'object' ? servico.id.valor : servico.id) + index} value={typeof servico.id === 'object' ? servico.id.valor : servico.id}>                      {servico.nome} - R$ {servico.preco.toFixed(2)} ({servico.duracaoMinutos} min)
                     </option>
                   ))}
                 </select>

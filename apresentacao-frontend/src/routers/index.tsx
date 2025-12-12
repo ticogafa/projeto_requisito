@@ -10,6 +10,8 @@ import ProfessionalView from '@/views/Profissional/ProfessionalView';
 
 import AdminDashboardView from '@/views/Administrador/AdminDashboardView';
 import AgendamentoView from '@/views/Administrador/AgendamentoView';
+import CashControlView from '@/views/Administrador/CashControlView';
+import PerformanceReportView from '@/views/Administrador/PerformanceReportView';
 import { AdminLayout } from '@/views/Administrador/components';
 import EstoqueView from '@/views/Administrador/EstoqueView';
 import ProfissionaisView from '@/views/ProfissioinalView';
@@ -117,6 +119,26 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <AdminDashboardView />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/admin/controle-caixa',
+        element: (
+          <ProtectedRoute>
+            <AdminLayout>
+              <CashControlView />
+            </AdminLayout>
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/admin/relatorio-desempenho',
+        element: (
+          <ProtectedRoute>
+            <AdminLayout>
+              <PerformanceReportView />
+            </AdminLayout>
           </ProtectedRoute>
         )
       }

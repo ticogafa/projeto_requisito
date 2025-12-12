@@ -79,7 +79,7 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
 
   if (!props.visible) return null;
 
-  const servicoSelecionado = props.servicos.find(s => s.id.valor === servicoId);
+  const servicoSelecionado = props.servicos.find(s => (typeof s.id === 'object' ? s.id.valor : s.id) === servicoId);
 
   return (
     <div
@@ -117,7 +117,7 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
             >
               <option value="">Selecione um serviço</option>
               {props.servicos.map((servico, index) => (
-                <option key={`servico-${servico.id.valor}-${index}`} value={servico.id.valor}>
+                <option key={`servico-${(typeof servico.id === 'object' ? servico.id.valor : servico.id)}-${index}`} value={typeof servico.id === 'object' ? servico.id.valor : servico.id}>
                   {servico.nome} - R$ {servico.preco.toFixed(2)} ({servico.duracaoMinutos} min)
                 </option>
               ))}

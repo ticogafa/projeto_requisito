@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { AgendamentoInterface } from '@/interfaces/AgendamentoInterface';
 
 interface ProfessionalCalendarProps {
@@ -18,7 +18,7 @@ const MONTHS = [
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
 ];
 
-export default function ProfessionalCalendar({ agendamentos, onStart, onFinish, onCancel, onAppointmentClick }: ProfessionalCalendarProps) {
+export default function ProfessionalCalendar({ agendamentos, onAppointmentClick }: ProfessionalCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('week');
 

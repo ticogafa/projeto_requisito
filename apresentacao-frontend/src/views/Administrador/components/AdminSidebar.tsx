@@ -11,7 +11,9 @@ export default function AdminSidebar() {
     { icon: 'content_cut', label: 'Serviços', path: '/admin/servicos' },
     { icon: 'inventory_2', label: 'Estoque', path: '/admin/estoque' },
     { icon: 'attach_money', label: 'Financeiro', path: '/admin/financeiro' },
-    { icon: 'bar_chart', label: 'Relatórios', path: '/admin/relatorios' }
+    { icon: 'bar_chart', label: 'Relatórios', path: '/admin/relatorios' },
+    { icon: 'account_balance_wallet', label: 'Controle de Caixa', path: '/admin/controle-caixa' },
+    { icon: 'analytics', label: 'Relatório de Desempenho', path: '/admin/relatorio-desempenho' }
   ];
 
   return (
