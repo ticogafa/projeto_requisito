@@ -30,22 +30,20 @@ trap cleanup SIGINT
 echo -e "${BLUE}=== Starting Barber Shop Project (Interactive Mode) ===${NC}"
 
 # 1. Start Docker Container (Database)
-echo -e "${GREEN}[1/3] Checking Database...${NC}"
-if [ ! "$(docker ps -q -f name=barbearia-container)" ]; then
-    if [ "$(docker ps -aq -f status=exited -f name=barbearia-container)" ]; then
-        echo "Starting existing barbearia-container..."
-        docker start barbearia-container
-    else
-        echo "Creating and starting new barbearia-container..."
-        docker run --name barbearia-container -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=barbearia_db -p 3306:3306 -v barbearia_db_data:/var/lib/mysql -d mysql:8.0
-    fi
-else
-    echo "Database container is already running."
+echo -e "${GREEN}[1/3] Starting Database with Docker Compose...${NC}"
+
+# Remove old container if it exists (to migrate to docker-compose)
+if [ "$(docker ps -aq -f name=barbearia-container)" ]; then
+    echo "Removing old barbearia-container to switch to docker-compose..."
+    docker rm -f barbearia-container
 fi
+
+# Start DB using docker-compose
+docker-compose up -d db
 
 # Wait for DB to be ready
 echo "Waiting for database to initialize..."
-sleep 3
+sleep 5
 
 # 2. Start Backend
 echo -e "${GREEN}[2/3] Starting Backend (Spring Boot)...${NC}"

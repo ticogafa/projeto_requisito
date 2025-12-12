@@ -4,6 +4,7 @@ import { useServicosOferecidos } from '@/hooks/useServicosOferecidos';
 import { useLoadingStore } from '@/store/useLoadingStore';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
+import { registerSecondaryUser, saveUserRole } from '@/auth';
 
 interface NewProfessionalModalProps {
   visible: boolean;
@@ -21,6 +22,7 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess, p
   const [email, setEmail] = useState('');
   const [cpf, setCpf] = useState('');
   const [telefone, setTelefone] = useState('');
+  const [senha, setSenha] = useState('');
   const [senioridade, setSenioridade] = useState('JUNIOR');
   const [inicioJornada, setInicioJornada] = useState('08:00:00');
   const [fimJornada, setFimJornada] = useState('18:00:00');
@@ -58,6 +60,7 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess, p
         setEmail('');
         setCpf('');
         setTelefone('');
+        setSenha('');
         setSenioridade('JUNIOR');
         setInicioJornada('08:00:00');
         setFimJornada('18:00:00');
@@ -66,7 +69,7 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess, p
     }
   }, [visible, profissionalParaEditar]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -90,20 +93,33 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess, p
       closeModal();
     };
 
-    const errorAction = (error: AxiosError) => {
+    const errorAction = (error: AxiosError | any) => {
       const errorData = error.response?.data as { message?: string } | undefined;
-      toast.error(errorData?.message || 'Erro ao salvar profissional');
+      toast.error(errorData?.message || error.message || 'Erro ao salvar profissional');
     };
 
     const doneAction = () => setLoading(false);
 
     if (profissionalParaEditar) {
-
       const id = profissionalParaEditar.id?.valor || profissionalParaEditar.id;
       mainService.atualizarProfissional(id, payload, successAction, errorAction, doneAction);
     } else {
+      try {
+        if (!senha) {
+          throw new Error("Senha é obrigatória para novos profissionais");
+        }
+        // 1. Create user in Firebase
+        const userCredential = await registerSecondaryUser(email, senha);
+        
+        // 2. Save role in Firestore
+        await saveUserRole(userCredential.user.uid, email, 'profissional', nome, cpf, telefone);
 
-      mainService.criarProfissional(payload, successAction, errorAction, doneAction);
+        // 3. Create professional in Backend
+        mainService.criarProfissional(payload, successAction, errorAction, doneAction);
+      } catch (error: any) {
+        setLoading(false);
+        toast.error(error.message || "Erro ao criar usuário no Firebase");
+      }
     }
   };
 
@@ -166,6 +182,14 @@ export default function NewProfessionalModal({ visible, closeModal, onSuccess, p
                 className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none" />
             </div>
           </div>
+
+          {!profissionalParaEditar && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Senha *</label>
+              <input required type="password" value={senha} onChange={e => setSenha(e.target.value)}
+                className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none" />
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium mb-1">Senioridade *</label>

@@ -94,6 +94,14 @@ export const logout = async () => {
   return await signOut(auth);
 };
 
+export const registerSecondaryUser = async (email: string, password: string) => {
+  const secondaryApp = initializeApp(firebaseConfig, "Secondary");
+  const secondaryAuth = getAuth(secondaryApp);
+  const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+  await signOut(secondaryAuth);
+  return userCredential;
+};
+
 const FIREBASE_ERROR_MESSAGES: Record<string, string> = {
   // Erros de autenticação - Credenciais
   'auth/invalid-credential': 'Email ou senha incorretos',
