@@ -1,5 +1,5 @@
 services:
-  postgres:
+  -postgres:
      container_name: postgres
      image: postgres:18
      environment:

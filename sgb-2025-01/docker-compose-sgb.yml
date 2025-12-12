@@ -1,5 +1,5 @@
 services:
-  postgres:
+  -postgres:
      container_name: postgres  
      image: postgres:18
      environment:
@@ -11,7 +11,7 @@ services:
      ports:
        - 5432:5432
 
-  sgb:
+  -sgb:
      image: sgb-apresentacao-frontend:0.0.1-SNAPSHOT
      environment:
        SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
