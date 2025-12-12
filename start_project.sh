@@ -37,7 +37,7 @@ if [ ! "$(docker ps -q -f name=barbearia-container)" ]; then
         docker start barbearia-container
     else
         echo "Creating and starting new barbearia-container..."
-        docker run --name barbearia-container -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=barbearia_db -p 3306:3306 -d mysql:8.0
+        docker run --name barbearia-container -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=barbearia_db -p 3306:3306 -v barbearia_db_data:/var/lib/mysql -d mysql:8.0
     fi
 else
     echo "Database container is already running."

@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.cesarschool.barbearia.dominio.principal.cliente.Cliente;
-import com.cesarschool.barbearia.dominio.principal.cliente.ClienteServico;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Email;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Telefone;
+import com.cesarschool.barbearia.dominio.principal.cliente.Cliente;
+import com.cesarschool.barbearia.dominio.principal.cliente.ClienteServico;
 
 import lombok.RequiredArgsConstructor;
 
@@ -73,23 +73,13 @@ public class ClienteControlador {
             )))
             .orElse(ResponseEntity.notFound().build());
     }
-}
 
-class ClienteResumo {
-    private Integer id;
-    private String nome;
-    private String email;
-    private String telefone;
-    
-    public ClienteResumo(Integer id, String nome, String email, String telefone) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
-        this.telefone = telefone;
+    @lombok.Data
+    @lombok.AllArgsConstructor
+    public static class ClienteResumo {
+        private Integer id;
+        private String nome;
+        private String email;
+        private String telefone;
     }
-    
-    public Integer getId() { return id; }
-    public String getNome() { return nome; }
-    public String getEmail() { return email; }
-    public String getTelefone() { return telefone; }
 }
