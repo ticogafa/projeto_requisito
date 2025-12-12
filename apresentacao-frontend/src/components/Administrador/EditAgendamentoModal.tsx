@@ -51,7 +51,7 @@ export default function EditAgendamentoModal({ agendamento, onClose, onSuccess }
 
     try {
       const requestData = {
-        dataHora: formData.dataHora,
+        dataHora: `${formData.dataHora}:00`,
         profissionalId: formData.profissionalId ? parseInt(formData.profissionalId) : undefined,
         observacoes: formData.observacoes || undefined,
       };

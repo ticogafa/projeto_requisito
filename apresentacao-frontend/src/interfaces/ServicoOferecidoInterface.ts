@@ -1,5 +1,5 @@
 export interface ServicoOferecido {
-  id: number;
+  id: { valor: number };
   nome: string;
   preco: number;
   descricao: string;

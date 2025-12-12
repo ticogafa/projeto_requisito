@@ -1,7 +1,10 @@
 package com.cesarschool.barbearia.infraestrutura.persistencia.jpa;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -41,20 +44,59 @@ class AgendamentoRepositorioAplicacaoImpl implements AgendamentoRepositorioAplic
         
         var horaInicio = dataHora.toLocalTime();
         var horaFim = dataHora.toLocalTime().plusMinutes(duracaoMinutos);
+        var inicioDia = dataHora.toLocalDate().atStartOfDay();
+        var fimDia = dataHora.toLocalDate().atTime(LocalTime.MAX);
         
         logger.info("Buscando profissionais disponíveis - servicoId: " + servicoId.getValor() + 
-                   ", horaInicio: " + horaInicio + 
-                   ", horaFim: " + horaFim + 
+                   ", data: " + dataHora.toLocalDate() +
+                   ", horario: " + horaInicio + " as " + horaFim + 
                    ", duração: " + duracaoMinutos + "min");
         
-        var resultado = profissionalDisponivelRepo.buscarDisponiveis(
-            servicoId.getValor(),
-            horaInicio,
-            horaFim
+        // 1. Buscar todos os profissionais qualificados e ativos (Entidades completas para acessar jornada)
+        List<ProfissionalJpa> candidatos = profissionalDisponivelRepo.buscarCandidatos(
+            servicoId.getValor()
         );
         
-        logger.success("Query retornou " + resultado.size() + " profissionais encontrados");
-        return resultado;
+        logger.info("Encontrados " + candidatos.size() + " profissionais qualificados.");
+
+        // 2. Buscar agendamentos do dia para verificar conflitos
+        List<AgendamentoConflitoInfo> agendamentosDoDia = profissionalDisponivelRepo.buscarAgendamentosDoDia(
+            inicioDia, fimDia
+        );
+
+        // 3. Filtrar na memória
+        List<ProfissionalDisponivelResumo> disponiveis = candidatos.stream()
+            .filter(p -> {
+                // A. Verificar Jornada de Trabalho
+                if (horaInicio.isBefore(p.getInicioJornada()) || horaFim.isAfter(p.getFimJornada())) {
+                    return false;
+                }
+                
+                // B. Verificar Conflitos
+                boolean temConflito = agendamentosDoDia.stream()
+                    .filter(a -> a.getProfissionalId().equals(p.getId()))
+                    .anyMatch(a -> {
+                        LocalDateTime aInicio = a.getDataHora();
+                        LocalDateTime aFim = aInicio.plusMinutes(a.getDuracao());
+                        
+                        LocalDateTime reqInicio = dataHora;
+                        LocalDateTime reqFim = reqInicio.plusMinutes(duracaoMinutos);
+                        
+                        // Overlap logic: (StartA < EndB) and (EndA > StartB)
+                        return reqInicio.isBefore(aFim) && reqFim.isAfter(aInicio);
+                    });
+                
+                return !temConflito;
+            })
+            .map(p -> new ProfissionalResumoImpl(
+                p.getId(), 
+                p.getNome(), 
+                p.getSenioridade().name()
+            ))
+            .collect(Collectors.toList());
+        
+        logger.success("Retornando " + disponiveis.size() + " profissionais disponíveis após filtros.");
+        return disponiveis;
     }
 
     @Override
@@ -71,36 +113,50 @@ class AgendamentoRepositorioAplicacaoImpl implements AgendamentoRepositorioAplic
     public List<AgendamentoResumo> listarTodos() {
         return agendamentoResumoRepo.listarTodos();
     }
+    
+    // Implementação interna do DTO para retorno
+    private record ProfissionalResumoImpl(Integer id, String nome, String senioridade) implements ProfissionalDisponivelResumo {
+        @Override public Integer getId() { return id; }
+        @Override public String getNome() { return nome; }
+        @Override public String getSenioridade() { return senioridade; }
+    }
 }
 
 /**
- * Repository para consultas de profissionais disponíveis.
- * Usa projeção de interface Spring Data JPA.
+ * Interface para projeção de informações de conflito
+ */
+interface AgendamentoConflitoInfo {
+    Integer getProfissionalId();
+    LocalDateTime getDataHora();
+    Integer getDuracao();
+}
+
+/**
+ * Repository para consultas de profissionais disponíveis e verificação de conflitos.
  */
 @Repository
 interface ProfissionalDisponivelQueryRepository extends JpaRepository<ProfissionalJpa, Integer> {
     
-    /**
-     * Busca profissionais disponíveis usando projeção.
-     * Retorna apenas profissionais que:
-     * 1. Estão qualificados para o serviço (via profissional_servico)
-     * 2. Estão dentro da jornada de trabalho
-     * Por enquanto não verifica conflitos de agendamento (TODO).
-     */
     @Query("""
-        SELECT DISTINCT p.id as id, p.nome as nome, p.senioridade as senioridade
+        SELECT DISTINCT p
         FROM ProfissionalJpa p
         INNER JOIN p.servicosOferecidos s
         WHERE s.id = :servicoId
         AND p.ativo = true
-        AND :horaInicio >= p.inicioJornada
-        AND :horaFim <= p.fimJornada
         ORDER BY p.senioridade DESC, p.nome
         """)
-    List<ProfissionalDisponivelResumo> buscarDisponiveis(
-        @Param("servicoId") Integer servicoId,
-        @Param("horaInicio") java.time.LocalTime horaInicio,
-        @Param("horaFim") java.time.LocalTime horaFim
+    List<ProfissionalJpa> buscarCandidatos(@Param("servicoId") Integer servicoId);
+
+    @Query("""
+        SELECT a.profissionalId as profissionalId, a.dataHora as dataHora, s.duracaoMinutos as duracao
+        FROM AgendamentoJpa a
+        JOIN ServicoOferecidoJpa s ON s.id = a.servicoId
+        WHERE a.dataHora >= :inicioDia AND a.dataHora <= :fimDia
+        AND a.status IN ('PENDENTE', 'CONFIRMADO')
+        """)
+    List<AgendamentoConflitoInfo> buscarAgendamentosDoDia(
+        @Param("inicioDia") LocalDateTime inicioDia,
+        @Param("fimDia") LocalDateTime fimDia
     );
 }
 

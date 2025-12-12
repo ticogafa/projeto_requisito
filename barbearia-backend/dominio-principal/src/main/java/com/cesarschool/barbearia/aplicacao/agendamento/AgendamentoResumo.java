@@ -13,7 +13,6 @@ public interface AgendamentoResumo {
     Integer getProfissionalId();
     String getProfissionalNome();
     Integer getClienteId();
-    String getClienteNome();
     Integer getServicoId();
     String getServicoNome();
     BigDecimal getServicoPreco();

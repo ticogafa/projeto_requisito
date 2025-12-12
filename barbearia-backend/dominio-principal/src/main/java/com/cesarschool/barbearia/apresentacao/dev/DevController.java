@@ -5,10 +5,13 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoServicoAplicacao;
+import com.cesarschool.barbearia.aplicacao.agendamento.ProfissionalDisponivelResumo;
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento;
@@ -22,6 +25,9 @@ public class DevController {
 
     @Autowired
     private AgendamentoRepositorio agendamentoRepositorio;
+    
+    @Autowired
+    private AgendamentoServicoAplicacao agendamentoServicoAplicacao;
 
     @PostMapping("/seed-agendamentos")
     public ResponseEntity<String> seedAgendamentos() {
@@ -59,6 +65,15 @@ public class DevController {
         );
 
         return ResponseEntity.ok("Dados de teste gerados com sucesso! Agendamentos criados para: " + agora);
+    }
+    
+    @GetMapping("/test-profissionais-disponiveis")
+    public ResponseEntity<?> testProfissionaisDisponiveis() {
+        LocalDateTime dataHora = LocalDateTime.of(2025, 12, 16, 10, 0);
+        List<ProfissionalDisponivelResumo> disponiveis = 
+            agendamentoServicoAplicacao.buscarProfissionaisDisponiveis(1, dataHora);
+        
+        return ResponseEntity.ok(disponiveis);
     }
 
     private void criarAgendamento(LocalDateTime dataHora, Integer clienteId, Integer profissionalId, Integer servicoId, String obs) {

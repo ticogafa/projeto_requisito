@@ -85,7 +85,7 @@ public final class ProfissionalJpa {
     @JoinTable(
         name = "profissional_servico",
         joinColumns = @JoinColumn(name = "profissional_id"),
-        inverseJoinColumns = @JoinColumn(name = "servico_id")
+        inverseJoinColumns = @JoinColumn(name = "servicos_oferecidos_id")
     )
     private List<ServicoOferecidoJpa> servicosOferecidos;
 }
@@ -97,7 +97,7 @@ interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integ
     @Query("SELECT DISTINCT p FROM ProfissionalJpa p JOIN p.servicosOferecidos s WHERE s.id = :servicoId AND p.ativo = true")
     List<ProfissionalJpa> findByServicoId(@Param("servicoId") Integer servicoId);
     
-    @Query(value = "SELECT COUNT(*) FROM profissional_servico WHERE profissional_id = :profissionalId AND servico_id = :servicoId", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM profissional_servico WHERE profissional_id = :profissionalId AND servicos_oferecidos_id = :servicoId", nativeQuery = true)
     Long countQualificacao(@Param("profissionalId") Integer profissionalId, @Param("servicoId") Integer servicoId);
     
     List<ProfissionalJpa> findByAtivoTrue();

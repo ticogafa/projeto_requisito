@@ -124,7 +124,6 @@ export default function EditAppointmentModal(props: EditAppointmentModalProps) {
               required
               value={dataHora}
               onChange={(e) => setDataHora(e.target.value)}
-              min={new Date().toISOString().slice(0, 16)}
               className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none"
             />
             <p className="mt-2 text-xs text-gray-400">

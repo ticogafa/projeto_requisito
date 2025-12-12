@@ -37,7 +37,7 @@ public class ServicoOferecidoControlador {
         return exceptionHandler.withHandler(() -> {
             logger.info("Criando novo serviço: " + novoServico.getNome());
             ServicoOferecido salvo = servico.registrar(novoServico);
-            
+
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{id}")
                     .buildAndExpand(salvo.getId().getValor())

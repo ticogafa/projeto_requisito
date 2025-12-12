@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
 import type { CriarAgendamentoRequest, ProfissionalDisponivelInterface } from '@/interfaces/AgendamentoInterface';
 import type { ServicoOferecido } from '@/interfaces/ServicoOferecidoInterface';
+import MainService from '@/services/MainService';
 import { normalizeIds } from '@/utils/apiHelpers';
+import { type AxiosError, type AxiosResponse } from 'axios';
+import { useEffect, useState } from 'react';
 
 interface NewAgendamentoModalProps {
   onClose: () => void;
@@ -36,87 +38,88 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
     }
   }, [formData.servicoId, formData.dataHora]);
 
-  const loadServicos = async () => {
+  const loadServicos = () => {
     setLoadingServicos(true);
-    try {
-      const response = await fetch('http://localhost:8080/api/servico');
-      if (response.ok) {
-        const data = await response.json();
+    MainService.getInstance().getServicosOferecidos(
+      {},
+      {},
+      (response: AxiosResponse) => {
+        const data = response.data;
         console.log('Serviços carregados:', data);
         // Normalizar IDs e filtrar apenas serviços ativos
         const normalized = normalizeIds(data) as ServicoOferecido[];
         const servicosAtivos = normalized.filter((s) => s.ativo === true || s.ativo === undefined);
         console.log('Serviços ativos:', servicosAtivos);
         setServicos(servicosAtivos);
-      } else {
-        console.error('Erro ao carregar serviços - Status:', response.status);
-        setError('Erro ao carregar serviços do servidor.');
+      },
+      (error: AxiosError) => {
+        console.error('Erro ao carregar serviços:', error);
+        setError('Erro ao carregar serviços. Verifique a conexão com o servidor.');
+      },
+      () => {
+        setLoadingServicos(false);
       }
-    } catch (error) {
-      console.error('Erro ao carregar serviços:', error);
-      setError('Erro ao carregar serviços. Verifique a conexão com o servidor.');
-    } finally {
-      setLoadingServicos(false);
-    }
+    );
   };
 
-  const loadProfissionaisDisponiveis = async () => {
+  const loadProfissionaisDisponiveis = () => {
     setLoadingProfissionais(true);
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/agendamentos/profissionais-disponiveis?servicoId=${formData.servicoId}&dataHora=${formData.dataHora}`
-      );
-      if (response.ok) {
-        const data = await response.json();
+    MainService.getInstance().getProfissionaisDisponiveis(
+      {
+        servicoId: formData.servicoId,
+        dataHora: formData.dataHora
+      },
+      {},
+      (response: AxiosResponse) => {
+        const data = response.data;
         setProfissionaisDisponiveis(data);
-      } else {
+      },
+      (error: AxiosError) => {
+        console.error('Erro ao carregar profissionais disponíveis:', error);
         setProfissionaisDisponiveis([]);
+      },
+      () => {
+        setLoadingProfissionais(false);
       }
-    } catch (error) {
-      console.error('Erro ao carregar profissionais disponíveis:', error);
-      setProfissionaisDisponiveis([]);
-    } finally {
-      setLoadingProfissionais(false);
-    }
+    );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    try {
-      const requestData: CriarAgendamentoRequest = {
-        clienteId,
-        servicoId: parseInt(formData.servicoId),
-        dataHora: formData.dataHora,
-        profissionalId: formData.profissionalId ? parseInt(formData.profissionalId) : undefined,
-        observacoes: formData.observacoes || undefined,
-      };
+    // Enviar a data/hora local como está, garantindo formato compatível com LocalDateTime no backend
+    // Evita conversão para UTC que causava erro de fuso horário
+    const dataHoraISO = `${formData.dataHora}:00`;
 
-      const response = await fetch('http://localhost:8080/api/agendamentos/criar', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
+    const requestData: CriarAgendamentoRequest = {
+      clienteId,
+      servicoId: parseInt(formData.servicoId),
+      dataHora: dataHoraISO,
+      profissionalId: formData.profissionalId ? parseInt(formData.profissionalId) : undefined,
+      observacoes: formData.observacoes || undefined,
+    };
 
-      if (response.ok) {
+    MainService.getInstance().criarAgendamento(
+      requestData,
+      (response: AxiosResponse) => {
         onSuccess();
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Erro ao criar agendamento');
+      },
+      (error: AxiosError) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const message = (error.response?.data as any)?.message || 'Erro ao criar agendamento';
+        setError(message);
+        console.error('Erro ao criar agendamento:', error);
+      },
+      () => {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Erro ao criar agendamento:', error);
-      setError('Erro ao criar agendamento');
-    } finally {
-      setLoading(false);
-    }
+    );
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    console.log(`Campo ${e.target.name} alterado para: ${e.target.value}`);
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -180,8 +183,8 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
                   className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">{servicos.length === 0 ? 'Nenhum serviço disponível' : 'Selecione um serviço'}</option>
-                  {servicos.map((servico) => (
-                    <option key={servico.id} value={servico.id}>
+                  {servicos.map((servico, index) => (
+                    <option key={servico.id.valor + index} value={servico.id.valor}>
                       {servico.nome} - R$ {servico.preco.toFixed(2)} ({servico.duracaoMinutos} min)
                     </option>
                   ))}
@@ -237,8 +240,8 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
                   className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Sistema escolherá automaticamente</option>
-                  {profissionaisDisponiveis.map((prof) => (
-                    <option key={prof.id} value={prof.id}>
+                  {profissionaisDisponiveis.map((prof, index) => (
+                    <option key={`prof-${prof.id}-${index}`} value={prof.id}>
                       {prof.nome} ({prof.senioridade})
                     </option>
                   ))}

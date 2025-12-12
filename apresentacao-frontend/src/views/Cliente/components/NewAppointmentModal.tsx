@@ -1,8 +1,10 @@
+import { useAuth } from '@/auth/AuthContext';
 import { useCriarAgendamento } from '@/hooks/useCriarAgendamento';
 import { useProfissionaisDisponiveis } from '@/hooks/useProfissionaisDisponiveis';
 import type { AgendamentoInterface } from '@/interfaces/AgendamentoInterface';
 import type { ServicosOferecidosResponse } from '@/interfaces/ServicoOferecidoInterface';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 interface NewAppointmentModalProps {
   visible: boolean;
@@ -17,11 +19,20 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
   const [profissionalId, setProfissionalId] = useState<number | null>(null);
   const [observacoes, setObservacoes] = useState('');
 
+  const { user } = useAuth();
   const { data: profissionais } = useProfissionaisDisponiveis(
     servicoId,
     dataHora
   );
   const { criar } = useCriarAgendamento();
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    console.log('Valor selecionado:', value, 'Tipo:', typeof value);
+    const numeroId = value ? Number(value) : null;
+    console.log('ID convertido:', numeroId, 'É NaN?', isNaN(numeroId as number));
+    setServicoId(numeroId);
+  }
 
   // Reset profissional quando mudar serviço ou data
   useEffect(() => {
@@ -32,14 +43,24 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
     e.preventDefault();
 
     if (!servicoId || !dataHora) {
+      toast.error('Por favor, selecione um serviço e data/hora');
       return;
     }
 
+    if (!user) {
+      toast.error('Você precisa estar autenticado para agendar');
+      return;
+    }
+
+    // Enviar a data/hora local como está, apenas garantindo o formato ISO-8601 sem timezone (LocalTime)
+    // O backend espera LocalDateTime e assume que é o horário local do negócio
+    const dataHoraISO = `${dataHora}:00`;
+
     criar(
       {
-        clienteId: 1, // TODO: Pegar do contexto de autenticação
+        clienteId: 1, // TODO: Substituir por user.uid quando tivermos mapeamento de Firebase UID para Cliente ID
         servicoId,
-        dataHora,
+        dataHora: dataHoraISO,
         profissionalId: profissionalId || undefined,
         observacoes
       },
@@ -58,7 +79,7 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
 
   if (!props.visible) return null;
 
-  const servicoSelecionado = props.servicos.find(s => s.id === servicoId);
+  const servicoSelecionado = props.servicos.find(s => s.id.valor === servicoId);
 
   return (
     <div
@@ -91,12 +112,12 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
             <select
               required
               value={servicoId || ''}
-              onChange={(e) => setServicoId(Number(e.target.value))}
+              onChange={handleChange}
               className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none"
             >
               <option value="">Selecione um serviço</option>
-              {props.servicos.map((servico) => (
-                <option key={servico.id} value={servico.id}>
+              {props.servicos.map((servico, index) => (
+                <option key={`servico-${servico.id.valor}-${index}`} value={servico.id.valor}>
                   {servico.nome} - R$ {servico.preco.toFixed(2)} ({servico.duracaoMinutos} min)
                 </option>
               ))}
@@ -108,7 +129,7 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
                   <span>Duração: {servicoSelecionado.duracaoMinutos} minutos</span>
                   <span className="mx-2">•</span>
                   <span className="material-icons text-xs">payments</span>
-                  <span>Valor: R$ {servicoSelecionado.preco.toFixed(2)}</span>
+                  <span>Valor: R$ {servicoSelecionado.preco?.toFixed(2) || '0.00'}</span>
                 </div>
               </div>
             )}
@@ -125,10 +146,16 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
               min={new Date().toISOString().slice(0, 16)}
               className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none"
             />
-            <p className="mt-2 text-xs text-gray-400">
-              <span className="material-icons text-xs align-middle">info</span>
-              Horário de funcionamento: 8h às 18h
-            </p>
+            <div className="mt-2 space-y-1">
+              <p className="text-xs text-gray-400">
+                <span className="material-icons text-xs align-middle">schedule</span>
+                Horário de funcionamento: 8h às 18h (Segunda a Sexta) | 8h às 14h (Sábado)
+              </p>
+              <p className="text-xs text-primary">
+                <span className="material-icons text-xs align-middle">tips_and_updates</span>
+                Dica: Para testar, selecione uma próxima Segunda-feira às 10h ou Quarta-feira às 15h
+              </p>
+            </div>
           </div>
 
           {/* Profissional */}
@@ -146,13 +173,13 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
                 className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none"
               >
                 <option value="">Sistema escolherá o primeiro disponível</option>
-                {profissionais.map((prof) => (
-                  <option key={prof.id} value={prof.id}>
+                {profissionais && profissionais.length > 0 && profissionais.map((prof, index) => (
+                  <option key={`prof-${prof.id}-${index}`} value={prof.id}>
                     {prof.nome} ({prof.senioridade})
                   </option>
                 ))}
               </select>
-              {profissionais.length === 0 && (
+              {profissionais && profissionais.length === 0 && (
                 <p className="text-sm text-yellow-400 mt-2">
                   <span className="material-icons text-xs align-middle">warning</span>
                   Nenhum profissional qualificado disponível neste horário. O sistema buscará automaticamente.
@@ -197,7 +224,9 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-400">Profissional:</span>
                   <span className="font-medium">
-                    {profissionais.find(p => p.id === profissionalId)?.nome || 'Automático'}
+                    {profissionalId && profissionais 
+                      ? profissionais.find(p => p.id === profissionalId)?.nome || 'Automático'
+                      : 'Automático'}
                   </span>
                 </div>
                 <div className="flex justify-between border-t border-dark-600 pt-2 mt-2">
