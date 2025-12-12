@@ -188,6 +188,21 @@ mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dmaven.test.skip=true
 - **Nota Importante:** O proxy implementado é um **Virtual Proxy** (adiamento de carregamento), não um Cache Proxy tradicional. A distinção é importante pois Virtual Proxy foca em **lazy initialization** enquanto Cache Proxy foca em **reutilização de resultados já computados**.
 - **Aplicabilidade:** Cache, Lazy Loading, Access Control, Logging, Remote Proxy
 
+# Ver estatísticas em JSON
+curl http://localhost:8080/api/proxy/statistics | jq .
+
+# Ver estatísticas em texto
+curl http://localhost:8080/api/proxy/statistics/text
+
+# Ver informações do padrão
+curl http://localhost:8080/api/proxy/info | jq .
+
+# Limpar cache
+curl -X DELETE http://localhost:8080/api/proxy/cache
+
+# Resetar estatísticas
+curl -X DELETE http://localhost:8080/api/proxy/statistics
+
 ---
 
 ## 📝 Observações
