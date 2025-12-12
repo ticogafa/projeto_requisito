@@ -175,6 +175,7 @@ export default function AdminDashboardView() {
                 const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
                   PENDENTE: { bg: 'bg-yellow-500/10', text: 'text-yellow-400', label: 'Pendente' },
                   CONFIRMADO: { bg: 'bg-primary/10', text: 'text-primary', label: 'Confirmado' },
+                  EM_ANDAMENTO: { bg: 'bg-purple-500/10', text: 'text-purple-400', label: 'Em Andamento' },
                   CONCLUIDO: { bg: 'bg-blue-500/10', text: 'text-blue-400', label: 'Concluído' },
                   CANCELADO: { bg: 'bg-red-500/10', text: 'text-red-400', label: 'Cancelado' },
                 };

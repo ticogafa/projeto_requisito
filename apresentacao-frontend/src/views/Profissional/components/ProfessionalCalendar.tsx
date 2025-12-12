@@ -109,7 +109,7 @@ export default function ProfessionalCalendar({ agendamentos, onAppointmentClick 
     switch (status) {
       case 'CONFIRMADO': return 'bg-blue-600 border-blue-700';
       case 'PENDENTE': return 'bg-yellow-600 border-yellow-700';
-      case 'EM_ANDAMENTO': return 'bg-purple-600 border-purple-700';
+      case 'EM_ANDAMENTO': return 'bg-purple-600 border-purple-700 animate-pulse';
       case 'CONCLUIDO': return 'bg-green-600 border-green-700';
       case 'CANCELADO': return 'bg-red-600 border-red-700';
       default: return 'bg-gray-600 border-gray-700';

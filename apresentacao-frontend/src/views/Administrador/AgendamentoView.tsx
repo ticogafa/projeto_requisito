@@ -112,6 +112,7 @@ export default function AgendamentoView() {
     const statusConfig: Record<string, { bg: string; text: string; icon: string }> = {
       PENDENTE: { bg: 'bg-yellow-500/10 border-yellow-500/30', text: 'text-yellow-400', icon: 'schedule' },
       CONFIRMADO: { bg: 'bg-green-500/10 border-green-500/30', text: 'text-green-400', icon: 'check_circle' },
+      EM_ANDAMENTO: { bg: 'bg-purple-500/10 border-purple-500/30', text: 'text-purple-400', icon: 'autorenew' },
       CANCELADO: { bg: 'bg-red-500/10 border-red-500/30', text: 'text-red-400', icon: 'cancel' },
       CONCLUIDO: { bg: 'bg-blue-500/10 border-blue-500/30', text: 'text-blue-400', icon: 'done_all' },
     };
@@ -178,6 +179,7 @@ export default function AgendamentoView() {
               <option value="TODOS">Todos os Status</option>
               <option value="PENDENTE">Pendente</option>
               <option value="CONFIRMADO">Confirmado</option>
+              <option value="EM_ANDAMENTO">Em Andamento</option>
               <option value="CONCLUIDO">Concluído</option>
               <option value="CANCELADO">Cancelado</option>
             </select>

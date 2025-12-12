@@ -23,8 +23,8 @@ export default function ProfessionalAgendaTable({ agendamentos, onStart, onFinis
         label: 'Agendado'
       },
       EM_ANDAMENTO: {
-        bg: 'bg-primary/10',
-        text: 'text-primary',
+        bg: 'bg-purple-500/10',
+        text: 'text-purple-400',
         icon: 'autorenew',
         label: 'Em andamento'
       },
