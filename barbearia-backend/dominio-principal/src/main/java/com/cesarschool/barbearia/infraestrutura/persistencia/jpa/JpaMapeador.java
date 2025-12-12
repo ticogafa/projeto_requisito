@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration.AccessLevel;
 import org.springframework.stereotype.Component;
 
+import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.ExecucaoAtendimentoId;
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
@@ -45,8 +46,19 @@ class JpaMapeador extends ModelMapper {
         configurarConversoresServicos();
         configurarConversoresCliente();
         configurarConversoresIds();
+        configurarConversoresExecucaoAtendimento();
     }
     
+    private void configurarConversoresExecucaoAtendimento() {
+        // String -> ExecucaoAtendimentoId
+        addConverter(new AbstractConverter<String, ExecucaoAtendimentoId>() {
+            @Override
+            public ExecucaoAtendimentoId convert(String source) {
+                return source != null ? new ExecucaoAtendimentoId(java.util.UUID.fromString(source)) : null;
+            }
+        });
+    }
+
     // ==================== CONVERSORES DE PRODUTO ====================
     
     private void configurarConversoresProduto() {

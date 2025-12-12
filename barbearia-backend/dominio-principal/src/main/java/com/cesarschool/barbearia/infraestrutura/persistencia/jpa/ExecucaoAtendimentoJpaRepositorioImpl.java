@@ -37,7 +37,7 @@ public class ExecucaoAtendimentoJpaRepositorioImpl implements ExecucaoAtendiment
         Integer profissionalIdInt = execucao.getProfissionalId().getValor();
 
         ExecucaoAtendimentoJpa jpa = ExecucaoAtendimentoJpa.builder()
-            .id(execucao.getId() != null ? execucao.getId().toString() : null)
+            .id(execucao.getId() != null ? execucao.getId().getValor().toString() : null)
             .profissionalId(profissionalIdInt) 
             .valor(execucao.getValor())
             .inicio(execucao.getInicio())

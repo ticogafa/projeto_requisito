@@ -10,11 +10,14 @@ import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalId;
 
 public class ExecucaoAtendimento {
 
-    private final ExecucaoAtendimentoId id;
-    private final ProfissionalId profissionalId;
-    private final BigDecimal valor; // valor do serviço
-    private final LocalDateTime inicio;
+    private ExecucaoAtendimentoId id;
+    private ProfissionalId profissionalId;
+    private BigDecimal valor; // valor do serviço
+    private LocalDateTime inicio;
     private LocalDateTime fim; // null até finalizar
+
+    public ExecucaoAtendimento() {
+    }
 
     private ExecucaoAtendimento(ExecucaoAtendimentoId id,
                                 ProfissionalId profissionalId,
