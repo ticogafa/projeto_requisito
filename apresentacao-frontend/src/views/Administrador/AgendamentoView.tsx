@@ -137,7 +137,7 @@ export default function AgendamentoView() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 p-6">
       {/* Header */}
-      <div className="mb-8">\n        <div className="flex items-center gap-3 mb-2">
+      <div className="mb-8">        <div className="flex items-center gap-3 mb-2">
           <div className="bg-primary/10 p-3 rounded-xl">
             <span className="material-icons text-primary text-3xl">event</span>
           </div>
