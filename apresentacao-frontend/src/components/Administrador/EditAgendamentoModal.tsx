@@ -13,6 +13,7 @@ export default function EditAgendamentoModal({ agendamento, onClose, onSuccess }
     dataHora: agendamento.dataHora.slice(0, 16), // Formato para datetime-local
     profissionalId: agendamento.profissionalId?.toString() || '',
     observacoes: agendamento.observacoes || '',
+    status: agendamento.status || 'PENDENTE',
   });
   const [loading, setLoading] = useState(false);
   const [loadingProfissionais, setLoadingProfissionais] = useState(false);
@@ -50,11 +51,27 @@ export default function EditAgendamentoModal({ agendamento, onClose, onSuccess }
     setError('');
 
     try {
-      const requestData = {
-        dataHora: `${formData.dataHora}:00`,
-        profissionalId: formData.profissionalId ? parseInt(formData.profissionalId) : undefined,
-        observacoes: formData.observacoes || undefined,
-      };
+      // Verifica se apenas o status foi alterado (e não a data/hora)
+      const statusMudou = formData.status !== agendamento.status;
+      const dataHoraMudou = formData.dataHora !== agendamento.dataHora.slice(0, 16);
+      const profissionalMudou = formData.profissionalId !== agendamento.profissionalId?.toString();
+      const observacoesMudou = (formData.observacoes || '') !== (agendamento.observacoes || '');
+      
+      // Se apenas o status mudou, enviar apenas o status
+      let requestData: any;
+      if (statusMudou && !dataHoraMudou && !profissionalMudou && !observacoesMudou) {
+        requestData = {
+          status: formData.status,
+        };
+      } else {
+        // Caso contrário, enviar todos os campos
+        requestData = {
+          dataHora: `${formData.dataHora}:00`,
+          profissionalId: formData.profissionalId ? parseInt(formData.profissionalId) : undefined,
+          observacoes: formData.observacoes || undefined,
+          status: formData.status,
+        };
+      }
 
       const response = await fetch(`http://localhost:8080/api/agendamentos/${agendamento.id}`, {
         method: 'PUT',
@@ -125,20 +142,36 @@ export default function EditAgendamentoModal({ agendamento, onClose, onSuccess }
 
           {/* Info do Serviço (Readonly) */}
           <div className="bg-dark-700/50 border border-dark-600 rounded-lg p-4">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3">
               <span className="material-icons text-secondary">content_cut</span>
               <div>
                 <p className="text-xs text-gray-400">Serviço</p>
                 <p className="text-white font-medium">{agendamento.servicoNome}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="material-icons text-blue-400">info</span>
-              <div>
-                <p className="text-xs text-gray-400">Status Atual</p>
-                <p className="text-white font-medium">{agendamento.status}</p>
-              </div>
-            </div>
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
+              <span className="material-icons text-lg">info</span>
+              Status do Agendamento
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              <option value="PENDENTE">Pendente</option>
+              <option value="CONFIRMADO">Confirmado</option>
+              <option value="EM_ANDAMENTO">Em Andamento</option>
+              <option value="CONCLUIDO">Concluído</option>
+              <option value="CANCELADO">Cancelado</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              O administrador pode alterar o status do agendamento conforme necessário
+            </p>
           </div>
 
           {/* Data e Hora */}

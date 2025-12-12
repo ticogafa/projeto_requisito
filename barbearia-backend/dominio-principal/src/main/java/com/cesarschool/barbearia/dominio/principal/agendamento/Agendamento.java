@@ -71,8 +71,11 @@ public final class Agendamento {
     }
 
     public void concluir() {
-        if (status != StatusAgendamento.CONFIRMADO) {
-            throw new IllegalStateException("Apenas agendamentos confirmados podem ser concluídos");
+        // Permite concluir agendamentos CONFIRMADOS ou EM_ANDAMENTO
+        if (status != StatusAgendamento.CONFIRMADO && status != StatusAgendamento.EM_ANDAMENTO) {
+            throw new IllegalStateException(
+                "Apenas agendamentos confirmados ou em andamento podem ser concluídos. Status atual: " + status
+            );
         }
         this.status = StatusAgendamento.CONCLUIDO;
     }

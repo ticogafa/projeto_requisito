@@ -176,18 +176,23 @@ public class AgendamentoServicoAplicacao {
         notNull(request, "Request não pode ser nulo");
         notNull(agendamentoId, "ID do agendamento não pode ser nulo");
         
-        // Se estiver apenas mudando o status para CONCLUIDO, não validar horário
-        if (request.getStatus() != null && request.getStatus() == StatusAgendamento.CONCLUIDO) {
-            // Apenas concluir o agendamento
-            Agendamento concluido = agendamentoServico.concluir(
-                new com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId(agendamentoId)
-            );
+        // Se estiver apenas mudando o status, tratar separadamente
+        if (request.getStatus() != null) {
+            // Se for para concluir
+            if (request.getStatus() == StatusAgendamento.CONCLUIDO) {
+                Agendamento concluido = agendamentoServico.concluir(
+                    new com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId(agendamentoId)
+                );
+                
+                return repositorioAplicacao.buscarPorCliente(concluido.getClienteId())
+                    .stream()
+                    .filter(a -> a.getId().equals(concluido.getId().getValor()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado"));
+            }
             
-            return repositorioAplicacao.buscarPorCliente(concluido.getClienteId())
-                .stream()
-                .filter(a -> a.getId().equals(concluido.getId().getValor()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado"));
+            // Para outros status, usar o método de atualização de status
+            return atualizarStatus(agendamentoId, request.getStatus());
         }
         
         // Validar horário de funcionamento
