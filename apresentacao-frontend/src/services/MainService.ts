@@ -347,6 +347,28 @@ export default class MainService {
     );
   }
 
+  /**
+   * Atualiza o status de um agendamento.
+   * @param agendamentoId ID do agendamento
+   * @param status Novo status (EM_ANDAMENTO, CONCLUIDO, etc)
+   */
+  atualizarStatusAgendamento(
+    agendamentoId: number,
+    status: string,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.put(
+      `${AGENDAMENTO_URLS.BASE}/${agendamentoId}/status?status=${status}`,
+      {},
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
   registerUser(
     data: object,
     successCallback: (response: AxiosResponse) => void,

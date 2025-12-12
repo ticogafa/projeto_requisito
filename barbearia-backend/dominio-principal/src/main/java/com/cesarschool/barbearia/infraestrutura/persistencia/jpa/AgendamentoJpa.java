@@ -37,7 +37,7 @@ class AgendamentoJpa {
     LocalDateTime dataHora;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "STATUS", nullable = false, length = 20)
+    @Column(name = "STATUS", nullable = false, length = 50)
     StatusAgendamento status;
     
     @Column(name = "CLIENTE_ID", nullable = false)

@@ -6,6 +6,7 @@ package com.cesarschool.barbearia.dominio.principal.agendamento;
 public enum StatusAgendamento {
     PENDENTE("Pendente"),
     CONFIRMADO("Confirmado"),
+    EM_ANDAMENTO("Em Andamento"),
     CANCELADO("Cancelado"),
     CONCLUIDO("Concluído");
 
@@ -20,7 +21,7 @@ public enum StatusAgendamento {
     }
 
     public boolean podeSerCancelado() {
-        return this.equals(PENDENTE) || this.equals(CONFIRMADO);
+        return this.equals(PENDENTE) || this.equals(CONFIRMADO) || this.equals(EM_ANDAMENTO);
     }
 
     public boolean podeConfirmar() {

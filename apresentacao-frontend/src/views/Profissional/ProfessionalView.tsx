@@ -41,13 +41,26 @@ export default function ProfessionalView() {
       return;
     }
     
-    // Start timer locally
-    setActiveService({ id, startTime: new Date() });
+    setLoading(true);
     
-    // Update status to EM_ANDAMENTO locally (and ideally backend too, but for now just local/timer focus)
-    setAgendamentos(agendamentos.map(a => a.id === id ? { ...a, status: 'EM_ANDAMENTO' } : a));
-    toast.success('Atendimento iniciado!');
-    setSelectedAppointment(null);
+    // Atualizar status no backend
+    mainService.atualizarStatusAgendamento(
+      id,
+      'EM_ANDAMENTO',
+      (response) => {
+        // Start timer locally
+        setActiveService({ id, startTime: new Date() });
+        
+        // Update status locally with backend response
+        setAgendamentos(agendamentos.map(a => a.id === id ? response.data : a));
+        toast.success('Atendimento iniciado!');
+        setSelectedAppointment(null);
+      },
+      (error) => {
+        toast.error('Erro ao iniciar atendimento: ' + (error.response?.data as any)?.message || error.message);
+      },
+      () => setLoading(false)
+    );
   };
 
   const handleFinish = (id: number) => {
@@ -110,18 +123,31 @@ export default function ProfessionalView() {
             fim: endTime.toISOString()
         },
         () => {
-            // 2. Update appointment status to CONCLUIDO
-            setAgendamentos(agendamentos.map(a => a.id === finishingAppointmentId ? { ...a, status: 'CONCLUIDO' } : a));
-            toast.success(`Atendimento finalizado! Receita: R$ ${totalRevenue.toFixed(2)}`);
-            
-            // Cleanup
-            setActiveService(null);
-            setFinishingAppointmentId(null);
-            setShowRevenueModal(false);
-            setSelectedServices([]);
+            // 2. Update appointment status to CONCLUIDO in backend
+            mainService.atualizarStatusAgendamento(
+                finishingAppointmentId,
+                'CONCLUIDO',
+                (response) => {
+                    setAgendamentos(agendamentos.map(a => a.id === finishingAppointmentId ? response.data : a));
+                    toast.success(`Atendimento finalizado! Receita: R$ ${totalRevenue.toFixed(2)}`);
+                    
+                    // Cleanup
+                    setActiveService(null);
+                    setFinishingAppointmentId(null);
+                    setShowRevenueModal(false);
+                    setSelectedServices([]);
+                },
+                (error) => {
+                    toast.error('Erro ao atualizar status: ' + (error.response?.data as any)?.message || error.message);
+                },
+                () => setLoading(false)
+            );
         },
-        (error) => toast.error('Erro ao registrar atendimento: ' + (error.response?.data as any)?.message || error.message),
-        () => setLoading(false)
+        (error) => {
+            toast.error('Erro ao registrar atendimento: ' + (error.response?.data as any)?.message || error.message);
+            setLoading(false);
+        },
+        () => {}
     );
   };
 

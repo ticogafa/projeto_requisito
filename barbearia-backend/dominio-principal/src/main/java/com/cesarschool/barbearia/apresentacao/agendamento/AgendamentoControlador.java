@@ -191,4 +191,32 @@ public class AgendamentoControlador {
             throw new IllegalArgumentException("É necessário informar clienteId ou profissionalId para cancelar.");
         });
     }
+
+    /**
+     * Atualiza o status de um agendamento.
+     * @param id ID do agendamento
+     * @param status Novo status (EM_ANDAMENTO, CONCLUIDO, etc)
+     * @return Agendamento com status atualizado
+     */
+    @PutMapping("/{id}/status")
+    public ResponseEntity<AgendamentoResumo> atualizarStatus(
+            @PathVariable Integer id,
+            @RequestParam String status) {
+        
+        return exceptionHandler.withHandler(() -> {
+            logger.info("Atualizando status do agendamento " + id + " para " + status);
+            
+            com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento statusEnum;
+            try {
+                statusEnum = com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento.valueOf(status);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Status inválido: " + status + ". Valores aceitos: PENDENTE, CONFIRMADO, EM_ANDAMENTO, CONCLUIDO, CANCELADO");
+            }
+            
+            AgendamentoResumo agendamento = servicoAplicacao.atualizarStatus(id, statusEnum);
+            
+            logger.info("Status do agendamento " + id + " atualizado para " + status);
+            return ResponseEntity.ok(agendamento);
+        });
+    }
 }

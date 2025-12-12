@@ -39,6 +39,7 @@ public class AgendamentoServicoAplicacao {
     
     private final AgendamentoRepositorioAplicacao repositorioAplicacao;
     private final AgendamentoServico agendamentoServico;
+    private final com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoRepositorio agendamentoRepositorio;
     private final ServicoOferecidoServico servicoServico;
     private final ClienteRepositorio clienteRepositorio;
     private final ClienteServico clienteServico;
@@ -254,5 +255,40 @@ public class AgendamentoServicoAplicacao {
             .filter(a -> a.getId().equals(cancelado.getId().getValor()))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("Erro ao buscar agendamento cancelado"));
+    }
+
+    /**
+     * Atualiza o status de um agendamento.
+     * @param agendamentoId ID do agendamento
+     * @param novoStatus Novo status
+     * @return Agendamento atualizado
+     */
+    public AgendamentoResumo atualizarStatus(Integer agendamentoId, StatusAgendamento novoStatus) {
+        notNull(agendamentoId, "ID do agendamento não pode ser nulo");
+        notNull(novoStatus, "Novo status não pode ser nulo");
+        
+        logger.info("Atualizando status do agendamento " + agendamentoId + " para " + novoStatus);
+        
+        // Buscar agendamento pelo serviço de domínio
+        Agendamento agendamento = agendamentoServico.buscarPorId(
+            new com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId(agendamentoId)
+        );
+        
+        if (agendamento == null) {
+            throw new IllegalArgumentException("Agendamento não encontrado: " + agendamentoId);
+        }
+        
+        // Atualizar status através do método do domínio
+        agendamento.atualizarStatus(novoStatus);
+        
+        // Persistir mudança usando o repositório
+        agendamentoRepositorio.salvar(agendamento);
+        
+        // Retornar com dados completos
+        return repositorioAplicacao.buscarPorCliente(agendamento.getClienteId())
+            .stream()
+            .filter(a -> a.getId().equals(agendamento.getId().getValor()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Erro ao buscar agendamento atualizado"));
     }
 }

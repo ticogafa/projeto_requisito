@@ -120,6 +120,15 @@ public final class Agendamento {
         }
     }
 
+    /**
+     * Atualiza o status do agendamento.
+     * Permite mudanças diretas de status (ex: PENDENTE -> EM_ANDAMENTO, EM_ANDAMENTO -> CONCLUIDO).
+     */
+    public void atualizarStatus(StatusAgendamento novoStatus) {
+        Validacoes.validarObjetoObrigatorio(novoStatus, "Novo status");
+        this.status = novoStatus;
+    }
+
     
     public void setId(AgendamentoId id) {
         Validacoes.validarObjetoObrigatorio(id, "ID do Agendamento");

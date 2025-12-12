@@ -7,23 +7,21 @@ import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoRepositorioApl
 import com.cesarschool.barbearia.aplicacao.agendamento.AgendamentoServicoAplicacao;
 import com.cesarschool.barbearia.aplicacao.estoque.ProdutoRepositorioAplicacao;
 import com.cesarschool.barbearia.aplicacao.estoque.ProdutoServicoAplicacao;
-import com.cesarschool.barbearia.dominio.compartilhado.eventos.PublicadorEventos;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico;
-import com.cesarschool.barbearia.dominio.principal.produto.ProdutoRepositorio;
-import com.cesarschool.barbearia.dominio.principal.produto.ProdutoServico;
-import com.cesarschool.barbearia.dominio.principal.produto.estoque.GestaoEstoqueServico;
-import com.cesarschool.barbearia.dominio.principal.produto.estoque.MovimentacaoEstoqueRepositorio;
-import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalRepositorio;
-import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
-import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoRepositorio;
-import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoServico;
+import com.cesarschool.barbearia.dominio.principal.cliente.ClienteRepositorio;
+import com.cesarschool.barbearia.dominio.principal.cliente.ClienteServico;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.GestaoCaixaServico;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.IGestaoCaixa;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.LancamentoRepositorio;
 import com.cesarschool.barbearia.dominio.principal.cliente.caixa.ValidadorSaldoDecorator;
-import com.cesarschool.barbearia.dominio.principal.cliente.ClienteRepositorio;
-import com.cesarschool.barbearia.dominio.principal.cliente.ClienteServico;
+import com.cesarschool.barbearia.dominio.principal.produto.ProdutoRepositorio;
+import com.cesarschool.barbearia.dominio.principal.produto.ProdutoServico;
+import com.cesarschool.barbearia.dominio.principal.produto.estoque.GestaoEstoqueServico;
+import com.cesarschool.barbearia.dominio.principal.produto.estoque.MovimentacaoEstoqueRepositorio;
+import com.cesarschool.barbearia.dominio.principal.profissional.ProfissionalServico;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoRepositorio;
+import com.cesarschool.barbearia.dominio.principal.servico.ServicoOferecidoServico;
 
 /**
  * Configuração de Beans para Domain Services.
@@ -103,10 +101,18 @@ public class DomainServicesConfig {
     public AgendamentoServicoAplicacao agendamentoServicoAplicacao(
             AgendamentoRepositorioAplicacao repositorioAplicacao,
             AgendamentoServico agendamentoServico,
+            AgendamentoRepositorio agendamentoRepositorio,
             ServicoOferecidoServico servicoServico,
             ClienteRepositorio clienteRepositorio,
             ClienteServico clienteServico) {
-        return new AgendamentoServicoAplicacao(repositorioAplicacao, agendamentoServico, servicoServico, clienteRepositorio, clienteServico);
+        return new AgendamentoServicoAplicacao(
+            repositorioAplicacao, 
+            agendamentoServico, 
+            agendamentoRepositorio,
+            servicoServico, 
+            clienteRepositorio, 
+            clienteServico
+        );
     }
 
     /**
