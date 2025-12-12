@@ -119,7 +119,6 @@ export default function ServicoModal({ visible, servicoParaEditar, closeModal, o
             </div>
           </div>
 
-          {/* --- 4. NOVOS INPUTS VISUAIS --- */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Categoria</label>
@@ -135,8 +134,8 @@ export default function ServicoModal({ visible, servicoParaEditar, closeModal, o
               <label className="block text-sm font-medium mb-1">Destaque</label>
               <select value={destaque} onChange={e => setDestaque(e.target.value)} className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:outline-none">
                 <option value="">Nenhum</option>
-                <option value="POPULAR">🔥 Popular</option>
-                <option value="NOVO">✨ Novo</option>
+                <option value="POPULAR">Popular</option>
+                <option value="NOVO">Novo</option>
               </select>
             </div>
           </div>
@@ -150,7 +149,6 @@ export default function ServicoModal({ visible, servicoParaEditar, closeModal, o
               </div>
             </label>
           </div>
-          {/* ------------------------------- */}
 
           <div>
             <label className="block text-sm font-medium mb-1">Descrição</label>
