@@ -53,6 +53,9 @@ public class AgendamentoServicoAplicacao {
      */
     public AgendamentoResumo criar(CriarAgendamentoRequest request) {
         notNull(request, "Request não pode ser nulo");
+        notNull(request.getClienteId(), "ID do cliente não pode ser nulo");
+        notNull(request.getServicoId(), "ID do serviço não pode ser nulo");
+        notNull(request.getDataHora(), "Data/hora não pode ser nula");
         
         // Validar horário de funcionamento (8h às 18h)
         LocalTime hora = request.getDataHora().toLocalTime();

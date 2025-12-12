@@ -73,9 +73,12 @@ public class AgendamentoControlador {
     @PostMapping("/criar")
     public ResponseEntity<AgendamentoResumo> criar(@RequestBody CriarAgendamentoRequest request) {
         return exceptionHandler.withHandler(() -> {
-            logger.info("Criando agendamento - clienteId: " + request.getClienteId() + 
-                       ", profissionalId: " + request.getProfissionalId() + 
-                       ", servicoId: " + request.getServicoId());
+            logger.info("=== CRIAR AGENDAMENTO ===");
+            logger.info("ClienteId: " + request.getClienteId());
+            logger.info("ServicoId: " + request.getServicoId()); 
+            logger.info("ProfissionalId: " + request.getProfissionalId());
+            logger.info("DataHora: " + request.getDataHora());
+            logger.info("Observacoes: " + request.getObservacoes());
             
             AgendamentoResumo agendamento = servicoAplicacao.criar(request);
             

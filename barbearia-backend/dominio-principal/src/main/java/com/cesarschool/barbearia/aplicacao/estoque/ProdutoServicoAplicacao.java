@@ -1,5 +1,6 @@
 package com.cesarschool.barbearia.aplicacao.estoque;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.apache.commons.lang3.Validate.notNull;
@@ -79,13 +80,22 @@ public class ProdutoServicoAplicacao {
         notNull(id, "ID não pode ser nulo");
         notNull(request, "Request não pode ser nulo");
         
+        // Busca produto atual para preservar valores não enviados
+        Produto produtoAtual = gestaoEstoque.buscarProduto(new ProdutoId(id));
+        
+        // Usa valores do request se fornecidos, senão mantém os atuais
+        String nome = request.getNome() != null ? request.getNome() : produtoAtual.getNome();
+        Integer estoque = request.getEstoque() != null ? request.getEstoque() : produtoAtual.getEstoque();
+        BigDecimal preco = request.getPreco() != null ? request.getPreco() : produtoAtual.getPreco();
+        Integer estoqueMinimo = request.getEstoqueMinimo() != null ? request.getEstoqueMinimo() : produtoAtual.getEstoqueMinimo();
+        
         // Cria entidade atualizada
         Produto produto = new Produto(
             id,
-            request.getNome(),
-            request.getEstoque(),
-            request.getPreco(),
-            request.getEstoqueMinimo()
+            nome,
+            estoque,
+            preco,
+            estoqueMinimo
         );
         
         // Atualiza via serviço de domínio

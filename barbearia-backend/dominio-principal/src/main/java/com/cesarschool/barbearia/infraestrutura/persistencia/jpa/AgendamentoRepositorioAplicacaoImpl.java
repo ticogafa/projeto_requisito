@@ -1,6 +1,5 @@
 package com.cesarschool.barbearia.infraestrutura.persistencia.jpa;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -211,14 +210,15 @@ interface AgendamentoResumoQueryRepository extends JpaRepository<AgendamentoJpa,
     @Query("""
         SELECT a.id as id,
                a.dataHora as dataHora,
+               a.clienteId as clienteId,
+               c.nome as clienteNome,
                a.profissionalId as profissionalId,
                COALESCE(p.nome, 'Aguardando confirmação') as profissionalNome,
                a.servicoId as servicoId,
                s.nome as servicoNome,
                s.preco as servicoPreco,
                a.status as status,
-               a.observacoes as observacoes,
-               c.nome as clienteNome
+               a.observacoes as observacoes
         FROM AgendamentoJpa a
         LEFT JOIN ProfissionalJpa p ON p.id = a.profissionalId
         INNER JOIN ServicoOferecidoJpa s ON s.id = a.servicoId
