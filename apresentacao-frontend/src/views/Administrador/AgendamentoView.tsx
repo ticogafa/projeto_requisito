@@ -22,6 +22,8 @@ export default function AgendamentoView() {
       const response = await fetch('http://localhost:8080/api/agendamentos');
       if (response.ok) {
         const data = await response.json();
+        console.log('Agendamentos carregados:', data.length, 'registros');
+        console.log('Primeiro agendamento:', data[0]);
         setAgendamentos(Array.isArray(data) ? data : []);
       }
     } catch (error) {
@@ -98,7 +100,8 @@ export default function AgendamentoView() {
   const filteredAgendamentos = agendamentos.filter((agendamento) => {
     const matchSearch = 
       agendamento.servicoNome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agendamento.profissionalNome.toLowerCase().includes(searchTerm.toLowerCase());
+      agendamento.profissionalNome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (agendamento.clienteNome?.toLowerCase() || '').includes(searchTerm.toLowerCase());
     
     const matchStatus = filterStatus === 'TODOS' || agendamento.status === filterStatus;
     
@@ -155,7 +158,7 @@ export default function AgendamentoView() {
             </span>
             <input
               type="text"
-              placeholder="Buscar por serviço ou profissional..."
+              placeholder="Buscar por cliente, serviço ou profissional..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"

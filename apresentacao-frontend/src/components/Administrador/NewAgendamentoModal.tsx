@@ -171,6 +171,12 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
              return;
         }
 
+        console.log('=== DADOS DO NOVO CLIENTE ===');
+        console.log('Nome:', formData.nomeCliente);
+        console.log('Email:', formData.emailCliente);
+        console.log('CPF:', formData.cpfCliente);
+        console.log('Telefone:', formData.telefoneCliente);
+
         requestData = {
           servicoId: servicoIdNum,
           dataHora: dataHoraISO,
@@ -181,6 +187,8 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
           cpfCliente: formData.cpfCliente,
           telefoneCliente: formData.telefoneCliente
         };
+
+        console.log('=== REQUEST DATA ===', requestData);
     } else {
         if (!formData.clienteId) {
             setError('Selecione um cliente ou mude para busca por email');
@@ -223,9 +231,11 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    console.log(`Campo alterado: ${name} = ${value}`);
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -329,6 +339,7 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
                         value={formData.emailCliente}
                         onChange={handleChange}
                         required
+                        autoComplete="off"
                         className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="cliente@email.com"
                     />
@@ -343,6 +354,7 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
                             value={formData.nomeCliente}
                             onChange={handleChange}
                             required
+                            autoComplete="off"
                             className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                             placeholder="Nome do Cliente"
                         />
@@ -355,6 +367,7 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
                             value={formData.cpfCliente}
                             onChange={handleChange}
                             required
+                            autoComplete="off"
                             className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                             placeholder="000.000.000-00"
                         />
@@ -367,6 +380,7 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
                         name="telefoneCliente"
                         value={formData.telefoneCliente}
                         onChange={handleChange}
+                        autoComplete="off"
                         required
                         className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="(00) 00000-0000"

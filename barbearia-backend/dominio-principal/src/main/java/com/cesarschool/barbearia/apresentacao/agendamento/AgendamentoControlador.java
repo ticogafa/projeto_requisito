@@ -82,7 +82,7 @@ public class AgendamentoControlador {
             
             AgendamentoResumo agendamento = servicoAplicacao.criar(request);
             
-            logger.success("Agendamento criado com sucesso - ID: " + agendamento.getId());
+            logger.info("Agendamento criado com sucesso - ID: " + agendamento.getId());
             return ResponseEntity.ok(agendamento);
         });
     }
@@ -154,7 +154,7 @@ public class AgendamentoControlador {
         
         AgendamentoResumo agendamento = servicoAplicacao.editar(id, request);
         
-        logger.success("Agendamento editado com sucesso - ID: " + id);
+        logger.info("Agendamento editado com sucesso - ID: " + id);
         return ResponseEntity.ok(agendamento);
     });
 }
@@ -178,13 +178,13 @@ public class AgendamentoControlador {
             
             if (clienteId != null) {
                 AgendamentoResumo agendamento = servicoAplicacao.cancelar(id, clienteId, TipoUsuario.CLIENTE);
-                logger.success("Agendamento cancelado com sucesso - ID: " + id);
+                logger.info("Agendamento cancelado com sucesso - ID: " + id);
                 return ResponseEntity.ok(agendamento);
             } 
             
             if (profissionalId != null) {
                 AgendamentoResumo agendamento = servicoAplicacao.cancelar(id, profissionalId, TipoUsuario.PROFISSIONAL);
-                logger.success("Agendamento cancelado com sucesso - ID: " + id);
+                logger.info("Agendamento cancelado com sucesso - ID: " + id);
                 return ResponseEntity.ok(agendamento);
             }
             

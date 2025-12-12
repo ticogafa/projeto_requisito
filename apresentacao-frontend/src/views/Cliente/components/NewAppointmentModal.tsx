@@ -11,6 +11,7 @@ interface NewAppointmentModalProps {
   servicos: ServicosOferecidosResponse;
   closeModal: () => void;
   onSuccess?: (agendamento: AgendamentoInterface) => void;
+  clienteId: number | null;
 }
 
 export default function NewAppointmentModal(props: NewAppointmentModalProps) {
@@ -52,13 +53,18 @@ export default function NewAppointmentModal(props: NewAppointmentModalProps) {
       return;
     }
 
+    if (!props.clienteId) {
+      toast.error('Não foi possível identificar o cliente. Por favor, recarregue a página.');
+      return;
+    }
+
     // Enviar a data/hora local como está, apenas garantindo o formato ISO-8601 sem timezone (LocalTime)
     // O backend espera LocalDateTime e assume que é o horário local do negócio
     const dataHoraISO = `${dataHora}:00`;
 
     criar(
       {
-        clienteId: 1, // TODO: Substituir por user.uid quando tivermos mapeamento de Firebase UID para Cliente ID
+        clienteId: props.clienteId,
         servicoId,
         dataHora: dataHoraISO,
         profissionalId: profissionalId || undefined,

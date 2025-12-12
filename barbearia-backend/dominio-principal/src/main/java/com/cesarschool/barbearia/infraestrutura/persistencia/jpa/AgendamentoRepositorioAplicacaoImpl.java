@@ -94,7 +94,7 @@ class AgendamentoRepositorioAplicacaoImpl implements AgendamentoRepositorioAplic
             ))
             .collect(Collectors.toList());
         
-        logger.success("Retornando " + disponiveis.size() + " profissionais disponíveis após filtros.");
+        logger.info("Retornando " + disponiveis.size() + " profissionais disponíveis após filtros.");
         return disponiveis;
     }
 
@@ -172,7 +172,7 @@ interface AgendamentoResumoQueryRepository extends JpaRepository<AgendamentoJpa,
                a.profissionalId as profissionalId,
                COALESCE(p.nome, 'Aguardando confirmação') as profissionalNome,
                a.clienteId as clienteId,
-               c.nome as clienteNome,
+               COALESCE(c.nome, 'Cliente não identificado') as clienteNome,
                a.servicoId as servicoId,
                s.nome as servicoNome,
                s.preco as servicoPreco,
@@ -181,7 +181,7 @@ interface AgendamentoResumoQueryRepository extends JpaRepository<AgendamentoJpa,
         FROM AgendamentoJpa a
         LEFT JOIN ProfissionalJpa p ON p.id = a.profissionalId
         INNER JOIN ServicoOferecidoJpa s ON s.id = a.servicoId
-        INNER JOIN ClienteJpa c ON c.id = a.clienteId
+        LEFT JOIN ClienteJpa c ON c.id = a.clienteId
         WHERE a.clienteId = :clienteId
         ORDER BY a.dataHora DESC
         """)
@@ -194,14 +194,15 @@ interface AgendamentoResumoQueryRepository extends JpaRepository<AgendamentoJpa,
                p.nome as profissionalNome,
                a.servicoId as servicoId,
                s.nome as servicoNome,
+               s.preco as servicoPreco,
                a.clienteId as clienteId,
-               c.nome as clienteNome,
+               COALESCE(c.nome, 'Cliente não identificado') as clienteNome,
                a.status as status,
                a.observacoes as observacoes
         FROM AgendamentoJpa a
         JOIN ProfissionalJpa p ON p.id = a.profissionalId
         JOIN ServicoOferecidoJpa s ON s.id = a.servicoId
-        JOIN ClienteJpa c ON c.id = a.clienteId
+        LEFT JOIN ClienteJpa c ON c.id = a.clienteId
         WHERE a.profissionalId = :profissionalId
         ORDER BY a.dataHora DESC
         """)
@@ -211,7 +212,7 @@ interface AgendamentoResumoQueryRepository extends JpaRepository<AgendamentoJpa,
         SELECT a.id as id,
                a.dataHora as dataHora,
                a.clienteId as clienteId,
-               c.nome as clienteNome,
+               COALESCE(c.nome, 'Cliente não identificado') as clienteNome,
                a.profissionalId as profissionalId,
                COALESCE(p.nome, 'Aguardando confirmação') as profissionalNome,
                a.servicoId as servicoId,

@@ -7,6 +7,9 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoServico;
 import com.cesarschool.barbearia.dominio.principal.agendamento.StatusAgendamento;
@@ -31,6 +34,8 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class AgendamentoServicoAplicacao {
+    
+    private static final Logger logger = LoggerFactory.getLogger(AgendamentoServicoAplicacao.class);
     
     private final AgendamentoRepositorioAplicacao repositorioAplicacao;
     private final AgendamentoServico agendamentoServico;
@@ -75,11 +80,18 @@ public class AgendamentoServicoAplicacao {
             Optional<Cliente> clienteOpt = clienteRepositorio.buscarPorEmail(emailStr);
             if (clienteOpt.isPresent()) {
                 clienteId = clienteOpt.get().getId().getValor();
+                logger.info("Cliente encontrado por email: " + emailStr + " - ID: " + clienteId + " - Nome: " + clienteOpt.get().getNome());
             } else {
                 // Criar novo cliente
                 notNull(request.getNomeCliente(), "Nome do cliente é obrigatório para novo cadastro");
                 notNull(request.getCpfCliente(), "CPF do cliente é obrigatório para novo cadastro");
                 notNull(request.getTelefoneCliente(), "Telefone do cliente é obrigatório para novo cadastro");
+                
+                logger.info("=== CRIANDO NOVO CLIENTE ===");
+                logger.info("Nome: " + request.getNomeCliente());
+                logger.info("Email: " + emailStr);
+                logger.info("CPF: " + request.getCpfCliente());
+                logger.info("Telefone: " + request.getTelefoneCliente());
                 
                 Cliente novoCliente = new Cliente(
                     request.getNomeCliente(),
@@ -90,6 +102,7 @@ public class AgendamentoServicoAplicacao {
                 
                 Cliente salvo = clienteServico.criarCliente(novoCliente);
                 clienteId = salvo.getId().getValor();
+                logger.info("Cliente criado com sucesso - ID: " + clienteId + " - Nome: " + salvo.getNome());
             }
         }
         

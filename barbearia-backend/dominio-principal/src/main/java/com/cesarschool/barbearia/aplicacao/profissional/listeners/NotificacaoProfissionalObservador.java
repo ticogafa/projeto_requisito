@@ -105,7 +105,7 @@ public class NotificacaoProfissionalObservador implements Observador<Profissiona
             message.setText(corpo);
 
             mailSender.send(message);
-            logger.success("[EMAIL ENVIADO] Para: " + destinatario);
+            logger.info("[EMAIL ENVIADO] Para: " + destinatario);
         } catch (Exception e) {
             System.err.println("[ERRO EMAIL] Falha ao enviar para " + destinatario + ": " + e.getMessage());
         }

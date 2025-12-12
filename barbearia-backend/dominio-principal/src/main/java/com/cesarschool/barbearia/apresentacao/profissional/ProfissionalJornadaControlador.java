@@ -46,7 +46,7 @@ public class ProfissionalJornadaControlador {
             AtualizarJornadaComando comando = new AtualizarJornadaComando(id, jornadas);
             servicoAplicacao.atualizarJornada(comando);
             
-            logger.success("Jornada atualizada com sucesso para o profissional ID: " + id);
+            logger.info("Jornada atualizada com sucesso para o profissional ID: " + id);
             return ResponseEntity.ok().build();
         });
     }

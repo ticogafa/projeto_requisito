@@ -46,7 +46,7 @@ public class ProfissionalControlador {
                     .buildAndExpand(novo.getId().getValor())
                     .toUri();
                     
-            logger.success("Profissional criado com sucesso. ID: " + novo.getId().getValor());
+            logger.info("Profissional criado com sucesso. ID: " + novo.getId().getValor());
             return ResponseEntity.created(uri).body(novo);
         });
     }

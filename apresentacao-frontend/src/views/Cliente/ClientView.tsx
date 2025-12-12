@@ -158,6 +158,7 @@ export default function ClientView() {
         visible={modalVisible}
         closeModal={() => setModalVisible(false)}
         onSuccess={handleSuccess}
+        clienteId={clienteId}
       />
 
       <EditAppointmentModal
