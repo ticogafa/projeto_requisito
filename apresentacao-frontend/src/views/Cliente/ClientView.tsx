@@ -67,8 +67,39 @@ export default function ClientView() {
     );
   };
 
+  const [ratingModalVisible, setRatingModalVisible] = useState(false);
+  const [ratingAppointmentId, setRatingAppointmentId] = useState<number | null>(null);
+  const [ratingValue, setRatingValue] = useState(5);
+
   const handleRate = (id: number) => {
-    toast.info(`Avaliar agendamento ${id} - Em desenvolvimento`);
+    setRatingAppointmentId(id);
+    setRatingValue(5);
+    setRatingModalVisible(true);
+  };
+
+  const confirmRating = () => {
+    if (!ratingAppointmentId) return;
+
+    const agendamento = agendamentos.find(a => a.id === ratingAppointmentId);
+    if (!agendamento || !agendamento.profissionalId) {
+        toast.error('Erro ao identificar o profissional.');
+        return;
+    }
+
+    setLoading(true);
+    mainService.registrarAvaliacao(
+        {
+            profissionalId: agendamento.profissionalId,
+            nota: ratingValue
+        },
+        () => {
+            toast.success('Avaliação enviada com sucesso!');
+            setRatingModalVisible(false);
+            setRatingAppointmentId(null);
+        },
+        (error) => toast.error('Erro ao enviar avaliação: ' + (error.response?.data as any)?.message || error.message),
+        () => setLoading(false)
+    );
   };
 
   const handleSuccess = (novoAgendamento: AgendamentoInterface) => {
@@ -129,6 +160,45 @@ export default function ClientView() {
         onCancel={handleCancel}
         onRate={handleRate}
       />
+
+      {/* Rating Modal */}
+      {ratingModalVisible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-dark-800 rounded-xl p-6 w-full max-w-md border border-dark-600 shadow-xl">
+            <h3 className="text-xl font-bold text-white mb-4">Avaliar Atendimento</h3>
+            <p className="text-gray-400 mb-4">Como foi sua experiência?</p>
+            
+            <div className="flex justify-center gap-2 mb-6">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setRatingValue(star)}
+                  className="transition transform hover:scale-110 focus:outline-none"
+                >
+                  <span className={`material-icons text-4xl ${star <= ratingValue ? 'text-yellow-400' : 'text-gray-600'}`}>
+                    star
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setRatingModalVisible(false)}
+                className="px-4 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-dark-700 transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmRating}
+                className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-medium transition"
+              >
+                Enviar Avaliação
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </ClientLayout>
   );
 }

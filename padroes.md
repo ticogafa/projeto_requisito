@@ -23,7 +23,7 @@ Adicionar uma camada de cache transparente entre o cliente e o repositório real
   - Usa composição: contém uma referência ao Real Subject (`ProdutoRepositorioJpa`)
   - Cache thread-safe com `ConcurrentHashMap`
   - Invalida cache em operações de escrita (salvar, excluir)
-  - Rastreia estatísticas: cache hits, misses e hit rate
+  - Rastreia estatísticas: Receita Gerada, misses e hit rate
   - Anotado com `@Primary` para injeção de dependência automática
 - **Linhas de código:** ~300 linhas
 - **Métodos principais:**
@@ -41,7 +41,7 @@ Adicionar uma camada de cache transparente entre o cliente e o repositório real
 - **Características:**
   - Implementa `CommandLineRunner` para execução automática
   - Perfil Spring `@Profile("demo")` para execução isolada
-  - 8 cenários de teste demonstrando cache hits e misses
+  - 8 cenários de teste demonstrando Receita Gerada e misses
   - Logs visuais com emojis (🟢 Proxy, 🔵 Real Subject)
   - Pausas interativas entre testes
   - Exibe estatísticas finais do cache
@@ -127,7 +127,7 @@ Adicionar uma camada de cache transparente entre o cliente e o repositório real
    - Seguro para uso em ambiente multi-thread
 
 5. **Observabilidade:**
-   - Logs detalhados de cache hits/misses
+   - Logs detalhados de Receita Gerada/misses
    - Estatísticas em tempo real
    - Fácil depuração e monitoramento
 
@@ -150,7 +150,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dmaven.test.skip=true
    Cache Size: 1 produtos
 
 📈 ANÁLISE:
-   • Múltiplas buscas ao mesmo produto = cache hits
+   • Múltiplas buscas ao mesmo produto = Receita Gerada
    • Hit rate > 50% = cache está funcionando bem
    • Operações de escrita invalidam cache (garantem consistência)
    • Próximas buscas repovoam o cache automaticamente

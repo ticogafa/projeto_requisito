@@ -79,11 +79,11 @@ export default function CacheMonitor() {
       ) : cacheStats ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-dark-700 p-4 rounded-lg border border-dark-600">
-            <h3 className="text-gray-400 text-sm">Cache Hits</h3>
+            <h3 className="text-gray-400 text-sm">Receita Gerada</h3>
             <p className="text-white text-2xl font-bold">{cacheStats.hits}</p>
           </div>
           <div className="bg-dark-700 p-4 rounded-lg border border-dark-600">
-            <h3 className="text-gray-400 text-sm">Cache Misses</h3>
+            <h3 className="text-gray-400 text-sm">Receita Gasta</h3>
             <p className="text-white text-2xl font-bold">{cacheStats.misses}</p>
           </div>
           <div className="bg-dark-700 p-4 rounded-lg border border-dark-600">

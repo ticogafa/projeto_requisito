@@ -110,7 +110,7 @@ export default function CacheMonitorModal({ onClose }: { onClose: () => void }) 
                   <div className="bg-dark-700 border border-dark-600 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="material-icons text-green-400 text-sm">check_circle</span>
-                      <span className="text-xs text-gray-400 uppercase">Cache Hits</span>
+                      <span className="text-xs text-gray-400 uppercase">Receita Gerada</span>
                     </div>
                     <p className="text-2xl font-bold text-white">{metrics.cacheHits}</p>
                   </div>
@@ -118,7 +118,7 @@ export default function CacheMonitorModal({ onClose }: { onClose: () => void }) 
                   <div className="bg-dark-700 border border-dark-600 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="material-icons text-red-400 text-sm">cancel</span>
-                      <span className="text-xs text-gray-400 uppercase">Cache Misses</span>
+                      <span className="text-xs text-gray-400 uppercase">Receita Gasta</span>
                     </div>
                     <p className="text-2xl font-bold text-white">{metrics.cacheMisses}</p>
                   </div>

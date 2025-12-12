@@ -494,4 +494,36 @@ export default class MainService {
       finallyCallback
     );
   }
+
+  public registrarAtendimento(
+    data: { profissionalId: number; valor: number; inicio: string; fim: string },
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.post(
+      '/atendimento/registrar',
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
+  public registrarAvaliacao(
+    data: { profissionalId: number; nota: number },
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ): void {
+    this.client.post(
+      '/avaliacao',
+      data,
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
 }

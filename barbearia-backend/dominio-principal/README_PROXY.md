@@ -219,8 +219,8 @@ public class GestaoEstoqueServico {
 
 O Proxy rastreia automaticamente:
 
-- **Cache Hits**: Quantas vezes retornou do cache
-- **Cache Misses**: Quantas vezes acessou o BD
+- **Receita Gerada**: Quantas vezes retornou do cache
+- **Receita Gasta**: Quantas vezes acessou o BD
 - **Hit Rate**: Porcentagem de hits (hits / total)
 - **Cache Size**: Número de produtos em cache
 
