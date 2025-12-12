@@ -84,15 +84,9 @@ export const router = createBrowserRouter([
         path: '/admin/agendamentos',
         element: (
           <ProtectedRoute>
-            <AdminDashboardView />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: '/admin/agendamentos',
-        element: (
-          <ProtectedRoute>
-            <AgendamentoView />
+            <AdminLayout>
+              <AgendamentoView />
+            </AdminLayout>
           </ProtectedRoute>
         )
       },

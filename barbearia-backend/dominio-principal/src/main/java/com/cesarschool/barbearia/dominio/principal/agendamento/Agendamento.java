@@ -56,7 +56,9 @@ public final class Agendamento {
             ServicoOferecidoId servicoId,
             String observacoes) {
         this(dataHora, clienteId, profissionalId, servicoId, observacoes);
-        setId(id);
+        if (id != null) {
+            setId(id);
+        }
         setStatus(status);
     }
 

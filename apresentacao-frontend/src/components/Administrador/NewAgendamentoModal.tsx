@@ -45,9 +45,10 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
       {},
       (response: AxiosResponse) => {
         const data = response.data;
-        console.log('Serviços carregados:', data);
+        console.log('Serviços carregados (raw):', data);
         // Normalizar IDs e filtrar apenas serviços ativos
         const normalized = normalizeIds(data) as ServicoOferecido[];
+        console.log('Serviços após normalização:', normalized);
         const servicosAtivos = normalized.filter((s) => s.ativo === true || s.ativo === undefined);
         console.log('Serviços ativos:', servicosAtivos);
         setServicos(servicosAtivos);
@@ -63,15 +64,37 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
   };
 
   const loadProfissionaisDisponiveis = () => {
+    if (!formData.servicoId || !formData.dataHora) {
+      console.log('servicoId ou dataHora não preenchidos, pulando busca de profissionais');
+      setProfissionaisDisponiveis([]);
+      return;
+    }
+
     setLoadingProfissionais(true);
+    
+    // Converter servicoId para número e validar
+    const servicoIdNum = parseInt(formData.servicoId);
+    if (isNaN(servicoIdNum) || servicoIdNum <= 0) {
+      console.error('servicoId inválido:', formData.servicoId);
+      setProfissionaisDisponiveis([]);
+      setLoadingProfissionais(false);
+      return;
+    }
+
+    console.log('Buscando profissionais disponíveis:', {
+      servicoId: servicoIdNum,
+      dataHora: formData.dataHora
+    });
+
     MainService.getInstance().getProfissionaisDisponiveis(
       {
-        servicoId: formData.servicoId,
+        servicoId: servicoIdNum,
         dataHora: formData.dataHora
       },
       {},
       (response: AxiosResponse) => {
         const data = response.data;
+        console.log('Profissionais disponíveis recebidos:', data);
         setProfissionaisDisponiveis(data);
       },
       (error: AxiosError) => {
@@ -89,17 +112,33 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
     setLoading(true);
     setError('');
 
+    // Validações básicas
+    if (!formData.servicoId || !formData.dataHora) {
+      setError('Serviço e data/hora são obrigatórios');
+      setLoading(false);
+      return;
+    }
+
+    const servicoIdNum = parseInt(formData.servicoId);
+    if (isNaN(servicoIdNum) || servicoIdNum <= 0) {
+      setError('Serviço inválido selecionado');
+      setLoading(false);
+      return;
+    }
+
     // Enviar a data/hora local como está, garantindo formato compatível com LocalDateTime no backend
     // Evita conversão para UTC que causava erro de fuso horário
     const dataHoraISO = `${formData.dataHora}:00`;
 
     const requestData: CriarAgendamentoRequest = {
       clienteId,
-      servicoId: parseInt(formData.servicoId),
+      servicoId: servicoIdNum,
       dataHora: dataHoraISO,
       profissionalId: formData.profissionalId ? parseInt(formData.profissionalId) : undefined,
       observacoes: formData.observacoes || undefined,
     };
+
+    console.log('Enviando requisição de criação:', requestData);
 
     MainService.getInstance().criarAgendamento(
       requestData,
@@ -183,11 +222,14 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
                   className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">{servicos.length === 0 ? 'Nenhum serviço disponível' : 'Selecione um serviço'}</option>
-                  {servicos.map((servico, index) => (
-                    <option key={servico.id.valor + index} value={servico.id.valor}>
-                      {servico.nome} - R$ {servico.preco.toFixed(2)} ({servico.duracaoMinutos} min)
-                    </option>
-                  ))}
+                  {servicos.map((servico, index) => {
+                    const servicoId = typeof servico.id === 'object' ? servico.id.valor : servico.id;
+                    return (
+                      <option key={servicoId + '-' + index} value={servicoId}>
+                        {servico.nome} - R$ {servico.preco.toFixed(2)} ({servico.duracaoMinutos} min)
+                      </option>
+                    );
+                  })}
                 </select>
                 {servicos.length === 0 && !loadingServicos && (
                   <p className="text-xs text-yellow-400 mt-1 flex items-center gap-1">
@@ -215,7 +257,7 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
               className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Agendamentos devem ser feitos com pelo menos 1 hora de antecedência
+              Agendamentos devem ser feitos com pelo menos 2 horas de antecedência
             </p>
           </div>
 
