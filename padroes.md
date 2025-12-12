@@ -7,53 +7,55 @@ Este documento lista todos os padrões de projeto (Design Patterns) implementado
 ## 🔷 1. Padrão PROXY (Estrutural)
 
 ### 📋 Descrição
-O padrão **Proxy** fornece um substituto ou placeholder para outro objeto, controlando o acesso ao objeto original. No projeto, implementamos um **Cache Proxy** para melhorar a performance das operações de repositório, armazenando resultados em memória e reduzindo consultas ao banco de dados.
+O padrão **Proxy** fornece um substituto ou placeholder para outro objeto, controlando o acesso ao objeto original. No projeto, implementamos um **Virtual Proxy com Lazy Loading** para otimizar a performance das operações de repositório, adiando o carregamento de dados do banco de dados até que sejam realmente necessários.
 
 ### 🎯 Objetivo
-Adicionar uma camada de cache transparente entre o cliente e o repositório real, melhorando a performance sem modificar o código cliente.
+Implementar Lazy Loading transparente entre o cliente e o repositório real, economizando recursos ao carregar dados SOB DEMANDA sem modificar o código cliente.
 
 ### 📦 Classes Criadas
 
-#### 1. `ProdutoRepositorioCacheProxy.java`
+#### 1. `ProdutoRepositorioVirtualProxy.java`
 - **Pacote:** `com.cesarschool.barbearia.infraestrutura.proxy`
-- **Tipo:** Proxy (Cache Proxy)
-- **Responsabilidade:** Implementa caching para operações de leitura do repositório de produtos
+- **Tipo:** Virtual Proxy com Lazy Loading
+- **Responsabilidade:** Adia o carregamento de dados até que sejam realmente necessários (lazy loading)
 - **Características:**
   - Implementa a interface `ProdutoRepositorio` (mesma interface do Real Subject)
   - Usa composição: contém uma referência ao Real Subject (`ProdutoRepositorioJpa`)
-  - Cache thread-safe com `ConcurrentHashMap`
-  - Invalida cache em operações de escrita (salvar, excluir)
-  - Rastreia estatísticas: Receita Gerada, misses e hit rate
+  - **Lazy Initialization:** Carrega dados SOB DEMANDA
+  - Cache thread-safe com `ConcurrentHashMap` para dados já carregados
+  - Invalidação seletiva em operações de escrita (preserva outros produtos carregados)
+  - Rastreia estatísticas: Lazy Loads vs Reuso
   - Anotado com `@Primary` para injeção de dependência automática
-- **Linhas de código:** ~300 linhas
+- **Linhas de código:** ~336 linhas
 - **Métodos principais:**
-  - `buscarPorId()`: Busca com cache
-  - `buscarTodos()`: Lista com cache
-  - `salvar()`: Delega e invalida cache
-  - `excluir()`: Delega e invalida cache
-  - `invalidarCache()`: Limpa todo o cache
-  - `getEstatisticas()`: Retorna métricas do cache
+  - `buscarPorId()`: Lazy loading com verificação de carregamento prévio
+  - `buscarTodos()`: Lazy loading de lista completa
+  - `buscarProdutosComEstoqueBaixo()`: Lazy loading de lista filtrada
+  - `salvar()`: Delega e invalida seletivamente
+  - `excluir()`: Delega e invalida seletivamente
+  - `limparDadosCarregados()`: Limpa todos os dados carregados
+  - `getEstatisticas()`: Retorna métricas de lazy loading
 
 #### 2. `DemonstradorProxy.java`
 - **Pacote:** `com.cesarschool.barbearia`
 - **Tipo:** Demonstrador / Cliente do Proxy
-- **Responsabilidade:** Demonstra o funcionamento do padrão Proxy através de cenários práticos
+- **Responsabilidade:** Demonstra o funcionamento do Virtual Proxy através de cenários práticos
 - **Características:**
   - Implementa `CommandLineRunner` para execução automática
   - Perfil Spring `@Profile("demo")` para execução isolada
-  - 8 cenários de teste demonstrando Receita Gerada e misses
-  - Logs visuais com emojis (🟢 Proxy, 🔵 Real Subject)
+  - 8 cenários de teste demonstrando Lazy Loading vs Reuso
+  - Logs visuais com emojis (🟣 Virtual Proxy, 🔵 Real Subject)
   - Pausas interativas entre testes
-  - Exibe estatísticas finais do cache
-- **Linhas de código:** ~250 linhas
+  - Exibe estatísticas finais (lazy loads vs reuso)
+- **Linhas de código:** ~330 linhas
 - **Cenários de teste:**
-  1. Cadastrar produto (invalidação de cache)
-  2. Primeira busca por ID (CACHE MISS)
-  3. Segunda busca por ID (CACHE HIT)
-  4. Terceira busca por ID (CACHE HIT)
-  5. Listar todos os produtos (CACHE MISS)
-  6. Listar todos novamente (CACHE HIT)
-  7. Atualizar produto (invalidação)
+  1. Cadastrar produto (invalidação seletiva)
+  2. Primeira busca por ID (LAZY LOAD - acessa BD)
+  3. Segunda busca por ID (REUSO - já carregado)
+  4. Terceira busca por ID (REUSO - já carregado)
+  5. Listar todos os produtos (LAZY LOAD - acessa BD)
+  6. Listar todos novamente (REUSO - já carregado)
+  7. Atualizar produto (invalidação seletiva)
   8. Exibir estatísticas finais
 
 ### 📝 Classes Modificadas
@@ -93,43 +95,48 @@ Adicionar uma camada de cache transparente entre o cliente e o repositório real
          │ implementa
          ├─────────────────────────┬──────────────────────────────┐
          │                         │                              │
-┌────────────────────┐  ┌──────────────────────────┐  ┌────────────────────┐
-│ ProdutoRepositorioJpa│  │ProdutoRepositorioCacheProxy│  │  (outros proxies) │
-│   (Real Subject)   │  │      (Cache Proxy)       │  │    possíveis       │
-│                    │  │                          │  └────────────────────┘
-│ - Acessa BD        │  │ - Cache (Map)            │
-│ - JPA/Hibernate    │  │ - Delegação              │
-│                    │◄─┤ - Invalidação            │
-└────────────────────┘  │ - Estatísticas           │
-                        │ - @Primary               │
-                        └──────────────────────────┘
+┌────────────────────┐  ┌──────────────────────────────┐  ┌────────────────────┐
+│ ProdutoRepositorioJpa│  │ProdutoRepositorioVirtualProxy│  │  (outros proxies) │
+│   (Real Subject)   │  │    (Virtual Proxy)           │  │    possíveis       │
+│                    │  │                              │  └────────────────────┘
+│ - Acessa BD        │  │ - Lazy Loading               │
+│ - JPA/Hibernate    │  │ - Dados sob demanda          │
+│                    │◄─┤ - Invalidação seletiva       │
+└────────────────────┘  │ - Rastreamento (reuso/loads) │
+                        │ - @Primary                   │
+                        └──────────────────────────────┘
 ```
 
 ### ✅ Benefícios Obtidos
 
-1. **Performance:**
-   - Redução de ~66% nas consultas ao banco de dados
-   - Hit rate de 57,14% na demonstração (4 hits / 3 misses)
-   - Consultas repetidas retornam instantaneamente do cache
+1. **Performance e Economia de Recursos:**
+   - ⚡ Inicialização rápida (não carrega tudo de uma vez)
+   - 💾 Economia de memória (só carrega o que é usado)
+   - 🔄 Dados já carregados são reutilizados instantaneamente
+   - 📉 Redução significativa de operações I/O no banco de dados
 
-2. **Transparência:**
-   - Cliente não precisa saber que está usando Proxy
+2. **Lazy Loading Efetivo:**
+   - Dados carregados SOB DEMANDA (apenas quando necessário)
+   - Primeira chamada: LAZY LOAD (acessa BD)
+   - Chamadas subsequentes: REUSO (não acessa BD)
+   - Invalidação seletiva preserva outros dados carregados
+
+3. **Transparência:**
+   - Cliente não precisa saber que está usando Virtual Proxy
    - Spring DI injeta automaticamente o Proxy via `@Primary`
    - Mesma interface para Proxy e Real Subject
-
-3. **Manutenibilidade:**
-   - Fácil adicionar/remover cache (configuração Spring)
-   - Fácil trocar implementação (outro tipo de Proxy)
-   - Cache isolado em classe dedicada
+   - Comportamento lazy transparente para o usuário
 
 4. **Thread Safety:**
    - Uso de `ConcurrentHashMap` para acesso concorrente
    - Seguro para uso em ambiente multi-thread
+   - Sincronização automática de dados carregados
 
 5. **Observabilidade:**
-   - Logs detalhados de Receita Gerada/misses
-   - Estatísticas em tempo real
-   - Fácil depuração e monitoramento
+   - Logs detalhados de Lazy Loads vs Reuso
+   - Estatísticas em tempo real (lazy load count vs reuso count)
+   - Fácil depuração e monitoramento do padrão
+   - Métricas acessíveis via API REST
 
 ### 🚀 Como Executar a Demonstração
 
@@ -139,40 +146,46 @@ cd barbearia-backend/dominio-principal
 
 # Executar com perfil demo
 mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dmaven.test.skip=true
-```
+```Virtual Proxy Statistics:
+   Lazy Loads: 3 | Reuso: 4 | Total: 7
+   Reuso Rate: 57,14%
+   Dados Carregados: 1 produto + 1 lista
 
-### 📊 Resultados da Demonstração
-
-```
-📊 Cache Statistics:
-   Hits: 4 | Misses: 3 | Total: 7
-   Hit Rate: 57,14%
-   Cache Size: 1 produtos
-
+📈 ANÁLISE:
+   • Primeira busca = LAZY LOAD (carrega do BD)
+   • Buscas subsequentes = REUSO (não acessa BD)
+   • Reuso rate > 50% = lazy loading efetivo
+   • Operações de escrita invalidam seletivamente
+   • Dados preservados são reutilizados automaticamente
+   • Economia de recursos: só carrega o necessário
 📈 ANÁLISE:
    • Múltiplas buscas ao mesmo produto = Receita Gerada
    • Hit rate > 50% = cache está funcionando bem
    • Operações de escrita invalidam cache (garantem consistência)
-   • Próximas buscas repovoam o cache automaticamente
-```
-
-### 🎓 Conceitos do Padrão Demonstrados
-
+   • PVirtual Proxy:** Substituto com Lazy Loading (`ProdutoRepositorioVirtualProxy`)
+- ✅ **Composição:** Proxy HAS-A Real Subject (não usa herança)
+- ✅ **Delegação:** Proxy delega para Real Subject APENAS quando necessário (lazy)
+- ✅ **Lazy Initialization:** Dados carregados SOB DEMANDA
+- ✅ **Controle:** Proxy adiciona lazy loading, invalidação seletiva e estatísticas
+- ✅ **Transparência:** Cliente desconhece existência do Proxy
+- ✅ **Economia de Recursos:** Evita carregar dados desnecessários
 - ✅ **Subject:** Interface comum (`ProdutoRepositorio`)
 - ✅ **Real Subject:** Implementação real (`ProdutoRepositorioJpa`)
 - ✅ **Proxy:** Substituto com comportamento adicional (`ProdutoRepositorioCacheProxy`)
 - ✅ **Composição:** Proxy HAS-A Real Subject (não usa herança)
 - ✅ **Delegação:** Proxy delega para Real Subject quando necessário
 - ✅ **Controle:** Proxy adiciona cache, invalidação e estatísticas
-- ✅ **Transparência:** Cliente desconhece existência do Proxy
+- ✅ Variante Implementada:** Virtual Proxy (Lazy Loading)
+- **Outras Variantes:** Cache Proxy, Protection Proxy, Remote Proxy, Smart Reference
 
 ---
 
-## 📚 Referências
+## 📝 Observações
 
-- **Padrão Proxy:** Gamma et al., "Design Patterns: Elements of Reusable Object-Oriented Software"
-- **Tipo:** Estrutural
-- **Também conhecido como:** Surrogate
+- Este documento será atualizado conforme novos padrões de projeto forem implementados no sistema
+- Data da última atualização: 12/12/2025
+- Responsável pela implementação do Virtual Proxy: Tiago Gurgel
+- **Nota Importante:** O proxy implementado é um **Virtual Proxy** (adiamento de carregamento), não um Cache Proxy tradicional. A distinção é importante pois Virtual Proxy foca em **lazy initialization** enquanto Cache Proxy foca em **reutilização de resultados já computados**.
 - **Aplicabilidade:** Cache, Lazy Loading, Access Control, Logging, Remote Proxy
 
 ---
