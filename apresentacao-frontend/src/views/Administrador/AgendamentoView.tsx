@@ -211,6 +211,9 @@ export default function AgendamentoView() {
                     Data/Hora
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Cliente
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Serviço
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -239,6 +242,12 @@ export default function AgendamentoView() {
                         <span className="text-white font-medium">
                           {formatDateTime(agendamento.dataHora)}
                         </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <span className="material-icons text-purple-400 text-sm">person</span>
+                        <span className="text-white">{agendamento.clienteNome || 'N/A'}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
