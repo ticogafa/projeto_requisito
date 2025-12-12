@@ -5,16 +5,25 @@ import { normalizeIds } from '@/utils/apiHelpers';
 import { type AxiosError, type AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 
+interface Cliente {
+  id: number;
+  nome: string;
+  email: string;
+  telefone: string;
+}
+
 interface NewAgendamentoModalProps {
   onClose: () => void;
   onSuccess: () => void;
-  clienteId: number;
+  clienteId?: number; // Opcional - se não fornecido, mostra select para escolher
 }
 
 export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: NewAgendamentoModalProps) {
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [servicos, setServicos] = useState<ServicoOferecido[]>([]);
   const [profissionaisDisponiveis, setProfissionaisDisponiveis] = useState<ProfissionalDisponivelInterface[]>([]);
   const [formData, setFormData] = useState({
+    clienteId: clienteId?.toString() || '',
     servicoId: '',
     dataHora: '',
     profissionalId: '',
@@ -22,11 +31,15 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
   });
   const [loading, setLoading] = useState(false);
   const [loadingServicos, setLoadingServicos] = useState(true);
+  const [loadingClientes, setLoadingClientes] = useState(!clienteId); // Só carrega se não foi fornecido
   const [loadingProfissionais, setLoadingProfissionais] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     loadServicos();
+    if (!clienteId) {
+      loadClientes();
+    }
   }, []);
 
   useEffect(() => {
@@ -37,6 +50,22 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
       setFormData((prev) => ({ ...prev, profissionalId: '' }));
     }
   }, [formData.servicoId, formData.dataHora]);
+
+  const loadClientes = async () => {
+    setLoadingClientes(true);
+    try {
+      const response = await fetch('http://localhost:8080/api/clientes');
+      if (response.ok) {
+        const data = await response.json();
+        setClientes(Array.isArray(data) ? data : []);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar clientes:', error);
+      setClientes([]);
+    } finally {
+      setLoadingClientes(false);
+    }
+  };
 
   const loadServicos = () => {
     setLoadingServicos(true);
@@ -113,8 +142,15 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
     setError('');
 
     // Validações básicas
-    if (!formData.servicoId || !formData.dataHora) {
-      setError('Serviço e data/hora são obrigatórios');
+    if (!formData.clienteId || !formData.servicoId || !formData.dataHora) {
+      setError('Cliente, serviço e data/hora são obrigatórios');
+      setLoading(false);
+      return;
+    }
+
+    const clienteIdNum = parseInt(formData.clienteId);
+    if (isNaN(clienteIdNum) || clienteIdNum <= 0) {
+      setError('Cliente inválido selecionado');
       setLoading(false);
       return;
     }
@@ -131,7 +167,7 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
     const dataHoraISO = `${formData.dataHora}:00`;
 
     const requestData: CriarAgendamentoRequest = {
-      clienteId,
+      clienteId: clienteIdNum,
       servicoId: servicoIdNum,
       dataHora: dataHoraISO,
       profissionalId: formData.profissionalId ? parseInt(formData.profissionalId) : undefined,
@@ -197,6 +233,46 @@ export default function NewAgendamentoModal({ onClose, onSuccess, clienteId }: N
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-center gap-2">
               <span className="material-icons text-red-400">error</span>
               <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+
+          {/* Cliente (apenas para admin) */}
+          {!clienteId && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
+                <span className="material-icons text-lg">person</span>
+                Cliente *
+              </label>
+              {loadingClientes ? (
+                <div className="flex items-center gap-2 px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                  <span className="text-gray-400 text-sm">Carregando clientes...</span>
+                </div>
+              ) : (
+                <>
+                  <select
+                    name="clienteId"
+                    value={formData.clienteId}
+                    onChange={handleChange}
+                    required
+                    disabled={clientes.length === 0}
+                    className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">{clientes.length === 0 ? 'Nenhum cliente cadastrado' : 'Selecione um cliente'}</option>
+                    {clientes.map((cliente) => (
+                      <option key={cliente.id} value={cliente.id}>
+                        {cliente.nome} - {cliente.telefone}
+                      </option>
+                    ))}
+                  </select>
+                  {clientes.length === 0 && !loadingClientes && (
+                    <p className="text-xs text-yellow-400 mt-1 flex items-center gap-1">
+                      <span className="material-icons text-sm">warning</span>
+                      Nenhum cliente cadastrado. Cadastre clientes antes de criar agendamentos.
+                    </p>
+                  )}
+                </>
+              )}
             </div>
           )}
 

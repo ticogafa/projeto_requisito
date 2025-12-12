@@ -12,9 +12,6 @@ export default function AgendamentoView() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('TODOS');
 
-  // ID do cliente para criar novos agendamentos (admin cria para qualquer cliente)
-  const clienteId = 1; // TODO: Implementar seleção de cliente no modal de criação
-
   useEffect(() => {
     loadAgendamentos();
   }, []);
@@ -318,7 +315,6 @@ export default function AgendamentoView() {
             setShowNewModal(false);
             loadAgendamentos();
         }}
-          clienteId={clienteId}
         />
       )}
 
