@@ -1,4 +1,4 @@
-package com.cesarschool.barbearia.api;
+package com.cesarschool.barbearia.apresentacao.relatorio;
 
 import java.time.LocalDate;
 
