@@ -115,11 +115,9 @@ public class DevController {
     }
     
     private void limparDados() {
-        // Ordem: dependentes primeiro, depois independentes
-        // (não implementado para evitar problemas, mas deixo a estrutura)
-        // agendamentoRepositorio.deletarTodos();
-        // horarioTrabalhoRepositorio.deletarTodos();
-        // etc...
+        // Por enquanto, não limpa dados - o seed deve ser idempotente
+        // ou ser executado após limpar o banco manualmente
+        // TODO: Implementar métodos de limpeza nos repositórios
     }
     
     // ==================== SEED: CLIENTES ====================
@@ -168,8 +166,16 @@ public class DevController {
             )
         );
         
-        clientes.forEach(clienteRepositorio::salvar);
-        return clientes.size();
+        int count = 0;
+        for (Cliente c : clientes) {
+            try {
+                clienteRepositorio.salvar(c);
+                count++;
+            } catch (Exception e) {
+                // Cliente já existe, ignora
+            }
+        }
+        return count;
     }
     
     // ==================== SEED: PROFISSIONAIS ====================
@@ -213,8 +219,16 @@ public class DevController {
         andre.setAtivo(true);
         profissionais.add(andre);
         
-        profissionais.forEach(profissionalRepositorio::salvar);
-        return profissionais.size();
+        int count = 0;
+        for (Profissional p : profissionais) {
+            try {
+                profissionalRepositorio.salvar(p);
+                count++;
+            } catch (Exception e) {
+                // Profissional já existe, ignora
+            }
+        }
+        return count;
     }
     
     // ==================== SEED: SERVIÇOS OFERECIDOS ====================
@@ -283,8 +297,16 @@ public class DevController {
             )
         );
         
-        servicos.forEach(servicoRepositorio::salvar);
-        return servicos.size();
+        int count = 0;
+        for (ServicoOferecido s : servicos) {
+            try {
+                servicoRepositorio.salvar(s);
+                count++;
+            } catch (Exception e) {
+                // Serviço já existe, ignora
+            }
+        }
+        return count;
     }
     
     // ==================== SEED: PRODUTOS ====================
@@ -303,8 +325,16 @@ public class DevController {
             new Produto(null, "Toalha de Barbeiro", 30, new BigDecimal("22.00"), 15)
         );
         
-        produtos.forEach(produtoRepositorio::salvar);
-        return produtos.size();
+        int count = 0;
+        for (Produto p : produtos) {
+            try {
+                produtoRepositorio.salvar(p);
+                count++;
+            } catch (Exception e) {
+                // Produto já existe, ignora
+            }
+        }
+        return count;
     }
     
     // ==================== SEED: HORÁRIOS DE TRABALHO ====================
@@ -424,7 +454,11 @@ public class DevController {
             StatusAgendamento.CONFIRMADO
         ));
         
-        return agendamentos.size();
+        int count = 0;
+        for (Agendamento a : agendamentos) {
+            if (a != null) count++;
+        }
+        return count;
     }
     
     private Agendamento criarAgendamento(
@@ -435,16 +469,21 @@ public class DevController {
         String observacoes,
         StatusAgendamento status
     ) {
-        Agendamento agendamento = new Agendamento(
-            dataHora,
-            new ClienteId(clienteId),
-            new ProfissionalId(profissionalId),
-            new ServicoOferecidoId(servicoId),
-            observacoes
-        );
-        agendamento.setStatus(status);
-        agendamentoRepositorio.salvar(agendamento);
-        return agendamento;
+        try {
+            Agendamento agendamento = new Agendamento(
+                dataHora,
+                new ClienteId(clienteId),
+                new ProfissionalId(profissionalId),
+                new ServicoOferecidoId(servicoId),
+                observacoes
+            );
+            agendamento.setStatus(status);
+            agendamentoRepositorio.salvar(agendamento);
+            return agendamento;
+        } catch (Exception e) {
+            // Agendamento já existe ou erro, retorna null
+            return null;
+        }
     }
 
     // ==================== ENDPOINTS DE TESTE ====================
