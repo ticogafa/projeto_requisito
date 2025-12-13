@@ -1,5 +1,6 @@
 import { useAuth } from '@/auth/AuthContext';
 import { useAgendamentosPorProfissional } from '@/hooks/useAgendamentosPorProfissional';
+import { useProfissionais } from '@/hooks/useProfissionais';
 import { useServicosOferecidos } from '@/hooks/useServicosOferecidos';
 import { AgendamentoInterface } from '@/interfaces/AgendamentoInterface';
 import { ServicoOferecido } from '@/interfaces/ServicoOferecidoInterface';
@@ -8,9 +9,10 @@ import MainService from '@/services/MainService';
 import { useLoadingStore } from '@/store/useLoadingStore';
 import { AppointmentDetailsModal, ProfessionalAgendaTable, ProfessionalCalendar, ProfessionalHeader, ProfessionalLayout } from '@/views/Profissional/components';
 import { ServiceTimer } from '@/views/Profissional/components/ServiceTimer';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { ProfissionalInterface } from '@/interfaces/ProfissionaisInterfaces';
 
 export default function ProfessionalView() {
   const navigate = useNavigate();
@@ -28,9 +30,15 @@ export default function ProfessionalView() {
   const [selectedServices, setSelectedServices] = useState<ServicoOferecido[]>([]);
   const [finishingAppointmentId, setFinishingAppointmentId] = useState<number | null>(null);
 
-  // TODO: Pegar profissionalId do backend baseado no user.email
-  const profissionalId = 1;
-  const userName = user?.email?.split('@')[0] || 'Profissional';
+  const { data: profissionais } = useProfissionais();
+  
+  const currentProf = profissionais.find(p => {
+    const profEmail = typeof p.email === 'object' ? p.email.value : p.email;
+    return profEmail?.toLowerCase() === user?.email?.toLowerCase();
+  });
+  
+  const profissionalId = currentProf?.id.valor || 0;
+  const userName = currentProf?.nome || user?.email?.split('@')[0] || 'Profissional';
   
   const { data: agendamentos, setData: setAgendamentos } = useAgendamentosPorProfissional(profissionalId);
   const { data: servicosOferecidos } = useServicosOferecidos();
@@ -107,7 +115,7 @@ export default function ProfessionalView() {
   };
 
   const confirmFinish = () => {
-    if (!finishingAppointmentId || !activeService) return;
+    if (!finishingAppointmentId || !activeService || profissionalId === null) return;
 
     const totalRevenue = selectedServices.reduce((acc, s) => acc + s.preco, 0);
 
@@ -155,6 +163,7 @@ export default function ProfessionalView() {
     if (!window.confirm('Tem certeza que deseja cancelar este agendamento?')) {
       return;
     }
+    if (profissionalId === null) return;
     setLoading(true);
     mainService.cancelarAgendamentoPorProfissional(
       id,

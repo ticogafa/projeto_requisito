@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
 @SpringBootApplication(scanBasePackages = "com.cesarschool.barbearia")
-@EnableJpaRepositories(basePackages = "com.cesarschool.barbearia.infraestrutura.persistencia.jpa")
-@EntityScan(basePackages = "com.cesarschool.barbearia.infraestrutura.persistencia.jpa")
+@EnableJpaRepositories(basePackages = {"com.cesarschool.barbearia.infraestrutura.persistencia.jpa", "com.cesarschool.barbearia.dominio.principal"})
+@EntityScan(basePackages = {"com.cesarschool.barbearia.infraestrutura.persistencia.jpa", "com.cesarschool.barbearia.dominio.principal"})
 public class Main {
     
     public static void main(String[] args) {

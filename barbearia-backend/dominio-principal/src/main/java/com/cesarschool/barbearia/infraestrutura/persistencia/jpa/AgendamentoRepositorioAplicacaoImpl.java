@@ -192,13 +192,13 @@ interface AgendamentoResumoQueryRepository extends JpaRepository<AgendamentoJpa,
                a.dataHora as dataHora,
                a.profissionalId as profissionalId,
                p.nome as profissionalNome,
+               a.clienteId as clienteId,
                a.servicoId as servicoId,
                s.nome as servicoNome,
                s.preco as servicoPreco,
-               a.clienteId as clienteId,
-               COALESCE(c.nome, 'Cliente não identificado') as clienteNome,
                a.status as status,
-               a.observacoes as observacoes
+               a.observacoes as observacoes,
+               COALESCE(c.nome, 'Cliente não identificado') as clienteNome
         FROM AgendamentoJpa a
         JOIN ProfissionalJpa p ON p.id = a.profissionalId
         JOIN ServicoOferecidoJpa s ON s.id = a.servicoId

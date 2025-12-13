@@ -4,6 +4,7 @@ import { ProfissionaisResponse } from '@/interfaces/ProfissionaisInterfaces';
 import HttpClient from '@/services/httpClient';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { ServicoOferecido } from '@/interfaces/ServicoOferecidoInterface';
+import { Caixa } from '@/interfaces/Caixa';
 
 export default class MainService {
   client: HttpClient;
@@ -579,5 +580,13 @@ export default class MainService {
       errorCallback,
       finallyCallback
     );
+  }
+
+  public getLancamentos(successCallback: (response: AxiosResponse<Caixa[]>) => void, errorCallback: (error: AxiosError) => void, finallyCallback: () => void): void {
+    this.client.get('/caixa', {}, {}, successCallback, errorCallback, finallyCallback);
+  }
+
+  public addLancamento(data: { descricao: string; valor: number; tipo: 'ENTRADA' | 'SAIDA' }, successCallback: (response: AxiosResponse<Caixa>) => void, errorCallback: (error: AxiosError) => void, finallyCallback: () => void): void {
+    this.client.post('/caixa', data, {}, successCallback, errorCallback, finallyCallback);
   }
 }
