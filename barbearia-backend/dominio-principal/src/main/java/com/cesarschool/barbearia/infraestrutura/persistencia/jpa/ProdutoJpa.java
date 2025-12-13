@@ -88,11 +88,11 @@ interface ProdutoJpaRepository extends JpaRepository<ProdutoJpa, Integer> {
  * acessando diretamente o banco de dados.</p>
  * 
  * <p><b>Padrão Proxy:</b> Esta classe é o Real Subject que contém a lógica
- * real de acesso ao banco de dados. O Proxy (ProdutoRepositorioCacheProxy)
+ * real de acesso ao banco de dados. O Proxy (ProdutoRepositorioVirtualProxy)
  * delega as chamadas para esta classe.</p>
  * 
  * @author Tiago
- * @version 3.0 - Implementação do Padrão Proxy
+ * @version 5.0 - Implementação do Padrão Proxy (Híbrido: Real Subject com Spring, Proxy manual)
  */
 @Repository("produtoRepositorioJpa")
 class ProdutoRepositorioJpa implements ProdutoRepositorio {

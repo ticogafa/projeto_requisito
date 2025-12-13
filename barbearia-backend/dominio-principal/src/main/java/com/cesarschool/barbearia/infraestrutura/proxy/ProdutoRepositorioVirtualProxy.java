@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -49,10 +50,10 @@ import com.cesarschool.barbearia.dominio.principal.produto.ProdutoRepositorio;
  * </ul>
  * 
  * @author Tiago
- * @version 5.0 - Virtual Proxy com Lazy Loading (padrão GoF)
+ * @version 7.0 - Virtual Proxy com Lazy Loading (Híbrido: Proxy instanciado por Spring, lógica pura)
  */
 @Component
-@Primary  // Spring injeta este Proxy por padrão ao invés do Real Subject
+@Primary
 public class ProdutoRepositorioVirtualProxy implements ProdutoRepositorio {
     
     // ========== COMPOSIÇÃO (não herança!) ==========
@@ -95,16 +96,19 @@ public class ProdutoRepositorioVirtualProxy implements ProdutoRepositorio {
      */
     private int lazyLoadContador = 0;
     
-    // ========== CONSTRUTOR COM INJEÇÃO DE DEPENDÊNCIA ==========
+    // ========== CONSTRUTOR COM SPRING DI (apenas para injeção) ==========
     /**
-     * Construtor com injeção de dependência.
+     * Construtor com injeção de dependência do Real Subject.
+     * Spring gerencia APENAS a injeção, a lógica do Proxy é pura (sem dependência de framework).
      * 
-     * @param realSubject Real Subject injetado pelo Spring.
+     * @param realSubject Real Subject injetado pelo Spring
      */
+    @Autowired
     public ProdutoRepositorioVirtualProxy(@Qualifier("produtoRepositorioJpa") ProdutoRepositorio realSubject) {
         this.realSubject = realSubject;
         System.out.println("🟣 [VIRTUAL PROXY] Virtual Proxy inicializado - LAZY LOADING ativado");
         System.out.println("🟣 [VIRTUAL PROXY] Dados serão carregados SOB DEMANDA (quando necessário)");
+        System.out.println("🟣 [VIRTUAL PROXY] Abordagem: Injeção via Spring, lógica pura (independente de framework)");
     }
     
     // ========== MÉTODOS DA INTERFACE PRODUTOREPOSITORIO ==========

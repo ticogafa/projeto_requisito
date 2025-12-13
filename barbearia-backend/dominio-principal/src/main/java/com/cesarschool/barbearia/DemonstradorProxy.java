@@ -12,10 +12,10 @@ import com.cesarschool.barbearia.dominio.principal.produto.ProdutoRepositorio;
 import com.cesarschool.barbearia.infraestrutura.proxy.ProdutoRepositorioVirtualProxy;
 
 /**
- * Demonstrador do Padrão PROXY com Cache.
+ * Demonstrador do Padrão PROXY com Lazy Loading.
  * 
  * <p>Este demonstrador executa uma série de testes interativos que mostram
- * visualmente como o Cache Proxy funciona e melhora a performance do sistema.</p>
+ * visualmente como o Virtual Proxy funciona e melhora a performance do sistema.</p>
  * 
  * <p><b>Como executar:</b></p>
  * <pre>
@@ -25,15 +25,15 @@ import com.cesarschool.barbearia.infraestrutura.proxy.ProdutoRepositorioVirtualP
  * 
  * <p><b>O que será demonstrado:</b></p>
  * <ul>
- *   <li>✅ Cache Miss (primeira busca acessa BD)</li>
- *   <li>✅ Cache Hit (segunda busca NÃO acessa BD)</li>
+ *   <li>✅ Lazy Loading (primeira busca carrega do BD)</li>
+ *   <li>✅ Reuso (segunda busca usa dados já carregados)</li>
  *   <li>✅ Invalidação de cache após escrita</li>
- *   <li>✅ Estatísticas de performance (hit rate)</li>
- *   <li>✅ Logs diferenciando Proxy 🟢 vs Real Subject 🔵</li>
+ *   <li>✅ Estatísticas de performance (reuso rate)</li>
+ *   <li>✅ Logs diferenciando Proxy 🟣 vs Real Subject 🔵</li>
  * </ul>
  * 
  * @author Tiago
- * @version 3.0 - Demonstração do Padrão Proxy
+ * @version 5.0 - Demonstração do Padrão Proxy (Abordagem Híbrida)
  */
 @Component
 @Profile("demo")
@@ -83,16 +83,16 @@ public class DemonstradorProxy implements CommandLineRunner {
     private void imprimirCabecalho() {
         System.out.println("\n");
         System.out.println("╔══════════════════════════════════════════════════════════╗");
-        System.out.println("║      DEMONSTRAÇÃO DO PADRÃO PROXY (Cache)               ║");
+        System.out.println("║      DEMONSTRAÇÃO DO PADRÃO PROXY (Virtual Proxy - SEM Spring DI)     ║");
         System.out.println("╚══════════════════════════════════════════════════════════╝");
         System.out.println();
-        System.out.println("🎯 Objetivo: Demonstrar cache proxy melhorando performance");
+        System.out.println("🎯 Objetivo: Demonstrar Virtual Proxy com Lazy Loading (SEM Spring DI)");
         System.out.println();
         System.out.println("📖 Legenda:");
-        System.out.println("   🟢 [PROXY] = Cache Proxy (controla acesso)");
+        System.out.println("   🟣 [PROXY] = Virtual Proxy (controla acesso + lazy loading)");
         System.out.println("   🔵 [REAL SUBJECT] = Repositório JPA (acessa BD)");
-        System.out.println("   ✅ CACHE HIT = Dados retornados do cache (rápido!)");
-        System.out.println("   ❌ CACHE MISS = Precisou acessar BD (lento)");
+        System.out.println("   ✅ REUSO = Dados já carregados (rápido!)");
+        System.out.println("   📥 LAZY LOAD = Precisa carregar do BD (primeira vez)");
         System.out.println();
     }
     
@@ -189,7 +189,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         System.out.println("TESTE 5: Listar todos os produtos (primeira vez)");
         imprimirSeparador();
         System.out.println();
-        System.out.println("💡 Esperado: CACHE MISS - lista não está em cache ainda");
+        System.out.println("💡 Esperado: LAZY LOAD - lista completa ainda não foi carregada");
         System.out.println();
         
         System.out.println("➤ Listando todos os produtos...");
@@ -208,7 +208,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         System.out.println("TESTE 6: Listar todos os produtos (segunda vez)");
         imprimirSeparador();
         System.out.println();
-        System.out.println("💡 Esperado: CACHE HIT - lista está em cache");
+        System.out.println("💡 Esperado: REUSO - lista já está carregada");
         System.out.println();
         
         System.out.println("➤ Listando todos os produtos novamente...");
@@ -244,7 +244,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         produtoRepositorio.salvar(produto);
         System.out.println();
         System.out.println("✅ Produto atualizado");
-        System.out.println("🗑️ Cache INVALIDADO - garantindo consistência dos dados");
+        System.out.println("🗑️ Dados INVALIDADOS - garantindo consistência dos dados");
         System.out.println();
         
         esperarEnter();
@@ -252,10 +252,10 @@ public class DemonstradorProxy implements CommandLineRunner {
     
     private void teste8_BuscarAposInvalidacao() {
         imprimirSeparador();
-        System.out.println("TESTE 8: Buscar após invalidação de cache");
+        System.out.println("TESTE 8: Buscar após invalidação");
         imprimirSeparador();
         System.out.println();
-        System.out.println("💡 Esperado: CACHE MISS - cache foi invalidado no teste anterior");
+        System.out.println("💡 Esperado: LAZY LOAD - dados foram invalidados no teste anterior");
         System.out.println();
         
         Integer id = Integer.parseInt(System.getProperty("demo.produto.id"));
@@ -266,7 +266,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         System.out.println();
         System.out.println("✅ Produto encontrado: " + produto.getNome());
         System.out.println("   Preço atualizado: R$ " + produto.getPreco());
-        System.out.println("📊 Produto está novamente no cache para próximas consultas");
+        System.out.println("📊 Produto foi recarregado e está disponível para reuso");
         System.out.println();
         
         esperarEnter();

@@ -12,6 +12,11 @@ O padrão **Proxy** fornece um substituto ou placeholder para outro objeto, cont
 ### 🎯 Objetivo
 Implementar Lazy Loading transparente entre o cliente e o repositório real, economizando recursos ao carregar dados SOB DEMANDA sem modificar o código cliente.
 
+**Abordagem Implementada:** Híbrida - Spring DI gerencia apenas a injeção de dependências (`@Component`, `@Primary`, `@Autowired`), enquanto a lógica do Proxy permanece pura e independente de framework. Isso garante:
+- ✅ Portabilidade (Proxy pode ser usado sem Spring)
+- ✅ Transparência (Spring injeta automaticamente via `@Primary`)
+- ✅ Testabilidade (lógica desacoplada do framework)
+
 ### 📦 Classes Criadas
 
 #### 1. `ProdutoRepositorioVirtualProxy.java`
@@ -26,7 +31,6 @@ Implementar Lazy Loading transparente entre o cliente e o repositório real, eco
   - Invalidação seletiva em operações de escrita (preserva outros produtos carregados)
   - Rastreia estatísticas: Lazy Loads vs Reuso
   - Anotado com `@Primary` para injeção de dependência automática
-- **Linhas de código:** ~336 linhas
 - **Métodos principais:**
   - `buscarPorId()`: Lazy loading com verificação de carregamento prévio
   - `buscarTodos()`: Lazy loading de lista completa
@@ -47,7 +51,6 @@ Implementar Lazy Loading transparente entre o cliente e o repositório real, eco
   - Logs visuais com emojis (🟣 Virtual Proxy, 🔵 Real Subject)
   - Pausas interativas entre testes
   - Exibe estatísticas finais (lazy loads vs reuso)
-- **Linhas de código:** ~330 linhas
 - **Cenários de teste:**
   1. Cadastrar produto (invalidação seletiva)
   2. Primeira busca por ID (LAZY LOAD - acessa BD)
@@ -77,35 +80,6 @@ Implementar Lazy Loading transparente entre o cliente e o repositório real, eco
   - **JavaDoc:** Adicionada documentação explicando o papel de "Subject" no padrão Proxy
   - **Comentários:** Esclarecimento de que esta interface é implementada tanto pelo Proxy quanto pelo Real Subject
 - **Impacto:** Interface agora documenta explicitamente seu papel no padrão
-
-### 🏗️ Estrutura do Padrão
-
-```
-┌─────────────────┐
-│     Cliente     │ (DemonstradorProxy, Controllers, Services)
-│                 │
-└────────┬────────┘
-         │ usa
-         ▼
-┌─────────────────────────────┐
-│   ProdutoRepositorio        │  ← Subject (Interface)
-│   (interface)               │
-└─────────────────────────────┘
-         △
-         │ implementa
-         ├─────────────────────────┬──────────────────────────────┐
-         │                         │                              │
-┌────────────────────┐  ┌──────────────────────────────┐  ┌────────────────────┐
-│ ProdutoRepositorioJpa│  │ProdutoRepositorioVirtualProxy│  │  (outros proxies) │
-│   (Real Subject)   │  │    (Virtual Proxy)           │  │    possíveis       │
-│                    │  │                              │  └────────────────────┘
-│ - Acessa BD        │  │ - Lazy Loading               │
-│ - JPA/Hibernate    │  │ - Dados sob demanda          │
-│                    │◄─┤ - Invalidação seletiva       │
-└────────────────────┘  │ - Rastreamento (reuso/loads) │
-                        │ - @Primary                   │
-                        └──────────────────────────────┘
-```
 
 ### ✅ Benefícios Obtidos
 
@@ -138,57 +112,66 @@ Implementar Lazy Loading transparente entre o cliente e o repositório real, eco
    - Fácil depuração e monitoramento do padrão
    - Métricas acessíveis via API REST
 
-### 🚀 Como Executar a Demonstração
+### 📊 Análise de Performance
 
-```bash
-# Navegar até o diretório do projeto
-cd barbearia-backend/dominio-principal
+📈 **Métricas de Lazy Loading:**
+- Primeira busca = **LAZY LOAD** (carrega do BD)
+- Buscas subsequentes = **REUSO** (não acessa BD)
+- Reuso rate > 50% = lazy loading efetivo
+- Operações de escrita invalidam seletivamente
+- Dados preservados são reutilizados automaticamente
+- Economia de recursos: só carrega o necessário
 
-# Executar com perfil demo
-mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dmaven.test.skip=true
-```
-Virtual Proxy Statistics:
-   Lazy Loads: 3 | Reuso: 4 | Total: 7
-   Reuso Rate: 57,14%
-   Dados Carregados: 1 produto + 1 lista
+### 🔍 Verificação do Padrão Proxy (GoF)
 
-📈 ANÁLISE:
-   • Primeira busca = LAZY LOAD (carrega do BD)
-   • Buscas subsequentes = REUSO (não acessa BD)
-   • Reuso rate > 50% = lazy loading efetivo
-   • Operações de escrita invalidam seletivamente
-   • Dados preservados são reutilizados automaticamente
-   • Economia de recursos: só carrega o necessário
-📈 ANÁLISE:
-   • Múltiplas buscas ao mesmo produto = Receita Gerada
-   • Hit rate > 50% = cache está funcionando bem
-   • Operações de escrita invalidam cache (garantem consistência)
-   • PVirtual Proxy:** Substituto com Lazy Loading (`ProdutoRepositorioVirtualProxy`)
+- ✅ **Subject:** Interface comum (`ProdutoRepositorio`)
+- ✅ **Real Subject:** Implementação real com @Repository (`ProdutoRepositorioJpa`)
+- ✅ **Virtual Proxy:** Substituto com Lazy Loading (`ProdutoRepositorioVirtualProxy`)
 - ✅ **Composição:** Proxy HAS-A Real Subject (não usa herança)
 - ✅ **Delegação:** Proxy delega para Real Subject APENAS quando necessário (lazy)
 - ✅ **Lazy Initialization:** Dados carregados SOB DEMANDA
 - ✅ **Controle:** Proxy adiciona lazy loading, invalidação seletiva e estatísticas
-- ✅ **Transparência:** Cliente desconhece existência do Proxy
+- ✅ **Transparência:** Cliente desconhece existência do Proxy (via @Primary)
 - ✅ **Economia de Recursos:** Evita carregar dados desnecessários
-- ✅ **Subject:** Interface comum (`ProdutoRepositorio`)
-- ✅ **Real Subject:** Implementação real (`ProdutoRepositorioJpa`)
-- ✅ **Proxy:** Substituto com comportamento adicional (`ProdutoRepositorioCacheProxy`)
-- ✅ **Composição:** Proxy HAS-A Real Subject (não usa herança)
-- ✅ **Delegação:** Proxy delega para Real Subject quando necessário
-- ✅ **Controle:** Proxy adiciona cache, invalidação e estatísticas
-- ✅ Variante Implementada:** Virtual Proxy (Lazy Loading)
-- **Outras Variantes:** Cache Proxy, Protection Proxy, Remote Proxy, Smart Reference
+
+### 🔧 Spring DI no Padrão Proxy (Abordagem Híbrida)
+
+**Como funciona:**
+- `@Component` + `@Primary`: Spring registra o Proxy e o torna a implementação padrão
+- `@Autowired` + `@Qualifier("produtoRepositorioJpa")`: Injeta o Real Subject no Proxy
+- `@Repository("produtoRepositorioJpa")`: Identifica o Real Subject para injeção
+
+**Benefícios da Abordagem Híbrida:**
+1. ✅ Spring gerencia **apenas** a injeção (framework agnóstico para lógica)
+2. ✅ Proxy pode ser instanciado manualmente se necessário (portável)
+3. ✅ Transparência total para clientes (Spring injeta Proxy automaticamente)
+4. ✅ Lógica do Proxy permanece pura (sem dependência de framework)
+
+**Variantes do Padrão Proxy:**
+- ✅ **Implementado:** Virtual Proxy (Lazy Loading) + Cache embutido
+- **Outras Variantes:** Protection Proxy, Remote Proxy, Smart Reference
 
 ---
 
-## 📝 Observações
+## 📝 Observações e Comandos Úteis
 
-- Este documento será atualizado conforme novos padrões de projeto forem implementados no sistema
-- Data da última atualização: 12/12/2025
-- Responsável pela implementação do Virtual Proxy: Tiago Gurgel
-- **Nota Importante:** O proxy implementado é um **Virtual Proxy** (adiamento de carregamento), não um Cache Proxy tradicional. A distinção é importante pois Virtual Proxy foca em **lazy initialization** enquanto Cache Proxy foca em **reutilização de resultados já computados**.
-- **Aplicabilidade:** Cache, Lazy Loading, Access Control, Logging, Remote Proxy
+### ℹ️ Informações Gerais
+- **Responsável:** Tiago Gurgel
+- **Tipo:** Virtual Proxy com Lazy Loading + Cache embutido
+- **Abordagem:** Híbrida (Spring DI para injeção, lógica pura)
+- **Nota Importante:** Este é um **Virtual Proxy** (lazy initialization) que também implementa cache. A distinção é importante: Virtual Proxy foca em **adiar carregamento**, enquanto o cache é um benefício adicional da implementação.
 
+### 🛠️ Comandos para Demonstração (Profile demo)
+
+```bash
+# Executar demonstração do proxy
+cd barbearia-backend/dominio-principal
+mvn spring-boot:run -Dspring-boot.run.profiles=demo
+```
+
+### 📊 API de Monitoramento (quando backend está rodando)
+
+```bash
 # Ver estatísticas em JSON
 curl http://localhost:8080/api/proxy/statistics | jq .
 
@@ -198,19 +181,15 @@ curl http://localhost:8080/api/proxy/statistics/text
 # Ver informações do padrão
 curl http://localhost:8080/api/proxy/info | jq .
 
-# Limpar cache
+# Limpar dados carregados (lazy)
 curl -X DELETE http://localhost:8080/api/proxy/cache
 
 # Resetar estatísticas
 curl -X DELETE http://localhost:8080/api/proxy/statistics
+```
 
 ---
 
-## 📝 Observações
-
-- Este documento será atualizado conforme novos padrões de projeto forem implementados no sistema
-- Data da última atualização: 10/12/2025
-- Responsável pela implementação do Proxy: Tiago Gurgel
 
 # Padrão Strategy - Sistema de Tratamento de Exceções
 
