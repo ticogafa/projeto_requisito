@@ -1,263 +1,60 @@
-# 🎯 Padrão Proxy - Implementação Completa
+# Padrão Proxy - Virtual Proxy com Lazy Loading
 
-## 📋 Resumo
+## Resumo
+O projeto usa um Virtual Proxy para `ProdutoRepositorio`, focado em lazy loading (adiamento de leitura) para operações de estoque. O proxy mantém o contrato do repositório, carrega dados apenas quando acessados e invalida seletivamente após escritas.
 
-Este projeto implementa o **Padrão de Projeto Proxy (Estrutural)** com um **Cache Proxy** para melhorar a performance do repositório de produtos.
-
-## 🏗️ Estrutura do Padrão
-
+## Estrutura
 ```
-┌─────────────────────────┐
-│  Subject (Interface)    │
-│  ProdutoRepositorio     │  ← Interface comum
-└───────────┬─────────────┘
-            │
-            ├─────────────────┬─────────────────┐
-            │                 │                 │
-     ┌──────▼──────┐   ┌─────▼─────┐   ┌──────▼──────┐
-     │ Real Subject│   │   Proxy   │   │   Cliente   │
-     │  (JPA Repo) │◄──┤  (Cache)  │◄──┤  (Servico)  │
-     └─────────────┘   └───────────┘   └─────────────┘
+Cliente (GestaoEstoqueServico, controllers, DemonstradorProxy)
+          |
+          v
+ProdutoRepositorio (Subject)
+    |                    
+    |-- ProdutoRepositorioVirtualProxy (Virtual Proxy, @Primary)
+    |       - Lazy load (produtos individuais, lista completa, lista estoque baixo)
+    |       - Cache em ConcurrentHashMap
+    |       - Invalidação seletiva e métricas
+    |
+    └-- ProdutoRepositorioJpa (Real Subject)
+            - Acesso direto ao banco via Spring Data JPA
 ```
 
-## 📂 Arquivos Implementados
+## Componentes
+- Subject: `dominio/principal/produto/ProdutoRepositorio.java` (contrato comum; JavaDoc atualizado para citar o Virtual Proxy).
+- Real Subject: `infraestrutura/persistencia/jpa/ProdutoRepositorioJpa` (acessa BD, logs de acesso).
+- Virtual Proxy: `infraestrutura/proxy/ProdutoRepositorioVirtualProxy` (lazy loading, invalidação seletiva, métricas, `@Primary`).
+- Cliente principal: `dominio/principal/produto/estoque/GestaoEstoqueServico` (operações de estoque usando o contrato do repositório; se beneficia do lazy load).
+- Observabilidade: `apresentacao/proxy/ProxyMetricasControlador` (estatísticas e limpeza de cache via HTTP).
+- Demonstração: `com.cesarschool.barbearia.DemonstradorProxy` (profile `demo`).
 
-### 1. Interface Subject
-- **Arquivo:** `dominio/principal/produto/ProdutoRepositorio.java`
-- **Papel:** Define o contrato comum entre Proxy e Real Subject
-- **Modificações:** Adicionado JavaDoc do padrão Proxy
+## Fluxo do Virtual Proxy
+1. Cliente usa `ProdutoRepositorio` sem conhecer o proxy.
+2. Proxy verifica se o dado já está carregado; se não, delega ao Real Subject e armazena (lazy load).
+3. Operações de escrita (`salvar`, `remover`) invalidam apenas o produto alterado e as listas dependentes.
+4. Métricas de reuso vs lazy load ficam disponíveis para depuração/monitoramento.
 
-### 2. Real Subject
-- **Arquivo:** `infraestrutura/persistencia/jpa/ProdutoJpa.java`
-- **Classe:** `ProdutoRepositorioJpa`
-- **Papel:** Implementação real que acessa o banco de dados
-- **Modificações:**
-  - Renomeado de `ProdutoRepositorioImpl` para `ProdutoRepositorioJpa`
-  - Adicionado `@Repository("produtoRepositorioJpa")`
-  - Adicionado logs: `🔵 [REAL SUBJECT]` em todos os métodos
+## Endpoints de observabilidade
+- GET `/api/proxy/statistics` → métricas em JSON.
+- GET `/api/proxy/statistics/text` → métricas em texto legível.
+- DELETE `/api/proxy/cache` → limpa dados lazy-loaded.
+- DELETE `/api/proxy/statistics` → reseta contadores.
 
-### 3. Cache Proxy ⭐
-- **Arquivo:** `infraestrutura/proxy/ProdutoRepositorioCacheProxy.java`
-- **Papel:** Proxy que adiciona cache ao repositório
-- **Características:**
-  - ✅ Mesma interface que Real Subject
-  - ✅ Usa composição (HAS-A)
-  - ✅ Cache com `ConcurrentHashMap` (thread-safe)
-  - ✅ Rastreia estatísticas (hits/misses)
-  - ✅ Invalida cache em operações de escrita
-  - ✅ Logs: `🟢 [PROXY]`
-- **Anotações:**
-  - `@Component` - Bean Spring
-  - `@Primary` - Injetado por padrão
-
-### 4. Demonstrador
-- **Arquivo:** `DemonstradorProxy.java`
-- **Papel:** Demonstra visualmente o funcionamento do Cache Proxy
-- **Testes:**
-  1. Cadastrar produto
-  2. Primeira busca (cache miss)
-  3. Segunda busca (cache hit)
-  4. Terceira busca (cache hit)
-  5. Listar todos (cache miss)
-  6. Listar todos novamente (cache hit)
-  7. Atualizar produto (invalida cache)
-  8. Buscar após invalidação (cache miss)
-
-### 5. Testes BDD
-- **Feature:** `test/resources/features/Proxy.feature`
-- **Steps:** `test/java/com/cesarschool/cucumber/proxy/ProxyTest.java`
-- **Cenários:** 11 cenários validando:
-  - Cache hit/miss
-  - Invalidação de cache
-  - Estrutura do padrão
-  - Performance
-
-## 🚀 Como Executar
-
-### Compilar o Projeto
-
-```bash
+## Demonstração
+```
 cd barbearia-backend/dominio-principal
-mvn clean compile
+mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dmaven.test.skip=true
 ```
 
-### Executar o Demonstrador
+## Por que trocar o cache proxy anterior?
+- O antigo `ProdutoRepositorioCacheProxy` era focado em cache preemptivo; foi removido da documentação porque a implementação real agora é um Virtual Proxy voltado a lazy loading e invalidação seletiva.
+- A interface e os clientes permanecem inalterados; apenas o comportamento interno mudou para priorizar economia de I/O.
 
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=demo
-```
-
-**Saída esperada:**
-
-```
-╔══════════════════════════════════════════════════════════╗
-║      DEMONSTRAÇÃO DO PADRÃO PROXY (Cache)               ║
-╚══════════════════════════════════════════════════════════╝
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TESTE 1: Cadastrar produto
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🟢 [PROXY] salvar() - Delegando para Real Subject
-🔵 [REAL SUBJECT] salvar() - Acessando BD
-✅ Produto salvo com ID: 1
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TESTE 2: Primeira busca (cache VAZIO)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🟢 [PROXY] buscarPorId(1)
-❌ CACHE MISS - Delegando para Real Subject
-🔵 [REAL SUBJECT] buscarPorId(1) - Acessando BD
-📊 Estatísticas: Hits=0 | Misses=1
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TESTE 3: Segunda busca (produto JÁ EM CACHE)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🟢 [PROXY] buscarPorId(1)
-✅ CACHE HIT! (não acessou BD)
-📊 Estatísticas: Hits=1 | Misses=1
-
-📊 Cache Statistics:
-   Hits: 2 | Misses: 1 | Total: 3
-   Hit Rate: 66.67%
-```
-
-### Executar Testes BDD
-
-```bash
-mvn test -Dtest=ProxyTest
-```
-
-**Ou executar todos os testes:**
-
-```bash
-mvn test
-```
-
-## 📊 Benefícios Demonstrados
-
-| Aspecto | Antes (Sem Proxy) | Depois (Com Proxy) | Melhoria |
-|---------|-------------------|---------------------|----------|
-| Consultas repetidas | Sempre acessa BD | Cache hit (instantâneo) | ~90% mais rápido |
-| Carga no BD | Alta | Reduzida | -66% em média |
-| Latência | ~50-100ms | ~1ms (cache) | 50-100x melhor |
-| Escalabilidade | Limitada pelo BD | Alta (cache em memória) | Muito melhor |
-
-## 🎓 Conceitos do Padrão Proxy
-
-### ✅ O que foi implementado corretamente:
-
-1. **Mesma Interface**
-   - Proxy e Real Subject implementam `ProdutoRepositorio`
-   - Cliente não sabe que está usando Proxy
-
-2. **Composição (HAS-A)**
-   - Proxy TEM-UM Real Subject
-   - Não usa herança
-
-3. **Delegação**
-   - Proxy delega chamadas para Real Subject quando necessário
-   - Em cache hit, NÃO delega
-
-4. **Controle de Acesso**
-   - Proxy adiciona cache
-   - Proxy rastreia estatísticas
-   - Proxy invalida cache em operações de escrita
-
-5. **Transparência**
-   - Cliente usa interface `ProdutoRepositorio`
-   - Spring injeta Proxy automaticamente via `@Primary`
-   - Código cliente não precisa mudar
-
-## 🔄 Proxy vs Adapter
-
-| Aspecto | PROXY | ADAPTER |
-|---------|-------|---------|
-| Interface | Mesma interface | Interfaces diferentes |
-| Objetivo | Controlar acesso | Converter interface |
-| Quando usar | Cache, logging, lazy loading | APIs externas incompatíveis |
-| Estrutura | Subject comum | Adaptee diferente |
-
-## 🛠️ Configuração Spring
-
-### Injeção de Dependência
-
-O Spring injeta automaticamente o **Proxy** ao invés do Real Subject devido ao `@Primary`:
-
-```java
-// No Proxy
-@Component
-@Primary  // ← Spring injeta este por padrão
-public class ProdutoRepositorioCacheProxy implements ProdutoRepositorio {
-    private final ProdutoRepositorio realSubject;
-    
-    public ProdutoRepositorioCacheProxy(
-        @Qualifier("produtoRepositorioJpa") ProdutoRepositorio realSubject
-    ) {
-        this.realSubject = realSubject;
-    }
-}
-
-// No Real Subject
-@Repository("produtoRepositorioJpa")
-class ProdutoRepositorioJpa implements ProdutoRepositorio {
-    // Implementação JPA
-}
-
-// No Serviço (NÃO precisa mudar!)
-@Service
-public class GestaoEstoqueServico {
-    private final ProdutoRepositorio produtoRepositorio;
-    
-    public GestaoEstoqueServico(ProdutoRepositorio produtoRepositorio) {
-        // Spring injeta automaticamente o Proxy
-        this.produtoRepositorio = produtoRepositorio;
-    }
-}
-```
-
-## 📈 Estatísticas do Cache
-
-O Proxy rastreia automaticamente:
-
-- **Receita Gerada**: Quantas vezes retornou do cache
-- **Receita Gasta**: Quantas vezes acessou o BD
-- **Hit Rate**: Porcentagem de hits (hits / total)
-- **Cache Size**: Número de produtos em cache
-
-Acesse via:
-
-```java
-if (repositorio instanceof ProdutoRepositorioCacheProxy proxy) {
-    String stats = proxy.getEstatisticas();
-    System.out.println(stats);
-}
-```
-
-## 🧪 Validação da Implementação
-
-### Checklist de Validação
-
-- [x] Interface Subject documentada
-- [x] Real Subject com logs `🔵`
-- [x] Cache Proxy implementado com logs `🟢`
-- [x] Injeção de dependência configurada (`@Primary`)
-- [x] Demonstrador funcional
-- [x] 11 cenários BDD implementados
-- [x] Compilação sem erros
-- [x] Logs diferenciando Proxy vs Real Subject
-- [x] Cache hit rate > 50% na demonstração
-- [x] Invalidação de cache funcionando
-
-## 📚 Referências
-
-- **Design Patterns (GoF)**: Proxy Pattern (Structural)
-- **Spring Framework**: Dependency Injection, `@Primary`, `@Qualifier`
-- **Cucumber**: BDD Testing
-- **Java**: ConcurrentHashMap (thread-safety)
-
-## 👤 Autor
-
-**Tiago**  
+## Checklist rápido
+- [x] Subject documentado
+- [x] Real Subject com `@Repository("produtoRepositorioJpa")`
+- [x] Virtual Proxy com `@Primary`, lazy loading e métricas
+- [x] Endpoints de métricas disponíveis
+- [x] Cliente de estoque funcionando sobre o proxy
 Versão 3.0 - Implementação do Padrão Proxy com Cache
 
 ---

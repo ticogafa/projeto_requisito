@@ -8,12 +8,12 @@ import com.cesarschool.barbearia.dominio.compartilhado.base.Repositorio;
  * Interface Subject do Padrão PROXY.
  * 
  * <p>Esta interface define o contrato comum entre o Real Subject (ProdutoRepositorioJpa)
- * e o Proxy (ProdutoRepositorioCacheProxy).</p>
+ * e o Virtual Proxy com lazy loading (ProdutoRepositorioVirtualProxy).</p>
  * 
  * <p><b>Padrão Proxy:</b> Fornece um substituto para outro objeto, controlando o acesso a ele.</p>
  * 
  * @author Tiago
- * @version 3.0
+ * @version 4.0
  */
 public interface ProdutoRepositorio extends Repositorio<Produto, Integer>{
 	/**

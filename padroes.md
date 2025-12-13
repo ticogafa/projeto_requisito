@@ -4,213 +4,216 @@ Este documento lista todos os padrões de projeto (Design Patterns) implementado
 
 ---
 
-## 1. Padrão PROXY (Estrutural)
+## 1. Padrão PROXY (Virtual Proxy com Lazy Loading)
 
 ### Descrição
-O padrão **Proxy** fornece um substituto ou placeholder para outro objeto, controlando o acesso ao objeto original. No projeto, implementamos um **Virtual Proxy com Lazy Loading** para otimizar a performance das operações de repositório, adiando o carregamento de dados do banco de dados até que sejam realmente necessários.
+Implementação de Virtual Proxy para controle de estoque: o proxy adia o carregamento dos produtos e das listas (todos e estoque baixo) até o primeiro acesso, reaproveitando dados em memória e invalidando seletivamente após gravações.
 
 ### Objetivo
-Implementar Lazy Loading transparente entre o cliente e o repositório real, economizando recursos ao carregar dados SOB DEMANDA sem modificar o código cliente.
+Reduzir chamadas ao banco durante operações de estoque (cadastro, movimentação, alertas) sem alterar o contrato usado pelos serviços. O proxy entrega transparência ao cliente e mantém consistência ao invalidar apenas o que foi afetado.
 
-### Classes Criadas
+### Classes usadas (código essencial)
 
-#### 1. `ProdutoRepositorioVirtualProxy.java`
-- **Pacote:** `com.cesarschool.barbearia.infraestrutura.proxy`
-- **Tipo:** Virtual Proxy com Lazy Loading
-- **Responsabilidade:** Adia o carregamento de dados até que sejam realmente necessários (lazy loading)
-- **Características:**
-  - Implementa a interface `ProdutoRepositorio` (mesma interface do Real Subject)
-  - Usa composição: contém uma referência ao Real Subject (`ProdutoRepositorioJpa`)
-  - **Lazy Initialization:** Carrega dados SOB DEMANDA
-  - Cache thread-safe com `ConcurrentHashMap` para dados já carregados
-  - Invalidação seletiva em operações de escrita (preserva outros produtos carregados)
-  - Rastreia estatísticas: Lazy Loads vs Reuso
-  - Anotado com `@Primary` para injeção de dependência automática
-- **Linhas de código:** ~336 linhas
-- **Métodos principais:**
-  - `buscarPorId()`: Lazy loading com verificação de carregamento prévio
-  - `buscarTodos()`: Lazy loading de lista completa
-  - `buscarProdutosComEstoqueBaixo()`: Lazy loading de lista filtrada
-  - `salvar()`: Delega e invalida seletivamente
-  - `excluir()`: Delega e invalida seletivamente
-  - `limparDadosCarregados()`: Limpa todos os dados carregados
-  - `getEstatisticas()`: Retorna métricas de lazy loading
-
-#### 2. `DemonstradorProxy.java`
-- **Pacote:** `com.cesarschool.barbearia`
-- **Tipo:** Demonstrador / Cliente do Proxy
-- **Responsabilidade:** Demonstra o funcionamento do Virtual Proxy através de cenários práticos
-- **Características:**
-  - Implementa `CommandLineRunner` para execução automática
-  - Perfil Spring `@Profile("demo")` para execução isolada
-  - 8 cenários de teste demonstrando Lazy Loading vs Reuso
-  - Logs visuais com emojis (🟣 Virtual Proxy, 🔵 Real Subject)
-  - Pausas interativas entre testes
-  - Exibe estatísticas finais (lazy loads vs reuso)
-- **Linhas de código:** ~330 linhas
-- **Cenários de teste:**
-  1. Cadastrar produto (invalidação seletiva)
-  2. Primeira busca por ID (LAZY LOAD - acessa BD)
-  3. Segunda busca por ID (REUSO - já carregado)
-  4. Terceira busca por ID (REUSO - já carregado)
-  5. Listar todos os produtos (LAZY LOAD - acessa BD)
-  6. Listar todos novamente (REUSO - já carregado)
-  7. Atualizar produto (invalidação seletiva)
-  8. Exibir estatísticas finais
-
-### Classes Modificadas
-
-#### 1. `ProdutoRepositorioJpa.java` (antes: `ProdutoRepositorioImpl.java`)
-- **Pacote:** `com.cesarschool.barbearia.infraestrutura.persistencia`
-- **Tipo:** Real Subject
-- **Modificações:**
-  - **Renomeação:** De `ProdutoRepositorioImpl` para `ProdutoRepositorioJpa`
-  - **JavaDoc:** Adicionada documentação explicando o papel de "Real Subject" no padrão Proxy
-  - **Logs:** Adicionados `System.out.println("🔵 [REAL SUBJECT] ...")` em todos os métodos para demonstração
-  - **Bean naming:** Adicionado `@Repository("produtoRepositorioJpa")` para identificação no Spring DI
-- **Impacto:** Classe agora é explicitamente identificada como o Real Subject do padrão
-
-#### 2. `ProdutoRepositorio.java`
-- **Pacote:** `com.cesarschool.barbearia.dominio.principal.produto`
-- **Tipo:** Subject (Interface)
-- **Modificações:**
-  - **JavaDoc:** Adicionada documentação explicando o papel de "Subject" no padrão Proxy
-  - **Comentários:** Esclarecimento de que esta interface é implementada tanto pelo Proxy quanto pelo Real Subject
-- **Impacto:** Interface agora documenta explicitamente seu papel no padrão
-
-### Estrutura do Padrão
-
-```
-┌─────────────────┐
-│     Cliente     │ (DemonstradorProxy, Controllers, Services)
-│                 │
-└────────┬────────┘
-         │ usa
-         ▼
-┌─────────────────────────────┐
-│   ProdutoRepositorio        │  ← Subject (Interface)
-│   (interface)               │
-└─────────────────────────────┘
-         △
-         │ implementa
-         ├─────────────────────────┬──────────────────────────────┐
-         │                         │                              │
-┌────────────────────┐  ┌──────────────────────────────┐  ┌────────────────────┐
-│ ProdutoRepositorioJpa│  │ProdutoRepositorioVirtualProxy│  │  (outros proxies) │
-│   (Real Subject)   │  │    (Virtual Proxy)           │  │    possíveis       │
-│                    │  │                              │  └────────────────────┘
-│ - Acessa BD        │  │ - Lazy Loading               │
-│ - JPA/Hibernate    │  │ - Dados sob demanda          │
-│                    │◄─┤ - Invalidação seletiva       │
-└────────────────────┘  │ - Rastreamento (reuso/loads) │
-                        │ - @Primary                   │
-                        └──────────────────────────────┘
+**Subject (contrato comum)**
+```java
+// ProdutoRepositorio.java
+public interface ProdutoRepositorio extends Repositorio<Produto, Integer> {
+  Produto salvar(Produto produto);
+  Produto buscarPorId(Integer id);
+  List<Produto> listarTodos();
+  void remover(Integer id);
+  List<Produto> findProdutosComEstoqueBaixo();
+  List<Produto> listarProdutosComEstoqueBaixo();
+}
 ```
 
-### Benefícios Obtidos
+**Real Subject (acesso ao BD)**
+```java
+// ProdutoRepositorioJpa (classe package-private)
+@Repository("produtoRepositorioJpa")
+class ProdutoRepositorioJpa implements ProdutoRepositorio {
+  @Autowired ProdutoJpaRepository repositorio;
+  @Autowired JpaMapeador mapeador;
 
-1. **Performance e Economia de Recursos:**
-   - Inicialização rápida (não carrega tudo de uma vez)
-   - Economia de memória (só carrega o que é usado)
-   - Dados já carregados são reutilizados instantaneamente
-   - Redução significativa de operações I/O no banco de dados
+  public Produto salvar(Produto produto) {
+    System.out.println("🔵 [REAL SUBJECT] salvar() - Acessando BD");
+    var salvo = repositorio.save(mapeador.map(produto, ProdutoJpa.class));
+    return mapeador.map(salvo, Produto.class);
+  }
 
-2. **Lazy Loading Efetivo:**
-   - Dados carregados SOB DEMANDA (apenas quando necessário)
-   - Primeira chamada: LAZY LOAD (acessa BD)
-   - Chamadas subsequentes: REUSO (não acessa BD)
-   - Invalidação seletiva preserva outros dados carregados
+  public Produto buscarPorId(Integer id) {
+    System.out.println("🔵 [REAL SUBJECT] buscarPorId(" + id + ") - Acessando BD");
+    return repositorio.findById(id).map(p -> mapeador.map(p, Produto.class)).orElse(null);
+  }
 
-3. **Transparência:**
-   - Cliente não precisa saber que está usando Virtual Proxy
-   - Spring DI injeta automaticamente o Proxy via `@Primary`
-   - Mesma interface para Proxy e Real Subject
-   - Comportamento lazy transparente para o usuário
+  public List<Produto> listarTodos() {
+    System.out.println("🔵 [REAL SUBJECT] listarTodos() - Acessando BD");
+    return repositorio.findAll().stream().map(p -> mapeador.map(p, Produto.class)).toList();
+  }
 
-4. **Thread Safety:**
-   - Uso de `ConcurrentHashMap` para acesso concorrente
-   - Seguro para uso em ambiente multi-thread
-   - Sincronização automática de dados carregados
+  public void remover(Integer id) {
+    System.out.println("🔵 [REAL SUBJECT] remover(" + id + ") - Acessando BD");
+    repositorio.deleteById(id);
+  }
 
-5. **Observabilidade:**
-   - Logs detalhados de Lazy Loads vs Reuso
-   - Estatísticas em tempo real (lazy load count vs reuso count)
-   - Fácil depuração e monitoramento do padrão
-   - Métricas acessíveis via API REST
+  public List<Produto> findProdutosComEstoqueBaixo() {
+    System.out.println("🔵 [REAL SUBJECT] findProdutosComEstoqueBaixo() - Acessando BD");
+    return repositorio.findProdutosAbaixoEstoqueMinimo().stream()
+        .map(p -> mapeador.map(p, Produto.class)).toList();
+  }
 
-### Como Executar a Demonstração
+  public List<Produto> listarProdutosComEstoqueBaixo() { return findProdutosComEstoqueBaixo(); }
+}
+```
 
-```bash
-# Navegar até o diretório do projeto
+**Virtual Proxy com lazy loading**
+```java
+// ProdutoRepositorioVirtualProxy.java
+@Component
+@Primary
+public class ProdutoRepositorioVirtualProxy implements ProdutoRepositorio {
+  private final ProdutoRepositorio realSubject;
+  private final Map<Integer, Produto> produtosCarregados = new ConcurrentHashMap<>();
+  private List<Produto> listaTodosCarregada;
+  private List<Produto> listaEstoqueBaixoCarregada;
+  private int reusoContador;
+  private int lazyLoadContador;
+
+  @Autowired
+  public ProdutoRepositorioVirtualProxy(@Qualifier("produtoRepositorioJpa") ProdutoRepositorio realSubject) {
+    this.realSubject = realSubject;
+  }
+
+  public Produto salvar(Produto produto) {
+    Produto salvo = realSubject.salvar(produto);
+    if (salvo != null && salvo.getId() != null) { produtosCarregados.remove(salvo.getId()); }
+    listaTodosCarregada = null;
+    listaEstoqueBaixoCarregada = null;
+    if (salvo != null && salvo.getId() != null) { produtosCarregados.put(salvo.getId(), salvo); }
+    return salvo;
+  }
+
+  public Produto buscarPorId(Integer id) {
+    if (produtosCarregados.containsKey(id)) { reusoContador++; return produtosCarregados.get(id); }
+    lazyLoadContador++;
+    Produto produto = realSubject.buscarPorId(id);
+    if (produto != null) { produtosCarregados.put(id, produto); }
+    return produto;
+  }
+
+  public List<Produto> listarTodos() {
+    if (listaTodosCarregada != null) { reusoContador++; return listaTodosCarregada; }
+    lazyLoadContador++;
+    listaTodosCarregada = realSubject.listarTodos();
+    listaTodosCarregada.forEach(p -> produtosCarregados.put(p.getId(), p));
+    return listaTodosCarregada;
+  }
+
+  public void remover(Integer id) {
+    realSubject.remover(id);
+    produtosCarregados.remove(id);
+    listaTodosCarregada = null;
+    listaEstoqueBaixoCarregada = null;
+  }
+
+  public List<Produto> findProdutosComEstoqueBaixo() {
+    if (listaEstoqueBaixoCarregada != null) { reusoContador++; return listaEstoqueBaixoCarregada; }
+    lazyLoadContador++;
+    listaEstoqueBaixoCarregada = realSubject.findProdutosComEstoqueBaixo();
+    return listaEstoqueBaixoCarregada;
+  }
+
+  public List<Produto> listarProdutosComEstoqueBaixo() { return findProdutosComEstoqueBaixo(); }
+
+  public void invalidarDadosCarregados() {
+    produtosCarregados.clear();
+    listaTodosCarregada = null;
+    listaEstoqueBaixoCarregada = null;
+  }
+
+  public void resetarEstatisticas() { reusoContador = 0; lazyLoadContador = 0; }
+  public Map<String, Object> getMetricas() { return Map.of("reuso", reusoContador, "lazyLoads", lazyLoadContador); }
+  public String getEstatisticas() { return "Reuso=" + reusoContador + " LazyLoads=" + lazyLoadContador; }
+}
+```
+
+**Cliente de estoque (usa o contrato sem conhecer o proxy)**
+```java
+// GestaoEstoqueServico.java (trecho)
+public class GestaoEstoqueServico {
+  private final ProdutoRepositorio produtoRepositorio;
+  private final MovimentacaoEstoqueRepositorio movimentacaoRepositorio;
+
+  public GestaoEstoqueServico(ProdutoRepositorio produtoRepositorio,
+                              MovimentacaoEstoqueRepositorio movimentacaoRepositorio) {
+    this.produtoRepositorio = produtoRepositorio;
+    this.movimentacaoRepositorio = movimentacaoRepositorio;
+  }
+
+  public Produto cadastrarProduto(Produto produto, String usuario) {
+    validarNomeUnico(produto.getNome(), null);
+    Produto salvo = produtoRepositorio.salvar(produto);
+    // registra movimentação inicial se houver estoque...
+    return salvo;
+  }
+
+  public Produto adicionarEstoque(ProdutoId id, int quantidade, String obs, String usuario) {
+    Produto produto = buscarProduto(id);
+    produto.setEstoque(produto.getEstoque() + quantidade);
+    Produto atualizado = produtoRepositorio.salvar(produto);
+    registrarMovimentacao(id, produto.getNome(), TipoMovimentacao.ENTRADA,
+        quantidade, produto.getEstoque() - quantidade, produto.getEstoque(), obs, usuario);
+    return atualizado;
+  }
+}
+```
+
+**Observabilidade via HTTP**
+```java
+// ProxyMetricasControlador.java (trecho)
+@RestController
+@RequestMapping("/api/proxy")
+public class ProxyMetricasControlador {
+  private final ProdutoRepositorioVirtualProxy virtualProxy;
+
+  @GetMapping("/statistics")
+  public ResponseEntity<Map<String, Object>> getStatistics() {
+    return ResponseEntity.ok(virtualProxy.getMetricas());
+  }
+
+  @DeleteMapping("/cache")
+  public ResponseEntity<Map<String, String>> clearCache() {
+    virtualProxy.invalidarDadosCarregados();
+    return ResponseEntity.ok(Map.of("message", "Cache limpo"));
+  }
+}
+```
+
+### Classes alteradas e motivo
+- `ProdutoRepositorioVirtualProxy`: versão nova substitui o cache proxy antigo; agora foca em lazy loading (não em cache preemptivo), adiciona invalidação seletiva, métricas e listas específicas (todos e estoque baixo).
+- `ProdutoRepositorio`: JavaDoc ajustado para referenciar o Virtual Proxy, evitando menção ao cache proxy obsoleto.
+- `ProdutoRepositorioJpa`: mantém logs e `@Repository("produtoRepositorioJpa")` como Real Subject; serve de alvo do Virtual Proxy.
+
+### Proxy desatualizado removido
+- `ProdutoRepositorioCacheProxy` (Cache Proxy) estava documentado, mas não é mais usado. A documentação foi substituída pela versão atual (Virtual Proxy com lazy loading) para evitar inconsistências.
+
+### Fluxo resumido
+1) Cliente chama `ProdutoRepositorio` sem saber da existência do proxy.
+2) Proxy verifica se dados estão carregados; se não, delega ao Real Subject (lazy load) e armazena localmente.
+3) Operações de escrita invalidam somente o que foi impactado (produto alterado e listas relacionadas).
+4) Métricas podem ser consultadas ou zeradas via controller ou métodos utilitários.
+
+### Endpoints úteis (observabilidade)
+- `GET /api/proxy/statistics` → métricas em JSON
+- `GET /api/proxy/statistics/text` → métricas em texto
+- `DELETE /api/proxy/cache` → limpa dados lazy-loaded
+- `DELETE /api/proxy/statistics` → reseta contadores
+
+### Execução de demonstração
+```
 cd barbearia-backend/dominio-principal
-
-# Executar com perfil demo
 mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dmaven.test.skip=true
 ```
-Virtual Proxy Statistics:
-   Lazy Loads: 3 | Reuso: 4 | Total: 7
-   Reuso Rate: 57,14%
-   Dados Carregados: 1 produto + 1 lista
-
- ANÁLISE:
-   • Primeira busca = LAZY LOAD (carrega do BD)
-   • Buscas subsequentes = REUSO (não acessa BD)
-   • Reuso rate > 50% = lazy loading efetivo
-   • Operações de escrita invalidam seletivamente
-   • Dados preservados são reutilizados automaticamente
-   • Economia de recursos: só carrega o necessário
-ANÁLISE:
-   • Múltiplas buscas ao mesmo produto = Receita Gerada
-   • Hit rate > 50% = cache está funcionando bem
-   • Operações de escrita invalidam cache (garantem consistência)
-   • PVirtual Proxy:** Substituto com Lazy Loading (`ProdutoRepositorioVirtualProxy`)
-- **Composição:** Proxy HAS-A Real Subject (não usa herança)
-- **Delegação:** Proxy delega para Real Subject APENAS quando necessário (lazy)
-- **Lazy Initialization:** Dados carregados SOB DEMANDA
-- **Controle:** Proxy adiciona lazy loading, invalidação seletiva e estatísticas
-- **Transparência:** Cliente desconhece existência do Proxy
-- **Economia de Recursos:** Evita carregar dados desnecessários
-- **Subject:** Interface comum (`ProdutoRepositorio`)
-- **Real Subject:** Implementação real (`ProdutoRepositorioJpa`)
-- **Proxy:** Substituto com comportamento adicional (`ProdutoRepositorioCacheProxy`)
-- **Composição:** Proxy HAS-A Real Subject (não usa herança)
-- **Delegação:** Proxy delega para Real Subject quando necessário
-- **Controle:** Proxy adiciona cache, invalidação e estatísticas
--Variante Implementada:** Virtual Proxy (Lazy Loading)
-- **Outras Variantes:** Cache Proxy, Protection Proxy, Remote Proxy, Smart Reference
-
----
-
-## Observações
-
-- Este documento será atualizado conforme novos padrões de projeto forem implementados no sistema
-- Data da última atualização: 12/12/2025
-- Responsável pela implementação do Virtual Proxy: Tiago Gurgel
-- **Nota Importante:** O proxy implementado é um **Virtual Proxy** (adiamento de carregamento), não um Cache Proxy tradicional. A distinção é importante pois Virtual Proxy foca em **lazy initialization** enquanto Cache Proxy foca em **reutilização de resultados já computados**.
-- **Aplicabilidade:** Cache, Lazy Loading, Access Control, Logging, Remote Proxy
-
-# Ver estatísticas em JSON
-curl http://localhost:8080/api/proxy/statistics | jq .
-
-# Ver estatísticas em texto
-curl http://localhost:8080/api/proxy/statistics/text
-
-# Ver informações do padrão
-curl http://localhost:8080/api/proxy/info | jq .
-
-# Limpar cache
-curl -X DELETE http://localhost:8080/api/proxy/cache
-
-# Resetar estatísticas
-curl -X DELETE http://localhost:8080/api/proxy/statistics
-
----
-
-## Observações
-
-- Este documento será atualizado conforme novos padrões de projeto forem implementados no sistema
-- Data da última atualização: 10/12/2025
-- Responsável pela implementação do Proxy: Tiago Gurgel
 
 ## 2. Padrão DECORATOR (Estrutural) - Gestão de Caixa
 
