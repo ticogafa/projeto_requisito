@@ -2,16 +2,39 @@ import { useAuth } from '@/auth/AuthContext';
 import AuthService from '@/services/AuthService';
 import JornadaManager from '@/components/Profissional/JornadaManager';
 import { ProfessionalLayout } from '@/views/Profissional/components';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import MainService from '@/services/MainService';
+import { useLoadingStore } from '@/store/useLoadingStore';
 
 export default function ProfessionalJornadaView() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const mainService = MainService.getInstance();
+  const { setLoading } = useLoadingStore();
   
-  // TODO: Pegar profissionalId do backend baseado no user.email
-  const profissionalId = 1;
+  const [profissionalId, setProfissionalId] = useState<number | null>(null);
   const userName = user?.email?.split('@')[0] || 'Profissional';
+
+  useEffect(() => {
+    if (user?.email) {
+      setLoading(true);
+      mainService.getProfissionalPorEmail(
+        user.email,
+        (response) => {
+          setProfissionalId(response.data.id.valor);
+        },
+        (error) => {
+           console.error('Erro ao buscar profissional:', error);
+           toast.error('Não foi possível carregar os dados do profissional.');
+           // Optionally redirect if professional not found
+           // navigate('/login'); 
+        },
+        () => setLoading(false)
+      );
+    }
+  }, [user?.email, navigate, mainService, setLoading]);
 
   const handleLogout = async () => {
     const successCallback = () => {
@@ -25,6 +48,20 @@ export default function ProfessionalJornadaView() {
 
     AuthService.logout(successCallback, errorCallback);
   };
+
+  if (profissionalId === null) {
+    return (
+        <ProfessionalLayout
+            userName={userName}
+            activeMenuItem="jornada"
+            onLogout={handleLogout}
+        >
+            <div className="text-center text-gray-400 p-8">
+                Carregando dados da jornada...
+            </div>
+        </ProfessionalLayout>
+    );
+  }
 
   return (
     <ProfessionalLayout

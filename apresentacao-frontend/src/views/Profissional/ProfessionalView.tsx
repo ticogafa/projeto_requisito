@@ -12,7 +12,7 @@ import { ServiceTimer } from '@/views/Profissional/components/ServiceTimer';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ProfissionalInterface } from '@/interfaces/ProfissionaisInterfaces';
+import { ProfissionalInterface } from '@/interfaces/ProfissionalInterface'; // Corrected import path
 
 export default function ProfessionalView() {
   const navigate = useNavigate();
@@ -30,17 +30,32 @@ export default function ProfessionalView() {
   const [selectedServices, setSelectedServices] = useState<ServicoOferecido[]>([]);
   const [finishingAppointmentId, setFinishingAppointmentId] = useState<number | null>(null);
 
-  const { data: profissionais } = useProfissionais();
+  const [profissionalId, setProfissionalId] = useState<number | null>(null);
+  const [userName, setUserName] = useState<string>('');
+
+  const { data: profissionais, loading: loadingProfissionais } = useProfissionais();
   
-  const currentProf = profissionais.find(p => {
-    const profEmail = typeof p.email === 'object' ? p.email.value : p.email;
-    return profEmail?.toLowerCase() === user?.email?.toLowerCase();
-  });
+  useEffect(() => {
+    if (user?.email && profissionais.length > 0) {
+      const currentProf = profissionais.find(p => {
+        const profEmail = typeof p.email === 'object' ? p.email.value : p.email;
+        return profEmail?.toLowerCase() === user.email?.toLowerCase();
+      });
+
+      if (currentProf) {
+        setProfissionalId(currentProf.id.valor);
+        setUserName(currentProf.nome);
+      } else {
+        toast.error('Profissional não encontrado para o usuário logado.');
+        navigate('/login'); // Redirect to login if professional not found
+      }
+    } else if (!loadingProfissionais && !user?.email) {
+      // User is not logged in or email is missing, and professionals are done loading
+      navigate('/login');
+    }
+  }, [user?.email, profissionais, loadingProfissionais, navigate]);
   
-  const profissionalId = currentProf?.id.valor || 0;
-  const userName = currentProf?.nome || user?.email?.split('@')[0] || 'Profissional';
-  
-  const { data: agendamentos, setData: setAgendamentos } = useAgendamentosPorProfissional(profissionalId);
+  const { data: agendamentos, setData: setAgendamentos } = useAgendamentosPorProfissional(profissionalId || 0);
   const { data: servicosOferecidos } = useServicosOferecidos();
 
   const handleStart = (id: number) => {
@@ -195,12 +210,12 @@ export default function ProfessionalView() {
 
   return (
     <ProfessionalLayout
-      userName={userName}
+      userName={userName || 'Profissional'}
       activeMenuItem="agenda"
       onLogout={handleLogout}
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <ProfessionalHeader userName={userName} />
+        <ProfessionalHeader userName={userName || 'Profissional'} />
         
         <div className="flex bg-dark-800 rounded-lg p-1 border border-dark-600">
           <button

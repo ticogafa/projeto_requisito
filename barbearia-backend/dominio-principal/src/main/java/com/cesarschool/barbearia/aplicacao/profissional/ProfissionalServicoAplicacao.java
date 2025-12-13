@@ -1,5 +1,6 @@
 package com.cesarschool.barbearia.aplicacao.profissional;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -96,6 +97,19 @@ public class ProfissionalServicoAplicacao {
     }
 
     public List<JornadaResumo> obterJornada(Integer profissionalId) {
-        return repositorio.listarJornadas(profissionalId);
+        List<JornadaResumo> jornadas = repositorio.listarJornadas(profissionalId);
+        if (jornadas.isEmpty()) {
+            return java.util.Arrays.stream(com.cesarschool.barbearia.dominio.compartilhado.enums.DiaSemana.values())
+                .map(dia -> JornadaResumo.builder()
+                    .diaSemana(dia)
+                    .horaInicio(java.time.LocalTime.of(8, 0))
+                    .horaFim(java.time.LocalTime.of(18, 0))
+                    .intervaloInicio(null)
+                    .intervaloFim(null)
+                    .ativo(true)
+                    .build())
+                .collect(java.util.stream.Collectors.toList());
+        }
+        return jornadas;
     }
 }
