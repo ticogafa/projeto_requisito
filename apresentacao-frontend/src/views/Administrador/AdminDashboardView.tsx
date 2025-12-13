@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/views/Administrador/components/index';
 import { useNavigate } from 'react-router-dom';
+import { useCaixaStore } from '@/store/useCaixaStore';
 
 interface Agendamento {
   id: number;
@@ -27,14 +28,16 @@ interface Produto {
 
 export default function AdminDashboardView() {
   const navigate = useNavigate();
+  const { saldo, fetchLancamentos } = useCaixaStore();
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    fetchLancamentos();
     loadDashboardData();
-  }, []);
+  }, [fetchLancamentos]);
 
   const loadDashboardData = async () => {
     try {
@@ -77,16 +80,12 @@ export default function AdminDashboardView() {
 
   const profissionaisAtivos = Array.isArray(profissionais) ? profissionais.filter(p => p.ativo).length : 0;
   
-  const faturamentoHoje = agendamentosHoje
-    .filter(ag => ag.status === 'CONCLUIDO')
-    .reduce((total, ag) => total + (ag.servicoPreco || 0), 0);
-
   const produtosBaixoEstoque = Array.isArray(produtos) ? produtos.length : 0;
 
   const stats = [
     { label: 'Agendamentos Hoje', value: agendamentosHoje.length.toString(), icon: 'event', color: 'text-primary', bg: 'bg-primary/10' },
     { label: 'Profissionais Ativos', value: profissionaisAtivos.toString(), icon: 'people', color: 'text-green-400', bg: 'bg-green-500/10' },
-    { label: 'Faturamento Hoje', value: `R$ ${faturamentoHoje.toFixed(2)}`, icon: 'attach_money', color: 'text-blue-400', bg: 'bg-blue-500/10' },
+    { label: 'Saldo em Caixa', value: `R$ ${saldo.toFixed(2)}`, icon: 'account_balance_wallet', color: 'text-blue-400', bg: 'bg-blue-500/10' },
     { label: 'Estoque Baixo', value: produtosBaixoEstoque.toString(), icon: 'inventory_2', color: 'text-yellow-400', bg: 'bg-yellow-500/10' }
   ];
 
@@ -104,7 +103,7 @@ export default function AdminDashboardView() {
             <div className="flex items-center justify-between mb-4">
               <span className={`material-icons text-4xl ${stat.color}`}>{stat.icon}</span>
               <span className={`${stat.bg} ${stat.color} px-3 py-1 rounded-full text-sm font-semibold`}>
-                Hoje
+                Geral
               </span>
             </div>
             <h3 className="text-3xl font-bold mb-1 text-white">{stat.value}</h3>
@@ -118,7 +117,7 @@ export default function AdminDashboardView() {
           { icon: 'event_note', label: 'Agenda Geral', desc: 'Gerenciar tudo', path: '/admin/agendamentos', color: 'text-primary' },
           { icon: 'schedule', label: 'Jornada', desc: 'Configurar horários', path: '/admin/profissionais', color: 'text-green-400' },
           { icon: 'content_cut', label: 'Serviços', desc: 'Gerenciar catálogo', path: '/admin/servicos', color: 'text-blue-400' },
-          { icon: 'account_balance_wallet', label: 'Caixa', desc: 'Entradas e saídas', path: '/admin/financeiro', color: 'text-green-400' },
+          { icon: 'account_balance_wallet', label: 'Caixa', desc: 'Entradas e saídas', path: '/admin/controle-caixa', color: 'text-green-400' },
           { icon: 'bar_chart', label: 'Relatórios', desc: 'Métricas', path: '/admin/relatorios', color: 'text-blue-400' }
         ].map((action, idx) => (
           <button

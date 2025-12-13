@@ -1,48 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Caixa } from '@/interfaces/Caixa';
-import MainService from '@/services/MainService';
+import { useCaixaStore } from '@/store/useCaixaStore';
 
 const CashControlView: React.FC = () => {
-    const [lancamentos, setLancamentos] = useState<Caixa[]>([]);
+    const { lancamentos, saldo, fetchLancamentos, addLancamento } = useCaixaStore();
     const [descricao, setDescricao] = useState('');
     const [valor, setValor] = useState('');
     const [tipo, setTipo] = useState<'ENTRADA' | 'SAIDA'>('ENTRADA');
-    const mainService = MainService.getInstance();
 
     useEffect(() => {
-        loadLancamentos();
-    }, []);
-
-    const loadLancamentos = () => {
-        mainService.getLancamentos(
-            (response) => {
-                setLancamentos(response.data);
-            },
-            (error) => {
-                console.error('Erro ao buscar lançamentos:', error);
-            },
-            () => {}
-        );
-    };
+        fetchLancamentos();
+    }, [fetchLancamentos]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const novoLancamento = {
+        if (!descricao || !valor || isNaN(parseFloat(valor))) {
+            return;
+        }
+        addLancamento({
             descricao,
             valor: parseFloat(valor),
             tipo,
-        };
-        mainService.addLancamento(
-            novoLancamento,
-            () => {
-                loadLancamentos();
-                setDescricao('');
-                setValor('');
-            },
-            (error) => {
-                console.error('Erro ao adicionar lançamento:', error);
-            }
-        );
+        });
+        setDescricao('');
+        setValor('');
     };
 
     const totalEntradas = lancamentos
@@ -52,8 +32,6 @@ const CashControlView: React.FC = () => {
     const totalSaidas = lancamentos
         .filter((l) => l.tipo === 'SAIDA')
         .reduce((acc, s) => acc + s.valor, 0);
-
-    const saldo = totalEntradas - totalSaidas;
 
     return (
         <div className="p-6">
@@ -99,7 +77,13 @@ const CashControlView: React.FC = () => {
                             <option value="SAIDA">Saída</option>
                         </select>
                     </div>
-                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">Adicionar</button>
+                    <button
+                        type="submit"
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:bg-gray-500 disabled:cursor-not-allowed"
+                        disabled={!descricao || !valor || isNaN(parseFloat(valor))}
+                    >
+                        Adicionar
+                    </button>
                 </form>
             </div>
             <div className="mt-6">

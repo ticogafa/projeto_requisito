@@ -32,23 +32,13 @@ public class LancamentoJpaRepositorioImpl implements LancamentoRepositorio {
 
     @Override
     public void salvar(Lancamento lancamento) {
-        // Converte Domínio -> JPA
-        LancamentoJpa jpa = LancamentoJpa.builder()
-                .id(lancamento.getId().toString())
-                .clienteId(lancamento.getClienteId() != null ? lancamento.getClienteId().toString() : null)
-                .status(lancamento.getStatus())
-                .descricao(lancamento.getDescricao())
-                .valor(lancamento.getValor())
-                .meioPagamento(lancamento.getMeioPagamento())
-                .quando(lancamento.getQuando())
-                .build();
-
+        LancamentoJpa jpa = mapeador.map(lancamento, LancamentoJpa.class);
         springRepo.save(jpa);
     }
 
     @Override
     public Optional<Lancamento> buscarPorId(LancamentoId id) {
-        return springRepo.findById(id.toString())
+        return springRepo.findById(id.getValor().toString())
                 .map(this::converterParaDominio);
     }
 
@@ -61,7 +51,7 @@ public class LancamentoJpaRepositorioImpl implements LancamentoRepositorio {
 
     @Override
     public List<Lancamento> buscarPendentesPorCliente(ClienteId clienteId) {
-        return springRepo.findByClienteIdAndStatus(clienteId.toString(), StatusLancamento.PENDENTE).stream()
+        return springRepo.findByClienteIdAndStatus(clienteId.getValor().toString(), StatusLancamento.PENDENTE).stream()
                 .map(this::converterParaDominio)
                 .toList();
     }

@@ -11,6 +11,8 @@ import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.ExecucaoAten
 import com.cesarschool.barbearia.dominio.principal.agendamento.Agendamento;
 import com.cesarschool.barbearia.dominio.principal.agendamento.AgendamentoId;
 import com.cesarschool.barbearia.dominio.principal.cliente.ClienteId;
+import com.cesarschool.barbearia.dominio.principal.cliente.caixa.Lancamento;
+import com.cesarschool.barbearia.dominio.principal.cliente.caixa.LancamentoId;
 import com.cesarschool.barbearia.dominio.principal.produto.Produto;
 import com.cesarschool.barbearia.dominio.principal.produto.ProdutoId;
 import com.cesarschool.barbearia.dominio.principal.produto.estoque.MovimentacaoEstoque;
@@ -47,6 +49,7 @@ class JpaMapeador extends ModelMapper {
         configurarConversoresCliente();
         configurarConversoresIds();
         configurarConversoresExecucaoAtendimento();
+        configurarConversoresLancamento();
     }
     
     private void configurarConversoresExecucaoAtendimento() {
@@ -303,6 +306,45 @@ class JpaMapeador extends ModelMapper {
         });
     }
     
+    // ==================== CONVERSORES DE LANCAMENTO ====================
+    
+    private void configurarConversoresLancamento() {
+        // LancamentoJpa -> Lancamento
+        addConverter(new AbstractConverter<LancamentoJpa, Lancamento>() {
+            @Override
+            public Lancamento convert(LancamentoJpa source) {
+                var id = source.getId() != null ? new LancamentoId(java.util.UUID.fromString(source.getId())) : null;
+                var clienteId = source.getClienteId() != null ? new ClienteId(Integer.parseInt(source.getClienteId())) : null;
+                
+                return new Lancamento(
+                    id,
+                    clienteId,
+                    source.getStatus(),
+                    source.getDescricao(),
+                    source.getValor(),
+                    source.getMeioPagamento(),
+                    source.getQuando()
+                );
+            }
+        });
+
+        // Lancamento -> LancamentoJpa
+        addConverter(new AbstractConverter<Lancamento, LancamentoJpa>() {
+            @Override
+            public LancamentoJpa convert(Lancamento source) {
+                return LancamentoJpa.builder()
+                    .id(source.getId() != null ? source.getId().getValor().toString() : null)
+                    .clienteId(source.getClienteId() != null ? source.getClienteId().getValor().toString() : null)
+                    .status(source.getStatus())
+                    .descricao(source.getDescricao())
+                    .valor(source.getValor())
+                    .meioPagamento(source.getMeioPagamento())
+                    .quando(source.getQuando())
+                    .build();
+            }
+        });
+    }
+
     // ==================== CONVERSORES DE IDs ====================
     
     private void configurarConversoresIds() {
