@@ -31,8 +31,8 @@ public class ExceptionHandler {
         try {
             return callable.get();
         } catch (Exception e) {
-            ExceptionHandlerStrategy adapter = registry.getStrategy(e);
-            return (ResponseEntity<T>) adapter.toResponseEntity();
+            ExceptionHandlerStrategy strategy = registry.getStrategy(e);
+            return (ResponseEntity<T>) strategy.toResponseEntity();
         }
     }
 }

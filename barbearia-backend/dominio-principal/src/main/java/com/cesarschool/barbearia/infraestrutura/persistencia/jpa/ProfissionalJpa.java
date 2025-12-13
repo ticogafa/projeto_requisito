@@ -82,6 +82,9 @@ public class ProfissionalJpa {
     @Column(name = "MOTIVO_INATIVIDADE", length = 255)
     private String motivoInatividade; 
 
+    @jakarta.persistence.OneToMany(mappedBy = "profissionalId", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)
+    private List<JornadaTrabalhoJpa> jornadas = new ArrayList<>();
+
     @ManyToMany(fetch = jakarta.persistence.FetchType.EAGER)
     @JoinTable(
         name = "profissional_servico",
@@ -254,12 +257,45 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
     public void simularAgendamentoAtivo(String nomeServico, boolean ativo) {}
     @Override public boolean temAgendamentoAtivo(String nomeServico) { return false; }
 
-    @Override
-    public List<JornadaResumo> listarJornadas(Integer profissionalId) {
-        return new ArrayList<>(); 
+ @Override
+    public void atualizarJornadas(Integer profissionalId, List<JornadaResumo> jornadas) {
+        ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
+            .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
+        
+        profissional.getJornadas().clear();
+        
+        if (jornadas != null) {
+            for (com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo dto : jornadas) {
+                JornadaTrabalhoJpa jornada = JornadaTrabalhoJpa.builder()
+                    .profissionalId(profissionalId)
+                    .diaSemana(dto.getDiaSemana())
+                    .horaInicio(dto.getHoraInicio())
+                    .horaFim(dto.getHoraFim())
+                    .intervaloInicio(dto.getIntervaloInicio())
+                    .intervaloFim(dto.getIntervaloFim())
+                    .ativo(dto.isAtivo())
+                    .build();
+                profissional.getJornadas().add(jornada);
+            }
+        }
+        
+        profissionalJpaRepository.save(profissional);
     }
 
     @Override
-    public void atualizarJornadas(Integer profissionalId, List<JornadaResumo> jornadas) {
+    public List<com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo> listarJornadas(Integer profissionalId) {
+        ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
+            .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
+            
+        return profissional.getJornadas().stream()
+            .map(j -> com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo.builder()
+                .diaSemana(j.getDiaSemana())
+                .horaInicio(j.getHoraInicio())
+                .horaFim(j.getHoraFim())
+                .intervaloInicio(j.getIntervaloInicio())
+                .intervaloFim(j.getIntervaloFim())
+                .ativo(j.isAtivo())
+                .build())
+            .collect(Collectors.toList());
     }
 }

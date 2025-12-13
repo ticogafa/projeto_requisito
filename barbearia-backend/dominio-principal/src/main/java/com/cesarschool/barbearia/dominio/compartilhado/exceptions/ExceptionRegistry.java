@@ -13,9 +13,9 @@ public class ExceptionRegistry {
     private final Map<Class<? extends Exception>, ExceptionEntry> registry = new HashMap<>();
 
     public void register(Class<? extends Exception> exceptionClass,
-                         Class<? extends ExceptionHandlerStrategy> adapter,
+                         Class<? extends ExceptionHandlerStrategy> strategy,
                          HttpStatus status) {
-        registry.put(exceptionClass, new ExceptionEntry(adapter, status));
+        registry.put(exceptionClass, new ExceptionEntry(strategy, status));
     }
 
     public void register(Class<? extends Exception> exceptionClass, HttpStatus status) {

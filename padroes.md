@@ -146,7 +146,8 @@ cd barbearia-backend/dominio-principal
 
 # Executar com perfil demo
 mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dmaven.test.skip=true
-```Virtual Proxy Statistics:
+```
+Virtual Proxy Statistics:
    Lazy Loads: 3 | Reuso: 4 | Total: 7
    Reuso Rate: 57,14%
    Dados Carregados: 1 produto + 1 lista
@@ -210,3 +211,438 @@ curl -X DELETE http://localhost:8080/api/proxy/statistics
 - Este documento será atualizado conforme novos padrões de projeto forem implementados no sistema
 - Data da última atualização: 10/12/2025
 - Responsável pela implementação do Proxy: Tiago Gurgel
+
+# Padrão Strategy - Sistema de Tratamento de Exceções
+
+## Mapeamento para o Padrão GoF
+
+### 1. **Strategy** (Interface/Contrato)
+
+**Classe:** `ExceptionHandlerStrategy` (interface)
+
+- Define a interface comum para todas as estratégias de tratamento de exceções
+- Declara métodos que todas as concrete strategies devem implementar
+
+### 2. **ConcreteStrategy** (Implementação Concreta)
+
+**Classe:** `GenericExceptionHandlerStrategy` (class)
+
+- Implementa o algoritmo de tratamento de exceção genérico
+- Converte exceções em `ResponseEntity` HTTP
+- Pode ser estendido com outras estratégias específicas no futuro
+
+### 3. **Context** (Contexto de Uso)
+
+**Classe:** `ExceptionHandler` (class)
+
+- Mantém referência ao registry que fornece as strategies
+- Delega o tratamento de exceções para a strategy apropriada
+- Método `withHandler()` executa operações com tratamento automático
+
+### 4. **Componentes Auxiliares**
+
+#### **ExceptionRegistry** (Factory/Registry Pattern)
+- Responsável por criar e fornecer a strategy apropriada
+- Usa padrão Factory para instanciar strategies
+- Mantém mapeamento de Exception → Strategy
+
+#### **ExceptionEntry** (Value Object)
+- Encapsula metadados de cada exceção registrada
+- Associa tipo de exceção com sua strategy e HTTP status
+
+---
+
+## Diagrama de Sequência - Fluxo de Execução
+
+![Diagrama Strategy](/DOCUMENTAÇÃO/PADROES/strategy.png)
+
+---
+
+## Benefícios do Padrão Strategy Nesta Implementação
+
+### 1. **Open/Closed Principle**
+- Aberto para extensão: Novas strategies podem ser adicionadas sem modificar código existente
+- Fechado para modificação: O Context (`ExceptionHandler`) não precisa ser alterado
+
+### 2. **Single Responsibility**
+- Cada strategy é responsável por um tipo específico de tratamento
+- ExceptionRegistry gerencia o mapeamento
+- ExceptionHandler coordena o fluxo
+
+### 3. **Flexibilidade**
+- Diferentes exceções podem ter diferentes estratégias de tratamento
+- HTTP status codes podem variar por tipo de exceção
+- Fácil adicionar novos tipos de exceção
+
+### 4. **Testabilidade**
+- Strategies podem ser testadas isoladamente
+- Mock strategies podem ser injetadas para testes
+- Context pode ser testado independentemente
+
+---
+
+## Exemplo de Uso
+
+```java
+@RestController
+public class ProdutoControlador {
+    
+    private final ExceptionHandler exceptionHandler;
+    
+    // ...
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<ProdutoResponse> buscarPorId(@PathVariable Long id) {
+        return exceptionHandler.withHandler(() -> {
+            // Lógica que pode lançar exceções
+            Produto produto = produtoServico.buscarPorId(new ProdutoId(id));
+            return ResponseEntity.ok(mapeador.toResponse(produto));
+        });
+    }
+}
+```
+
+### Fluxo:
+1. Controller chama `withHandler()` passando uma lambda
+2. ExceptionHandler executa a lambda dentro de try-catch
+3. Se exceção ocorrer:
+   - ExceptionHandler pede ao Registry a strategy apropriada
+   - Registry cria `GenericExceptionHandlerStrategy` com status HTTP adequado
+   - Strategy converte exceção em `ResponseEntity<Map<String, String>>`
+4. Response é retornado ao cliente
+
+---
+
+## Extensibilidade Futura
+
+### Adicionar Nova ConcreteStrategy
+
+```java
+public class ValidationExceptionHandlerStrategy implements ExceptionHandlerStrategy {
+    private final ValidationException exception;
+    private final HttpStatus status;
+    
+    public ValidationExceptionHandlerStrategy(ValidationException ex) {
+        this.exception = ex;
+        this.status = HttpStatus.UNPROCESSABLE_ENTITY;
+    }
+    
+    @Override
+    public ResponseEntity<Map<String, String>> toResponseEntity() {
+        Map<String, String> body = new HashMap<>();
+        body.put("name", "ValidationError");
+        body.put("message", exception.getMessage());
+        body.put("field", exception.getFieldName());
+        body.put("invalidValue", exception.getInvalidValue());
+        body.put("statusCode", "422");
+        body.put("timestamp", ZonedDateTime.now().toString());
+        return ResponseEntity.status(status).body(body);
+    }
+    
+    // ... outros métodos
+}
+```
+
+### Registrar Nova Strategy
+
+```java
+@Component
+public class ExceptionRegistry {
+    
+    public void configureDefaults() {
+        // Registros existentes...
+        
+        // Nova strategy específica
+        register(ValidationException.class, 
+                 ValidationExceptionHandlerStrategy.class, 
+                 HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+}
+```
+
+---
+
+## Comparação com o Padrão GoF Original
+
+| Componente GoF | Implementação | Responsabilidade |
+|----------------|---------------|------------------|
+| **Strategy** (interface) | `ExceptionHandlerStrategy` | Define contrato para tratamento |
+| **ConcreteStrategy** | `GenericExceptionHandlerStrategy` | Implementa tratamento genérico |
+| **Context** | `ExceptionHandler` | Coordena execução e delegação |
+| **Cliente** | Controllers | Usa o Context para tratar erros |
+| **(Extra) Factory** | `ExceptionRegistry` | Cria strategies apropriadas |
+
+---
+
+## Conclusão
+
+A implementação segue fielmente o padrão **Strategy** do GoF, com adições de padrões complementares:
+
+- **Strategy**: Para algoritmos intercambiáveis de tratamento
+- **Factory**: Para criação de strategies (ExceptionRegistry)
+- **Registry**: Para mapeamento de exceções
+- **Value Object**: Para encapsular metadados (ExceptionEntry)
+
+Esta arquitetura permite:
+- ✅ Adicionar novos tipos de exceção sem alterar código existente
+- ✅ Diferentes estratégias de serialização por tipo de erro
+- ✅ Mapeamento flexível de HTTP status codes
+- ✅ Código limpo, testável e manutenível
+
+---
+
+### 📚 Clientes do Padrão Strategy (Tratamento de Exceções)
+
+O `ExceptionHandler` (Context) é injetado e utilizado por diversos controladores para garantir um tratamento de exceções consistente em toda a API. Abaixo estão exemplos reais de uso:
+
+#### 1. AgendamentoControlador.java (Uso Principal)
+
+**Pacote:** `com.cesarschool.barbearia.apresentacao.agendamento`
+**Caminho:** [AgendamentoControlador.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/apresentacao/agendamento/AgendamentoControlador.java)
+
+**Injeção do Context:**
+```java
+@RestController
+@RequestMapping("/api/agendamentos")
+public class AgendamentoControlador {
+    
+    @Autowired
+    private AgendamentoServicoAplicacao servicoAplicacao;
+    
+    @Autowired
+    private ExceptionHandler exceptionHandler;  // ← Context do padrão Strategy
+    
+    // ... métodos
+}
+```
+
+**Exemplo 1 - Criar Agendamento:**
+```java
+@PostMapping("/criar")
+public ResponseEntity<AgendamentoResumo> criar(@RequestBody CriarAgendamentoRequest request) {
+    return exceptionHandler.withHandler(() -> {
+        logger.info("=== CRIAR AGENDAMENTO ===");
+        logger.info("ClienteId: " + request.getClienteId());
+        logger.info("ServicoId: " + request.getServicoId()); 
+        logger.info("ProfissionalId: " + request.getProfissionalId());
+        
+        AgendamentoResumo agendamento = servicoAplicacao.criar(request);
+        logger.info("Agendamento criado: " + agendamento.getId());
+        
+        return ResponseEntity.status(201).body(agendamento);
+    });
+}
+```
+- **Exceções tratadas:** `ClienteNaoEncontradoException`, `ServicoNaoEncontradoException`, `ProfissionalNaoEncontradoException`, `HorarioIndisponivelException`
+- **Strategy aplicada:** `GenericExceptionHandlerStrategy` converte cada exceção em `ResponseEntity` com HTTP status apropriado
+- **Resultado:** Cliente recebe JSON estruturado com `name`, `message`, `statusCode`, `timestamp`
+
+**Exemplo 2 - Editar Agendamento:**
+```java
+@PutMapping("/{id}")
+public ResponseEntity<AgendamentoResumo> editar(
+        @PathVariable Integer id,
+        @RequestBody EditarAgendamentoRequest request) {
+    
+    return exceptionHandler.withHandler(() -> {
+        logger.info("Editando agendamento - ID: " + id + 
+                   ", nova dataHora: " + request.getDataHora());
+        
+        AgendamentoResumo agendamento = servicoAplicacao.editar(id, request);
+        
+        logger.info("Agendamento editado com sucesso - ID: " + id);
+        return ResponseEntity.ok(agendamento);
+    });
+}
+```
+- **Exceções tratadas:** `AgendamentoNaoEncontradoException`, `HorarioIndisponivelException`, `StatusInvalidoException`
+- **Benefício:** Todas as exceções são capturadas e convertidas automaticamente pela strategy
+
+**Exemplo 3 - Cancelar Agendamento:**
+```java
+@DeleteMapping("/{id}")
+public ResponseEntity<AgendamentoResumo> cancelar(
+        @PathVariable Integer id,
+        @RequestParam(required = false) Integer clienteId,
+        @RequestParam(required = false) Integer profissionalId) {
+    
+    return exceptionHandler.withHandler(() -> {
+        logger.info("Cancelando agendamento - ID: " + id);
+        
+        if (clienteId != null) {
+            AgendamentoResumo agendamento = servicoAplicacao.cancelar(id, clienteId, TipoUsuario.CLIENTE);
+            return ResponseEntity.ok(agendamento);
+        } 
+        
+        if (profissionalId != null) {
+            AgendamentoResumo agendamento = servicoAplicacao.cancelar(id, profissionalId, TipoUsuario.PROFISSIONAL);
+            return ResponseEntity.ok(agendamento);
+        }
+        
+        throw new IllegalArgumentException("É necessário informar clienteId ou profissionalId");
+    });
+}
+```
+- **Exceções tratadas:** `AgendamentoNaoEncontradoException`, `OperacaoNaoPermitidaException`, `IllegalArgumentException`
+- **Resultado:** Cada tipo de exceção recebe tratamento apropriado via Strategy
+
+**Exemplo 4 - Listar Agendamentos por Cliente:**
+```java
+@GetMapping("/por-cliente")
+public ResponseEntity<List<AgendamentoResumo>> listarPorCliente(@RequestParam Integer clienteId) {
+    return exceptionHandler.withHandler(() -> {
+        logger.info("Listando agendamentos do cliente: " + clienteId);
+        
+        List<AgendamentoResumo> agendamentos = servicoAplicacao.listarPorCliente(clienteId);
+        
+        logger.info("Encontrados " + agendamentos.size() + " agendamentos");
+        return ResponseEntity.ok(agendamentos);
+    });
+}
+```
+
+**Exemplo 5 - Atualizar Status:**
+```java
+@PutMapping("/{id}/status")
+public ResponseEntity<AgendamentoResumo> atualizarStatus(
+        @PathVariable Integer id,
+        @RequestParam String status) {
+    
+    return exceptionHandler.withHandler(() -> {
+        logger.info("Atualizando status do agendamento " + id + " para " + status);
+        
+        StatusAgendamento statusEnum;
+        try {
+            statusEnum = StatusAgendamento.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Status inválido: " + status);
+        }
+        
+        AgendamentoResumo agendamento = servicoAplicacao.atualizarStatus(id, statusEnum);
+        return ResponseEntity.ok(agendamento);
+    });
+}
+```
+
+#### 2. ServicoOferecidoControlador.java
+
+**Caminho:** [ServicoOferecidoControlador.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/apresentacao/servico/ServicoOferecidoControlador.java)
+
+**Exemplo de Uso:**
+```java
+@GetMapping
+public ResponseEntity<List<ServicoOferecidoResponse>> listarTodos() {
+    return exceptionHandler.withHandler(() -> {
+        List<ServicoOferecidoResponse> servicos = servicoAplicacao.listarTodos();
+        return ResponseEntity.ok(servicos);
+    });
+}
+
+@PostMapping
+public ResponseEntity<ServicoOferecidoResponse> criar(@RequestBody CriarServicoRequest request) {
+    return exceptionHandler.withHandler(() -> {
+        ServicoOferecidoResponse servico = servicoAplicacao.criar(request);
+        return ResponseEntity.status(201).body(servico);
+    });
+}
+```
+
+#### 3. ProdutoControlador.java
+
+**Caminho:** [ProdutoControlador.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/apresentacao/produto/ProdutoControlador.java)
+
+**Exemplo de Uso:**
+```java
+@GetMapping("/{id}")
+public ResponseEntity<ProdutoResponse> buscarPorId(@PathVariable Long id) {
+    return exceptionHandler.withHandler(() -> {
+        Produto produto = produtoServico.buscarPorId(new ProdutoId(id));
+        return ResponseEntity.ok(mapeador.toResponse(produto));
+    });
+}
+```
+
+#### 4. ProfissionalControlador.java
+
+**Caminho:** [ProfissionalControlador.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/apresentacao/profissional/ProfissionalControlador.java)
+
+**Exemplo de Uso:**
+```java
+@PostMapping
+public ResponseEntity<ProfissionalResponse> criar(@RequestBody CriarProfissionalRequest request) {
+    return exceptionHandler.withHandler(() -> {
+        ProfissionalResponse profissional = servicoAplicacao.criar(request);
+        return ResponseEntity.status(201).body(profissional);
+    });
+}
+```
+
+#### 5. ProfissionalJornadaControlador.java
+
+**Caminho:** [ProfissionalJornadaControlador.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/apresentacao/profissional/ProfissionalJornadaControlador.java)
+
+**Exemplo de Uso:**
+```java
+@PostMapping("/{profissionalId}/jornada")
+public ResponseEntity<Void> definirJornada(
+        @PathVariable Integer profissionalId,
+        @RequestBody DefinirJornadaRequest request) {
+    
+    return exceptionHandler.withHandler(() -> {
+        servicoAplicacao.definirJornada(profissionalId, request);
+        return ResponseEntity.ok().build();
+    });
+}
+```
+
+---
+
+### 🎯 Fluxo Completo em Agendamentos
+
+**Cenário:** Cliente tenta criar agendamento em horário já ocupado
+
+```
+1. Request HTTP POST /api/agendamentos/criar
+   ↓
+2. AgendamentoControlador.criar()
+   ↓
+3. exceptionHandler.withHandler(() -> {...})  ← Context executa lambda
+   ↓
+4. servicoAplicacao.criar(request)
+   ↓
+5. AgendamentoServico.criar() - validação de horário
+   ↓
+6. ❌ Lança HorarioIndisponivelException("Profissional já possui agendamento neste horário")
+   ↓
+7. ExceptionHandler captura exceção (try-catch)
+   ↓
+8. registry.getStrategy(HorarioIndisponivelException.class)
+   ↓
+9. ExceptionRegistry busca strategy registrada
+   ↓
+10. Retorna GenericExceptionHandlerStrategy(ex, HttpStatus.CONFLICT)
+    ↓
+11. strategy.toResponseEntity() cria resposta:
+    {
+      "name": "HorarioIndisponivelException",
+      "message": "Profissional já possui agendamento neste horário",
+      "statusCode": "409 CONFLICT",
+      "timestamp": "2025-12-12T15:30:00-03:00"
+    }
+    ↓
+12. ResponseEntity retornado ao cliente com HTTP 409
+```
+
+---
+
+### ✅ Benefícios Observados na Prática
+
+1. **Consistência:** Todas as exceções em todos os controladores são tratadas de forma uniforme
+2. **Manutenibilidade:** Adicionar novo tipo de exceção não requer alterar controladores
+3. **Separação de Responsabilidades:** Controladores focam na lógica de negócio, Strategy cuida da serialização
+4. **Testabilidade:** Fácil testar estratégias isoladamente
+5. **Extensibilidade:** Novos controladores automaticamente se beneficiam do tratamento centralizado
+
+---
+
+## 💎 Menção Honrosa: Padrão SINGLETON

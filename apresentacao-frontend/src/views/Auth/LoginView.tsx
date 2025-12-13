@@ -56,7 +56,7 @@ export default function LoginView() {
   const handleResetData = () => {
     setLoading(true);
     MainService.getInstance().resetarDadosTeste(
-      () => toast.success('Dados de agendamento recriados com sucesso!'),
+      () => toast.success('Dados de teste recriados com sucesso! (Clientes, Profissionais, Serviços, Produtos e Agendamentos)'),
       () => toast.error('Erro ao recriar dados'),
       () => setLoading(false)
     );
@@ -156,8 +156,8 @@ export default function LoginView() {
           <div className="grid grid-cols-1 gap-3">
             {[
               { role: 'Admin', email: 'admin@barbearia.com', pass: 'senha123', icon: 'admin_panel_settings', color: 'text-red-400' },
-              { role: 'Profissional', email: 'profissional@barbearia.com', pass: 'senha123', icon: 'content_cut', color: 'text-blue-400' },
-              { role: 'Cliente', email: 'cliente@barbearia.com', pass: 'senha123', icon: 'person', color: 'text-green-400' }
+              { role: 'Profissional', email: 'carlos@barbearia.com', pass: 'senha123', icon: 'content_cut', color: 'text-blue-400' },
+              { role: 'Cliente', email: 'joao.silva@email.com', pass: 'senha123', icon: 'person', color: 'text-green-400' }
             ].map((user) => (
               <button
                 key={user.role}

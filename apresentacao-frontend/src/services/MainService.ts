@@ -541,7 +541,7 @@ export default class MainService {
     finallyCallback: () => void
   ): void {
     this.client.post(
-      '/dev/seed-agendamentos',
+      '/dev/seed-all',
       {},
       {},
       successCallback,
