@@ -15,6 +15,9 @@ public class Avaliacao {
     private Nota nota;
     private LocalDateTime data;
 
+    public Avaliacao() {
+    }
+
     public Avaliacao(AvaliacaoId id, ProfissionalId profissionalId, Nota nota, LocalDateTime data) {
         this.id = id;
         this.profissionalId = profissionalId;
