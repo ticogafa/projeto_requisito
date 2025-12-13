@@ -11,9 +11,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo;
 import com.cesarschool.barbearia.dominio.compartilhado.logger.LoggerSingleton;
@@ -83,7 +85,7 @@ public class ProfissionalJpa {
     @Column(name = "MOTIVO_INATIVIDADE", length = 255)
     private String motivoInatividade; 
 
-    @jakarta.persistence.OneToMany(mappedBy = "profissionalId", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER, orphanRemoval = true)
+    @jakarta.persistence.OneToMany(mappedBy = "profissionalId", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)
     private List<JornadaTrabalhoJpa> jornadas = new ArrayList<>();
 
     @ManyToMany(fetch = jakarta.persistence.FetchType.EAGER)
@@ -110,6 +112,13 @@ interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integ
 }
 
 @Repository
+interface JornadaTrabalhoJpaRepository extends JpaRepository<JornadaTrabalhoJpa, Integer> {
+    @Modifying
+    @Transactional
+    void deleteByProfissionalId(Integer profissionalId);
+}
+
+@Repository
 class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
 
     private static final LoggerSingleton logger = LoggerSingleton.getInstance();
@@ -117,7 +126,8 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
     @Autowired
     private ProfissionalJpaRepository profissionalJpaRepository;
     
-    
+    @Autowired
+    private JornadaTrabalhoJpaRepository jornadaTrabalhoJpaRepository;
     private ProfissionalJpa toEntity(Profissional dominio) {
         Agenda agenda = dominio.getAgenda() != null ? dominio.getAgenda() : new Agenda();
         
@@ -261,23 +271,19 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
 
  @Override
     public void atualizarJornadas(Integer profissionalId, List<JornadaResumo> jornadas) {
+        // Delete all existing jornadas for this professional first
+        jornadaTrabalhoJpaRepository.deleteByProfissionalId(profissionalId);
+        
+        // Now find the professional and add new jornadas
         ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
             .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
         
-        // Remove TODAS as jornadas antigas do banco de dados primeiro
-        if (!profissional.getJornadas().isEmpty()) {
-            profissional.getJornadas().clear();
-            profissionalJpaRepository.save(profissional); // Força flush para deletar do banco
-            profissionalJpaRepository.flush();
-        }
+        // Clear the in-memory list
+        profissional.getJornadas().clear();
         
-        // Recarrega o profissional para garantir estado limpo
-        profissional = profissionalJpaRepository.findById(profissionalId)
-            .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
-        
+        // Add only active jornadas with valid hours
         if (jornadas != null) {
             for (com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo dto : jornadas) {
-                // Só persiste jornadas ATIVAS com horários válidos
                 if (dto.isAtivo() && dto.getHoraInicio() != null && dto.getHoraFim() != null) {
                     JornadaTrabalhoJpa jornada = JornadaTrabalhoJpa.builder()
                         .profissionalId(profissionalId)
