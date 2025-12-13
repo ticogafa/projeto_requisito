@@ -49,7 +49,7 @@ export default function AdminDashboardView() {
       setAgendamentos(Array.isArray(agendamentosData) ? agendamentosData : []);
 
       // Buscar profissionais
-      const profissionaisResponse = await fetch('http://localhost:8080/api/profissionais');
+      const profissionaisResponse = await fetch('http://localhost:8080/api/profissional');
       const profissionaisData = await profissionaisResponse.json();
       setProfissionais(Array.isArray(profissionaisData) ? profissionaisData : []);
 
@@ -109,28 +109,6 @@ export default function AdminDashboardView() {
             <h3 className="text-3xl font-bold mb-1 text-white">{stat.value}</h3>
             <p className="text-gray-400 text-sm">{stat.label}</p>
           </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-        {[
-          { icon: 'event_note', label: 'Agenda Geral', desc: 'Gerenciar tudo', path: '/admin/agendamentos', color: 'text-primary' },
-          { icon: 'schedule', label: 'Jornada', desc: 'Configurar horários', path: '/admin/profissionais', color: 'text-green-400' },
-          { icon: 'content_cut', label: 'Serviços', desc: 'Gerenciar catálogo', path: '/admin/servicos', color: 'text-blue-400' },
-          { icon: 'account_balance_wallet', label: 'Caixa', desc: 'Entradas e saídas', path: '/admin/controle-caixa', color: 'text-green-400' },
-          { icon: 'bar_chart', label: 'Relatórios', desc: 'Métricas', path: '/admin/relatorios', color: 'text-blue-400' }
-        ].map((action, idx) => (
-          <button
-            key={idx}
-            onClick={() => navigate(action.path)}
-            className="bg-dark-800 border border-dark-600 hover:border-primary rounded-xl p-4 text-left transition group"
-          >
-            <span className={`material-icons text-3xl mb-2 group-hover:scale-110 transition ${action.color}`}>
-              {action.icon}
-            </span>
-            <h4 className="font-semibold mb-1 text-white">{action.label}</h4>
-            <p className="text-xs text-gray-400">{action.desc}</p>
-          </button>
         ))}
       </div>
 

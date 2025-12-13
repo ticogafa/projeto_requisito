@@ -20,27 +20,6 @@ export default function ClientSidebar({ activeItem = 'appointments' }: ClientSid
       onClick: () => {
         // navigateToAppointments()
       }
-    },
-    {
-      icon: 'history',
-      label: 'Histórico',
-      onClick: () => {
-        toast.info('Esta funcionalidade estará disponível em breve.');
-      }
-    },
-    {
-      icon: 'card_giftcard',
-      label: 'Vouchers e Pontos',
-      onClick: () => {
-        toast.info('Esta funcionalidade estará disponível em breve.');
-      }
-    },
-    {
-      icon: 'person',
-      label: 'Perfil',
-      onClick: () => {
-        toast.info('Esta funcionalidade estará disponível em breve.');
-      }
     }
   ];
 

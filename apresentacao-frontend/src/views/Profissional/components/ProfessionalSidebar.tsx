@@ -1,4 +1,3 @@
-import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 interface MenuItem {
@@ -30,34 +29,6 @@ export default function ProfessionalSidebar({ activeItem = 'agenda' }: Professio
       active: activeItem === 'jornada',
       onClick: () => {
         navigate('/profissional/jornada');
-      }
-    },
-    {
-      icon: 'star',
-      label: 'Minhas Avaliações',
-      onClick: () => {
-        toast.info('Esta funcionalidade estará disponível em breve.');
-      }
-    },
-    {
-      icon: 'history',
-      label: 'Histórico',
-      onClick: () => {
-        toast.info('Esta funcionalidade estará disponível em breve.');
-      }
-    },
-    {
-      icon: 'content_cut',
-      label: 'Serviços',
-      onClick: () => {
-        toast.info('Esta funcionalidade estará disponível em breve.');
-      }
-    },
-    {
-      icon: 'person',
-      label: 'Perfil',
-      onClick: () => {
-        toast.info('Esta funcionalidade estará disponível em breve.');
       }
     }
   ];
