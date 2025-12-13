@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cesarschool.barbearia.dominio.compartilhado.observer.Observador;
+import com.cesarschool.barbearia.dominio.compartilhado.observer.Sujeito;
 import com.cesarschool.barbearia.dominio.compartilhado.utils.Validacoes;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
 import com.cesarschool.barbearia.dominio.principal.profissional.eventos.ProfissionalEvent;
@@ -18,18 +19,24 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ProfissionalServico {
+public class ProfissionalServico implements Sujeito<ProfissionalEvent> {
     
     private final ProfissionalRepositorio repositorio;
 
-    
     private final List<Observador<ProfissionalEvent>> observadores = new ArrayList<>();
 
+    @Override
     public void adicionarObservador(Observador<ProfissionalEvent> observador) {
         this.observadores.add(observador);
     }
 
-    private void notificarObservadores(ProfissionalEvent evento) {
+    @Override
+    public void removerObservador(Observador<ProfissionalEvent> observador) {
+        this.observadores.remove(observador);
+    }
+
+    @Override
+    public void notificarObservadores(ProfissionalEvent evento) {
         for (Observador<ProfissionalEvent> obs : observadores) {
             obs.atualizar(evento);
         }
@@ -88,6 +95,7 @@ public class ProfissionalServico {
         }
         
         Profissional salvo = repositorio.salvar(profissional);
+        
         notificarObservadores(new ProfissionalEvent(this, salvo, TipoAcao.CRIADO));
         
         return salvo;
@@ -112,26 +120,11 @@ public class ProfissionalServico {
         ProfissionalId idVo = new ProfissionalId(id);
         Profissional existente = buscarPorId(idVo);
         
-        
-        
-        
-        
-        if (dadosAtualizados.getNome() != null) {
-            existente.setNome(dadosAtualizados.getNome());
-        }
-        if (dadosAtualizados.getTelefone() != null) {
-            existente.setTelefone(dadosAtualizados.getTelefone());
-        }
-        if (dadosAtualizados.getEmail() != null) {
-            existente.setEmail(dadosAtualizados.getEmail());
-        }
-        if (dadosAtualizados.getCpf() != null) {
-            existente.setCpf(dadosAtualizados.getCpf());
-        }
-        if (dadosAtualizados.getAgenda() != null) {
-            existente.setAgenda(dadosAtualizados.getAgenda());
-        }
-        
+        if (dadosAtualizados.getNome() != null) existente.setNome(dadosAtualizados.getNome());
+        if (dadosAtualizados.getTelefone() != null) existente.setTelefone(dadosAtualizados.getTelefone());
+        if (dadosAtualizados.getEmail() != null) existente.setEmail(dadosAtualizados.getEmail());
+        if (dadosAtualizados.getCpf() != null) existente.setCpf(dadosAtualizados.getCpf());
+        if (dadosAtualizados.getAgenda() != null) existente.setAgenda(dadosAtualizados.getAgenda());
         
         existente.setAtivo(dadosAtualizados.isAtivo()); 
 
@@ -150,6 +143,7 @@ public class ProfissionalServico {
     public void remover(ProfissionalId id) {
         Profissional p = buscarPorId(id);
         repositorio.remover(id.getValor());
+        
         notificarObservadores(new ProfissionalEvent(this, p, TipoAcao.DESLIGADO));
     }
     
@@ -166,6 +160,7 @@ public class ProfissionalServico {
         profissional.desativar(motivo);
         
         Profissional salvo = repositorio.salvar(profissional);
+        
         notificarObservadores(new ProfissionalEvent(this, salvo, TipoAcao.DESLIGADO));
         
         return salvo;
