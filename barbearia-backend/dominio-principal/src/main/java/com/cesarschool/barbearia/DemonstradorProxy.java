@@ -1,6 +1,7 @@
 package com.cesarschool.barbearia;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.boot.CommandLineRunner;
@@ -11,30 +12,6 @@ import com.cesarschool.barbearia.dominio.principal.produto.Produto;
 import com.cesarschool.barbearia.dominio.principal.produto.ProdutoRepositorio;
 import com.cesarschool.barbearia.infraestrutura.proxy.ProdutoRepositorioVirtualProxy;
 
-/**
- * Demonstrador do Padrão PROXY com Lazy Loading.
- * 
- * <p>Este demonstrador executa uma série de testes interativos que mostram
- * visualmente como o Virtual Proxy funciona e melhora a performance do sistema.</p>
- * 
- * <p><b>Como executar:</b></p>
- * <pre>
- * cd barbearia-backend/dominio-principal
- * mvn spring-boot:run -Dspring-boot.run.profiles=demo
- * </pre>
- * 
- * <p><b>O que será demonstrado:</b></p>
- * <ul>
- *   <li>✅ Lazy Loading (primeira busca carrega do BD)</li>
- *   <li>✅ Reuso (segunda busca usa dados já carregados)</li>
- *   <li>✅ Invalidação de cache após escrita</li>
- *   <li>✅ Estatísticas de performance (reuso rate)</li>
- *   <li>✅ Logs diferenciando Proxy 🟣 vs Real Subject 🔵</li>
- * </ul>
- * 
- * @author Tiago
- * @version 5.0 - Demonstração do Padrão Proxy (Abordagem Híbrida)
- */
 @Component
 @Profile("demo")
 public class DemonstradorProxy implements CommandLineRunner {
@@ -49,6 +26,9 @@ public class DemonstradorProxy implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         imprimirCabecalho();
+        
+        // Limpar dados de testes anteriores que possam ter falhado
+        limparDadosAnteriores();
         
         // Teste 1: Cadastrar produto
         teste1_CadastrarProduto();
@@ -77,18 +57,21 @@ public class DemonstradorProxy implements CommandLineRunner {
         // Estatísticas finais
         exibirEstatisticasFinais();
         
+        // Limpeza dos dados de teste
+        limparDadosDeTeste();
+        
         imprimirRodape();
     }
     
     private void imprimirCabecalho() {
         System.out.println("\n");
         System.out.println("╔══════════════════════════════════════════════════════════╗");
-        System.out.println("║      DEMONSTRAÇÃO DO PADRÃO PROXY (Virtual Proxy - SEM Spring DI)     ║");
+        System.out.println("║      DEMONSTRAÇÃO DO PADRÃO PROXY (Virtual Proxy         ║");
         System.out.println("╚══════════════════════════════════════════════════════════╝");
         System.out.println();
-        System.out.println("🎯 Objetivo: Demonstrar Virtual Proxy com Lazy Loading (SEM Spring DI)");
+        System.out.println("Objetivo: Demonstrar Virtual Proxy com Lazy Loading");
         System.out.println();
-        System.out.println("📖 Legenda:");
+        System.out.println("Legenda:");
         System.out.println("   🟣 [PROXY] = Virtual Proxy (controla acesso + lazy loading)");
         System.out.println("   🔵 [REAL SUBJECT] = Repositório JPA (acessa BD)");
         System.out.println("   ✅ REUSO = Dados já carregados (rápido!)");
@@ -147,8 +130,8 @@ public class DemonstradorProxy implements CommandLineRunner {
         System.out.println("TESTE 3: Segunda busca por ID (produto JÁ EM CACHE)");
         imprimirSeparador();
         System.out.println();
-        System.out.println("💡 Esperado: CACHE HIT - NÃO vai acessar o banco de dados!");
-        System.out.println("   🚀 Performance melhorada - sem latência de BD");
+        System.out.println("Esperado: CACHE HIT - NÃO vai acessar o banco de dados!");
+        System.out.println("   Performance melhorada - sem latência de BD");
         System.out.println();
         
         Integer id = Integer.parseInt(System.getProperty("demo.produto.id"));
@@ -168,7 +151,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         System.out.println("TESTE 4: Terceira busca por ID (ainda em cache)");
         imprimirSeparador();
         System.out.println();
-        System.out.println("💡 Esperado: CACHE HIT novamente!");
+        System.out.println("Esperado: CACHE HIT novamente!");
         System.out.println();
         
         Integer id = Integer.parseInt(System.getProperty("demo.produto.id"));
@@ -178,7 +161,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         Produto produto = produtoRepositorio.buscarPorId(id);
         System.out.println();
         System.out.println("✅ Produto retornado: " + produto.getNome());
-        System.out.println("📈 Note como as buscas 2 e 3 são instantâneas (sem acesso a BD)");
+        System.out.println("Note como as buscas 2 e 3 são instantâneas (sem acesso a BD)");
         System.out.println();
         
         esperarEnter();
@@ -189,7 +172,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         System.out.println("TESTE 5: Listar todos os produtos (primeira vez)");
         imprimirSeparador();
         System.out.println();
-        System.out.println("💡 Esperado: LAZY LOAD - lista completa ainda não foi carregada");
+        System.out.println("Esperado: LAZY LOAD - lista completa ainda não foi carregada");
         System.out.println();
         
         System.out.println("➤ Listando todos os produtos...");
@@ -208,7 +191,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         System.out.println("TESTE 6: Listar todos os produtos (segunda vez)");
         imprimirSeparador();
         System.out.println();
-        System.out.println("💡 Esperado: REUSO - lista já está carregada");
+        System.out.println("Esperado: REUSO - lista já está carregada");
         System.out.println();
         
         System.out.println("➤ Listando todos os produtos novamente...");
@@ -217,7 +200,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         var produtos = produtoRepositorio.listarTodos();
         System.out.println();
         System.out.println("✅ Total de produtos: " + produtos.size());
-        System.out.println("🚀 Lista retornada instantaneamente do cache!");
+        System.out.println("Lista retornada instantaneamente do cache!");
         System.out.println();
         
         esperarEnter();
@@ -228,7 +211,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         System.out.println("TESTE 7: Atualizar produto (invalida cache)");
         imprimirSeparador();
         System.out.println();
-        System.out.println("💡 Esperado: Cache será INVALIDADO após salvar");
+        System.out.println("Esperado: Cache será INVALIDADO após salvar");
         System.out.println();
         
         Integer id = Integer.parseInt(System.getProperty("demo.produto.id"));
@@ -244,7 +227,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         produtoRepositorio.salvar(produto);
         System.out.println();
         System.out.println("✅ Produto atualizado");
-        System.out.println("🗑️ Dados INVALIDADOS - garantindo consistência dos dados");
+        System.out.println("Dados INVALIDADOS - garantindo consistência dos dados");
         System.out.println();
         
         esperarEnter();
@@ -255,7 +238,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         System.out.println("TESTE 8: Buscar após invalidação");
         imprimirSeparador();
         System.out.println();
-        System.out.println("💡 Esperado: LAZY LOAD - dados foram invalidados no teste anterior");
+        System.out.println("Esperado: LAZY LOAD - dados foram invalidados no teste anterior");
         System.out.println();
         
         Integer id = Integer.parseInt(System.getProperty("demo.produto.id"));
@@ -266,7 +249,7 @@ public class DemonstradorProxy implements CommandLineRunner {
         System.out.println();
         System.out.println("✅ Produto encontrado: " + produto.getNome());
         System.out.println("   Preço atualizado: R$ " + produto.getPreco());
-        System.out.println("📊 Produto foi recarregado e está disponível para reuso");
+        System.out.println("Produto foi recarregado e está disponível para reuso");
         System.out.println();
         
         esperarEnter();
@@ -283,7 +266,7 @@ public class DemonstradorProxy implements CommandLineRunner {
             System.out.println(proxy.getEstatisticas());
             
             // Análise
-            System.out.println("📈 ANÁLISE:");
+            System.out.println("ANÁLISE:");
             System.out.println("   • Primeira busca = LAZY LOAD (carrega do banco)");
             System.out.println("   • Buscas subsequentes = REUSO (já carregado)");
             System.out.println("   • Taxa de reuso > 50% = lazy loading efetivo");
@@ -292,6 +275,44 @@ public class DemonstradorProxy implements CommandLineRunner {
         }
         
         System.out.println();
+    }
+    
+    private void limparDadosAnteriores() {
+        try {
+            // Buscar produto pelo nome (pode existir de execução anterior que falhou)
+            List<Produto> produtos = produtoRepositorio.listarTodos();
+            for (Produto p : produtos) {
+                if (p.getNome().equals("Shampoo Anticaspa Premium")) {
+                    System.out.println("🧹 Removendo produto de teste anterior (ID: " + p.getId() + ")");
+                    produtoRepositorio.remover(p.getId());
+                    System.out.println("✅ Dados de teste anterior removidos\n");
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            // Ignorar erros na limpeza prévia (pode não haver dados para limpar)
+        }
+    }
+    
+    private void limparDadosDeTeste() {
+        imprimirSeparador();
+        System.out.println("🧹 LIMPEZA: Removendo dados de teste");
+        imprimirSeparador();
+        System.out.println();
+        
+        try {
+            Integer id = Integer.parseInt(System.getProperty("demo.produto.id"));
+            System.out.println("➤ Removendo produto de teste ID: " + id);
+            produtoRepositorio.remover(id);
+            System.out.println("✅ Produto de teste removido com sucesso");
+            System.out.println("   Banco de dados limpo - pronto para próxima execução");
+        } catch (Exception e) {
+            System.out.println("⚠️  Não foi possível remover o produto de teste");
+            System.out.println("   (Talvez já tenha sido removido manualmente)");
+        }
+        
+        System.out.println();
+        esperarEnter();
     }
     
     private void imprimirRodape() {

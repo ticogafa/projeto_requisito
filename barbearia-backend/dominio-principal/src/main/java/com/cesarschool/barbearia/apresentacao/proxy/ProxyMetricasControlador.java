@@ -10,23 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cesarschool.barbearia.infraestrutura.proxy.ProdutoRepositorioVirtualProxy;
 
-/**
- * Controlador REST para expor métricas do Virtual Proxy em tempo real.
- * 
- * <p>Este controlador permite monitorar o comportamento do Virtual Proxy através de endpoints REST,
- * facilitando a observação do lazy loading, reuso de dados e performance do sistema.</p>
- * 
- * <p><b>Endpoints disponíveis:</b></p>
- * <ul>
- *   <li>GET /api/proxy/statistics - Retorna estatísticas em formato JSON</li>
- *   <li>GET /api/proxy/statistics/text - Retorna estatísticas em formato texto legível</li>
- *   <li>DELETE /api/proxy/cache - Limpa todos os dados lazy-loaded do cache</li>
- *   <li>DELETE /api/proxy/statistics - Reseta os contadores de estatísticas</li>
- * </ul>
- * 
- * @author Tiago Gurgel
- * @version 1.0
- */
 @RestController
 @RequestMapping("/api/proxy")
 public class ProxyMetricasControlador {
