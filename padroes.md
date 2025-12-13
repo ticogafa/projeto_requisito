@@ -1,23 +1,18 @@
-# 📐 Padrões de Projeto Adotados
+# Padrões de Projeto Adotados
 
 Este documento lista todos os padrões de projeto (Design Patterns) implementados no projeto Barbearia Backend, detalhando as classes criadas e/ou modificadas para cada padrão.
 
 ---
 
-## 🔷 1. Padrão PROXY (Estrutural)
+## 1. Padrão PROXY (Estrutural)
 
-### 📋 Descrição
+### Descrição
 O padrão **Proxy** fornece um substituto ou placeholder para outro objeto, controlando o acesso ao objeto original. No projeto, implementamos um **Virtual Proxy com Lazy Loading** para otimizar a performance das operações de repositório, adiando o carregamento de dados do banco de dados até que sejam realmente necessários.
 
-### 🎯 Objetivo
+### Objetivo
 Implementar Lazy Loading transparente entre o cliente e o repositório real, economizando recursos ao carregar dados SOB DEMANDA sem modificar o código cliente.
 
-**Abordagem Implementada:** Híbrida - Spring DI gerencia apenas a injeção de dependências (`@Component`, `@Primary`, `@Autowired`), enquanto a lógica do Proxy permanece pura e independente de framework. Isso garante:
-- ✅ Portabilidade (Proxy pode ser usado sem Spring)
-- ✅ Transparência (Spring injeta automaticamente via `@Primary`)
-- ✅ Testabilidade (lógica desacoplada do framework)
-
-### 📦 Classes Criadas
+### Classes Criadas
 
 #### 1. `ProdutoRepositorioVirtualProxy.java`
 - **Pacote:** `com.cesarschool.barbearia.infraestrutura.proxy`
@@ -31,6 +26,7 @@ Implementar Lazy Loading transparente entre o cliente e o repositório real, eco
   - Invalidação seletiva em operações de escrita (preserva outros produtos carregados)
   - Rastreia estatísticas: Lazy Loads vs Reuso
   - Anotado com `@Primary` para injeção de dependência automática
+- **Linhas de código:** ~336 linhas
 - **Métodos principais:**
   - `buscarPorId()`: Lazy loading com verificação de carregamento prévio
   - `buscarTodos()`: Lazy loading de lista completa
@@ -51,6 +47,7 @@ Implementar Lazy Loading transparente entre o cliente e o repositório real, eco
   - Logs visuais com emojis (🟣 Virtual Proxy, 🔵 Real Subject)
   - Pausas interativas entre testes
   - Exibe estatísticas finais (lazy loads vs reuso)
+- **Linhas de código:** ~330 linhas
 - **Cenários de teste:**
   1. Cadastrar produto (invalidação seletiva)
   2. Primeira busca por ID (LAZY LOAD - acessa BD)
@@ -61,7 +58,7 @@ Implementar Lazy Loading transparente entre o cliente e o repositório real, eco
   7. Atualizar produto (invalidação seletiva)
   8. Exibir estatísticas finais
 
-### 📝 Classes Modificadas
+### Classes Modificadas
 
 #### 1. `ProdutoRepositorioJpa.java` (antes: `ProdutoRepositorioImpl.java`)
 - **Pacote:** `com.cesarschool.barbearia.infraestrutura.persistencia`
@@ -81,13 +78,42 @@ Implementar Lazy Loading transparente entre o cliente e o repositório real, eco
   - **Comentários:** Esclarecimento de que esta interface é implementada tanto pelo Proxy quanto pelo Real Subject
 - **Impacto:** Interface agora documenta explicitamente seu papel no padrão
 
-### ✅ Benefícios Obtidos
+### Estrutura do Padrão
+
+```
+┌─────────────────┐
+│     Cliente     │ (DemonstradorProxy, Controllers, Services)
+│                 │
+└────────┬────────┘
+         │ usa
+         ▼
+┌─────────────────────────────┐
+│   ProdutoRepositorio        │  ← Subject (Interface)
+│   (interface)               │
+└─────────────────────────────┘
+         △
+         │ implementa
+         ├─────────────────────────┬──────────────────────────────┐
+         │                         │                              │
+┌────────────────────┐  ┌──────────────────────────────┐  ┌────────────────────┐
+│ ProdutoRepositorioJpa│  │ProdutoRepositorioVirtualProxy│  │  (outros proxies) │
+│   (Real Subject)   │  │    (Virtual Proxy)           │  │    possíveis       │
+│                    │  │                              │  └────────────────────┘
+│ - Acessa BD        │  │ - Lazy Loading               │
+│ - JPA/Hibernate    │  │ - Dados sob demanda          │
+│                    │◄─┤ - Invalidação seletiva       │
+└────────────────────┘  │ - Rastreamento (reuso/loads) │
+                        │ - @Primary                   │
+                        └──────────────────────────────┘
+```
+
+### Benefícios Obtidos
 
 1. **Performance e Economia de Recursos:**
-   - ⚡ Inicialização rápida (não carrega tudo de uma vez)
-   - 💾 Economia de memória (só carrega o que é usado)
-   - 🔄 Dados já carregados são reutilizados instantaneamente
-   - 📉 Redução significativa de operações I/O no banco de dados
+   - Inicialização rápida (não carrega tudo de uma vez)
+   - Economia de memória (só carrega o que é usado)
+   - Dados já carregados são reutilizados instantaneamente
+   - Redução significativa de operações I/O no banco de dados
 
 2. **Lazy Loading Efetivo:**
    - Dados carregados SOB DEMANDA (apenas quando necessário)
@@ -112,66 +138,57 @@ Implementar Lazy Loading transparente entre o cliente e o repositório real, eco
    - Fácil depuração e monitoramento do padrão
    - Métricas acessíveis via API REST
 
-### 📊 Análise de Performance
+### Como Executar a Demonstração
 
-📈 **Métricas de Lazy Loading:**
-- Primeira busca = **LAZY LOAD** (carrega do BD)
-- Buscas subsequentes = **REUSO** (não acessa BD)
-- Reuso rate > 50% = lazy loading efetivo
-- Operações de escrita invalidam seletivamente
-- Dados preservados são reutilizados automaticamente
-- Economia de recursos: só carrega o necessário
+```bash
+# Navegar até o diretório do projeto
+cd barbearia-backend/dominio-principal
 
-### 🔍 Verificação do Padrão Proxy (GoF)
+# Executar com perfil demo
+mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dmaven.test.skip=true
+```
+Virtual Proxy Statistics:
+   Lazy Loads: 3 | Reuso: 4 | Total: 7
+   Reuso Rate: 57,14%
+   Dados Carregados: 1 produto + 1 lista
 
-- ✅ **Subject:** Interface comum (`ProdutoRepositorio`)
-- ✅ **Real Subject:** Implementação real com @Repository (`ProdutoRepositorioJpa`)
-- ✅ **Virtual Proxy:** Substituto com Lazy Loading (`ProdutoRepositorioVirtualProxy`)
-- ✅ **Composição:** Proxy HAS-A Real Subject (não usa herança)
-- ✅ **Delegação:** Proxy delega para Real Subject APENAS quando necessário (lazy)
-- ✅ **Lazy Initialization:** Dados carregados SOB DEMANDA
-- ✅ **Controle:** Proxy adiciona lazy loading, invalidação seletiva e estatísticas
-- ✅ **Transparência:** Cliente desconhece existência do Proxy (via @Primary)
-- ✅ **Economia de Recursos:** Evita carregar dados desnecessários
-
-### 🔧 Spring DI no Padrão Proxy (Abordagem Híbrida)
-
-**Como funciona:**
-- `@Component` + `@Primary`: Spring registra o Proxy e o torna a implementação padrão
-- `@Autowired` + `@Qualifier("produtoRepositorioJpa")`: Injeta o Real Subject no Proxy
-- `@Repository("produtoRepositorioJpa")`: Identifica o Real Subject para injeção
-
-**Benefícios da Abordagem Híbrida:**
-1. ✅ Spring gerencia **apenas** a injeção (framework agnóstico para lógica)
-2. ✅ Proxy pode ser instanciado manualmente se necessário (portável)
-3. ✅ Transparência total para clientes (Spring injeta Proxy automaticamente)
-4. ✅ Lógica do Proxy permanece pura (sem dependência de framework)
-
-**Variantes do Padrão Proxy:**
-- ✅ **Implementado:** Virtual Proxy (Lazy Loading) + Cache embutido
-- **Outras Variantes:** Protection Proxy, Remote Proxy, Smart Reference
+ ANÁLISE:
+   • Primeira busca = LAZY LOAD (carrega do BD)
+   • Buscas subsequentes = REUSO (não acessa BD)
+   • Reuso rate > 50% = lazy loading efetivo
+   • Operações de escrita invalidam seletivamente
+   • Dados preservados são reutilizados automaticamente
+   • Economia de recursos: só carrega o necessário
+ANÁLISE:
+   • Múltiplas buscas ao mesmo produto = Receita Gerada
+   • Hit rate > 50% = cache está funcionando bem
+   • Operações de escrita invalidam cache (garantem consistência)
+   • PVirtual Proxy:** Substituto com Lazy Loading (`ProdutoRepositorioVirtualProxy`)
+- **Composição:** Proxy HAS-A Real Subject (não usa herança)
+- **Delegação:** Proxy delega para Real Subject APENAS quando necessário (lazy)
+- **Lazy Initialization:** Dados carregados SOB DEMANDA
+- **Controle:** Proxy adiciona lazy loading, invalidação seletiva e estatísticas
+- **Transparência:** Cliente desconhece existência do Proxy
+- **Economia de Recursos:** Evita carregar dados desnecessários
+- **Subject:** Interface comum (`ProdutoRepositorio`)
+- **Real Subject:** Implementação real (`ProdutoRepositorioJpa`)
+- **Proxy:** Substituto com comportamento adicional (`ProdutoRepositorioCacheProxy`)
+- **Composição:** Proxy HAS-A Real Subject (não usa herança)
+- **Delegação:** Proxy delega para Real Subject quando necessário
+- **Controle:** Proxy adiciona cache, invalidação e estatísticas
+-Variante Implementada:** Virtual Proxy (Lazy Loading)
+- **Outras Variantes:** Cache Proxy, Protection Proxy, Remote Proxy, Smart Reference
 
 ---
 
-## 📝 Observações e Comandos Úteis
+## Observações
 
-### ℹ️ Informações Gerais
-- **Responsável:** Tiago Gurgel
-- **Tipo:** Virtual Proxy com Lazy Loading + Cache embutido
-- **Abordagem:** Híbrida (Spring DI para injeção, lógica pura)
-- **Nota Importante:** Este é um **Virtual Proxy** (lazy initialization) que também implementa cache. A distinção é importante: Virtual Proxy foca em **adiar carregamento**, enquanto o cache é um benefício adicional da implementação.
+- Este documento será atualizado conforme novos padrões de projeto forem implementados no sistema
+- Data da última atualização: 12/12/2025
+- Responsável pela implementação do Virtual Proxy: Tiago Gurgel
+- **Nota Importante:** O proxy implementado é um **Virtual Proxy** (adiamento de carregamento), não um Cache Proxy tradicional. A distinção é importante pois Virtual Proxy foca em **lazy initialization** enquanto Cache Proxy foca em **reutilização de resultados já computados**.
+- **Aplicabilidade:** Cache, Lazy Loading, Access Control, Logging, Remote Proxy
 
-### 🛠️ Comandos para Demonstração (Profile demo)
-
-```bash
-# Executar demonstração do proxy
-cd barbearia-backend/dominio-principal
-mvn spring-boot:run -Dspring-boot.run.profiles=demo
-```
-
-### 📊 API de Monitoramento (quando backend está rodando)
-
-```bash
 # Ver estatísticas em JSON
 curl http://localhost:8080/api/proxy/statistics | jq .
 
@@ -181,15 +198,19 @@ curl http://localhost:8080/api/proxy/statistics/text
 # Ver informações do padrão
 curl http://localhost:8080/api/proxy/info | jq .
 
-# Limpar dados carregados (lazy)
+# Limpar cache
 curl -X DELETE http://localhost:8080/api/proxy/cache
 
 # Resetar estatísticas
 curl -X DELETE http://localhost:8080/api/proxy/statistics
-```
 
 ---
 
+## Observações
+
+- Este documento será atualizado conforme novos padrões de projeto forem implementados no sistema
+- Data da última atualização: 10/12/2025
+- Responsável pela implementação do Proxy: Tiago Gurgel
 
 # Padrão Strategy - Sistema de Tratamento de Exceções
 
@@ -267,8 +288,6 @@ curl -X DELETE http://localhost:8080/api/proxy/statistics
 public class ProdutoControlador {
     
     private final ExceptionHandler exceptionHandler;
-    
-    // ...
     
     @GetMapping("/{id}")
     public ResponseEntity<ProdutoResponse> buscarPorId(@PathVariable Long id) {
@@ -363,14 +382,14 @@ A implementação segue fielmente o padrão **Strategy** do GoF, com adições d
 - **Value Object**: Para encapsular metadados (ExceptionEntry)
 
 Esta arquitetura permite:
-- ✅ Adicionar novos tipos de exceção sem alterar código existente
-- ✅ Diferentes estratégias de serialização por tipo de erro
-- ✅ Mapeamento flexível de HTTP status codes
-- ✅ Código limpo, testável e manutenível
+-Adicionar novos tipos de exceção sem alterar código existente
+-Diferentes estratégias de serialização por tipo de erro
+-Mapeamento flexível de HTTP status codes
+-Código limpo, testável e manutenível
 
 ---
 
-### 📚 Clientes do Padrão Strategy (Tratamento de Exceções)
+### Clientes do Padrão Strategy (Tratamento de Exceções)
 
 O `ExceptionHandler` (Context) é injetado e utilizado por diversos controladores para garantir um tratamento de exceções consistente em toda a API. Abaixo estão exemplos reais de uso:
 
@@ -576,7 +595,7 @@ public ResponseEntity<Void> definirJornada(
 
 ---
 
-### 🎯 Fluxo Completo em Agendamentos
+### Fluxo Completo em Agendamentos
 
 **Cenário:** Cliente tenta criar agendamento em horário já ocupado
 
@@ -591,7 +610,7 @@ public ResponseEntity<Void> definirJornada(
    ↓
 5. AgendamentoServico.criar() - validação de horário
    ↓
-6. ❌ Lança HorarioIndisponivelException("Profissional já possui agendamento neste horário")
+6. Lança HorarioIndisponivelException("Profissional já possui agendamento neste horário")
    ↓
 7. ExceptionHandler captura exceção (try-catch)
    ↓
@@ -614,7 +633,7 @@ public ResponseEntity<Void> definirJornada(
 
 ---
 
-### ✅ Benefícios Observados na Prática
+###Benefícios Observados na Prática
 
 1. **Consistência:** Todas as exceções em todos os controladores são tratadas de forma uniforme
 2. **Manutenibilidade:** Adicionar novo tipo de exceção não requer alterar controladores
@@ -624,4 +643,146 @@ public ResponseEntity<Void> definirJornada(
 
 ---
 
-## 💎 Menção Honrosa: Padrão SINGLETON
+## 3. Padrão OBSERVER (Comportamental)
+
+### Descrição
+O padrão **Observer** define um mecanismo de assinatura para notificar múltiplos objetos sobre quaisquer eventos que aconteçam com o objeto que eles estão observando.  
+
+No projeto, foi adotada a implementação **Canônica/Acadêmica**, conforme a literatura de **Engenharia de Software Moderna**, utilizando **interfaces explícitas** (`Subject` e `Observer`) para garantir o **desacoplamento total** entre a regra de negócio e o mecanismo de notificação.
+
+---
+
+### Objetivo
+Permitir que o sistema reaja a mudanças de estado críticas — como **contratação**, **atualização** ou **demissão** de um profissional — disparando ações secundárias (envio de e-mail, geração de logs, etc.) **sem acoplar a regra de negócio principal à infraestrutura de notificação**.
+
+---
+
+### Classes Criadas
+
+#### 1. `Sujeito.java` (Interface)
+- **Pacote:** `com.cesarschool.barbearia.dominio.compartilhado.padraoobserver`
+- **Tipo:** Subject Interface (Contrato)
+- **Responsabilidade:**  
+  Define o contrato padronizado para qualquer classe que deseje emitir notificações.
+
+**Características:**
+- Utiliza **Generics `<T>`** para flexibilidade de eventos
+- Métodos canônicos:
+  - `adicionarObservador`
+  - `removerObservador`
+  - `notificarObservadores`
+- Garante o **Princípio da Inversão de Dependência (DIP)**
+
+---
+
+#### 2. `Observador.java` (Interface)
+- **Pacote:** `com.cesarschool.barbearia.dominio.compartilhado.padraoobserver`
+- **Tipo:** Observer Interface (Contrato)
+- **Responsabilidade:**  
+  Define o contrato para qualquer classe que deseje escutar eventos.
+
+**Características:**
+- Método funcional único: `atualizar(T evento)`
+- Permite a criação de múltiplos observadores (Log, Email, Push) sem alterar o sujeito
+
+---
+
+#### 3. `NotificacaoProfissionalObservador.java`
+- **Pacote:** `com.cesarschool.barbearia.dominio.principal.profissional.observadores`
+- **Tipo:** Concrete Observer
+- **Responsabilidade:**  
+  Recebe o evento de mudança e executa a lógica de envio de e-mail.
+
+**Características:**
+- Implementa `Observador<ProfissionalEvent>`
+- Contém a lógica de formatação da mensagem (Boas-vindas / Desligamento)
+- Isolada da lógica de persistência do banco de dados
+
+---
+
+### Classes Modificadas
+
+#### 1. `ProfissionalServico.java`
+- **Pacote:** `com.cesarschool.barbearia.dominio.principal.profissional`
+- **Tipo:** Concrete Subject
+
+**Modificações:**
+- **Implementação de Interface:**  
+  A classe passou a implementar `Sujeito<ProfissionalEvent>`.
+
+  **Justificativa:**  
+  Cumprir o contrato acadêmico do padrão Observer e permitir que o serviço seja tratado genericamente como um emissor de eventos.
+
+- **Gestão de Estado (Lista de Observadores):**  
+  Adição de uma lista interna `private final List<Observador>`.
+
+  **Justificativa:**  
+  Armazenar os observadores registrados sem depender de implementações concretas.
+
+- **Gatilhos de Notificação:**  
+  Inserção da chamada `notificarObservadores()` ao final dos métodos:
+  - `registrarNovo`
+  - `atualizar`
+  - `desativar`
+
+  **Justificativa:**  
+  Transformar operações CRUD passivas em **gatilhos ativos de propagação de eventos** para o restante do sistema.
+
+**Impacto:**  
+A classe deixou de ser apenas um processador de dados e passou a atuar como o **Subject central do domínio de Profissionais**.
+
+---
+
+### Estrutura do Padrão
+```
+ ┌─────────────────┐           notifica            ┌──────────────────┐
+ │  Sujeito (Intf) │ ────────────────────────────> │ Observador (Intf)│
+ └─────────────────┘                               └──────────────────┘
+          ▲                                                  ▲
+          │ implementa                                       │ implementa
+          │                                                  │
+ ┌───────────────────────┐                         ┌──────────────────────────────┐
+ │ #  ProfissionalServico│                         │NotificacaoProfissionalObserv.│
+ │  (Concrete Subject)   │                         │     (Concrete Observer)      │
+ │                       │                         │                              │
+ │ - Lista de Observ.    │                         │ - Envia E-mail               │
+ │ - Regra de Negócio    │                         │ - Gera Log                   │
+ └───────────────────────┘                         └──────────────────────────────┘
+```
+
+### Benefícios Obtidos
+
+1. **Princípio Aberto/Fechado (OCP):**
+   - Novos observadores (ex: `EstoqueObservador`) podem ser adicionados sem modificar o código do `ProfissionalServico`.
+
+2. **Baixo Acoplamento:**
+   - O serviço de domínio não depende de bibliotecas de e-mail ou infraestrutura externa.
+
+3. **Conformidade Acadêmica:**
+   - Implementação segue rigorosamente a separação entre **Subject** e **Observer**, conforme descrito na literatura clássica de padrões de projeto.
+
+---
+
+## 4. Menção Honrosa: Padrão SINGLETON
+
+### Descrição
+O padrão **Singleton** garante que uma classe tenha apenas uma instância e fornece um ponto global de acesso a ela.
+
+---
+
+### Objetivo
+Economizar recursos de memória e garantir a **consistência do estado** em serviços que não precisam ser instanciados múltiplas vezes (*Stateless Services*).
+
+---
+
+### Implementação no Projeto
+No ecossistema **Spring Boot**, o padrão Singleton é gerenciado automaticamente pelo **Container de Injeção de Dependência (IoC)**.
+
+- **Classes afetadas:**  
+  Todas anotadas com `@Service`, `@Repository` e `@RestController`.
+
+- **Modificação:**  
+  Uso das anotações do framework (ex: `@Service` em `ProfissionalServico`) instrui o Spring a gerenciar essas classes como **Singletons**.
+
+- **Justificativa:**  
+  Delegar ao framework o controle do ciclo de vida dos objetos, evitando a criação manual de instâncias (`new ProfissionalServico()`) e garantindo que todos os controladores compartilhem a mesma instância de serviço e recursos de infraestrutura.
