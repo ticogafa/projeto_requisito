@@ -83,7 +83,7 @@ public class ProfissionalJpa {
     @Column(name = "MOTIVO_INATIVIDADE", length = 255)
     private String motivoInatividade; 
 
-    @jakarta.persistence.OneToMany(mappedBy = "profissionalId", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)
+    @jakarta.persistence.OneToMany(mappedBy = "profissionalId", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER, orphanRemoval = true)
     private List<JornadaTrabalhoJpa> jornadas = new ArrayList<>();
 
     @ManyToMany(fetch = jakarta.persistence.FetchType.EAGER)
@@ -264,20 +264,32 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
         ProfissionalJpa profissional = profissionalJpaRepository.findById(profissionalId)
             .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
         
-        profissional.getJornadas().clear();
+        // Remove TODAS as jornadas antigas do banco de dados primeiro
+        if (!profissional.getJornadas().isEmpty()) {
+            profissional.getJornadas().clear();
+            profissionalJpaRepository.save(profissional); // Força flush para deletar do banco
+            profissionalJpaRepository.flush();
+        }
+        
+        // Recarrega o profissional para garantir estado limpo
+        profissional = profissionalJpaRepository.findById(profissionalId)
+            .orElseThrow(() -> new IllegalArgumentException("Profissional não encontrado: " + profissionalId));
         
         if (jornadas != null) {
             for (com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo dto : jornadas) {
-                JornadaTrabalhoJpa jornada = JornadaTrabalhoJpa.builder()
-                    .profissionalId(profissionalId)
-                    .diaSemana(dto.getDiaSemana())
-                    .horaInicio(dto.getHoraInicio())
-                    .horaFim(dto.getHoraFim())
-                    .intervaloInicio(dto.getIntervaloInicio())
-                    .intervaloFim(dto.getIntervaloFim())
-                    .ativo(dto.isAtivo())
-                    .build();
-                profissional.getJornadas().add(jornada);
+                // Só persiste jornadas ATIVAS com horários válidos
+                if (dto.isAtivo() && dto.getHoraInicio() != null && dto.getHoraFim() != null) {
+                    JornadaTrabalhoJpa jornada = JornadaTrabalhoJpa.builder()
+                        .profissionalId(profissionalId)
+                        .diaSemana(dto.getDiaSemana())
+                        .horaInicio(dto.getHoraInicio())
+                        .horaFim(dto.getHoraFim())
+                        .intervaloInicio(dto.getIntervaloInicio())
+                        .intervaloFim(dto.getIntervaloFim())
+                        .ativo(true)
+                        .build();
+                    profissional.getJornadas().add(jornada);
+                }
             }
         }
         

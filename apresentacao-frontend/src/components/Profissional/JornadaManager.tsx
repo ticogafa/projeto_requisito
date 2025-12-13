@@ -1,6 +1,6 @@
-import { DIAS_SEMANA, type JornadaDto } from '@/interfaces/JornadaInterface';
+import { DIAS_SEMANA, type JornadaDto as JornadaResumo } from '@/interfaces/JornadaInterface';
 import MainService from '@/services/MainService';
-import type { AxiosError } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -9,12 +9,13 @@ interface JornadaManagerProps {
 }
 
 export default function JornadaManager({ profissionalId }: JornadaManagerProps) {
-  const [jornadas, setJornadas] = useState<JornadaDto[]>([]);
+  const [jornadas, setJornadas] = useState<JornadaResumo[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
+    console.log('Loading jornada for profissionalId:', profissionalId);
     loadJornada();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profissionalId]);
@@ -23,7 +24,10 @@ export default function JornadaManager({ profissionalId }: JornadaManagerProps) 
     setLoading(true);
     MainService.getInstance().getJornada(
       profissionalId,
-      (data: JornadaDto[]) => {
+      (response: AxiosResponse) => {
+        const data = (response.data as JornadaResumo[]) || [];
+        console.log('Dados recebidos do backend:', data);
+        
         // Merge with defaults to ensure all days are present
         const merged = DIAS_SEMANA.map(dia => {
           const existing = data.find(j => j.diaSemana === dia.value);
@@ -36,53 +40,80 @@ export default function JornadaManager({ profissionalId }: JornadaManagerProps) 
                  intervaloFim: existing.intervaloFim?.slice(0, 5) || ''
              };
           }
+          // Valores padrão para dias sem configuração
           return {
             diaSemana: dia.value,
             horaInicio: '08:00',
             horaFim: '18:00',
             intervaloInicio: '',
             intervaloFim: '',
-            ativo: true // Default to active
+            ativo: false // Padrão desativado quando não há dados
           };
         });
+        console.log('Jornadas mescladas:', merged);
         setJornadas(merged);
       },
       (error: AxiosError) => {
         console.error('Erro ao carregar jornada', error);
-        toast.error('Erro ao carregar jornada de trabalho');
+        
+        // Se der erro (ex: 404 - não encontrado), criar jornadas padrão
+        const defaultJornadas = DIAS_SEMANA.map(dia => ({
+          diaSemana: dia.value,
+          horaInicio: '08:00',
+          horaFim: '18:00',
+          intervaloInicio: '',
+          intervaloFim: '',
+          ativo: false
+        }));
+        setJornadas(defaultJornadas);
+        
+        toast.info('Nenhuma jornada cadastrada. Configure seus horários abaixo.');
       },
       () => setLoading(false)
     );
   };
 
-  const validateJornada = (currentJornadas: JornadaDto[]) => {
+  const validateJornada = (currentJornadas: JornadaResumo[]) => {
     const newErrors: { [key: string]: string } = {};
   
-    currentJornadas.forEach((jornada, _index) => {
-      if (jornada.ativo && (!jornada.horaInicio || !jornada.horaFim)) {
+    currentJornadas.forEach((jornada) => {
+      // Apenas valida dias ativos
+      if (!jornada.ativo) return;
+      
+      if (!jornada.horaInicio || !jornada.horaFim) {
         newErrors[jornada.diaSemana] = 'Horário de início e fim são obrigatórios para dias ativos.';
-      } else if (jornada.ativo && jornada.horaInicio >= jornada.horaFim) {
+        return;
+      }
+      
+      if (jornada.horaInicio >= jornada.horaFim) {
         newErrors[jornada.diaSemana] = 'Horário de fim deve ser depois do horário de início.';
+        return;
       }
   
-      if (jornada.ativo && jornada.intervaloInicio && jornada.intervaloFim) {
+      // Valida intervalo apenas se ambos os campos estiverem preenchidos
+      if (jornada.intervaloInicio && jornada.intervaloFim) {
         if (jornada.intervaloInicio >= jornada.intervaloFim) {
           newErrors[jornada.diaSemana] = 'Início do intervalo deve ser antes do fim do intervalo.';
+          return;
         }
         if (jornada.intervaloInicio < jornada.horaInicio || jornada.intervaloFim > jornada.horaFim) {
           newErrors[jornada.diaSemana] = 'Intervalo deve estar dentro do horário de trabalho.';
+          return;
         }
-      } else if (jornada.ativo && (jornada.intervaloInicio || jornada.intervaloFim)) {
-        newErrors[jornada.diaSemana] = 'Ambos, início e fim do intervalo, devem ser preenchidos.';
+      } else if (jornada.intervaloInicio || jornada.intervaloFim) {
+        newErrors[jornada.diaSemana] = 'Preencha ambos os campos do intervalo ou deixe ambos vazios.';
       }
     });
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
   
-  const handleTimeChange = (index: number, field: keyof JornadaDto, value: string | boolean) => {
+  const handleTimeChange = (index: number, field: keyof JornadaResumo, value: string | boolean) => {
+    console.log(`Alterando campo ${field} do índice ${index} para:`, value);
     const newJornadas = [...jornadas];
     newJornadas[index] = { ...newJornadas[index], [field]: value };
+    console.log('Nova jornada após mudança:', newJornadas[index]);
     setJornadas(newJornadas);
   
     // Validate immediately after change
@@ -90,25 +121,67 @@ export default function JornadaManager({ profissionalId }: JornadaManagerProps) 
   };
 
   const handleSave = () => {
+    console.log('Estado atual de jornadas antes de salvar:', jornadas);
+    
     if (!validateJornada(jornadas)) {
       toast.error('Corrija os erros no formulário antes de salvar.');
       return;
     }
 
+    // Verificar se há pelo menos um dia ativo
+    const hasActiveDays = jornadas.some(j => j.ativo && j.horaInicio && j.horaFim);
+    if (!hasActiveDays) {
+      toast.error('Configure pelo menos um dia de trabalho ativo antes de salvar.');
+      return;
+    }
+
     setSaving(true);
     
-    // Filter out inactive entries or format if needed
-    const payload = jornadas.filter(j => j.ativo); // Only send active days for now, or adapt backend to handle inactive
-
+    // Enviar TODOS os dias com informação de ativo/inativo
+    const payload = jornadas.map(j => {
+      console.log(`Processando dia ${j.diaSemana}:`, j);
+      if (j.ativo && j.horaInicio && j.horaFim) {
+        // Dia ativo: envia todos os campos
+        return {
+          diaSemana: j.diaSemana,
+          horaInicio: j.horaInicio,
+          horaFim: j.horaFim,
+          intervaloInicio: j.intervaloInicio || null,
+          intervaloFim: j.intervaloFim || null,
+          ativo: true
+        };
+      } else {
+        // Dia inativo: envia apenas info de desativação
+        return {
+          diaSemana: j.diaSemana,
+          horaInicio: null,
+          horaFim: null,
+          intervaloInicio: null,
+          intervaloFim: null,
+          ativo: false
+        };
+      }
+    });
+    
+    console.log('Payload final a ser enviado:', JSON.stringify(payload, null, 2));
+    
     MainService.getInstance().atualizarJornada(
       profissionalId,
       payload,
-      () => {
+      (response: AxiosResponse) => {
+        console.log('✅ Resposta do backend após salvar:', response.data);
         toast.success('Jornada atualizada com sucesso!');
+        
+        // Aguardar um pouco antes de recarregar para garantir que o backend processou
+        setTimeout(() => {
+          console.log('Recarregando jornadas do backend...');
+          loadJornada();
+        }, 500);
       },
       (error: AxiosError) => {
         console.error('Erro ao salvar jornada', error);
-        toast.error('Erro ao atualizar jornada: ' + (error.response?.data as any)?.message || error.message);
+        const errorMsg = (error.response?.data as any)?.message || error.message;
+        toast.error('Erro ao atualizar jornada: ' + errorMsg);
       },
       () => setSaving(false)
     );

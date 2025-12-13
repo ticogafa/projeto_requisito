@@ -3,6 +3,7 @@ package com.cesarschool.cucumber.agendamento.infraestrutura;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo;
 import com.cesarschool.barbearia.dominio.compartilhado.valueobjects.Cpf;
@@ -92,5 +93,10 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
     @Override
     public List<JornadaResumo> listarJornadas(Integer profissionalId) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<Profissional> buscarPorEmail(String email) {
+        return Optional.empty();
     }
 }

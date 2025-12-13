@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.cesarschool.barbearia.aplicacao.profissional.JornadaResumo;
@@ -159,5 +160,10 @@ public class ProfissionalMockRepositorio implements ProfissionalRepositorio {
     @Override
     public List<JornadaResumo> listarJornadas(Integer profissionalId) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<Profissional> buscarPorEmail(String email) {
+        return Optional.empty();
     }
 }
