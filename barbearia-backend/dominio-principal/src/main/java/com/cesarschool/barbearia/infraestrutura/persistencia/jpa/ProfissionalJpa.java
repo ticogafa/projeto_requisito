@@ -298,4 +298,9 @@ class ProfissionalJpaRepositorioImpl implements ProfissionalRepositorio {
                 .build())
             .collect(Collectors.toList());
     }
+
+    @Override
+    public java.util.Optional<Profissional> buscarPorEmail(String email) {
+        return profissionalJpaRepository.findByEmail(email).map(this::toDomain);
+    }
 }

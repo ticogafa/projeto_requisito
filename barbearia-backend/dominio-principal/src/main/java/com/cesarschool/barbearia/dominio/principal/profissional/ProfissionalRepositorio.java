@@ -58,4 +58,5 @@ public interface ProfissionalRepositorio extends Repositorio<Profissional, Integ
     boolean temAgendamentoAtivo(String nomeServico);
     boolean possuiAssociacaoServico(String nomeProfissional, String nomeServico);
     void removerAssociacaoServico(String nomeProfissional, String nomeServico);
+    java.util.Optional<Profissional> buscarPorEmail(String email);
 }

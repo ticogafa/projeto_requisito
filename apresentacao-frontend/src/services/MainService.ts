@@ -238,6 +238,22 @@ export default class MainService {
   /**
    * Creates a new appointment.
    */
+  public getProfissionalPorEmail(
+    email: string,
+    successCallback: (response: AxiosResponse) => void,
+    errorCallback: (error: AxiosError) => void,
+    finallyCallback: () => void
+  ) {
+    this.client.get(
+      '/profissional/buscar',
+      { email },
+      {},
+      successCallback,
+      errorCallback,
+      finallyCallback
+    );
+  }
+
   criarAgendamento(
     data: object,
     successCallback: (response: AxiosResponse) => void,

@@ -65,6 +65,11 @@ public class ProfissionalServico implements Sujeito<ProfissionalEvent> {
         return buscarPorId(new ProfissionalId(id));
     }
 
+    public java.util.Optional<Profissional> buscarPorEmail(String email) {
+        Validacoes.validarStringObrigatoria(email, "Email");
+        return repositorio.buscarPorEmail(email);
+    }
+
     public Profissional buscarPorCpf(Cpf cpf) {
         Validacoes.validarObjetoObrigatorio(cpf, "O CPF");
         return repositorio.buscarPorCpf(cpf);

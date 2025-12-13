@@ -109,4 +109,14 @@ public class ProfissionalControlador {
             return ResponseEntity.ok(profissionais);
         });
     }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<Profissional> buscarPorEmail(@org.springframework.web.bind.annotation.RequestParam String email) {
+        return exceptionHandler.withHandler(() -> {
+            logger.info("Buscando profissional por email: " + email);
+            return servico.buscarPorEmail(email)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+        });
+    }
 }
