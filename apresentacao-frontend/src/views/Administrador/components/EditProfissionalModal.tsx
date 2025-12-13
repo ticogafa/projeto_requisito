@@ -151,7 +151,6 @@ export default function EditProfessionalModal({ visible, profissional, closeModa
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {/* CAMPO EMAIL BLOQUEADO */}
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
               <input
@@ -162,7 +161,6 @@ export default function EditProfessionalModal({ visible, profissional, closeModa
               />
             </div>
 
-            {/* CAMPO CPF BLOQUEADO */}
             <div>
               <label className="block text-sm font-medium mb-1">CPF</label>
               <input

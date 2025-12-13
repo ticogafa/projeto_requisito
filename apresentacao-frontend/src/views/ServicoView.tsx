@@ -41,17 +41,52 @@ export default function ServicosView() {
     setModalVisible(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm('Tem certeza que deseja desativar este serviço?')) {
-      setLoading(true);
+  const handleToggleStatus = (servico: ServicoOferecido) => {
+    const idNumerico = typeof servico.id === 'object' ? servico.id.valor : servico.id;
+
+    const isAtivo = servico.ativo;
+    const actionText = isAtivo ? 'desativar' : 'reativar';
+
+    if (!confirm(`Tem certeza que deseja ${actionText} este serviço?`)) return;
+
+    setLoading(true);
+
+    if (isAtivo) {
       mainService.deletarServico(
-        id,
+        idNumerico,
         () => {
           toast.success('Serviço desativado com sucesso!');
           fetchServicos();
         },
-        (_error: AxiosError) => {
+        (error: AxiosError) => {
           toast.error('Erro ao desativar serviço.');
+          setLoading(false);
+        },
+        () => setLoading(false)
+      );
+    } else {
+      const payload = {
+        id: { valor: idNumerico },
+        nome: servico.nome,
+        preco: servico.preco,
+        duracaoMinutos: servico.duracaoMinutos,
+        descricao: servico.descricao || '',
+        categoria: servico.categoria || '',
+        destaque: servico.destaque || '',
+        servicoDependente: !!servico.servicoDependente,
+        ativo: true
+      };
+
+      mainService.atualizarServico(
+        idNumerico,
+        payload,
+        () => {
+          toast.success('Serviço reativado com sucesso!');
+          fetchServicos();
+        },
+        (error: AxiosError) => {
+          console.error('Erro ao reativar - Detalhes:', error.response?.data);
+          toast.error('Erro ao reativar serviço.');
           setLoading(false);
         },
         () => setLoading(false)
@@ -83,7 +118,6 @@ export default function ServicosView() {
           </h1>
         </div>
 
-        {/* BARRA DE PESQUISA E BOTÃO (Layout padrão) */}
         <div className="flex items-center gap-4">
           <div className="relative">
             <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">search</span>
@@ -104,7 +138,7 @@ export default function ServicosView() {
         </div>
       </div>
 
-      {/* --- BARRA DE FILTROS (Estilo Clean) --- */}
+      {/* --- BARRA DE FILTROS --- */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <select
@@ -132,7 +166,7 @@ export default function ServicosView() {
         </div>
       </div>
 
-      {/* --- TABELA PADRÃO --- */}
+      {/* --- TABELA --- */}
       <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead className="bg-dark-900 text-gray-400 text-xs uppercase font-semibold">
@@ -158,7 +192,6 @@ export default function ServicosView() {
                   <td className="px-6 py-4 font-medium text-white">
                     <div className="flex flex-col">
                       <span className="text-base">{s.nome}</span>
-                      {/* Badges Pequenos e Discretos */}
                       <div className="flex gap-1 mt-1">
                         {s.destaque === 'POPULAR' && <span className="text-[10px] bg-orange-500/20 text-orange-400 px-1.5 rounded border border-orange-500/30">Popular</span>}
                         {s.destaque === 'NOVO' && <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 rounded border border-blue-500/30">Novo</span>}
@@ -188,11 +221,16 @@ export default function ServicosView() {
                       >
                         Editar
                       </button>
+
                       <button
-                        onClick={() => handleDelete(typeof s.id === 'object' ? s.id.valor : s.id)}
-                        className="bg-red-600/20 hover:bg-red-600/30 text-red-400 text-xs font-bold px-3 py-1.5 rounded transition border border-red-600/30"
+                        onClick={() => handleToggleStatus(s)}
+                        className={`text-xs font-bold px-3 py-1.5 rounded transition border ${
+                          s.ativo
+                            ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-600/30'
+                            : 'bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-600/30'
+                        }`}
                       >
-                        Desativar
+                        {s.ativo ? 'Desativar' : 'Reativar'}
                       </button>
                     </div>
                   </td>
