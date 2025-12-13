@@ -22,8 +22,10 @@ export default function ClientView() {
   const mainService = MainService.getInstance();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const ratedStorageKey = `ratedAppointments-${user?.email || 'anon'}`;
 
   const [clienteId, setClienteId] = useState<number | null>(null);
+  const [clientePontos, setClientePontos] = useState<number>(0);
   const userName = user?.email?.split('@')[0] || 'Usuário';
 
   useEffect(() => {
@@ -33,6 +35,9 @@ export default function ClientView() {
         user.email,
         (response) => {
           setClienteId(response.data.id);
+          if (typeof response.data.pontos === 'number') {
+            setClientePontos(response.data.pontos);
+          }
         },
         (error) => {
            console.error('Erro ao buscar cliente:', error);
@@ -94,6 +99,20 @@ export default function ClientView() {
   const [ratingValue, setRatingValue] = useState(5);
   const [ratedAppointments, setRatedAppointments] = useState<Set<number>>(new Set());
 
+  // Restore rated appointments from localStorage so the label persists after reloads
+  useEffect(() => {
+    const stored = localStorage.getItem(ratedStorageKey);
+    if (stored) {
+      try {
+        const parsed: number[] = JSON.parse(stored);
+        setRatedAppointments(new Set(parsed));
+      } catch (err) {
+        console.warn('Falha ao restaurar avaliações salvas', err);
+        localStorage.removeItem(ratedStorageKey);
+      }
+    }
+  }, [ratedStorageKey]);
+
   const handleRate = (id: number) => {
     setRatingAppointmentId(id);
     setRatingValue(5);
@@ -122,6 +141,7 @@ export default function ClientView() {
             setRatedAppointments((prev) => {
               const next = new Set(prev);
               next.add(ratingAppointmentId);
+              localStorage.setItem(ratedStorageKey, JSON.stringify(Array.from(next)));
               return next;
             });
         },
@@ -180,8 +200,20 @@ export default function ClientView() {
 
       <ClientHeader
         userName={userName}
+        pontos={clientePontos}
         onNewAppointment={() => setModalVisible(true)}
       />
+
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-dark-800 border border-dark-600 rounded-xl p-4 flex items-center justify-between shadow">
+          <div>
+            <p className="text-gray-400 text-sm">Pontos de fidelidade</p>
+            <p className="text-3xl font-bold text-primary">{clientePontos}</p>
+            <p className="text-xs text-gray-500">1 ponto por real consumido</p>
+          </div>
+          <span className="material-icons text-4xl text-primary">loyalty</span>
+        </div>
+      </div>
 
       <AppointmentsTable
         agendamentos={agendamentos}

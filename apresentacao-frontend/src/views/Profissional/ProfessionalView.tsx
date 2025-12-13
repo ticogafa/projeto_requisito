@@ -117,15 +117,17 @@ export default function ProfessionalView() {
   const confirmFinish = () => {
     if (!finishingAppointmentId || !activeService || profissionalId === null) return;
 
+    const appointment = agendamentos.find(a => a.id === finishingAppointmentId);
     const totalRevenue = selectedServices.reduce((acc, s) => acc + s.preco, 0);
 
     setLoading(true);
     const endTime = new Date();
     
-    // 1. Register execution in backend
+    // 1. Register execution in backend (including clienteId for pontos)
     mainService.registrarAtendimento(
         {
             profissionalId,
+            clienteId: appointment?.clienteId,
             valor: totalRevenue,
             inicio: activeService.startTime.toISOString(),
             fim: endTime.toISOString()

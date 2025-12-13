@@ -551,7 +551,7 @@ export default class MainService {
   }
 
   public registrarAtendimento(
-    data: { profissionalId: number; valor: number; inicio: string; fim: string },
+    data: { profissionalId: number; clienteId?: number; valor: number; inicio: string; fim: string },
     successCallback: (response: AxiosResponse) => void,
     errorCallback: (error: AxiosError) => void,
     finallyCallback: () => void

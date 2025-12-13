@@ -28,6 +28,7 @@ public class ExecucaoAtendimentoController {
     public ResponseEntity<ExecucaoAtendimento> registrar(@RequestBody RegistroAtendimentoRequest request) {
         ExecucaoAtendimento execucao = servico.registrarExecucao(
             request.getProfissionalId(),
+            request.getClienteId(),
             request.getValor(),
             request.getInicio(),
             request.getFim()
@@ -38,6 +39,7 @@ public class ExecucaoAtendimentoController {
     @Data
     public static class RegistroAtendimentoRequest {
         private Integer profissionalId;
+        private Integer clienteId;
         private BigDecimal valor;
         private LocalDateTime inicio;
         private LocalDateTime fim;

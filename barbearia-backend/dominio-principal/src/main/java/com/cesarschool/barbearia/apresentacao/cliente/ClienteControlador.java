@@ -38,7 +38,8 @@ public class ClienteControlador {
                 c.getId().getValor(),
                 c.getNome(),
                 c.getEmail().getValue(),
-                c.getTelefone().getValue()
+                c.getTelefone().getValue(),
+                c.getPontos()
             ))
             .collect(Collectors.toList());
         
@@ -71,7 +72,8 @@ public class ClienteControlador {
                 c.getId().getValor(),
                 c.getNome(),
                 c.getEmail().getValue(),
-                c.getTelefone().getValue()
+                c.getTelefone().getValue(),
+                c.getPontos()
             )))
             .orElse(ResponseEntity.notFound().build());
     }
@@ -83,5 +85,6 @@ public class ClienteControlador {
         private String nome;
         private String email;
         private String telefone;
+        private Integer pontos;
     }
 }
