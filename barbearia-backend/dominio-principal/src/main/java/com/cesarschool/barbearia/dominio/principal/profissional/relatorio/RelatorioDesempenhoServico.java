@@ -42,11 +42,13 @@ public class RelatorioDesempenhoServico implements IGeradorRelatorio {
         int atendimentos = concluidas.size();
 
         List<Avaliacao> avs = avaliacoes.porProfissionalNoPeriodo(profissionalId, inicio, fim);
-        
-        double media = avs.isEmpty() ? 0.0 : avs.stream()
-                .mapToInt(avaliacao -> avaliacao.getNota().getValue())
-                .average()
-                .orElse(0.0);
+
+        // Ignora avaliações com nota nula para evitar NullPointerException
+        double media = avs.stream()
+            .filter(a -> a.getNota() != null)
+            .mapToInt(a -> a.getNota().getValue())
+            .average()
+            .orElse(0.0);
 
         return new RelatorioDesempenho(minutosTotais, receitaTotal, atendimentos, media);
     }

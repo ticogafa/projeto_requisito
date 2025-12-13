@@ -5,9 +5,10 @@ interface Props {
   onEdit: (id: number) => void;
   onCancel: (id: number) => void;
   onRate: (id: number) => void;
+  ratedIds?: Set<number>;
 }
 
-export default function AppointmentsTable({ agendamentos, onEdit, onCancel, onRate }: Props) {
+export default function AppointmentsTable({ agendamentos, onEdit, onCancel, onRate, ratedIds = new Set() }: Props) {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       CONFIRMADO: {
@@ -94,12 +95,19 @@ export default function AppointmentsTable({ agendamentos, onEdit, onCancel, onRa
                       </button>
                     </div>
                   ) : agendamento.status === 'CONCLUIDO' ? (
-                    <button
-                      onClick={() => onRate(agendamento.id)}
-                      className="bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg text-sm font-medium transition"
-                    >
-                      Avaliar Profissional
-                    </button>
+                    ratedIds.has(agendamento.id) ? (
+                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-dark-700 text-gray-400 border border-dark-500">
+                        <span className="material-icons text-sm">check</span>
+                        Avaliado
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => onRate(agendamento.id)}
+                        className="bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg text-sm font-medium transition"
+                      >
+                        Avaliar Profissional
+                      </button>
+                    )
                   ) : (
                     <span className="text-gray-500">—</span>
                   )}

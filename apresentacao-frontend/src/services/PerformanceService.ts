@@ -1,6 +1,7 @@
 import HttpClient from './httpClient';
 import { URLS_PREFIX } from '@/constants/URLConstants';
 import { AxiosError, AxiosResponse } from 'axios';
+import { toast } from 'react-toastify';
 
 export interface RelatorioDesempenho {
   tempoServico: number;
@@ -41,7 +42,13 @@ export default class PerformanceService {
       params,
       {},
       (response: AxiosResponse) => successCallback(response.data as RelatorioDesempenho),
-      errorCallback,
+      (error: AxiosError) => {
+        // Bubble up the server message if available to make debugging easier
+        if (error.response?.data && typeof error.response.data === 'object' && 'message' in (error.response.data as any)) {
+          toast.error((error.response.data as any).message as string);
+        }
+        errorCallback(error);
+      },
       finallyCallback
     );
   }

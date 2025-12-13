@@ -379,6 +379,14 @@ class JpaMapeador extends ModelMapper {
                 return new ClienteId(source);
             }
         });
+
+        // Integer -> ProfissionalId
+        addConverter(new AbstractConverter<Integer, ProfissionalId>() {
+            @Override
+            public ProfissionalId convert(Integer source) {
+                return source != null ? new ProfissionalId(source) : null;
+            }
+        });
         
         // Integer -> ProfissionalId
         addConverter(new AbstractConverter<Integer, ProfissionalId>() {

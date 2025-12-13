@@ -92,6 +92,7 @@ export default function ClientView() {
   const [ratingModalVisible, setRatingModalVisible] = useState(false);
   const [ratingAppointmentId, setRatingAppointmentId] = useState<number | null>(null);
   const [ratingValue, setRatingValue] = useState(5);
+  const [ratedAppointments, setRatedAppointments] = useState<Set<number>>(new Set());
 
   const handleRate = (id: number) => {
     setRatingAppointmentId(id);
@@ -118,6 +119,11 @@ export default function ClientView() {
             toast.success('Avaliação enviada com sucesso!');
             setRatingModalVisible(false);
             setRatingAppointmentId(null);
+            setRatedAppointments((prev) => {
+              const next = new Set(prev);
+              next.add(ratingAppointmentId);
+              return next;
+            });
         },
         (error) => toast.error('Erro ao enviar avaliação: ' + (error.response?.data as any)?.message || error.message),
         () => setLoading(false)
@@ -182,6 +188,7 @@ export default function ClientView() {
         onEdit={handleEdit}
         onCancel={handleCancel}
         onRate={handleRate}
+        ratedIds={ratedAppointments}
       />
 
       {/* Rating Modal */}

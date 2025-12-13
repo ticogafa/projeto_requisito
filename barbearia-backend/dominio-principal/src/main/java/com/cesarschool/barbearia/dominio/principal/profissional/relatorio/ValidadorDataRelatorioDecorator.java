@@ -15,13 +15,7 @@ public class ValidadorDataRelatorioDecorator extends GeradorRelatorioDecorator {
 
     @Override
     public RelatorioDesempenho gerarParaDia(ProfissionalId profissionalId, LocalDate dia) {
-        
-        // REGRA DE NEGÓCIO ADICIONADA: Não permitir gerar relatório para uma data futura.
-        if (dia.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Não é possível gerar um relatório para uma data futura.");
-        }
-
-        // Se a validação passar, delega a chamada para o próximo da cadeia.
+        // Removida a restrição de data futura: delega diretamente
         return super.gerarParaDia(profissionalId, dia);
     }
 }
