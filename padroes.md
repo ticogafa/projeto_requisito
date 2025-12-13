@@ -212,6 +212,36 @@ curl -X DELETE http://localhost:8080/api/proxy/statistics
 - Data da última atualização: 10/12/2025
 - Responsável pela implementação do Proxy: Tiago Gurgel
 
+## 2. Padrão DECORATOR (Estrutural) - Gestão de Caixa
+
+### Descrição
+O padrão **Decorator** foi aplicado na funcionalidade de caixa para adicionar validação de saldo sem alterar a implementação base do serviço. A cadeia de decorators envolve o serviço de caixa e bloqueia saídas que deixariam o saldo negativo.
+
+### Objetivo
+Impedir que o saldo do caixa fique menor que zero ao registrar saídas, mantendo o código do serviço base enxuto e permitindo novas responsabilidades em camadas futuras.
+
+### Classes Criadas (Decorators)
+
+- `GestaoCaixaDecorator` – abstração que repassa todas as chamadas para o próximo componente da cadeia, permitindo empilhar responsabilidades. Código em [barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/dominio/principal/cliente/caixa/GestaoCaixaDecorator.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/dominio/principal/cliente/caixa/GestaoCaixaDecorator.java#L1-L35).
+- `ValidadorSaldoDecorator` – intercepta `registrarSaida` e lança `IllegalStateException` quando o valor da saída supera o saldo atual, impedindo saldo negativo. Código em [barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/dominio/principal/cliente/caixa/ValidadorSaldoDecorator.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/dominio/principal/cliente/caixa/ValidadorSaldoDecorator.java#L1-L22).
+
+### Classes Modificadas / Consumidoras
+
+- `DomainServicesConfig` – cria o bean `gestaoCaixaServico`, encadeando `GestaoCaixaServico` com `ValidadorSaldoDecorator`, para que qualquer injeção de `IGestaoCaixa` já receba a versão segura. Trecho em [barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/config/DomainServicesConfig.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/config/DomainServicesConfig.java#L148-L172).
+- `CaixaControlador` – controlador REST que injeta `IGestaoCaixa`; ao registrar saídas ele passa automaticamente pelo decorator de validação, garantindo que o saldo não fique negativo. Código em [barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/apresentacao/caixa/CaixaControlador.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/apresentacao/caixa/CaixaControlador.java#L1-L64).
+
+### Fluxo do Decorator na Gestão de Caixa
+
+1. Controller chama `IGestaoCaixa.registrarSaida` com o valor informado.
+2. `ValidadorSaldoDecorator` lê o saldo atual; se o valor exceder o saldo, lança exceção e impede o registro.
+3. Caso contrário, delega para o serviço base (`GestaoCaixaServico`), que persiste o lançamento normalmente.
+
+### Participantes
+
+- **Componente base:** `IGestaoCaixa` + `GestaoCaixaServico` (registra lançamentos e calcula saldo).
+- **Decorators:** `GestaoCaixaDecorator` (infraestrutura de encadeamento) e `ValidadorSaldoDecorator` (regra de saldo >= 0).
+- **Cliente:** `CaixaControlador` consome `IGestaoCaixa` e obtém o comportamento adicional de forma transparente via bean configurado em `DomainServicesConfig`.
+
 # Padrão Strategy - Sistema de Tratamento de Exceções
 
 ## Mapeamento para o Padrão GoF
@@ -763,7 +793,7 @@ A classe deixou de ser apenas um processador de dados e passou a atuar como o **
 
 ---
 
-## 4. Menção Honrosa: Padrão SINGLETON
+## 5. Menção Honrosa: Padrão SINGLETON
 
 ### Descrição
 O padrão **Singleton** garante que uma classe tenha apenas uma instância e fornece um ponto global de acesso a ela.
