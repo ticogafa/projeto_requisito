@@ -214,33 +214,115 @@ curl -X DELETE http://localhost:8080/api/proxy/statistics
 
 ## 2. Padrão DECORATOR (Estrutural) - Gestão de Caixa
 
-### Descrição
-O padrão **Decorator** foi aplicado na funcionalidade de caixa para adicionar validação de saldo sem alterar a implementação base do serviço. A cadeia de decorators envolve o serviço de caixa e bloqueia saídas que deixariam o saldo negativo.
+### Descrição e objetivo
+- Decorator adiciona validação de saldo sem alterar a implementação base do serviço de caixa e permite acoplar novas responsabilidades em cadeia (logging, auditoria etc.).
 
-### Objetivo
-Impedir que o saldo do caixa fique menor que zero ao registrar saídas, mantendo o código do serviço base enxuto e permitindo novas responsabilidades em camadas futuras.
+### Classes (código essencial)
+**Interface + serviço base**
+```java
+// IGestaoCaixa.java
+public interface IGestaoCaixa {
+  void registrarEntrada(String descricao, BigDecimal valor, MeioPagamento meio);
+  void registrarSaida(String descricao, BigDecimal valor, MeioPagamento meio);
+  void registrarDivida(ClienteId clienteId, String descricao, BigDecimal valor, MeioPagamento meio);
+  BigDecimal saldoAtual();
+}
 
-### Classes Criadas (Decorators)
+// GestaoCaixaServico.java
+public class GestaoCaixaServico implements IGestaoCaixa {
+  private final LancamentoRepositorio repositorio;
 
-- `GestaoCaixaDecorator` – abstração que repassa todas as chamadas para o próximo componente da cadeia, permitindo empilhar responsabilidades. Código em [barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/dominio/principal/cliente/caixa/GestaoCaixaDecorator.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/dominio/principal/cliente/caixa/GestaoCaixaDecorator.java#L1-L35).
-- `ValidadorSaldoDecorator` – intercepta `registrarSaida` e lança `IllegalStateException` quando o valor da saída supera o saldo atual, impedindo saldo negativo. Código em [barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/dominio/principal/cliente/caixa/ValidadorSaldoDecorator.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/dominio/principal/cliente/caixa/ValidadorSaldoDecorator.java#L1-L22).
+  public GestaoCaixaServico(LancamentoRepositorio repositorio) { this.repositorio = repositorio; }
 
-### Classes Modificadas / Consumidoras
+  public void registrarEntrada(String descricao, BigDecimal valor, MeioPagamento meio) {
+    repositorio.salvar(Lancamento.novoRecibemento(descricao, valor, meio));
+  }
 
-- `DomainServicesConfig` – cria o bean `gestaoCaixaServico`, encadeando `GestaoCaixaServico` com `ValidadorSaldoDecorator`, para que qualquer injeção de `IGestaoCaixa` já receba a versão segura. Trecho em [barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/config/DomainServicesConfig.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/config/DomainServicesConfig.java#L148-L172).
-- `CaixaControlador` – controlador REST que injeta `IGestaoCaixa`; ao registrar saídas ele passa automaticamente pelo decorator de validação, garantindo que o saldo não fique negativo. Código em [barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/apresentacao/caixa/CaixaControlador.java](barbearia-backend/dominio-principal/src/main/java/com/cesarschool/barbearia/apresentacao/caixa/CaixaControlador.java#L1-L64).
+  public void registrarSaida(String descricao, BigDecimal valor, MeioPagamento meio) {
+    repositorio.salvar(Lancamento.novoGasto(descricao, valor, meio));
+  }
 
-### Fluxo do Decorator na Gestão de Caixa
+  public void registrarDivida(ClienteId clienteId, String descricao, BigDecimal valor, MeioPagamento meio) {
+    repositorio.salvar(Lancamento.novaDivida(clienteId, descricao, valor, meio));
+  }
 
-1. Controller chama `IGestaoCaixa.registrarSaida` com o valor informado.
-2. `ValidadorSaldoDecorator` lê o saldo atual; se o valor exceder o saldo, lança exceção e impede o registro.
-3. Caso contrário, delega para o serviço base (`GestaoCaixaServico`), que persiste o lançamento normalmente.
+  public BigDecimal saldoAtual() { /* soma entradas - saídas */ }
+}
+```
 
-### Participantes
+**Decorator base + regra de saldo**
+```java
+// GestaoCaixaDecorator.java
+public abstract class GestaoCaixaDecorator implements IGestaoCaixa {
+  protected final IGestaoCaixa proximo;
+  public GestaoCaixaDecorator(IGestaoCaixa proximo) { this.proximo = proximo; }
+  public void registrarEntrada(String d, BigDecimal v, MeioPagamento m) { proximo.registrarEntrada(d, v, m); }
+  public void registrarSaida(String d, BigDecimal v, MeioPagamento m) { proximo.registrarSaida(d, v, m); }
+  public void registrarDivida(ClienteId c, String d, BigDecimal v, MeioPagamento m) { proximo.registrarDivida(c, d, v, m); }
+  public BigDecimal saldoAtual() { return proximo.saldoAtual(); }
+}
 
-- **Componente base:** `IGestaoCaixa` + `GestaoCaixaServico` (registra lançamentos e calcula saldo).
-- **Decorators:** `GestaoCaixaDecorator` (infraestrutura de encadeamento) e `ValidadorSaldoDecorator` (regra de saldo >= 0).
-- **Cliente:** `CaixaControlador` consome `IGestaoCaixa` e obtém o comportamento adicional de forma transparente via bean configurado em `DomainServicesConfig`.
+// ValidadorSaldoDecorator.java
+public class ValidadorSaldoDecorator extends GestaoCaixaDecorator {
+  public ValidadorSaldoDecorator(IGestaoCaixa proximo) { super(proximo); }
+
+  @Override
+  public void registrarSaida(String descricao, BigDecimal valor, MeioPagamento meio) {
+    if (valor.compareTo(proximo.saldoAtual()) > 0) {
+      throw new IllegalStateException("Operação bloqueada: Saldo insuficiente.");
+    }
+    super.registrarSaida(descricao, valor, meio);
+  }
+}
+```
+
+**Montagem da cadeia (bean Spring)**
+```java
+// DomainServicesConfig.java
+@Bean
+public IGestaoCaixa gestaoCaixaServico(LancamentoRepositorio repo) {
+  IGestaoCaixa base = new GestaoCaixaServico(repo);
+  return new ValidadorSaldoDecorator(base); // decorado ao expor o bean
+}
+```
+
+**Uso na borda (controller já recebe decorado)**
+```java
+// CaixaControlador.java
+@PostMapping
+public ResponseEntity<Void> adicionarLancamento(@RequestBody LancamentoRequest request) {
+  if (request.getTipo() == Caixa.TipoLancamento.ENTRADA) {
+    gestaoCaixa.registrarEntrada(request.getDescricao(), request.getValor(), MeioPagamento.DINHEIRO);
+  } else {
+    gestaoCaixa.registrarSaida(request.getDescricao(), request.getValor(), MeioPagamento.DINHEIRO);
+  }
+  return ResponseEntity.ok().build();
+}
+```
+
+### Testes automatizados
+```java
+// GestaoCaixaDecoratorTest.java
+@Test
+void deveBloquearSaidaQuandoSaldoInsuficiente() {
+  IGestaoCaixa servico = new ValidadorSaldoDecorator(new GestaoCaixaServico(new LancamentoMockRepositorio()));
+  servico.registrarEntrada("Saldo Inicial", new BigDecimal("100.00"));
+  assertThrows(IllegalStateException.class, () ->
+    servico.registrarSaida("Compra", new BigDecimal("150.00"))
+  );
+}
+
+@Test
+void devePermitirSaidaQuandoSaldoSuficiente() {
+  IGestaoCaixa servico = new ValidadorSaldoDecorator(new GestaoCaixaServico(new LancamentoMockRepositorio()));
+  servico.registrarEntrada("Saldo Inicial", new BigDecimal("100.00"));
+  servico.registrarSaida("Conta de Luz", new BigDecimal("40.00"));
+  assertEquals(0, new BigDecimal("60.00").compareTo(servico.saldoAtual()));
+}
+```
+
+### Como usar
+- Qualquer injeção de `IGestaoCaixa` já vem decorada pelo bean de configuração; clientes não precisam conhecer os decorators.
 
 # Padrão Strategy - Sistema de Tratamento de Exceções
 
