@@ -1,10 +1,9 @@
 import { AGENDAMENTO_URLS, AUTHENTICATION_URLS, PRODUTO_URLS, SERVICO_OFERECIDO_URLS, URLS_PREFIX } from '@/constants/URLConstants';
-import { JornadaDto } from '@/interfaces/JornadaInterface';
+import { Caixa } from '@/interfaces/Caixa';
 import { ProfissionaisResponse } from '@/interfaces/ProfissionaisInterfaces';
+import { ServicoOferecido } from '@/interfaces/ServicoOferecidoInterface';
 import HttpClient from '@/services/httpClient';
 import type { AxiosError, AxiosResponse } from 'axios';
-import { ServicoOferecido } from '@/interfaces/ServicoOferecidoInterface';
-import { Caixa } from '@/interfaces/Caixa';
 
 export default class MainService {
   client: HttpClient;
@@ -21,40 +20,42 @@ export default class MainService {
     return this.instance;
   }
 
-  public getJornada(
+  /**
+   * Gets work schedule (jornada) for a professional.
+   */
+  getJornada(
     profissionalId: number,
-    successCallback: (data: JornadaDto[]) => void,
+    successCallback: (response: AxiosResponse) => void,
     errorCallback: (error: AxiosError) => void,
-    finallyCallback: () => void
+    finallyCallback?: () => void
   ): void {
-    console.warn('getJornada method not yet implemented in MainService.');
-    // Placeholder for actual implementation
     this.client.get(
-      `/jornada/${profissionalId}`,
+      `/profissional/${profissionalId}/jornada`,
       {},
       {},
-      (response) => successCallback(response.data),
+      successCallback,
       errorCallback,
-      finallyCallback
+      finallyCallback || (() => {})
     );
   }
 
-  public atualizarJornada(
+  /**
+   * Updates work schedule (jornada) for a professional.
+   */
+  atualizarJornada(
     profissionalId: number,
-    data: JornadaDto[],
+    data: object,
     successCallback: (response: AxiosResponse) => void,
     errorCallback: (error: AxiosError) => void,
-    finallyCallback: () => void
+    finallyCallback?: () => void
   ): void {
-    console.warn('atualizarJornada method not yet implemented in MainService.');
-    // Placeholder for actual implementation
     this.client.put(
-      `/jornada/${profissionalId}`,
+      `/profissional/${profissionalId}/jornada`,
       data,
       {},
       successCallback,
       errorCallback,
-      finallyCallback
+      finallyCallback || (() => {})
     );
   }
 
@@ -100,6 +101,9 @@ export default class MainService {
     this.client.delete(`/servico/${id}`, {}, {}, successCallback, errorCallback, finallyCallback);
   }
 
+  /**
+  * Gets all works.
+  */
   getServicosOferecidos(
     params: object,
     header: object,
@@ -108,8 +112,7 @@ export default class MainService {
     finallyCallback: () => void
   ): void {
     this.client.get(
-      SERVICO_OFERECIDO_URLS.GET_ALL_SERVICOS_OFERECIDOS,
-      params,
+      SERVICO_OFERECIDO_URLS.GET_ALL_SERVICOS_OFERECIDOS, params,
       header,
       successCallback,
       errorCallback,

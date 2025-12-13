@@ -7,6 +7,7 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import ClientView from '@/views/Cliente/ClientView';
 import ProfessionalView from '@/views/Profissional/ProfessionalView';
+import ProfessionalJornadaView from '@/views/Profissional/ProfessionalJornadaView';
 
 import AdminDashboardView from '@/views/Administrador/AdminDashboardView';
 import AgendamentoView from '@/views/Administrador/AgendamentoView';
@@ -48,6 +49,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ProfessionalView />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/profissional/jornada',
+        element: (
+          <ProtectedRoute>
+            <ProfessionalJornadaView />
           </ProtectedRoute>
         )
       },

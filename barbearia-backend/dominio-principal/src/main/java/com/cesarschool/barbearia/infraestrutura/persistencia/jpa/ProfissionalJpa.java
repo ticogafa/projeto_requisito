@@ -2,10 +2,11 @@ package com.cesarschool.barbearia.infraestrutura.persistencia.jpa;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +98,7 @@ public class ProfissionalJpa {
 interface ProfissionalJpaRepository extends JpaRepository<ProfissionalJpa, Integer> {
     ProfissionalJpa findByCpf(String cpf);
     boolean existsByCpf(String cpf);
+    Optional<ProfissionalJpa> findByEmail(String email);
     
     @Query("SELECT DISTINCT p FROM ProfissionalJpa p JOIN p.servicosOferecidos s WHERE s.id = :servicoId AND p.ativo = true")
     List<ProfissionalJpa> findByServicoId(@Param("servicoId") Integer servicoId);

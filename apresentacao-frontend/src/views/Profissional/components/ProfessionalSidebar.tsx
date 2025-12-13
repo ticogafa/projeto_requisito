@@ -1,4 +1,5 @@
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 interface MenuItem {
   icon: string;
@@ -12,13 +13,23 @@ interface ProfessionalSidebarProps {
 }
 
 export default function ProfessionalSidebar({ activeItem = 'agenda' }: ProfessionalSidebarProps) {
+  const navigate = useNavigate();
+
   const menuItems: MenuItem[] = [
     {
       icon: 'calendar_today',
       label: 'Agenda',
       active: activeItem === 'agenda',
       onClick: () => {
-        // navigateToAgenda()
+        navigate('/profissional');
+      }
+    },
+    {
+      icon: 'schedule',
+      label: 'Jornada',
+      active: activeItem === 'jornada',
+      onClick: () => {
+        navigate('/profissional/jornada');
       }
     },
     {
