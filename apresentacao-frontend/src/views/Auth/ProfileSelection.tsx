@@ -22,7 +22,7 @@ const profiles: ProfileOption[] = [
   },
   {
     role: 'profissional',
-    icon: 'cut',
+    icon: 'content_cut',
     title: 'Profissional',
     description: 'Gerencie sua agenda e atendimentos',
     color: 'from-primary to-orange-600'

@@ -146,7 +146,10 @@ export default function ProfissionaisView() {
           <tbody className="divide-y divide-dark-600">
             {filteredProfissionais.map((prof) => (
               <tr key={prof.id.valor} className={`hover:bg-dark-800 transition ${!prof.ativo ? 'opacity-60' : ''}`}>
-                <td className="px-6 py-4 font-medium text-white">{prof.nome}</td>
+                <td className="px-6 py-4 font-medium text-white flex items-center gap-2">
+                  <span className="material-icons text-gray-500 text-lg">person</span>
+                  {prof.nome}
+                </td>
                 <td className="px-6 py-4 text-gray-300 capitalize">{prof.senioridade.toLowerCase()}</td>
                 <td className="px-6 py-4 text-gray-300">
                   {prof.agenda ? `Seg-Sex (${prof.agenda.inicioJornada.slice(0,5)}-${prof.agenda.fimJornada.slice(0,5)})` : 'N/A'}
