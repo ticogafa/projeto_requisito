@@ -42,7 +42,28 @@ Você precisará instalar os seguintes programas no seu computador. Clique nos l
 
 ---
 
-### 🛠️ Passo 1: Preparando o Banco de Dados
+## 🎯 Início Automático (Recomendado)
+
+A forma mais fácil de iniciar todo o projeto é usando o script automático:
+
+```bash
+./start_project.sh
+```
+
+Este script irá:
+- ✅ Iniciar o container Docker do MySQL
+- ✅ Iniciar o backend (servidor)
+- ✅ Iniciar o frontend (interface web)
+
+Tudo em terminais separados automaticamente!
+
+---
+
+## 🛠️ Início Manual (Passo a Passo)
+
+Se preferir iniciar cada componente manualmente ou o script automático não funcionar:
+
+### Passo 1: Preparando o Banco de Dados
 
 O sistema precisa de um lugar para guardar os dados (clientes, agendamentos, etc). Usaremos o Docker para criar um "Banco de Dados MySQL" virtual.
 
@@ -50,20 +71,46 @@ O sistema precisa de um lugar para guardar os dados (clientes, agendamentos, etc
 2.  Copie e cole o comando abaixo e aperte **Enter**:
 
 ```bash
-docker run --name barbearia-container -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=barbearia_db -p 3306:3306 -d mysql:8.0
+docker run --name barbearia-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=barbearia_db -p 3306:3306 -d mysql:8.0
 ```
 
 *O que isso faz?* Baixa e liga um banco de dados MySQL, define a senha como `root` e cria o banco `barbearia_db`.
 
-> **Nota:** Se der erro dizendo que o nome já existe, rode `docker rm barbearia-container` e tente novamente.
+> **Nota:** Se der erro dizendo que o nome já existe, rode `docker start barbearia-mysql` para iniciar o container existente.
 
 ---
 
-### 🖥️ Passo 2: Ligando o Site (Frontend)
+### Passo 2: Ligando o Servidor (Backend)
 
-Vamos colocar a parte visual do sistema para funcionar.
+Vamos ligar o cérebro do sistema primeiro (ele precisa estar rodando antes do frontend).
 
-1.  Abra um **novo Terminal** dentro da pasta do projeto.
+1.  Abra um **Terminal** na raiz do projeto.
+2.  Entre na pasta do backend:
+    ```bash
+    cd barbearia-backend/dominio-principal
+    ```
+3.  Rode o servidor com o comando abaixo:
+
+    *   **No Linux ou Mac:**
+        ```bash
+        ../../mvnw spring-boot:run -DskipTests
+        ```
+    *   **No Windows (PowerShell/CMD):**
+        ```cmd
+        ..\..\mvnw.cmd spring-boot:run -DskipTests
+        ```
+
+> **Dica:** O comando `-DskipTests` é usado para iniciar mais rápido, pulando verificações de teste que podem falhar dependendo da configuração da sua máquina.
+
+O servidor estará pronto quando você vir logs pararem de rolar e aparecer algo como "Started Main in ... seconds". Ele roda em **http://localhost:8080**.
+
+---
+
+### Passo 3: Ligando o Site (Frontend)
+
+Agora vamos colocar a parte visual do sistema para funcionar.
+
+1.  Abra um **novo Terminal** (mantenha o do backend aberto).
 2.  Entre na pasta do frontend digitando:
     ```bash
     cd apresentacao-frontend
@@ -81,37 +128,37 @@ Se tudo der certo, você verá uma mensagem dizendo **Local: http://localhost:51
 
 ---
 
-### ⚙️ Passo 3: Ligando o Servidor (Backend)
-
-Agora vamos ligar o cérebro do sistema.
-
-1.  Abra mais um **Terminal novo** (não use o do frontend).
-2.  Entre na pasta do backend:
-    ```bash
-    cd barbearia-backend
-    ```
-3.  Rode o servidor com o comando abaixo:
-
-    *   **No Linux ou Mac:**
-        ```bash
-        ./mvnw spring-boot:run -pl dominio-principal -DskipTests
-        ```
-    *   **No Windows (PowerShell/CMD):**
-        ```cmd
-        .\mvnw.cmd spring-boot:run -pl dominio-principal -DskipTests
-        ```
-
-> **Dica:** O comando `-DskipTests` é usado para iniciar mais rápido, pulando verificações de teste que podem falhar dependendo da configuração da sua máquina.
-
-O servidor estará pronto quando você vir logs pararem de rolar e aparecer algo como "Started Main in ... seconds". Ele roda em **http://localhost:8080**.
-
----
-
 ## 🔗 Acessando o Sistema
 
 Com os terminais abertos rodando (Docker, Backend e Frontend), acesse no seu navegador:
 
 👉 **[http://localhost:5173](http://localhost:5173)**
+
+---
+
+## 🎨 Demonstração do Padrão Proxy (Virtual Proxy com Lazy Loading)
+
+O projeto implementa o **Padrão Proxy** no repositório de produtos. Para ver uma demonstração interativa:
+
+1.  Certifique-se de que o Docker está rodando (`docker start barbearia-mysql`)
+2.  Entre na pasta do backend:
+    ```bash
+    cd barbearia-backend/dominio-principal
+    ```
+3.  Execute o modo demo:
+    ```bash
+    ../../mvnw spring-boot:run -Dspring-boot.run.profiles=demo -Dmaven.test.skip=true
+    ```
+
+A demonstração mostrará:
+- ✅ Lazy Loading (carregamento sob demanda)
+- ✅ Cache automático com reuso de dados
+- ✅ Invalidação seletiva de cache
+- ✅ Estatísticas de performance (hits/misses)
+- ✅ Comparação de tempos de resposta
+
+📖 Para mais detalhes sobre a implementação do padrão, consulte:
+- [padroes.md](padroes.md) - Documentação completa do Proxy Pattern
 
 ---
 
@@ -127,9 +174,41 @@ Se algo der errado, verifique esta lista:
     *   Verifique se você instalou o **JDK 21**. Digite `java -version` no terminal para confirmar.
 
 3.  **O Site abre mas não carrega dados (Tela branca ou erro de conexão):**
-    *   Verifique se o terminal do **Passo 3 (Backend)** ainda está rodando e não deu erro. O site precisa do servidor ligado para buscar informações.
+    *   Verifique se o terminal do **Backend** ainda está rodando e não deu erro. O site precisa do servidor ligado para buscar informações.
+    *   Certifique-se de que iniciou o **Backend ANTES do Frontend**.
 
 4.  **Banco de dados não conecta:**
-    *   Abra o **Docker Desktop** e veja se o container `barbearia-container` está com a luz verde (Running).
+    *   Abra o **Docker Desktop** e veja se o container `barbearia-mysql` está com a luz verde (Running).
+    *   Ou rode no terminal: `docker ps` para verificar se o container está ativo.
+    *   Se não estiver rodando: `docker start barbearia-mysql`
+
+5.  **Erro "No plugin found for prefix 'spring-boot'":**
+    *   Certifique-se de estar executando o comando Maven a partir da pasta correta: `barbearia-backend/dominio-principal`
+    *   Ou use o caminho relativo correto para o `mvnw` conforme as instruções acima.
+
+6.  **Duplicate entry no modo demo:**
+    *   O sistema possui limpeza automática de dados de teste. Se persistir, conecte ao MySQL e limpe manualmente:
+        ```bash
+        docker exec -it barbearia-mysql mysql -uroot -proot -e "DELETE FROM barbearia_db.produto WHERE nome='Shampoo Anticaspa Premium';"
+        ```
+
+---
+
+## 📚 Estrutura do Projeto
+
+```
+projeto_requisito/
+├── barbearia-backend/          # Backend (Java + Spring Boot)
+│   ├── dominio-principal/      # Módulo principal executável
+│   └── pai/                    # POM pai com dependências
+├── apresentacao-frontend/      # Frontend (React + TypeScript + Vite)
+├── DOCUMENTAÇÃO/               # Documentação do projeto
+│   ├── CONTEXT MAPPER/         # Modelagem de domínio
+│   ├── PADROES/                # Diagramas de padrões de projeto
+│   └── REQUISITOS/             # Levantamento de requisitos
+├── padroes.md                  # Documentação dos Design Patterns
+├── start_project.sh            # Script para iniciar todos os serviços
+└── README.md                   # Este arquivo
+```
 
 ---
