@@ -788,53 +788,6 @@ public ResponseEntity<Void> definirJornada(
 }
 ```
 
----
-
-### Fluxo Completo em Agendamentos
-
-**Cenário:** Cliente tenta criar agendamento em horário já ocupado
-
-```
-1. Request HTTP POST /api/agendamentos/criar
-   ↓
-2. AgendamentoControlador.criar()
-   ↓
-3. exceptionHandler.withHandler(() -> {...})  ← Context executa lambda
-   ↓
-4. servicoAplicacao.criar(request)
-   ↓
-5. AgendamentoServico.criar() - validação de horário
-   ↓
-6. Lança HorarioIndisponivelException("Profissional já possui agendamento neste horário")
-   ↓
-7. ExceptionHandler captura exceção (try-catch)
-   ↓
-8. registry.getStrategy(HorarioIndisponivelException.class)
-   ↓
-9. ExceptionRegistry busca strategy registrada
-   ↓
-10. Retorna GenericExceptionHandlerStrategy(ex, HttpStatus.CONFLICT)
-    ↓
-11. strategy.toResponseEntity() cria resposta:
-    {
-      "name": "HorarioIndisponivelException",
-      "message": "Profissional já possui agendamento neste horário",
-      "statusCode": "409 CONFLICT",
-      "timestamp": "2025-12-12T15:30:00-03:00"
-    }
-    ↓
-12. ResponseEntity retornado ao cliente com HTTP 409
-```
-
----
-
-###Benefícios Observados na Prática
-
-1. **Consistência:** Todas as exceções em todos os controladores são tratadas de forma uniforme
-2. **Manutenibilidade:** Adicionar novo tipo de exceção não requer alterar controladores
-3. **Separação de Responsabilidades:** Controladores focam na lógica de negócio, Strategy cuida da serialização
-4. **Testabilidade:** Fácil testar estratégias isoladamente
-5. **Extensibilidade:** Novos controladores automaticamente se beneficiam do tratamento centralizado
 
 ---
 
