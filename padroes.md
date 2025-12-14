@@ -169,8 +169,11 @@ public class GestaoEstoqueServico {
 ```
 
 **Observabilidade via HTTP**
+
+Duas controllers expõem endpoints para monitoramento do Virtual Proxy:
+
 ```java
-// ProxyMetricasControlador.java (trecho)
+// ProxyMetricasControlador.java
 @RestController
 @RequestMapping("/api/proxy")
 public class ProxyMetricasControlador {
@@ -180,40 +183,117 @@ public class ProxyMetricasControlador {
   public ResponseEntity<Map<String, Object>> getStatistics() {
     return ResponseEntity.ok(virtualProxy.getMetricas());
   }
+  
+  @GetMapping("/statistics/text")
+  public ResponseEntity<String> getStatisticsText() {
+    return ResponseEntity.ok(virtualProxy.getEstatisticas());
+  }
 
   @DeleteMapping("/cache")
   public ResponseEntity<Map<String, String>> clearCache() {
+    virtualProxy.invalidarDadosCarregados();
+    return ResponseEntity.ok(Map.of("message", "Cache limpo", "status", "success"));
+  }
+  
+  @DeleteMapping("/statistics")
+  public ResponseEntity<Map<String, String>> resetStatistics() {
+    virtualProxy.resetarEstatisticas();
+    return ResponseEntity.ok(Map.of("message", "Estatísticas resetadas", "status", "success"));
+  }
+}
+
+// CacheMonitorControlador.java
+@RestController
+@RequestMapping("/api/cache")
+public class CacheMonitorControlador {
+  private final ProdutoRepositorioVirtualProxy virtualProxy;
+
+  @GetMapping("/metricas")
+  public ResponseEntity<Map<String, Object>> getMetricas() {
+    return ResponseEntity.ok(virtualProxy.getMetricas());
+  }
+  
+  @GetMapping("/estatisticas")
+  public ResponseEntity<String> getEstatisticas() {
+    return ResponseEntity.ok(virtualProxy.obterEstatisticas());
+  }
+  
+  @PostMapping("/resetar")
+  public ResponseEntity<Map<String, String>> resetar() {
+    virtualProxy.resetarEstatisticas();
+    return ResponseEntity.ok(Map.of("message", "Estatísticas resetadas"));
+  }
+  
+  @PostMapping("/limpar")
+  public ResponseEntity<Map<String, String>> limpar() {
     virtualProxy.invalidarDadosCarregados();
     return ResponseEntity.ok(Map.of("message", "Cache limpo"));
   }
 }
 ```
 
-### Classes alteradas e motivo
-- `ProdutoRepositorioVirtualProxy`: versão nova substitui o cache proxy antigo; agora foca em lazy loading (não em cache preemptivo), adiciona invalidação seletiva, métricas e listas específicas (todos e estoque baixo).
-- `ProdutoRepositorio`: JavaDoc ajustado para referenciar o Virtual Proxy, evitando menção ao cache proxy obsoleto.
-- `ProdutoRepositorioJpa`: mantém logs e `@Repository("produtoRepositorioJpa")` como Real Subject; serve de alvo do Virtual Proxy.
+### Classes criadas e suas responsabilidades
 
-### Proxy desatualizado removido
-- `ProdutoRepositorioCacheProxy` (Cache Proxy) estava documentado, mas não é mais usado. A documentação foi substituída pela versão atual (Virtual Proxy com lazy loading) para evitar inconsistências.
+**Classes do padrão:**
+- `ProdutoRepositorio` (interface): Subject - contrato comum entre Proxy e Real Subject
+- `ProdutoRepositorioVirtualProxy`: Proxy - controla acesso e implementa lazy loading
+- `ProdutoRepositorioJpa`: Real Subject - acessa o banco de dados (classe interna em ProdutoJpa.java)
+- `ProxyMetricasControlador`: Expõe endpoints `/api/proxy/*` para monitoramento
+- `CacheMonitorControlador`: Expõe endpoints `/api/cache/*` para gestão de cache
+
+**Classes modificadas:**
+- `GestaoEstoqueServico`: Cliente do padrão - usa ProdutoRepositorio sem conhecer o Proxy
+
 
 ### Fluxo resumido
 1) Cliente chama `ProdutoRepositorio` sem saber da existência do proxy.
 2) Proxy verifica se dados estão carregados; se não, delega ao Real Subject (lazy load) e armazena localmente.
 3) Operações de escrita invalidam somente o que foi impactado (produto alterado e listas relacionadas).
-4) Métricas podem ser consultadas ou zeradas via controller ou métodos utilitários.
-
-### Endpoints úteis (observabilidade)
-- `GET /api/proxy/statistics` → métricas em JSON
-- `GET /api/proxy/statistics/text` → métricas em texto
-- `DELETE /api/proxy/cache` → limpa dados lazy-loaded
-- `DELETE /api/proxy/statistics` → reseta contadores
+4) Métricas são exibidas no console durante a demonstração.
 
 ### Execução de demonstração
-```
+```bash
 cd barbearia-backend/dominio-principal
 mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dmaven.test.skip=true
 ```
+
+### Comandos úteis para teste
+
+**Pré-requisitos:**
+```bash
+# Verificar se o MySQL está rodando
+sudo docker ps | grep barbearia-mysql
+
+# Iniciar o backend (em outro terminal)
+cd barbearia-backend/dominio-principal
+mvn spring-boot:run -Dmaven.test.skip=true
+```
+
+**Testar endpoints de métricas do proxy:**
+```bash
+# Ver estatísticas do Virtual Proxy (JSON)
+curl http://localhost:8080/api/proxy/statistics | jq .
+
+# Ver estatísticas do Virtual Proxy (texto)
+curl http://localhost:8080/api/proxy/statistics/text
+
+# Limpar cache do proxy
+curl -X DELETE http://localhost:8080/api/proxy/cache | jq .
+
+# Resetar estatísticas
+curl -X DELETE http://localhost:8080/api/proxy/statistics | jq .
+```
+
+
+**Monitorar logs do backend:**
+```bash
+# Os logs mostrarão:
+# 🟣 [VIRTUAL PROXY] = Ação do proxy (lazy loading, reuso, invalidação)
+# 🔵 [REAL SUBJECT] = Acesso ao banco de dados
+# ✅ REUSO = Dados retornados do cache
+# 📥 LAZY LOAD = Carregamento do banco
+```
+
 
 ## 2. Padrão DECORATOR (Estrutural) - Gestão de Caixa
 
