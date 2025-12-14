@@ -12,7 +12,7 @@ import { ServiceTimer } from '@/views/Profissional/components/ServiceTimer';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ProfissionalInterface } from '@/interfaces/ProfissionalInterface'; // Corrected import path
+
 
 export default function ProfessionalView() {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ export default function ProfessionalView() {
   const [profissionalId, setProfissionalId] = useState<number | null>(null);
   const [userName, setUserName] = useState<string>('');
 
-  const { data: profissionais, loading: loadingProfissionais } = useProfissionais();
+  const { data: profissionais } = useProfissionais();
   
   useEffect(() => {
     if (user?.email && profissionais.length > 0) {
@@ -49,11 +49,11 @@ export default function ProfessionalView() {
         toast.error('Profissional não encontrado para o usuário logado.');
         navigate('/login'); // Redirect to login if professional not found
       }
-    } else if (!loadingProfissionais && !user?.email) {
+    } else if (!user?.email) {
       // User is not logged in or email is missing, and professionals are done loading
       navigate('/login');
     }
-  }, [user?.email, profissionais, loadingProfissionais, navigate]);
+  }, [user?.email, profissionais, navigate]);
   
   const { data: agendamentos, setData: setAgendamentos } = useAgendamentosPorProfissional(profissionalId || 0);
   const { data: servicosOferecidos } = useServicosOferecidos();

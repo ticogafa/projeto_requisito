@@ -45,7 +45,7 @@ export default function AgendamentoView() {
     }
 
     try {
-      const clienteIdParam = agendamento.clienteId || clienteId;
+      const clienteIdParam = agendamento.clienteId;
       const response = await fetch(
         `http://localhost:8080/api/agendamentos/${agendamento.id}?clienteId=${clienteIdParam}`,
         { method: 'DELETE' }

@@ -43,7 +43,7 @@ export default class AuthService {
                  mainService.getClientePorEmail(
                     userData.email,
                     () => resolve(), // Encontrou, tudo certo
-                    (error) => {
+                    (_error) => {
                        // Se não encontrou (provavel 404), tenta criar
                        if (userData.name && userData.cpf && userData.phone) {
                           console.log('Cliente não encontrado no backend. Tentando criar...');

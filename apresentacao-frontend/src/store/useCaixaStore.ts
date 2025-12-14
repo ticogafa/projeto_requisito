@@ -45,7 +45,8 @@ export const useCaixaStore = create<CaixaStore>((set, get) => ({
       (error) => {
         console.error('Erro ao adicionar lançamento:', error);
         toast.error('Erro ao adicionar lançamento.');
-      }
+      },
+      () => {} // finallyCallback adicionado aqui
     );
   },
 }));

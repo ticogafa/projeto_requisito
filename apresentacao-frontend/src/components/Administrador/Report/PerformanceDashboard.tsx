@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import PerformanceService, { RelatorioDesempenho } from '@/services/PerformanceService';
 import { useProfissionais } from '@/hooks/useProfissionais';
 import { ProfissionalInterface } from '@/interfaces/ProfissionaisInterfaces';
-import type { AxiosError } from 'axios';
+
 
 interface ProfessionalReport {
   profissional: ProfissionalInterface;
